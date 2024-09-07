@@ -1,0 +1,29 @@
+.burger {
+    position: absolute;
+  }
+  
+  .navbar {
+    @mixin dark {
+      background-color: var(--mantine-color-dark-6);
+    }
+  }
+  
+  .navbar_header_text {
+    display: none;
+    font-weight: bolder;
+  
+    @media (max-width: $mantine-breakpoint-sm) {
+      display: block;
+    }
+  }
+  
+  .mobile_nav_header {
+    @media (max-width: $mantine-breakpoint-sm) {
+      margin-bottom: var(--mantine-spacing-md);
+    }
+  }
+  
+  .breadcrumb_links {
+    font-weight: medium;
+  }
+  
