@@ -1,6 +1,6 @@
 import { useAuth0 } from '@auth0/auth0-react';
 import { Outlet } from 'react-router-dom';
-import NotFound from '../../pages/NotFound.page';
+import { NotFoundPage } from '../../pages/NotFound/NotFound.page';
 
 interface Auth0User {
   role?: string[];
@@ -19,7 +19,7 @@ const AdminRouteGuard = () => {
     return <Outlet />;
   }
 
-  return <NotFound />;
+  return <NotFoundPage />;
 };
 
 export default AdminRouteGuard;

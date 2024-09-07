@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useAuth0 } from '@auth0/auth0-react';
 import {
   IconBarbell,
   IconChevronRight,
@@ -46,6 +47,7 @@ export function Navbar() {
   const { setColorScheme } = useMantineColorScheme();
   const [section, setSection] = useState<'general' | 'season'>('general');
   const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
+  const { logout } = useAuth0();
 
   const links = tabs[section].map((item) => <LinksGroup {...item} key={item.label} />);
 
@@ -118,7 +120,10 @@ export function Navbar() {
             <Menu.Divider />
 
             <Menu.Label>Authentication</Menu.Label>
-            <Menu.Item leftSection={<IconLogout style={{ width: rem(14), height: rem(14) }} />}>
+            <Menu.Item
+              onClick={() => logout()}
+              leftSection={<IconLogout style={{ width: rem(14), height: rem(14) }} />}
+            >
               Sign Out
             </Menu.Item>
           </Menu.Dropdown>

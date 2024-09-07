@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen } from '@test-utils';
 import { describe, expect, it, vi } from 'vitest';
 import AuthRouteGuard from './AuthRouteGuard';
 
@@ -15,16 +15,12 @@ vi.mock('@auth0/auth0-react', () => ({
 
 vi.mock('react-router-dom', () => ({
   useLocation: vi.fn(),
+  useNavigate: vi.fn(),
   Navigate: vi.fn(() => NavigateMock),
   Outlet: vi.fn(() => OutletMock),
 }));
 
 describe('AuthRouteGuard', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    vi.resetAllMocks();
-  });
-
   it('renders null when loading', () => {
     mocks.useAuth0.mockReturnValue({
       isAuthenticated: false,
@@ -45,13 +41,14 @@ describe('AuthRouteGuard', () => {
     expect(screen.queryByTestId('navigate')).toBeNull();
   });
 
-  it('redirects to /login when not loading and not authenticated', () => {
+  it('displays NotFound when not loading and not authenticated', () => {
     mocks.useAuth0.mockReturnValue({
       isAuthenticated: false,
       isLoading: false,
     });
     render(<AuthRouteGuard />);
     expect(screen.queryByTestId('outlet')).toBeNull();
-    expect(screen.queryByTestId('navigate')).toBeDefined();
+    expect(screen.queryByTestId('navigate')).toBeNull();
+    expect(screen.findAllByText('Page Not Found')).toBeDefined();
   });
 });

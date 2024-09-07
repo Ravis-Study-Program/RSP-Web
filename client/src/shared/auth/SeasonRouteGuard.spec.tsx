@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen } from '@test-utils';
 import * as ReactRouterDom from 'react-router-dom';
 import { describe, expect, it, vi } from 'vitest';
 import { SeasonRole } from '../Season';
@@ -18,16 +18,12 @@ const dummyLocation = {
 vi.mock('react-router-dom', () => ({
   useLoaderData: vi.fn(),
   useLocation: vi.fn(),
+  useNavigate: vi.fn(),
   Navigate: vi.fn(() => NavigateMock),
   Outlet: vi.fn(() => OutletMock),
 }));
 
 describe('SeasonRouteGuard', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    vi.resetAllMocks();
-  });
-
   it('renders Outlet for non-Unregistered roles', () => {
     vi.spyOn(ReactRouterDom, 'useLoaderData').mockReturnValue(SeasonRole.Mentor);
     vi.spyOn(ReactRouterDom, 'useLocation').mockReturnValue(dummyLocation);
