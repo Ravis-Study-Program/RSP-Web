@@ -60,8 +60,7 @@ const routes = (queryClient: QueryClient) => {
       </Route>
 
       {/* Unprotected Routes */}
-      <Route path="/" element={<Text>Home page</Text>} />
-      <Route path="/login" element={<LoginPage />} />
+      <Route path="/" element={<LoginPage />} />
       <Route path="*" element={<NotFoundPage />} />
     </>
   );

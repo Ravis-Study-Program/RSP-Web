@@ -1,9 +1,10 @@
 import { useAuth0 } from '@auth0/auth0-react';
+import { Navigate } from 'react-router-dom';
 import { Button, Container, Text, Title } from '@mantine/core';
 import classes from './Login.module.css';
 
 export function LoginPage() {
-  const { loginWithRedirect } = useAuth0();
+  const { loginWithRedirect, isLoading, isAuthenticated } = useAuth0();
 
   const handleLogin = () => {
     loginWithRedirect()
@@ -14,6 +15,14 @@ export function LoginPage() {
         // TODO: Log Failure
       });
   };
+
+  if (isLoading) {
+    return null;
+  }
+
+  if (isAuthenticated) {
+    return <Navigate to="/seasons" />;
+  }
 
   return (
     <Container fluid className={classes.wrapper}>
