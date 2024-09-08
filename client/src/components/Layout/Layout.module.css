@@ -1,29 +1,32 @@
 .burger {
-    position: absolute;
+  position: absolute;
+}
+
+.navbar {
+  @mixin dark {
+    background-color: var(--mantine-color-dark-6);
   }
-  
-  .navbar {
-    @mixin dark {
-      background-color: var(--mantine-color-dark-6);
-    }
+}
+
+.navbar_header_text {
+  display: none;
+  font-weight: bolder;
+
+  @media (max-width: $mantine-breakpoint-sm) {
+    display: block;
   }
-  
-  .navbar_header_text {
-    display: none;
-    font-weight: bolder;
-  
-    @media (max-width: $mantine-breakpoint-sm) {
-      display: block;
-    }
+}
+
+.mobile_nav_header {
+  @media (max-width: $mantine-breakpoint-sm) {
+    margin-bottom: var(--mantine-spacing-md);
   }
-  
-  .mobile_nav_header {
-    @media (max-width: $mantine-breakpoint-sm) {
-      margin-bottom: var(--mantine-spacing-md);
-    }
-  }
-  
-  .breadcrumb_links {
-    font-weight: medium;
-  }
-  
+}
+
+.breadcrumb_links {
+  font-weight: 600;
+}
+
+.main {
+  background-color: light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-8));
+}

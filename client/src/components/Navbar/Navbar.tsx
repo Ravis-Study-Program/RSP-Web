@@ -54,8 +54,8 @@ export function Navbar() {
   return (
     <nav className={classes.navbar}>
       <div className={classes.header}>
-        <Group justify="space-between">
-          <Title order={1} size="h3">
+        <Group justify="center">
+          <Title order={1} size="h3" ta="center">
             Ravi Study Program
           </Title>
         </Group>
