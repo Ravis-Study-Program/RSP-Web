@@ -6,6 +6,7 @@ import getSeasonsLoader from './actions/season/getSeasons';
 import { Layout } from './components/Layout/Layout';
 import { LoginPage } from './pages/Login/Login.page';
 import { NotFoundPage } from './pages/NotFound/NotFound.page';
+import { SeasonsPage } from './pages/Seasons/Seasons.page';
 import AdminRouteGuard from './shared/auth/AdminRouteGuard';
 import AuthRouteGuard from './shared/auth/AuthRouteGuard';
 import SeasonRouteGuard from './shared/auth/SeasonRouteGuard';
@@ -27,9 +28,8 @@ const routes = (queryClient: QueryClient) => {
       <Route element={<AuthRouteGuard />}>
         <Route path="/test-backend" element={placeholderPage('Test Backend')} />
 
-        <Route path="/settings" element={placeholderPage('Settings Page')} />
         <Route path="/profile" element={placeholderPage('Profile Page')} />
-        <Route path="/seasons" element={placeholderPage('General Season')} />
+        <Route path="/seasons" element={<SeasonsPage />} />
         <Route path="/resources" element={placeholderPage('Resources Page')} />
         <Route path="/leetcode" element={placeholderPage('Leetcode Page')} />
         <Route path="/mocks" element={placeholderPage('Mock Interviews Page')} />
