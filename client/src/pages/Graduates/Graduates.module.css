@@ -1,0 +1,29 @@
+.card {
+  background-color: var(--mantine-color-body);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.item {
+  &+& {
+    padding-top: var(--mantine-spacing-sm);
+    margin-top: var(--mantine-spacing-sm);
+  }
+}
+
+.switch {
+  & * {
+    cursor: pointer;
+  }
+}
+
+.title {
+  line-height: 1;
+}
+
+.footer {
+  padding: var(--mantine-spacing-xs) var(--mantine-spacing-lg);
+  margin-top: var(--mantine-spacing-md);
+}

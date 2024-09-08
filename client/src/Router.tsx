@@ -4,6 +4,7 @@ import { Text } from '@mantine/core';
 import getSeasonRoleLoader from './actions/season/getSeasonRoleLoader';
 import getSeasonsLoader from './actions/season/getSeasons';
 import { Layout } from './components/Layout/Layout';
+import { GraduatesPage } from './pages/Graduates/Graduates.page';
 import { LoginPage } from './pages/Login/Login.page';
 import { NotFoundPage } from './pages/NotFound/NotFound.page';
 import { SeasonsPage } from './pages/Seasons/Seasons.page';
@@ -32,6 +33,7 @@ const routes = (queryClient: QueryClient) => {
         <Route path="/profile" element={placeholderPage('Profile Page')} />
         <Route path="/seasons" element={<SeasonsPage />} />
         <Route path="/settings" element={<SettingsPage />} />
+        <Route path="/graduates" element={<GraduatesPage />} />
         <Route path="/resources" element={placeholderPage('Resources Page')} />
         <Route path="/leetcode" element={placeholderPage('Leetcode Page')} />
         <Route path="/mocks" element={placeholderPage('Mock Interviews Page')} />

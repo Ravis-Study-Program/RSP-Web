@@ -33,7 +33,7 @@ import classes from './Navbar.module.css';
 const tabs = {
   general: [
     { label: 'Seasons', icon: IconFlag, link: '/seasons' },
-    { label: 'Graduates', icon: IconSchool, link: '/users' },
+    { label: 'Graduates', icon: IconSchool, link: '/graduates' },
   ],
   season: [
     { label: 'Leetcode', icon: IconCode, link: '' },
@@ -54,8 +54,8 @@ export function Navbar() {
   return (
     <nav className={classes.navbar}>
       <div className={classes.header}>
-        <Group justify="space-between">
-          <Title order={1} size="h3">
+        <Group justify="center">
+          <Title order={1} size="h3" ta="center">
             Ravi Study Program
           </Title>
         </Group>

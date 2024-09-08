@@ -43,7 +43,7 @@ export function Layout({ children }: LayoutProps) {
         </Group>
         <Navbar />
       </AppShell.Navbar>
-      <AppShell.Main>{children}</AppShell.Main>
+      <AppShell.Main className={classes.main}>{children}</AppShell.Main>
     </AppShell>
   );
 }
