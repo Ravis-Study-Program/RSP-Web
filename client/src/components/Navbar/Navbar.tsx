@@ -33,7 +33,7 @@ import classes from './Navbar.module.css';
 const tabs = {
   general: [
     { label: 'Seasons', icon: IconFlag, link: '/seasons' },
-    { label: 'Graduates', icon: IconSchool, link: '/users' },
+    { label: 'Graduates', icon: IconSchool, link: '/graduates' },
   ],
   season: [
     { label: 'Leetcode', icon: IconCode, link: '' },
