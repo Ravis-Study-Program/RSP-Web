@@ -101,7 +101,11 @@ export function Navbar() {
             <Menu.Item leftSection={<IconUser style={{ width: rem(14), height: rem(14) }} />}>
               Profile
             </Menu.Item>
-            <Menu.Item leftSection={<IconSettings style={{ width: rem(14), height: rem(14) }} />}>
+            <Menu.Item
+              leftSection={<IconSettings style={{ width: rem(14), height: rem(14) }} />}
+              component="a"
+              href="/settings"
+            >
               Settings
             </Menu.Item>
             <Menu.Item
