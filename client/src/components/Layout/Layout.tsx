@@ -26,7 +26,7 @@ export function Layout({ children }: LayoutProps) {
       layout="alt"
       header={{ height: 65 }}
       navbar={{ width: 300, breakpoint: 'sm', collapsed: { mobile: !opened } }}
-      padding="md"
+      padding="xl"
     >
       <AppShell.Header>
         <Group h="100%" px="md">
