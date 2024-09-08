@@ -7,6 +7,7 @@ import { Layout } from './components/Layout/Layout';
 import { LoginPage } from './pages/Login/Login.page';
 import { NotFoundPage } from './pages/NotFound/NotFound.page';
 import { SeasonsPage } from './pages/Seasons/Seasons.page';
+import { SettingsPage } from './pages/Settings/Settings.page';
 import AdminRouteGuard from './shared/auth/AdminRouteGuard';
 import AuthRouteGuard from './shared/auth/AuthRouteGuard';
 import SeasonRouteGuard from './shared/auth/SeasonRouteGuard';
@@ -30,6 +31,7 @@ const routes = (queryClient: QueryClient) => {
 
         <Route path="/profile" element={placeholderPage('Profile Page')} />
         <Route path="/seasons" element={<SeasonsPage />} />
+        <Route path="/settings" element={<SettingsPage />} />
         <Route path="/resources" element={placeholderPage('Resources Page')} />
         <Route path="/leetcode" element={placeholderPage('Leetcode Page')} />
         <Route path="/mocks" element={placeholderPage('Mock Interviews Page')} />
