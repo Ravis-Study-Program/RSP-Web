@@ -1,4 +1,4 @@
-import { QueryClient } from 'react-query';
+import { QueryClient } from '@tanstack/react-query';
 import { LoaderFunction, LoaderFunctionArgs } from 'react-router-dom';
 import { SeasonRole } from '../../shared/Season';
 
@@ -35,10 +35,18 @@ export const getSeasonRoleLoader = (queryClient: QueryClient): LoaderFunction =>
     }
 
     const query = getSeasonRoleQuery(params.seasonSlug);
-    return (
-      queryClient.getQueryData<QueryResult>(query.queryKey) ??
-      queryClient.fetchQuery<QueryResult, unknown, QueryResult, string[]>(query.queryKey, query)
-    );
+
+    const cachedData = queryClient.getQueryData<QueryResult>(query.queryKey);
+    if (cachedData) {
+      return cachedData;
+    }
+
+    const fetchedData = await queryClient.fetchQuery<QueryResult>({
+      queryKey: query.queryKey,
+      queryFn: query.queryFn,
+    });
+
+    return fetchedData;
   };
 };
 

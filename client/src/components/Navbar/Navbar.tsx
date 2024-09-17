@@ -36,7 +36,7 @@ const tabs = {
     { label: 'Graduates', icon: IconSchool, link: '/graduates' },
   ],
   season: [
-    { label: 'Leetcode', icon: IconCode, link: '' },
+    { label: 'Leetcode', icon: IconCode, link: '/leetcode' },
     { label: 'Mocks', icon: IconBarbell, link: '' },
     { label: 'Students', icon: IconUsers, link: '' },
     { label: 'Resources', icon: IconFolder, link: '' },

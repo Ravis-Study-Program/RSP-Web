@@ -1,0 +1,6 @@
+.graphContainer {
+    margin-bottom: var(--mantine-spacing-xl);
+    padding: var(--mantine-spacing-xl);
+    border: rem(2px) solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
+    border-radius: var(--mantine-radius-md);
+}
