@@ -1,8 +1,8 @@
-import { QueryClient } from 'react-query';
+import { QueryClient } from '@tanstack/react-query';
 import { LoaderFunction } from 'react-router-dom';
 import { Season, SeasonRole } from '../../shared/Season';
 
-export const getSeasons = () => {
+export const getSeasons = (): Season[] => {
   // Hardcoded values that will be deleted and be replaced with actual API calls
   const results = [
     {
@@ -33,7 +33,7 @@ export const getSeasons = () => {
 
 export const getSeasonsQuery = () => ({
   queryKey: ['seasons'],
-  queryFn: () => getSeasons(),
+  queryFn: getSeasons, // Use the getSeasons function directly
 });
 
 type QueryResult = Season[];
@@ -41,10 +41,18 @@ type QueryResult = Season[];
 export const getSeasonsLoader = (queryClient: QueryClient): LoaderFunction => {
   return async (): Promise<QueryResult> => {
     const query = getSeasonsQuery();
-    return (
-      queryClient.getQueryData<QueryResult>(query.queryKey) ??
-      queryClient.fetchQuery<QueryResult, unknown, QueryResult, string[]>(query.queryKey, query)
-    );
+
+    const cachedData = queryClient.getQueryData<QueryResult>(query.queryKey);
+    if (cachedData) {
+      return cachedData;
+    }
+
+    const fetchedData = await queryClient.fetchQuery<QueryResult>({
+      queryKey: query.queryKey,
+      queryFn: query.queryFn,
+    });
+
+    return fetchedData;
   };
 };
 

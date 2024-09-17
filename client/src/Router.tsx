@@ -1,10 +1,11 @@
-import { QueryClient } from 'react-query';
+import { QueryClient } from '@tanstack/react-query';
 import { createRoutesFromElements, Route } from 'react-router-dom';
 import { Text } from '@mantine/core';
 import getSeasonRoleLoader from './actions/season/getSeasonRoleLoader';
 import getSeasonsLoader from './actions/season/getSeasons';
 import { Layout } from './components/Layout/Layout';
 import { GraduatesPage } from './pages/Graduates/Graduates.page';
+import { LeetcodePage } from './pages/Leetcode/Leetcode.page';
 import { LoginPage } from './pages/Login/Login.page';
 import { NotFoundPage } from './pages/NotFound/NotFound.page';
 import { SeasonsPage } from './pages/Seasons/Seasons.page';
@@ -35,7 +36,7 @@ const routes = (queryClient: QueryClient) => {
         <Route path="/settings" element={<SettingsPage />} />
         <Route path="/graduates" element={<GraduatesPage />} />
         <Route path="/resources" element={placeholderPage('Resources Page')} />
-        <Route path="/leetcode" element={placeholderPage('Leetcode Page')} />
+        <Route path="/leetcode" element={<LeetcodePage />} />
         <Route path="/mocks" element={placeholderPage('Mock Interviews Page')} />
 
         {/* Admin Routes */}

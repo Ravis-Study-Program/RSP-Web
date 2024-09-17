@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from 'react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Season } from '../../shared/Season';
 
 export const createSeason = (season: Season) => {
