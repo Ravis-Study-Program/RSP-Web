@@ -1,0 +1,46 @@
+﻿services:
+  api:
+    container_name: server
+    build:
+      context: server
+      dockerfile: Dockerfile
+    ports:
+      - "4000:8080"
+    depends_on:
+      - postgres
+  
+  postgres:
+    container_name: postgres
+    image: postgres:latest
+    ports:
+      - "5432:5432"
+    env_file:
+      - .env
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - /var/postgres:/data/postgres
+    networks:
+      - postgres
+
+  pgadmin:
+    depends_on:
+      - postgres
+    links:
+      - postgres:postgres
+    container_name: pgadmin
+    image: dpage/pgadmin4
+    ports:
+      - "8080:80"
+    env_file:
+      - .env
+    volumes:
+      - /var/pgadmin:/root/.pgadmin
+    networks:
+      - postgres
+
+networks:
+  postgres:
+    driver: bridge
