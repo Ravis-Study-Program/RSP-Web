@@ -93,7 +93,7 @@ public class CreateUserEndpoint : ICarterModule
 
             return Results.Ok(result.Value);
         })
-            .WithName("Yay")
-            .WithMetadata("Whoops");
+        .WithName("CreateUser")
+        .WithMetadata("CreateUser Metadata");
     }
 }

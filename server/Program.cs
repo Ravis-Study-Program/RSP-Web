@@ -15,6 +15,13 @@ var builder = WebApplication.CreateBuilder(args);
     var assembly = typeof(Program).Assembly;
 
     builder.Services
+        .AddCors(options =>
+        {
+            options.AddPolicy("CorsPolicy", policyBuilder =>
+            {
+                policyBuilder.AllowAnyHeader().AllowAnyMethod().WithOrigins("*");
+            });
+        })
         .AddEndpointsApiExplorer()
         .AddSwaggerGen(options =>
         {
@@ -40,6 +47,12 @@ var builder = WebApplication.CreateBuilder(args);
                     },
                     new string[] {}
                 }
+            });
+            options.SwaggerDoc("v1", new OpenApiInfo
+            {
+                Title = "Client",
+                Version = "v1",
+                Description = "RSP Web Application Backend Endpoints",
             });
         })
         .AddHttpContextAccessor()
@@ -76,6 +89,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 var app = builder.Build();
 {
+    app.UseCors("CorsPolicy");
     app.UseSwagger()
         .UseSwaggerUI()
         .UseExceptionHandler("/error")
