@@ -69,6 +69,8 @@ public class GetUserEndpoint : ICarterModule
             }
 
             return Results.Ok(result.Value);
-        });
+        })
+        .WithName("GetUser")
+        .WithMetadata("GetUser Metadata");;
     }
 }

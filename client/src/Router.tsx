@@ -10,6 +10,7 @@ import { LoginPage } from './pages/Login/Login.page';
 import { NotFoundPage } from './pages/NotFound/NotFound.page';
 import { SeasonsPage } from './pages/Seasons/Seasons.page';
 import { SettingsPage } from './pages/Settings/Settings.page';
+import { TestPage } from './pages/TestPage/TestPage.page';
 import AdminRouteGuard from './shared/auth/AdminRouteGuard';
 import AuthRouteGuard from './shared/auth/AuthRouteGuard';
 import SeasonRouteGuard from './shared/auth/SeasonRouteGuard';
@@ -66,6 +67,7 @@ const routes = (queryClient: QueryClient) => {
 
       {/* Unprotected Routes */}
       <Route path="/" element={<LoginPage />} />
+      <Route path="/testPage" element={<TestPage />} />
       <Route path="*" element={<NotFoundPage />} />
     </>
   );
