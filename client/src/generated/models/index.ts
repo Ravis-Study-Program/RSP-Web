@@ -6,4 +6,7 @@
  * OpenAPI spec version: v1
  */
 
-export * from './createUserRequest';
+export * from './adminCreateUserRequest';
+export * from './adminDeleteUserParams';
+export * from './adminUpdateUserRequest';
+export * from './createUserIfNotExistsRequest';

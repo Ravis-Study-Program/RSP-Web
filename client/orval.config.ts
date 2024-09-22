@@ -1,6 +1,6 @@
 import { defineConfig } from 'orval';
 
-const serverUrl = process.env.VITE_APP_AUTH0_DOMAIN;
+const serverUrl = 'http://localhost:4000';
 
 export default defineConfig({
   petstore: {

@@ -5,10 +5,13 @@ namespace RSPWebAPI.Database;
 
 public class ApplicationDbContext : DbContext
 {
-    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
-        : base(options)
-    {
-    }
-    
-    public DbSet<User> Users { get; set; }
+  public ApplicationDbContext()
+  {
+  }
+  public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+    : base(options)
+  {
+  }
+
+  public virtual DbSet<User> Users { get; set; }
 }

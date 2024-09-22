@@ -1,95 +1,109 @@
+using System.Net;
 using FluentValidation;
 using MediatR;
 
 namespace RSPWebAPI.Shared.Behaviours;
 
 internal sealed class ValidationPipelineBehavior<TRequest, TResponse>(IEnumerable<IValidator<TRequest>> validators)
-    : IPipelineBehavior<TRequest, TResponse>
-    where TRequest : IRequest<TResponse>
-    where TResponse : Result
+  : IPipelineBehavior<TRequest, TResponse>
+  where TRequest : IRequest<TResponse>
+  where TResponse : ApiResult
 {
-    public async Task<TResponse> Handle(
-        TRequest request,
-        RequestHandlerDelegate<TResponse> next,
-        CancellationToken cancellationToken)
+  public async Task<TResponse> Handle(
+    TRequest request,
+    RequestHandlerDelegate<TResponse> next,
+    CancellationToken cancellationToken)
+  {
+    if (!validators?.Any() ?? true)
     {
-        if (!validators.Any())
-        {
-            return await next();
-        }
-
-        var errors = validators
-            .Select(validator => validator.Validate(request))
-            .SelectMany(validationResult => validationResult.Errors)
-            .Where(validationFailure => validationFailure is not null)
-            .Select(failure => new Error(
-                failure.PropertyName,
-                failure.ErrorMessage))
-            .Distinct()
-            .ToArray();
-
-        if (errors.Length > 0)
-        {
-            return CreateValidationResult<TResponse>(errors);
-        }
-
-        return await next();
+      return await next();
     }
 
-    private static TResult CreateValidationResult<TResult>(Error[] errors)
-        where TResult : Result
+    var errors = validators
+                 .Select(validator => validator.Validate(request))
+                 .SelectMany(validationResult => validationResult.Errors)
+                 .Where(validationFailure => validationFailure is not null)
+                 .Select(failure => new ValidationError
+                 {
+                   Property = failure.PropertyName,
+                   Message = failure.ErrorMessage
+                 })
+                 .Distinct()
+                 .ToArray();
+
+    if (errors.Length > 0)
     {
-        if (typeof(TResult) == typeof(Result))
-        {
-            return (ValidationResult.WithErrors(errors) as TResult)!;
-        }
-
-        if (typeof(TResult).IsGenericType && typeof(TResult).GetGenericTypeDefinition() == typeof(Result<>))
-        {
-            var resultType = typeof(ValidationResult<>).MakeGenericType(typeof(TResult).GenericTypeArguments[0]);
-            var validationResult = resultType
-                .GetMethod(nameof(ValidationResult.WithErrors))!
-                .Invoke(null, new object?[] { errors })!;
-
-            return (TResult)validationResult;
-        }
-
-        throw new InvalidOperationException($"Unsupported result type: {typeof(TResult)}");
+      return CreateValidationResult<TResponse>(errors);
     }
 
+    return await next();
+  }
+
+  private static TResult CreateValidationResult<TResult>(ValidationError[] errors)
+    where TResult : ApiResult
+  {
+    // Handle non-generic ApiResult
+    if (typeof(TResult) == typeof(ApiResult))
+    {
+      return (TResult)(object)ValidationResult.WithErrors(errors);
+    }
+
+    // Handle generic ApiResult<T>
+    if (typeof(TResult).IsGenericType && typeof(TResult).GetGenericTypeDefinition() == typeof(ApiResult<>))
+    {
+      var resultType = typeof(ValidationResult<>).MakeGenericType(typeof(TResult).GenericTypeArguments[0]);
+      var methodInfo = resultType.GetMethod(nameof(ValidationResult.WithErrors));
+      if (methodInfo is null)
+      {
+        throw new InvalidOperationException($"Method 'WithErrors' not found in {resultType.Name}");
+      }
+
+      var validationResult = methodInfo.Invoke(null, new object[] { errors });
+      if (validationResult is TResult typedResult)
+      {
+        return typedResult;
+      }
+
+      throw new InvalidOperationException($"Failed to create validation result for type: {typeof(TResult)}");
+    }
+
+    throw new InvalidOperationException($"Unsupported result type: {typeof(TResult)}");
+  }
 }
 
-public interface IValidationResult
+public sealed class ValidationError : ApiError
 {
-    public static readonly Error ValidationError = new(
-        "ValidationError",
-        "A validation problem occurred.");
-
-    Error[] Errors { get; }
+  public string? Property { get; set; }
 }
 
-public sealed class ValidationResult : Result, IValidationResult
+public sealed class ValidationResult : ApiResult
 {
-    private ValidationResult(Error[] errors)
-        : base(false, new Error("ValidationError", string.Join("; ", errors.Select(e => $"{e.Code}: {e.Message}"))))
-    {
-        Errors = errors;
-    }
+  private ValidationResult(ValidationError[] errors)
+    : base(HttpStatusCode.BadRequest, new ApiError("There are some validation errors."))
+  {
+    Errors = errors;
+  }
 
-    public Error[] Errors { get; }
+  public ValidationError[] Errors { get; }
 
-    public static ValidationResult WithErrors(Error[] errors) => new(errors);
+  public static ValidationResult WithErrors(ValidationError[] errors)
+  {
+    return new ValidationResult(errors);
+  }
 }
 
-public sealed class ValidationResult<TValue> : Result<TValue>, IValidationResult
+public sealed class ValidationResult<TValue> : ApiResult<TValue>
 {
-    private ValidationResult(Error[] errors)
-        : base(default, false, new Error("ValidationError", string.Join(";", errors.Select(e => $"{e.Code}: {e.Message}"))))
-    {
-        Errors = errors;
-    }
+  private ValidationResult(ValidationError[] errors)
+    : base(default, HttpStatusCode.BadRequest, new ApiError("There are some validation errors."))
+  {
+    Errors = errors;
+  }
 
-    public Error[] Errors { get; }
+  public ValidationError[] Errors { get; }
 
-    public static ValidationResult<TValue> WithErrors(Error[] errors) => new(errors);
+  public static ValidationResult<TValue> WithErrors(ValidationError[] errors)
+  {
+    return new ValidationResult<TValue>(errors);
+  }
 }
