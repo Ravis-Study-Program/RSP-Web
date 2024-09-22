@@ -19,4 +19,13 @@ public static class Message
   public const string SeasonDeletionUnexpectedError = "An unexpected error has occurred during season deletion.";
   public const string SeasonUpdatedSuccessfully = "Season updated successfully.";
   public const string SeasonDeletedSuccessfully = "Season deleted successfully.";
+  
+  public const string RoleExists = "A season with this RoleId already exists.";
+  public const string RoleDoesNotExists = "No season found using the RoleId provided.";
+  public const string RoleCreatedSuccessfully = "Role created successfully.";
+  public const string RoleCreationUnexpectedError = "An unexpected error has occurred during season creation.";
+  public const string RoleUpdateUnexpectedError = "An unexpected error has occurred during season update.";
+  public const string RoleDeletionUnexpectedError = "An unexpected error has occurred during season deletion.";
+  public const string RoleUpdatedSuccessfully = "Role updated successfully.";
+  public const string RoleDeletedSuccessfully = "Role deleted successfully.";
 }
