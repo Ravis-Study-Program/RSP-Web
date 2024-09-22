@@ -15,4 +15,6 @@ public class Season
   [Required] public string Location { get; set; } = string.Empty;
 
   [Required] public string ImageUrl { get; set; } = string.Empty;
+
+  public ICollection<Enrollment> Enrollments { get; set; } = new List<Enrollment>();
 }
