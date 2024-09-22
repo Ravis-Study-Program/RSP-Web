@@ -5,185 +5,299 @@
  * RSP Web Application Backend Endpoints
  * OpenAPI spec version: v1
  */
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import type {
-  DefinedInitialDataOptions,
-  DefinedUseQueryResult,
   MutationFunction,
-  QueryFunction,
-  QueryKey,
-  UndefinedInitialDataOptions,
   UseMutationOptions,
   UseMutationResult,
-  UseQueryOptions,
-  UseQueryResult,
 } from '@tanstack/react-query';
 import { delay, http, HttpResponse } from 'msw';
 import { CustomAxiosInstance } from '../../shared/api/AxiosCustomInstance';
-import type { CreateUserRequest } from '../models';
+import type {
+  AdminCreateUserRequest,
+  AdminDeleteUserParams,
+  AdminUpdateUserRequest,
+  CreateUserIfNotExistsRequest,
+} from '../models';
 
 type SecondParameter<T extends (...args: any) => any> = Parameters<T>[1];
 
-export const createUser = (
-  createUserRequest: CreateUserRequest,
+export const adminCreateUser = (
+  adminCreateUserRequest: AdminCreateUserRequest,
   options?: SecondParameter<typeof CustomAxiosInstance>
 ) => {
   return CustomAxiosInstance<void>(
     {
-      url: `http://localhost:4000/api/users`,
+      url: `http://localhost:4000/api/admin/users`,
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      data: createUserRequest,
+      data: adminCreateUserRequest,
     },
     options
   );
 };
 
-export const getCreateUserMutationOptions = <TError = unknown, TContext = unknown>(options?: {
+export const getAdminCreateUserMutationOptions = <TError = unknown, TContext = unknown>(options?: {
   mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof createUser>>,
+    Awaited<ReturnType<typeof adminCreateUser>>,
     TError,
-    { data: CreateUserRequest },
+    { data: AdminCreateUserRequest },
     TContext
   >;
   request?: SecondParameter<typeof CustomAxiosInstance>;
 }): UseMutationOptions<
-  Awaited<ReturnType<typeof createUser>>,
+  Awaited<ReturnType<typeof adminCreateUser>>,
   TError,
-  { data: CreateUserRequest },
+  { data: AdminCreateUserRequest },
   TContext
 > => {
   const { mutation: mutationOptions, request: requestOptions } = options ?? {};
 
   const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof createUser>>,
-    { data: CreateUserRequest }
+    Awaited<ReturnType<typeof adminCreateUser>>,
+    { data: AdminCreateUserRequest }
   > = (props) => {
     const { data } = props ?? {};
 
-    return createUser(data, requestOptions);
+    return adminCreateUser(data, requestOptions);
   };
 
   return { mutationFn, ...mutationOptions };
 };
 
-export type CreateUserMutationResult = NonNullable<Awaited<ReturnType<typeof createUser>>>;
-export type CreateUserMutationBody = CreateUserRequest;
-export type CreateUserMutationError = unknown;
+export type AdminCreateUserMutationResult = NonNullable<
+  Awaited<ReturnType<typeof adminCreateUser>>
+>;
+export type AdminCreateUserMutationBody = AdminCreateUserRequest;
+export type AdminCreateUserMutationError = unknown;
 
-export const useCreateUser = <TError = unknown, TContext = unknown>(options?: {
+export const useAdminCreateUser = <TError = unknown, TContext = unknown>(options?: {
   mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof createUser>>,
+    Awaited<ReturnType<typeof adminCreateUser>>,
     TError,
-    { data: CreateUserRequest },
+    { data: AdminCreateUserRequest },
     TContext
   >;
   request?: SecondParameter<typeof CustomAxiosInstance>;
 }): UseMutationResult<
-  Awaited<ReturnType<typeof createUser>>,
+  Awaited<ReturnType<typeof adminCreateUser>>,
   TError,
-  { data: CreateUserRequest },
+  { data: AdminCreateUserRequest },
   TContext
 > => {
-  const mutationOptions = getCreateUserMutationOptions(options);
+  const mutationOptions = getAdminCreateUserMutationOptions(options);
 
   return useMutation(mutationOptions);
 };
 
-export const getUser = (
-  id: string,
-  options?: SecondParameter<typeof CustomAxiosInstance>,
-  signal?: AbortSignal
+export const reac = (
+  params: AdminDeleteUserParams,
+  options?: SecondParameter<typeof CustomAxiosInstance>
 ) => {
   return CustomAxiosInstance<void>(
-    { url: `http://localhost:4000/api/users/${id}`, method: 'GET', signal },
+    { url: `http://localhost:4000/api/admin/users`, method: 'DELETE', params },
     options
   );
 };
 
-export const getGetUserQueryKey = (id: string) => {
-  return [`http://localhost:4000/api/users/${id}`] as const;
-};
-
-export const getGetUserQueryOptions = <
-  TData = Awaited<ReturnType<typeof getUser>>,
-  TError = unknown,
->(
-  id: string,
-  options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUser>>, TError, TData>>;
-    request?: SecondParameter<typeof CustomAxiosInstance>;
-  }
-) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {};
-
-  const queryKey = queryOptions?.queryKey ?? getGetUserQueryKey(id);
-
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof getUser>>> = ({ signal }) =>
-    getUser(id, requestOptions, signal);
-
-  return { queryKey, queryFn, enabled: !!id, ...queryOptions } as UseQueryOptions<
-    Awaited<ReturnType<typeof getUser>>,
+export const getAdminDeleteUserMutationOptions = <TError = unknown, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof adminDeleteUser>>,
     TError,
-    TData
-  > & { queryKey: QueryKey };
+    { params: AdminDeleteUserParams },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof adminDeleteUser>>,
+  TError,
+  { params: AdminDeleteUserParams },
+  TContext
+> => {
+  const { mutation: mutationOptions, request: requestOptions } = options ?? {};
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof adminDeleteUser>>,
+    { params: AdminDeleteUserParams }
+  > = (props) => {
+    const { params } = props ?? {};
+
+    return adminDeleteUser(params, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
 };
 
-export type GetUserQueryResult = NonNullable<Awaited<ReturnType<typeof getUser>>>;
-export type GetUserQueryError = unknown;
+export type AdminDeleteUserMutationResult = NonNullable<
+  Awaited<ReturnType<typeof adminDeleteUser>>
+>;
 
-export function useGetUser<TData = Awaited<ReturnType<typeof getUser>>, TError = unknown>(
-  id: string,
-  options: {
-    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUser>>, TError, TData>> &
-      Pick<
-        DefinedInitialDataOptions<Awaited<ReturnType<typeof getUser>>, TError, TData>,
-        'initialData'
-      >;
-    request?: SecondParameter<typeof CustomAxiosInstance>;
-  }
-): DefinedUseQueryResult<TData, TError> & { queryKey: QueryKey };
-export function useGetUser<TData = Awaited<ReturnType<typeof getUser>>, TError = unknown>(
-  id: string,
-  options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUser>>, TError, TData>> &
-      Pick<
-        UndefinedInitialDataOptions<Awaited<ReturnType<typeof getUser>>, TError, TData>,
-        'initialData'
-      >;
-    request?: SecondParameter<typeof CustomAxiosInstance>;
-  }
-): UseQueryResult<TData, TError> & { queryKey: QueryKey };
-export function useGetUser<TData = Awaited<ReturnType<typeof getUser>>, TError = unknown>(
-  id: string,
-  options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUser>>, TError, TData>>;
-    request?: SecondParameter<typeof CustomAxiosInstance>;
-  }
-): UseQueryResult<TData, TError> & { queryKey: QueryKey };
+export type AdminDeleteUserMutationError = unknown;
 
-export function useGetUser<TData = Awaited<ReturnType<typeof getUser>>, TError = unknown>(
-  id: string,
-  options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUser>>, TError, TData>>;
-    request?: SecondParameter<typeof CustomAxiosInstance>;
-  }
-): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
-  const queryOptions = getGetUserQueryOptions(id, options);
+export const useAdminDeleteUser = <TError = unknown, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof adminDeleteUser>>,
+    TError,
+    { params: AdminDeleteUserParams },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof adminDeleteUser>>,
+  TError,
+  { params: AdminDeleteUserParams },
+  TContext
+> => {
+  const mutationOptions = getAdminDeleteUserMutationOptions(options);
 
-  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & { queryKey: QueryKey };
+  return useMutation(mutationOptions);
+};
 
-  query.queryKey = queryOptions.queryKey;
+export const adminUpdateUser = (
+  adminUpdateUserRequest: AdminUpdateUserRequest,
+  options?: SecondParameter<typeof CustomAxiosInstance>
+) => {
+  return CustomAxiosInstance<void>(
+    {
+      url: `http://localhost:4000/api/admin/users`,
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      data: adminUpdateUserRequest,
+    },
+    options
+  );
+};
 
-  return query;
-}
+export const getAdminUpdateUserMutationOptions = <TError = unknown, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof adminUpdateUser>>,
+    TError,
+    { data: AdminUpdateUserRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof adminUpdateUser>>,
+  TError,
+  { data: AdminUpdateUserRequest },
+  TContext
+> => {
+  const { mutation: mutationOptions, request: requestOptions } = options ?? {};
 
-export const getCreateUserMockHandler = (
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof adminUpdateUser>>,
+    { data: AdminUpdateUserRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return adminUpdateUser(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type AdminUpdateUserMutationResult = NonNullable<
+  Awaited<ReturnType<typeof adminUpdateUser>>
+>;
+export type AdminUpdateUserMutationBody = AdminUpdateUserRequest;
+export type AdminUpdateUserMutationError = unknown;
+
+export const useAdminUpdateUser = <TError = unknown, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof adminUpdateUser>>,
+    TError,
+    { data: AdminUpdateUserRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof adminUpdateUser>>,
+  TError,
+  { data: AdminUpdateUserRequest },
+  TContext
+> => {
+  const mutationOptions = getAdminUpdateUserMutationOptions(options);
+
+  return useMutation(mutationOptions);
+};
+
+export const createUserIfNotExists = (
+  createUserIfNotExistsRequest: CreateUserIfNotExistsRequest,
+  options?: SecondParameter<typeof CustomAxiosInstance>
+) => {
+  return CustomAxiosInstance<void>(
+    {
+      url: `http://localhost:4000/api/users/create-if-not-exists`,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      data: createUserIfNotExistsRequest,
+    },
+    options
+  );
+};
+
+export const getCreateUserIfNotExistsMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createUserIfNotExists>>,
+    TError,
+    { data: CreateUserIfNotExistsRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof createUserIfNotExists>>,
+  TError,
+  { data: CreateUserIfNotExistsRequest },
+  TContext
+> => {
+  const { mutation: mutationOptions, request: requestOptions } = options ?? {};
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof createUserIfNotExists>>,
+    { data: CreateUserIfNotExistsRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return createUserIfNotExists(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CreateUserIfNotExistsMutationResult = NonNullable<
+  Awaited<ReturnType<typeof createUserIfNotExists>>
+>;
+export type CreateUserIfNotExistsMutationBody = CreateUserIfNotExistsRequest;
+export type CreateUserIfNotExistsMutationError = unknown;
+
+export const useCreateUserIfNotExists = <TError = unknown, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createUserIfNotExists>>,
+    TError,
+    { data: CreateUserIfNotExistsRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof createUserIfNotExists>>,
+  TError,
+  { data: CreateUserIfNotExistsRequest },
+  TContext
+> => {
+  const mutationOptions = getCreateUserIfNotExistsMutationOptions(options);
+
+  return useMutation(mutationOptions);
+};
+
+export const getAdminCreateUserMockHandler = (
   overrideResponse?:
     | void
     | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<void> | void)
 ) => {
-  return http.post('*/api/users', async (info) => {
+  return http.post('*/api/admin/users', async (info) => {
     await delay(1000);
     if (typeof overrideResponse === 'function') {
       await overrideResponse(info);
@@ -192,12 +306,12 @@ export const getCreateUserMockHandler = (
   });
 };
 
-export const getGetUserMockHandler = (
+export const getAdminDeleteUserMockHandler = (
   overrideResponse?:
     | void
-    | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<void> | void)
+    | ((info: Parameters<Parameters<typeof http.delete>[1]>[0]) => Promise<void> | void)
 ) => {
-  return http.get('*/api/users/:id', async (info) => {
+  return http.delete('*/api/admin/users', async (info) => {
     await delay(1000);
     if (typeof overrideResponse === 'function') {
       await overrideResponse(info);
@@ -205,4 +319,37 @@ export const getGetUserMockHandler = (
     return new HttpResponse(null, { status: 200 });
   });
 };
-export const getClientMock = () => [getCreateUserMockHandler(), getGetUserMockHandler()];
+
+export const getAdminUpdateUserMockHandler = (
+  overrideResponse?:
+    | void
+    | ((info: Parameters<Parameters<typeof http.put>[1]>[0]) => Promise<void> | void)
+) => {
+  return http.put('*/api/admin/users', async (info) => {
+    await delay(1000);
+    if (typeof overrideResponse === 'function') {
+      await overrideResponse(info);
+    }
+    return new HttpResponse(null, { status: 200 });
+  });
+};
+
+export const getCreateUserIfNotExistsMockHandler = (
+  overrideResponse?:
+    | void
+    | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<void> | void)
+) => {
+  return http.post('*/api/users/create-if-not-exists', async (info) => {
+    await delay(1000);
+    if (typeof overrideResponse === 'function') {
+      await overrideResponse(info);
+    }
+    return new HttpResponse(null, { status: 200 });
+  });
+};
+export const getClientMock = () => [
+  getAdminCreateUserMockHandler(),
+  getAdminDeleteUserMockHandler(),
+  getAdminUpdateUserMockHandler(),
+  getCreateUserIfNotExistsMockHandler(),
+];

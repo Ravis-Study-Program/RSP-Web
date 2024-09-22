@@ -2938,6 +2938,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@faker-js/faker@npm:^9.0.1":
+  version: 9.0.1
+  resolution: "@faker-js/faker@npm:9.0.1"
+  checksum: 10c0/ca800e49857e42b95ab5a94c64d13de17bb188d0c9b43243b7afec2eb11d47b76af2211ec371ff7a1dd1c855e12403d071569c3eb82d15e7b8f5124007826763
+  languageName: node
+  linkType: hard
+
 "@floating-ui/core@npm:^1.6.0":
   version: 1.6.7
   resolution: "@floating-ui/core@npm:1.6.7"
@@ -12339,6 +12346,7 @@ __metadata:
   dependencies:
     "@auth0/auth0-react": "npm:^2.2.4"
     "@eslint/js": "npm:^9.9.1"
+    "@faker-js/faker": "npm:^9.0.1"
     "@ianvs/prettier-plugin-sort-imports": "npm:^4.3.1"
     "@mantine/charts": "npm:^7.12.2"
     "@mantine/core": "npm:^7.12.2"

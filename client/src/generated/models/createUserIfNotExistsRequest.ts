@@ -6,11 +6,9 @@
  * OpenAPI spec version: v1
  */
 
-export interface CreateUserRequest {
+export interface CreateUserIfNotExistsRequest {
   /** @nullable */
   discordId?: string | null;
-  /** @nullable */
-  email?: string | null;
   /** @nullable */
   name?: string | null;
   /** @nullable */
