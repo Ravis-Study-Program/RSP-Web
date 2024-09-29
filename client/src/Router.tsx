@@ -3,7 +3,9 @@ import { createRoutesFromElements, Route } from 'react-router-dom';
 import { Text } from '@mantine/core';
 import getSeasonRoleLoader from './actions/season/getSeasonRoleLoader';
 import { Layout } from './components/Layout/Layout';
+import { AdminRolesPage } from './pages/Admin/Roles/AdminRoles.page';
 import { AdminSeasonsPage } from './pages/Admin/Seasons/AdminSeasons.page';
+import { AdminUsersPage } from './pages/Admin/Users/AdminUsers.page';
 import { GraduatesPage } from './pages/Graduates/Graduates.page';
 import { LeetcodePage } from './pages/Leetcode/Leetcode.page';
 import { LoginPage } from './pages/Login/Login.page';
@@ -13,7 +15,6 @@ import { SettingsPage } from './pages/Settings/Settings.page';
 import AdminRouteGuard from './shared/auth/AdminRouteGuard';
 import AuthRouteGuard from './shared/auth/AuthRouteGuard';
 import SeasonRouteGuard from './shared/auth/SeasonRouteGuard';
-import { AdminUsersPage } from './pages/Admin/Users/AdminUsers.page';
 
 const placeholderPage = (title: string) => {
   return (
@@ -44,6 +45,7 @@ const routes = (queryClient: QueryClient) => {
         <Route path="admin" element={<AdminRouteGuard />}>
           <Route path="seasons" element={<AdminSeasonsPage />} />
           <Route path="users" element={<AdminUsersPage />} />
+          <Route path="roles" element={<AdminRolesPage />} />
         </Route>
 
         {/* Season Routes */}

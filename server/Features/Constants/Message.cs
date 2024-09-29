@@ -33,6 +33,8 @@ public static class Message
   public const string RoleDeletionUnexpectedError = "An unexpected error has occurred during season deletion.";
   public const string RoleUpdatedSuccessfully = "Role updated successfully.";
   public const string RoleDeletedSuccessfully = "Role deleted successfully.";
+  public const string RoleListSuccessfully = "List of Role retrieved successfully.";
+  public const string RoleListUnexpectedError = "An unexpected error has occurred during role list.";
 
   public const string EnrollmentExists = "A season with this EnrollmentId already exists.";
   public const string EnrollmentDoesNotExists = "No season found using the EnrollmentId provided.";

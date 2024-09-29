@@ -15,10 +15,6 @@ public static class AdminCreateRole
   public class Command : AdminAuthRequest<ApiResult<AdminCreateRoleResponse>>
   {
     public string Name { get; set; } = string.Empty;
-    public DateTime StartDate { get; set; }
-    public DateTime EndDate { get; set; }
-    public string Location { get; set; } = string.Empty;
-    public string ImageUrl { get; set; } = string.Empty;
   }
 
   public class Validator : AbstractValidator<Command>
@@ -94,7 +90,7 @@ public class AdminCreateRoleEndpoint : ICarterModule
            };
            var response = await sender.Send(command);
 
-           return Results.Json(response, statusCode: (int)response.StatusCode);
+           return ApiResultHelper.FormatResponse(response);
          }
        )
        .WithName("AdminCreateRole");
