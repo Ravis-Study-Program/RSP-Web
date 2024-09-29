@@ -67,7 +67,6 @@ var builder = WebApplication.CreateBuilder(args);
          })
          .AddValidatorsFromAssembly(assembly, includeInternalTypes: true)
          .AddCarter()
-         .AddValidatorsFromAssembly(assembly)
          .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
          .AddJwtBearer(options =>
          {

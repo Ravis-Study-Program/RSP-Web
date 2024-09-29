@@ -2,11 +2,17 @@ using System.Net;
 using Carter;
 using FluentValidation;
 using MediatR;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using RSPWebAPI.Database;
 using RSPWebAPI.Features.Constants;
 using RSPWebAPI.Shared;
 using RSPWebAPI.Shared.Behaviours;
+using AdminDeleteSeasonResult = Microsoft.AspNetCore.Http.HttpResults.Results<
+  Microsoft.AspNetCore.Http.HttpResults.Ok<RSPWebAPI.Shared.ApiResult<RSPWebAPI.Features.Seasons.AdminDeleteSeasonResponse>>,
+  Microsoft.AspNetCore.Http.HttpResults.NotFound<RSPWebAPI.Shared.ApiResult<RSPWebAPI.Features.Seasons.AdminDeleteSeasonResponse>>,
+  Microsoft.AspNetCore.Http.HttpResults.BadRequest<RSPWebAPI.Shared.ApiResult<RSPWebAPI.Features.Seasons.AdminDeleteSeasonResponse>>
+>;
 
 namespace RSPWebAPI.Features.Seasons;
 
@@ -83,7 +89,7 @@ public class AdminDeleteSeasonEndpoint : ICarterModule
   {
     app.MapDelete(
          "api/admin/seasons",
-         async (Guid seasonId, ISender sender) =>
+         async Task<AdminDeleteSeasonResult> (Guid seasonId, ISender sender) =>
          {
            var command = new AdminDeleteSeason.Command
            {
@@ -91,7 +97,7 @@ public class AdminDeleteSeasonEndpoint : ICarterModule
            };
            var response = await sender.Send(command);
 
-           return Results.Json(response, statusCode: (int)response.StatusCode);
+           return ApiResultHelper.FormatResponse(response);
          }
        )
        .WithName("AdminDeleteSeason");

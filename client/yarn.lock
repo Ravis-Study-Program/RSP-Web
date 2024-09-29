@@ -10202,6 +10202,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"mantine-form-zod-resolver@npm:^1.1.0":
+  version: 1.1.0
+  resolution: "mantine-form-zod-resolver@npm:1.1.0"
+  peerDependencies:
+    "@mantine/form": ">=7.0.0"
+    zod: ">=3.0.0"
+  checksum: 10c0/3ff086f2a5d7b9d3d56b09f16fdc27919000c2007279c2e5e6fe85c60c56ee75a13cfebaa1dd341c4ddafd73aba9a3c59a98ea41c59ea8d01c67483dc07ea1ad
+  languageName: node
+  linkType: hard
+
 "mantine-react-table@npm:^2.0.0-beta.6":
   version: 2.0.0-beta.6
   resolution: "mantine-react-table@npm:2.0.0-beta.6"
@@ -12380,6 +12390,7 @@ __metadata:
     eslint-plugin-react: "npm:^7.35.0"
     identity-obj-proxy: "npm:^3.0.0"
     jsdom: "npm:^25.0.0"
+    mantine-form-zod-resolver: "npm:^1.1.0"
     mantine-react-table: "npm:^2.0.0-beta.6"
     msw: "npm:^2.4.9"
     orval: "npm:^7.1.1"
@@ -12401,6 +12412,7 @@ __metadata:
     vite: "npm:^5.4.2"
     vite-tsconfig-paths: "npm:^5.0.1"
     vitest: "npm:^2.0.5"
+    zod: "npm:^3.23.8"
   languageName: unknown
   linkType: soft
 
@@ -14742,5 +14754,12 @@ __metadata:
   version: 2.1.2
   resolution: "yoctocolors-cjs@npm:2.1.2"
   checksum: 10c0/a0e36eb88fea2c7981eab22d1ba45e15d8d268626e6c4143305e2c1628fa17ebfaa40cd306161a8ce04c0a60ee0262058eab12567493d5eb1409780853454c6f
+  languageName: node
+  linkType: hard
+
+"zod@npm:^3.23.8":
+  version: 3.23.8
+  resolution: "zod@npm:3.23.8"
+  checksum: 10c0/8f14c87d6b1b53c944c25ce7a28616896319d95bc46a9660fe441adc0ed0a81253b02b5abdaeffedbeb23bdd25a0bf1c29d2c12dd919aef6447652dd295e3e69
   languageName: node
   linkType: hard

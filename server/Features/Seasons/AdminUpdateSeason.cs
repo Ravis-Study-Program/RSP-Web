@@ -7,6 +7,11 @@ using RSPWebAPI.Database;
 using RSPWebAPI.Features.Constants;
 using RSPWebAPI.Shared;
 using RSPWebAPI.Shared.Behaviours;
+using AdminUpdateSeasonResult = Microsoft.AspNetCore.Http.HttpResults.Results<
+  Microsoft.AspNetCore.Http.HttpResults.Ok<RSPWebAPI.Shared.ApiResult<RSPWebAPI.Features.Seasons.AdminUpdateSeasonResponse>>,
+  Microsoft.AspNetCore.Http.HttpResults.NotFound<RSPWebAPI.Shared.ApiResult<RSPWebAPI.Features.Seasons.AdminUpdateSeasonResponse>>,
+  Microsoft.AspNetCore.Http.HttpResults.BadRequest<RSPWebAPI.Shared.ApiResult<RSPWebAPI.Features.Seasons.AdminUpdateSeasonResponse>>
+>;
 
 namespace RSPWebAPI.Features.Seasons;
 
@@ -108,7 +113,7 @@ public class AdminUpdateSeasonEndpoint : ICarterModule
   {
     app.MapPut(
          "api/admin/seasons",
-         async (AdminUpdateSeasonRequest request, ISender sender) =>
+         async Task<AdminUpdateSeasonResult> (AdminUpdateSeasonRequest request, ISender sender) =>
          {
            var command = new AdminUpdateSeason.Command
            {
@@ -121,7 +126,7 @@ public class AdminUpdateSeasonEndpoint : ICarterModule
            };
            var response = await sender.Send(command);
 
-           return Results.Json(response, statusCode: (int)response.StatusCode);
+           return ApiResultHelper.FormatResponse(response);
          }
        )
        .WithName("AdminUpdateSeason");

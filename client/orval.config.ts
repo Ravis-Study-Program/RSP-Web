@@ -3,14 +3,13 @@ import { defineConfig } from 'orval';
 const serverUrl = 'http://localhost:4000';
 
 export default defineConfig({
-  petstore: {
+  api: {
     input: {
       target: `${serverUrl}/swagger/v1/swagger.json`,
     },
     output: {
       mode: 'single',
-      target: 'src/generated/actions',
-      schemas: 'src/generated/models',
+      target: 'src/generated/api',
       client: 'react-query',
       mock: true,
       baseUrl: serverUrl,
