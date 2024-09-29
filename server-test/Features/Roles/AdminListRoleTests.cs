@@ -11,20 +11,19 @@ using Xunit;
 
 namespace RSPWebAPI.Tests.Features.Roles;
 
-public class AdminCreateRoleTests: TestsHelper
+public class AdminListRoleTests: TestsHelper
 {
   private readonly Mock<ApplicationDbContext> _dbContextMock;
 
-  public AdminCreateRoleTests()
+  public AdminListRoleTests()
   {
     _dbContextMock = new Mock<ApplicationDbContext>();
   }
 
-  private AdminCreateRole.Command CreateDummyCommand()
+  private AdminListRole.Command ListDummyCommand()
   {
-    return new AdminCreateRole.Command
+    return new AdminListRole.Command
     {
-      Name = DummyName
     };
   }
 
@@ -34,11 +33,11 @@ public class AdminCreateRoleTests: TestsHelper
     _dbContextMock.Setup(x => x.Roles)
                   .ReturnsDbSet(new List<Role>());
 
-    var command = CreateDummyCommand();
-    var handler = new AdminCreateRole.Handler(_dbContextMock.Object, Mock.Of<ILogger<AdminCreateRole.Handler>>());
+    var command = ListDummyCommand();
+    var handler = new AdminListRole.Handler(_dbContextMock.Object, Mock.Of<ILogger<AdminListRole.Handler>>());
 
     var result = await handler.Handle(command, CancellationToken.None);
     Assert.Equal(HttpStatusCode.OK, result.StatusCode);
-    Assert.Equal(Message.RoleCreatedSuccessfully, result.SuccessMessage);
+    Assert.Equal(Message.RoleListSuccessfully, result.SuccessMessage);
   }
 }

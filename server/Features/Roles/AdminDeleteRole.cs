@@ -91,7 +91,7 @@ public class AdminDeleteRoleEndpoint : ICarterModule
            };
            var response = await sender.Send(command);
 
-           return Results.Json(response, statusCode: (int)response.StatusCode);
+           return ApiResultHelper.FormatResponse(response);
          }
        )
        .WithName("AdminDeleteRole");
