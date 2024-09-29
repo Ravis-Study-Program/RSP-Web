@@ -13,6 +13,7 @@ import { SettingsPage } from './pages/Settings/Settings.page';
 import AdminRouteGuard from './shared/auth/AdminRouteGuard';
 import AuthRouteGuard from './shared/auth/AuthRouteGuard';
 import SeasonRouteGuard from './shared/auth/SeasonRouteGuard';
+import { AdminUsersPage } from './pages/Admin/Users/AdminUsers.page';
 
 const placeholderPage = (title: string) => {
   return (
@@ -42,7 +43,7 @@ const routes = (queryClient: QueryClient) => {
         {/* Admin Routes */}
         <Route path="admin" element={<AdminRouteGuard />}>
           <Route path="seasons" element={<AdminSeasonsPage />} />
-          <Route path="users" element={placeholderPage('Admin: Users page')} />
+          <Route path="users" element={<AdminUsersPage />} />
         </Route>
 
         {/* Season Routes */}
