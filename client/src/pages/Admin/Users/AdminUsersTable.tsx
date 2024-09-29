@@ -1,4 +1,3 @@
-import dayjs from 'dayjs';
 import { useMemo } from 'react';
 import { IconEdit, IconTrash } from '@tabler/icons-react';
 import {
@@ -10,81 +9,76 @@ import {
 import { ActionIcon, Button, Flex, Text, Tooltip } from '@mantine/core';
 import { modals } from '@mantine/modals';
 import {
-  Season,
-  useAdminCreateSeason,
-  useAdminDeleteSeason,
-  useAdminListSeason,
-  useAdminUpdateSeason,
+  User,
+  useAdminCreateUser,
+  useAdminDeleteUser,
+  useAdminListUser,
+  useAdminUpdateUser,
 } from '@/generated/api/client';
-import { AdminSeasonsCreateModal } from './AdminSeasonsCreateModal';
-import { AdminSeasonsUpdateModal } from './AdminSeasonsUpdateModal';
-import classes from './AdminSeasonsTable.module.css';
+import { AdminUsersCreateModal } from './AdminUsersCreateModal';
+import { AdminUsersUpdateModal } from './AdminUsersUpdateModal';
+import classes from './AdminUsersTable.module.css';
 
-export const AdminSeasonsTable = () => {
+export const AdminUsersTable = () => {
   const {
-    data: seasonResponse,
-    isError: isLoadingSeasonsError,
-    isFetching: isFetchingSeasons,
-    isLoading: isLoadingSeasons,
-    refetch: refetchSeasons,
-  } = useAdminListSeason();
-  const { mutateAsync: createSeason, status: isCreatingSeasonStatus } = useAdminCreateSeason();
-  const { mutateAsync: updateSeason, status: isUpdatingSeasonStatus } = useAdminUpdateSeason();
-  const { mutateAsync: deleteSeason, status: isDeletingSeasonStatus } = useAdminDeleteSeason();
+    data: userResponse,
+    isError: isLoadingUsersError,
+    isFetching: isFetchingUsers,
+    isLoading: isLoadingUsers,
+    refetch: refetchUsers,
+  } = useAdminListUser();
+  const { mutateAsync: createUser, status: isCreatingUserStatus } = useAdminCreateUser();
+  const { mutateAsync: updateUser, status: isUpdatingUserStatus } = useAdminUpdateUser();
+  const { mutateAsync: deleteUser, status: isDeletingUserStatus } = useAdminDeleteUser();
 
-  const openDeleteConfirmModal = (row: MRT_Row<Season>) => {
+  const openDeleteConfirmModal = (row: MRT_Row<User>) => {
     modals.openConfirmModal({
-      title: 'Delete Season',
+      title: 'Delete User',
       children: (
-        <Text>Are you sure you want to delete this season? This action cannot be undone.</Text>
+        <Text>Are you sure you want to delete this user? This action cannot be undone.</Text>
       ),
       labels: { confirm: 'Delete', cancel: 'Cancel' },
       confirmProps: { color: 'red' },
       onConfirm: async () => {
-        await deleteSeason({ params: { seasonId: row.original.seasonId! } });
-        await refetchSeasons();
+        await deleteUser({ params: { email: row.original.email } });
+        await refetchUsers();
         modals.closeAll();
       },
     });
   };
 
-  const columns = useMemo<MRT_ColumnDef<Season>[]>(
+  const columns = useMemo<MRT_ColumnDef<User>[]>(
     () => [
       {
         accessorKey: 'name',
         header: 'Name',
       },
       {
-        accessorKey: 'startDate',
-        header: 'Start Date',
+        accessorKey: 'email',
+        header: 'Email',
+      },
+      {
+        accessorKey: 'isAdmin',
+        header: 'Is Admin',
         Cell: ({ row }) => {
-          const startFormatted = dayjs(row.original.startDate).format('D MMM YYYY');
-          return <Text size="sm">{startFormatted}</Text>;
+          return <Text size="sm">{row.original.isAdmin ? "Yes" : "No"}</Text>;
         },
       },
       {
-        accessorKey: 'endDate',
-        header: 'End Date',
-        Cell: ({ row }) => {
-          const endFormatted = dayjs(row.original.endDate).format('D MMM YYYY');
-          return <Text size="sm">{endFormatted}</Text>;
-        },
+        accessorKey: 'discordId',
+        header: 'Discord ID',
       },
       {
-        accessorKey: 'location',
-        header: 'Location',
-      },
-      {
-        accessorKey: 'imageUrl',
-        header: 'Image Url',
-      },
+        accessorKey: 'profileImage',
+        header: 'Profile Image',
+      }
     ],
     []
   );
 
   const table = useMantineReactTable({
     columns,
-    data: seasonResponse?.responseBody?.seasons ?? [],
+    data: userResponse?.responseBody?.users ?? [],
     mantinePaperProps: {
       className: classes.table,
     },
@@ -109,14 +103,14 @@ export const AdminSeasonsTable = () => {
       density: 'xs',
       sorting: [
         {
-          id: 'startDate',
+          id: 'email',
           desc: true,
         },
       ],
     },
     positionActionsColumn: 'last',
-    getRowId: (row) => row.seasonId?.toString(),
-    mantineToolbarAlertBannerProps: isLoadingSeasonsError
+    getRowId: (row) => row.userId?.toString(),
+    mantineToolbarAlertBannerProps: isLoadingUsersError
       ? {
           color: 'red',
           children: 'Error loading data',
@@ -124,18 +118,18 @@ export const AdminSeasonsTable = () => {
       : undefined,
     isMultiSortEvent: () => true,
     renderCreateRowModalContent: ({ table }) => (
-      <AdminSeasonsCreateModal
+      <AdminUsersCreateModal
         table={table}
-        createSeason={createSeason}
-        refetchSeasons={refetchSeasons}
+        createUser={createUser}
+        refetchUsers={refetchUsers}
       />
     ),
     renderEditRowModalContent: ({ table, row }) => (
-      <AdminSeasonsUpdateModal
+      <AdminUsersUpdateModal
         table={table}
         row={row}
-        updateSeason={updateSeason}
-        refetchSeasons={refetchSeasons}
+        updateUser={updateUser}
+        refetchUsers={refetchUsers}
       />
     ),
     renderRowActions: ({ row, table }) => (
@@ -158,17 +152,17 @@ export const AdminSeasonsTable = () => {
           table.setCreatingRow(true);
         }}
       >
-        Create New Season
+        Create New User
       </Button>
     ),
     state: {
-      isLoading: isLoadingSeasons,
+      isLoading: isLoadingUsers,
       isSaving:
-        isCreatingSeasonStatus === 'pending' ||
-        isUpdatingSeasonStatus === 'pending' ||
-        isDeletingSeasonStatus === 'pending',
-      showAlertBanner: isLoadingSeasonsError,
-      showProgressBars: isFetchingSeasons,
+        isCreatingUserStatus === 'pending' ||
+        isUpdatingUserStatus === 'pending' ||
+        isDeletingUserStatus === 'pending',
+      showAlertBanner: isLoadingUsersError,
+      showProgressBars: isFetchingUsers,
     },
   });
 

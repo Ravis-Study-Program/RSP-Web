@@ -1,5 +1,6 @@
 namespace RSPWebAPI.Features.Constants;
 
+// TODO: cleanup and refactor
 public static class Message
 {
   public const string UserEmailExists = "A user with this email already exists.";
@@ -10,7 +11,9 @@ public static class Message
   public const string UserDeletionUnexpectedError = "An unexpected error has occurred during user deletion.";
   public const string UserUpdatedSuccessfully = "User updated successfully.";
   public const string UserDeletedSuccessfully = "User deleted successfully.";
-
+  public const string UserListSuccessfully = "List of Users retrieved successfully.";
+  public const string UserListUnexpectedError = "An unexpected error has occurred during users list.";
+  
   public const string SeasonExists = "A season with this SeasonId already exists.";
   public const string SeasonDoesNotExists = "No season found using the SeasonId provided.";
   public const string SeasonCreatedSuccessfully = "Season created successfully.";
