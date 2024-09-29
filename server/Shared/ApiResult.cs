@@ -1,4 +1,5 @@
 using System.Net;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace RSPWebAPI.Shared;
 
@@ -38,4 +39,18 @@ public class ApiResult<TValue> : ApiResult
   }
 
   public TValue? ResponseBody { get; set; }
+}
+
+public static class ApiResultHelper
+{
+  public static Results<Ok<ApiResult<T>>, NotFound<ApiResult<T>>, BadRequest<ApiResult<T>>> FormatResponse<T>(
+    ApiResult<T> response)
+  {
+    return response.StatusCode switch
+    {
+      HttpStatusCode.OK => TypedResults.Ok(response),
+      HttpStatusCode.NotFound => TypedResults.NotFound(response),
+      _ => TypedResults.BadRequest(response)
+    };
+  }
 }

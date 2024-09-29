@@ -11,24 +11,19 @@ using Xunit;
 
 namespace RSPWebAPI.Tests.Features.Seasons;
 
-public class AdminCreateSeasonTests: TestsHelper
+public class AdminListSeasonTests: TestsHelper
 {
   private readonly Mock<ApplicationDbContext> _dbContextMock;
 
-  public AdminCreateSeasonTests()
+  public AdminListSeasonTests()
   {
     _dbContextMock = new Mock<ApplicationDbContext>();
   }
 
-  private AdminCreateSeason.Command CreateDummyCommand()
+  private AdminListSeason.Command ListDummyCommand()
   {
-    return new AdminCreateSeason.Command
+    return new AdminListSeason.Command
     {
-      Name = DummyName,
-      StartDate = DummyStartDate,
-      EndDate = DummyEndDate,
-      Location = DummyLocation,
-      ImageUrl = DummyImageUrl
     };
   }
 
@@ -38,11 +33,11 @@ public class AdminCreateSeasonTests: TestsHelper
     _dbContextMock.Setup(x => x.Seasons)
                   .ReturnsDbSet(new List<Season>());
 
-    var command = CreateDummyCommand();
-    var handler = new AdminCreateSeason.Handler(_dbContextMock.Object, Mock.Of<ILogger<AdminCreateSeason.Handler>>());
+    var command = ListDummyCommand();
+    var handler = new AdminListSeason.Handler(_dbContextMock.Object, Mock.Of<ILogger<AdminListSeason.Handler>>());
 
     var result = await handler.Handle(command, CancellationToken.None);
     Assert.Equal(HttpStatusCode.OK, result.StatusCode);
-    Assert.Equal(Message.SeasonCreatedSuccessfully, result.SuccessMessage);
+    Assert.Equal(Message.SeasonListSuccessfully, result.SuccessMessage);
   }
 }

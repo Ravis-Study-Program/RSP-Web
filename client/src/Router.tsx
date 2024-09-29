@@ -2,15 +2,14 @@ import { QueryClient } from '@tanstack/react-query';
 import { createRoutesFromElements, Route } from 'react-router-dom';
 import { Text } from '@mantine/core';
 import getSeasonRoleLoader from './actions/season/getSeasonRoleLoader';
-import getSeasonsLoader from './actions/season/getSeasons';
 import { Layout } from './components/Layout/Layout';
+import { AdminSeasonsPage } from './pages/Admin/Seasons/AdminSeasons.page';
 import { GraduatesPage } from './pages/Graduates/Graduates.page';
 import { LeetcodePage } from './pages/Leetcode/Leetcode.page';
 import { LoginPage } from './pages/Login/Login.page';
 import { NotFoundPage } from './pages/NotFound/NotFound.page';
 import { SeasonsPage } from './pages/Seasons/Seasons.page';
 import { SettingsPage } from './pages/Settings/Settings.page';
-import { TestPage } from './pages/TestPage/TestPage.page';
 import AdminRouteGuard from './shared/auth/AdminRouteGuard';
 import AuthRouteGuard from './shared/auth/AuthRouteGuard';
 import SeasonRouteGuard from './shared/auth/SeasonRouteGuard';
@@ -42,11 +41,7 @@ const routes = (queryClient: QueryClient) => {
 
         {/* Admin Routes */}
         <Route path="admin" element={<AdminRouteGuard />}>
-          <Route
-            path="seasons"
-            element={placeholderPage('Admin Seasons')}
-            loader={getSeasonsLoader(queryClient)}
-          />
+          <Route path="seasons" element={<AdminSeasonsPage />} />
           <Route path="users" element={placeholderPage('Admin: Users page')} />
         </Route>
 
@@ -67,7 +62,6 @@ const routes = (queryClient: QueryClient) => {
 
       {/* Unprotected Routes */}
       <Route path="/" element={<LoginPage />} />
-      <Route path="/testPage" element={<TestPage />} />
       <Route path="*" element={<NotFoundPage />} />
     </>
   );

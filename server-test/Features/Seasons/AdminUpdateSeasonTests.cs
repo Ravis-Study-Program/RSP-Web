@@ -27,7 +27,8 @@ public class AdminUpdateSeasonTests : TestsHelper
       Name = DummyName,
       StartDate = DummyStartDate,
       EndDate = DummyEndDate,
-      Location = DummyLocation
+      Location = DummyLocation,
+      ImageUrl = DummyImageUrl
     };
   }
 

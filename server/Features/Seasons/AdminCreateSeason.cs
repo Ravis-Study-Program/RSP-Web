@@ -1,12 +1,19 @@
+using System.ComponentModel.DataAnnotations;
 using System.Net;
 using Carter;
 using FluentValidation;
 using MediatR;
+using Microsoft.AspNetCore.Http.HttpResults;
 using RSPWebAPI.Database;
 using RSPWebAPI.Entities;
 using RSPWebAPI.Features.Constants;
 using RSPWebAPI.Shared;
 using RSPWebAPI.Shared.Behaviours;
+using AdminCreateSeasonResult = Microsoft.AspNetCore.Http.HttpResults.Results<
+  Microsoft.AspNetCore.Http.HttpResults.Ok<RSPWebAPI.Shared.ApiResult<RSPWebAPI.Features.Seasons.AdminCreateSeasonResponse>>,
+  Microsoft.AspNetCore.Http.HttpResults.NotFound<RSPWebAPI.Shared.ApiResult<RSPWebAPI.Features.Seasons.AdminCreateSeasonResponse>>,
+  Microsoft.AspNetCore.Http.HttpResults.BadRequest<RSPWebAPI.Shared.ApiResult<RSPWebAPI.Features.Seasons.AdminCreateSeasonResponse>>
+>;
 
 namespace RSPWebAPI.Features.Seasons;
 
@@ -27,7 +34,10 @@ public static class AdminCreateSeason
     {
       RuleFor(c => c.Name).NotEmpty();
       RuleFor(c => c.StartDate).NotEmpty();
-      RuleFor(c => c.EndDate).NotEmpty();
+      RuleFor(c => c.EndDate)
+            .NotEmpty()
+            .GreaterThan(c => c.StartDate)
+            .WithMessage("End date must be greater than start date.");
       RuleFor(c => c.Location).NotEmpty();
       RuleFor(c => c.ImageUrl).NotEmpty();
     }
@@ -54,7 +64,8 @@ public static class AdminCreateSeason
         Name = request.Name,
         StartDate = request.StartDate,
         EndDate = request.EndDate,
-        Location = request.Location
+        Location = request.Location,
+        ImageUrl = request.ImageUrl
       };
 
       try
@@ -97,7 +108,8 @@ public class AdminCreateSeasonEndpoint : ICarterModule
   {
     app.MapPost(
          "api/admin/seasons",
-         async (AdminCreateSeasonRequest request, ISender sender) =>
+         async Task<AdminCreateSeasonResult> (
+           AdminCreateSeasonRequest request, ISender sender) =>
          {
            var command = new AdminCreateSeason.Command
            {
@@ -109,7 +121,7 @@ public class AdminCreateSeasonEndpoint : ICarterModule
            };
            var response = await sender.Send(command);
 
-           return Results.Json(response, statusCode: (int)response.StatusCode);
+           return ApiResultHelper.FormatResponse(response);
          }
        )
        .WithName("AdminCreateSeason");

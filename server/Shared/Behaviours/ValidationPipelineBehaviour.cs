@@ -19,7 +19,7 @@ internal sealed class ValidationPipelineBehavior<TRequest, TResponse>(IEnumerabl
       return await next();
     }
 
-    var errors = validators
+    var errors = validators?
                  .Select(validator => validator.Validate(request))
                  .SelectMany(validationResult => validationResult.Errors)
                  .Where(validationFailure => validationFailure is not null)
@@ -31,7 +31,7 @@ internal sealed class ValidationPipelineBehavior<TRequest, TResponse>(IEnumerabl
                  .Distinct()
                  .ToArray();
 
-    if (errors.Length > 0)
+    if (errors?.Length > 0)
     {
       return CreateValidationResult<TResponse>(errors);
     }
@@ -79,12 +79,9 @@ public sealed class ValidationError : ApiError
 public sealed class ValidationResult : ApiResult
 {
   private ValidationResult(ValidationError[] errors)
-    : base(HttpStatusCode.BadRequest, new ApiError("There are some validation errors."))
+    : base(HttpStatusCode.BadRequest, new ApiError("There are some validation errors.", errors))
   {
-    Errors = errors;
   }
-
-  public ValidationError[] Errors { get; }
 
   public static ValidationResult WithErrors(ValidationError[] errors)
   {
@@ -95,12 +92,9 @@ public sealed class ValidationResult : ApiResult
 public sealed class ValidationResult<TValue> : ApiResult<TValue>
 {
   private ValidationResult(ValidationError[] errors)
-    : base(default, HttpStatusCode.BadRequest, new ApiError("There are some validation errors."))
+    : base(default, HttpStatusCode.BadRequest, new ApiError("There are some validation errors.", errors))
   {
-    Errors = errors;
   }
-
-  public ValidationError[] Errors { get; }
 
   public static ValidationResult<TValue> WithErrors(ValidationError[] errors)
   {
