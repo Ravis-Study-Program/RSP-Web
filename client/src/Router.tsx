@@ -3,6 +3,7 @@ import { createRoutesFromElements, Route } from 'react-router-dom';
 import { Text } from '@mantine/core';
 import getSeasonRoleLoader from './actions/season/getSeasonRoleLoader';
 import { Layout } from './components/Layout/Layout';
+import { AdminEnrollmentsPage } from './pages/Admin/Enrollments/AdminEnrollments.page';
 import { AdminRolesPage } from './pages/Admin/Roles/AdminRoles.page';
 import { AdminSeasonsPage } from './pages/Admin/Seasons/AdminSeasons.page';
 import { AdminUsersPage } from './pages/Admin/Users/AdminUsers.page';
@@ -46,6 +47,7 @@ const routes = (queryClient: QueryClient) => {
           <Route path="seasons" element={<AdminSeasonsPage />} />
           <Route path="users" element={<AdminUsersPage />} />
           <Route path="roles" element={<AdminRolesPage />} />
+          <Route path="enrollments" element={<AdminEnrollmentsPage />} />
         </Route>
 
         {/* Season Routes */}
