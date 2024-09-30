@@ -50,3 +50,8 @@
     background-color: light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-8));
   }
 }
+
+.userSkeleton {
+  width: 100%;
+  padding: var(--mantine-spacing-md);
+}
