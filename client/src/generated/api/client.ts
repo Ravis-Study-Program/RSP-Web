@@ -5,7 +5,6 @@
  * RSP Web Application Backend Endpoints
  * OpenAPI spec version: v1
  */
-import { faker } from '@faker-js/faker';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import type {
   DefinedInitialDataOptions,
@@ -19,7 +18,6 @@ import type {
   UseQueryOptions,
   UseQueryResult,
 } from '@tanstack/react-query';
-import { delay, http, HttpResponse } from 'msw';
 import { CustomAxiosInstance } from '../../shared/api/AxiosCustomInstance';
 
 export type AdminDeleteEnrollmentParams = {
@@ -114,14 +112,27 @@ export const HttpStatusCode = {
   NUMBER_511: 511,
 } as const;
 
+export interface EnrollmentResponse {
+  enrollmentId: string;
+  /** @minLength 1 */
+  role: string;
+  roleId: string;
+  /** @minLength 1 */
+  season: string;
+  seasonId: string;
+  /** @minLength 1 */
+  user: string;
+  userId: string;
+}
+
 export interface Enrollment {
-  enrollmentId?: string;
-  role?: Role;
-  roleId?: string;
-  season?: Season;
-  seasonId?: string;
-  user?: User;
-  userId?: string;
+  enrollmentId: string;
+  role: Role;
+  roleId: string;
+  season: Season;
+  seasonId: string;
+  user: User;
+  userId: string;
 }
 
 export interface User {
@@ -265,6 +276,22 @@ export interface AdminUpdateRoleRequest {
   roleId?: string;
 }
 
+export interface AdminUpdateEnrollmentResponse {
+  enrollmentId?: string;
+  roleId?: string;
+  seasonId?: string;
+  userId?: string;
+}
+
+export interface AdminUpdateEnrollmentResponseApiResult {
+  error?: ApiError;
+  readonly isSuccess?: boolean;
+  responseBody?: AdminUpdateEnrollmentResponse;
+  statusCode?: HttpStatusCode;
+  /** @nullable */
+  successMessage?: string | null;
+}
+
 export interface AdminUpdateEnrollmentRequest {
   enrollmentId?: string;
   roleId?: string;
@@ -314,6 +341,20 @@ export interface AdminListRoleResponseApiResult {
   successMessage?: string | null;
 }
 
+export interface AdminListEnrollmentResponse {
+  /** @nullable */
+  enrollments?: EnrollmentResponse[] | null;
+}
+
+export interface AdminListEnrollmentResponseApiResult {
+  error?: ApiError;
+  readonly isSuccess?: boolean;
+  responseBody?: AdminListEnrollmentResponse;
+  statusCode?: HttpStatusCode;
+  /** @nullable */
+  successMessage?: string | null;
+}
+
 export interface AdminDeleteUserResponse {
   [key: string]: unknown;
 }
@@ -348,6 +389,19 @@ export interface AdminDeleteRoleResponseApiResult {
   error?: ApiError;
   readonly isSuccess?: boolean;
   responseBody?: AdminDeleteRoleResponse;
+  statusCode?: HttpStatusCode;
+  /** @nullable */
+  successMessage?: string | null;
+}
+
+export interface AdminDeleteEnrollmentResponse {
+  [key: string]: unknown;
+}
+
+export interface AdminDeleteEnrollmentResponseApiResult {
+  error?: ApiError;
+  readonly isSuccess?: boolean;
+  responseBody?: AdminDeleteEnrollmentResponse;
   statusCode?: HttpStatusCode;
   /** @nullable */
   successMessage?: string | null;
@@ -437,6 +491,22 @@ export interface AdminCreateRoleResponseApiResult {
 export interface AdminCreateRoleRequest {
   /** @nullable */
   name?: string | null;
+}
+
+export interface AdminCreateEnrollmentResponse {
+  enrollmentId?: string;
+  roleId?: string;
+  seasonId?: string;
+  userId?: string;
+}
+
+export interface AdminCreateEnrollmentResponseApiResult {
+  error?: ApiError;
+  readonly isSuccess?: boolean;
+  responseBody?: AdminCreateEnrollmentResponse;
+  statusCode?: HttpStatusCode;
+  /** @nullable */
+  successMessage?: string | null;
 }
 
 export interface AdminCreateEnrollmentRequest {
@@ -1425,7 +1495,7 @@ export const adminCreateEnrollment = (
   adminCreateEnrollmentRequest: AdminCreateEnrollmentRequest,
   options?: SecondParameter<typeof CustomAxiosInstance>
 ) => {
-  return CustomAxiosInstance<void>(
+  return CustomAxiosInstance<AdminCreateEnrollmentResponseApiResult>(
     {
       url: `http://localhost:4000/api/admin/enrollments`,
       method: 'POST',
@@ -1437,7 +1507,7 @@ export const adminCreateEnrollment = (
 };
 
 export const getAdminCreateEnrollmentMutationOptions = <
-  TError = unknown,
+  TError = AdminCreateEnrollmentResponseApiResult,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -1471,9 +1541,12 @@ export type AdminCreateEnrollmentMutationResult = NonNullable<
   Awaited<ReturnType<typeof adminCreateEnrollment>>
 >;
 export type AdminCreateEnrollmentMutationBody = AdminCreateEnrollmentRequest;
-export type AdminCreateEnrollmentMutationError = unknown;
+export type AdminCreateEnrollmentMutationError = AdminCreateEnrollmentResponseApiResult;
 
-export const useAdminCreateEnrollment = <TError = unknown, TContext = unknown>(options?: {
+export const useAdminCreateEnrollment = <
+  TError = AdminCreateEnrollmentResponseApiResult,
+  TContext = unknown,
+>(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof adminCreateEnrollment>>,
     TError,
@@ -1496,14 +1569,14 @@ export const adminDeleteEnrollment = (
   params: AdminDeleteEnrollmentParams,
   options?: SecondParameter<typeof CustomAxiosInstance>
 ) => {
-  return CustomAxiosInstance<void>(
+  return CustomAxiosInstance<AdminDeleteEnrollmentResponseApiResult>(
     { url: `http://localhost:4000/api/admin/enrollments`, method: 'DELETE', params },
     options
   );
 };
 
 export const getAdminDeleteEnrollmentMutationOptions = <
-  TError = unknown,
+  TError = AdminDeleteEnrollmentResponseApiResult,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -1537,9 +1610,12 @@ export type AdminDeleteEnrollmentMutationResult = NonNullable<
   Awaited<ReturnType<typeof adminDeleteEnrollment>>
 >;
 
-export type AdminDeleteEnrollmentMutationError = unknown;
+export type AdminDeleteEnrollmentMutationError = AdminDeleteEnrollmentResponseApiResult;
 
-export const useAdminDeleteEnrollment = <TError = unknown, TContext = unknown>(options?: {
+export const useAdminDeleteEnrollment = <
+  TError = AdminDeleteEnrollmentResponseApiResult,
+  TContext = unknown,
+>(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof adminDeleteEnrollment>>,
     TError,
@@ -1558,11 +1634,97 @@ export const useAdminDeleteEnrollment = <TError = unknown, TContext = unknown>(o
   return useMutation(mutationOptions);
 };
 
+export const adminListEnrollment = (
+  options?: SecondParameter<typeof CustomAxiosInstance>,
+  signal?: AbortSignal
+) => {
+  return CustomAxiosInstance<AdminListEnrollmentResponseApiResult>(
+    { url: `http://localhost:4000/api/admin/enrollments`, method: 'GET', signal },
+    options
+  );
+};
+
+export const getAdminListEnrollmentQueryKey = () => {
+  return [`http://localhost:4000/api/admin/enrollments`] as const;
+};
+
+export const getAdminListEnrollmentQueryOptions = <
+  TData = Awaited<ReturnType<typeof adminListEnrollment>>,
+  TError = AdminListEnrollmentResponseApiResult,
+>(options?: {
+  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof adminListEnrollment>>, TError, TData>>;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getAdminListEnrollmentQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof adminListEnrollment>>> = ({ signal }) =>
+    adminListEnrollment(requestOptions, signal);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof adminListEnrollment>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type AdminListEnrollmentQueryResult = NonNullable<
+  Awaited<ReturnType<typeof adminListEnrollment>>
+>;
+export type AdminListEnrollmentQueryError = AdminListEnrollmentResponseApiResult;
+
+export function useAdminListEnrollment<
+  TData = Awaited<ReturnType<typeof adminListEnrollment>>,
+  TError = AdminListEnrollmentResponseApiResult,
+>(options: {
+  query: Partial<UseQueryOptions<Awaited<ReturnType<typeof adminListEnrollment>>, TError, TData>> &
+    Pick<
+      DefinedInitialDataOptions<Awaited<ReturnType<typeof adminListEnrollment>>, TError, TData>,
+      'initialData'
+    >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): DefinedUseQueryResult<TData, TError> & { queryKey: QueryKey };
+export function useAdminListEnrollment<
+  TData = Awaited<ReturnType<typeof adminListEnrollment>>,
+  TError = AdminListEnrollmentResponseApiResult,
+>(options?: {
+  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof adminListEnrollment>>, TError, TData>> &
+    Pick<
+      UndefinedInitialDataOptions<Awaited<ReturnType<typeof adminListEnrollment>>, TError, TData>,
+      'initialData'
+    >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey };
+export function useAdminListEnrollment<
+  TData = Awaited<ReturnType<typeof adminListEnrollment>>,
+  TError = AdminListEnrollmentResponseApiResult,
+>(options?: {
+  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof adminListEnrollment>>, TError, TData>>;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+export function useAdminListEnrollment<
+  TData = Awaited<ReturnType<typeof adminListEnrollment>>,
+  TError = AdminListEnrollmentResponseApiResult,
+>(options?: {
+  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof adminListEnrollment>>, TError, TData>>;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getAdminListEnrollmentQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
 export const adminUpdateEnrollment = (
   adminUpdateEnrollmentRequest: AdminUpdateEnrollmentRequest,
   options?: SecondParameter<typeof CustomAxiosInstance>
 ) => {
-  return CustomAxiosInstance<void>(
+  return CustomAxiosInstance<AdminUpdateEnrollmentResponseApiResult>(
     {
       url: `http://localhost:4000/api/admin/enrollments`,
       method: 'PUT',
@@ -1574,7 +1736,7 @@ export const adminUpdateEnrollment = (
 };
 
 export const getAdminUpdateEnrollmentMutationOptions = <
-  TError = unknown,
+  TError = AdminUpdateEnrollmentResponseApiResult,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -1608,9 +1770,12 @@ export type AdminUpdateEnrollmentMutationResult = NonNullable<
   Awaited<ReturnType<typeof adminUpdateEnrollment>>
 >;
 export type AdminUpdateEnrollmentMutationBody = AdminUpdateEnrollmentRequest;
-export type AdminUpdateEnrollmentMutationError = unknown;
+export type AdminUpdateEnrollmentMutationError = AdminUpdateEnrollmentResponseApiResult;
 
-export const useAdminUpdateEnrollment = <TError = unknown, TContext = unknown>(options?: {
+export const useAdminUpdateEnrollment = <
+  TError = AdminUpdateEnrollmentResponseApiResult,
+  TContext = unknown,
+>(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof adminUpdateEnrollment>>,
     TError,
@@ -1628,1071 +1793,3 @@ export const useAdminUpdateEnrollment = <TError = unknown, TContext = unknown>(o
 
   return useMutation(mutationOptions);
 };
-
-export const getAdminCreateUserResponseMock = (
-  overrideResponse: Partial<AdminCreateUserResponseApiResult> = {}
-): AdminCreateUserResponseApiResult => ({
-  error: faker.helpers.arrayElement([
-    {
-      message: faker.helpers.arrayElement([
-        faker.helpers.arrayElement([faker.word.sample(), null]),
-        undefined,
-      ]),
-      validationErrors: faker.helpers.arrayElement([
-        Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
-          message: faker.helpers.arrayElement([
-            faker.helpers.arrayElement([faker.word.sample(), null]),
-            undefined,
-          ]),
-          property: faker.helpers.arrayElement([
-            faker.helpers.arrayElement([faker.word.sample(), null]),
-            undefined,
-          ]),
-          validationErrors: faker.helpers.arrayElement([[], undefined]),
-        })),
-        undefined,
-      ]),
-    },
-    undefined,
-  ]),
-  isSuccess: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
-  responseBody: faker.helpers.arrayElement([
-    {
-      discordId: faker.helpers.arrayElement([
-        faker.helpers.arrayElement([faker.word.sample(), null]),
-        undefined,
-      ]),
-      email: faker.helpers.arrayElement([
-        faker.helpers.arrayElement([faker.word.sample(), null]),
-        undefined,
-      ]),
-      isAdmin: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
-      name: faker.helpers.arrayElement([
-        faker.helpers.arrayElement([faker.word.sample(), null]),
-        undefined,
-      ]),
-      profileImage: faker.helpers.arrayElement([
-        faker.helpers.arrayElement([faker.word.sample(), null]),
-        undefined,
-      ]),
-      userId: faker.helpers.arrayElement([faker.string.uuid(), undefined]),
-    },
-    undefined,
-  ]),
-  statusCode: faker.helpers.arrayElement([
-    faker.helpers.arrayElement(Object.values(HttpStatusCode)),
-    undefined,
-  ]),
-  successMessage: faker.helpers.arrayElement([
-    faker.helpers.arrayElement([faker.word.sample(), null]),
-    undefined,
-  ]),
-  ...overrideResponse,
-});
-
-export const getAdminDeleteUserResponseMock = (
-  overrideResponse: Partial<AdminDeleteUserResponseApiResult> = {}
-): AdminDeleteUserResponseApiResult => ({
-  error: faker.helpers.arrayElement([
-    {
-      message: faker.helpers.arrayElement([
-        faker.helpers.arrayElement([faker.word.sample(), null]),
-        undefined,
-      ]),
-      validationErrors: faker.helpers.arrayElement([
-        Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
-          message: faker.helpers.arrayElement([
-            faker.helpers.arrayElement([faker.word.sample(), null]),
-            undefined,
-          ]),
-          property: faker.helpers.arrayElement([
-            faker.helpers.arrayElement([faker.word.sample(), null]),
-            undefined,
-          ]),
-          validationErrors: faker.helpers.arrayElement([[], undefined]),
-        })),
-        undefined,
-      ]),
-    },
-    undefined,
-  ]),
-  isSuccess: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
-  responseBody: faker.helpers.arrayElement([{}, undefined]),
-  statusCode: faker.helpers.arrayElement([
-    faker.helpers.arrayElement(Object.values(HttpStatusCode)),
-    undefined,
-  ]),
-  successMessage: faker.helpers.arrayElement([
-    faker.helpers.arrayElement([faker.word.sample(), null]),
-    undefined,
-  ]),
-  ...overrideResponse,
-});
-
-export const getAdminListUserResponseMock = (
-  overrideResponse: Partial<AdminListUserResponseApiResult> = {}
-): AdminListUserResponseApiResult => ({
-  error: faker.helpers.arrayElement([
-    {
-      message: faker.helpers.arrayElement([
-        faker.helpers.arrayElement([faker.word.sample(), null]),
-        undefined,
-      ]),
-      validationErrors: faker.helpers.arrayElement([
-        Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
-          message: faker.helpers.arrayElement([
-            faker.helpers.arrayElement([faker.word.sample(), null]),
-            undefined,
-          ]),
-          property: faker.helpers.arrayElement([
-            faker.helpers.arrayElement([faker.word.sample(), null]),
-            undefined,
-          ]),
-          validationErrors: faker.helpers.arrayElement([[], undefined]),
-        })),
-        undefined,
-      ]),
-    },
-    undefined,
-  ]),
-  isSuccess: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
-  responseBody: faker.helpers.arrayElement([
-    {
-      users: faker.helpers.arrayElement([
-        Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
-          discordId: faker.word.sample(),
-          email: faker.word.sample(),
-          enrollments: faker.helpers.arrayElement([
-            Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
-              () => ({
-                enrollmentId: faker.helpers.arrayElement([faker.string.uuid(), undefined]),
-                role: faker.helpers.arrayElement([
-                  {
-                    enrollments: faker.helpers.arrayElement([[], undefined]),
-                    name: faker.word.sample(),
-                    roleId: faker.string.uuid(),
-                  },
-                  undefined,
-                ]),
-                roleId: faker.helpers.arrayElement([faker.string.uuid(), undefined]),
-                season: faker.helpers.arrayElement([
-                  {
-                    endDate: `${faker.date.past().toISOString().split('.')[0]}Z`,
-                    enrollments: faker.helpers.arrayElement([[], undefined]),
-                    imageUrl: faker.word.sample(),
-                    location: faker.word.sample(),
-                    name: faker.word.sample(),
-                    seasonId: faker.helpers.arrayElement([faker.string.uuid(), undefined]),
-                    startDate: `${faker.date.past().toISOString().split('.')[0]}Z`,
-                  },
-                  undefined,
-                ]),
-                seasonId: faker.helpers.arrayElement([faker.string.uuid(), undefined]),
-                userId: faker.helpers.arrayElement([faker.string.uuid(), undefined]),
-              })
-            ),
-            undefined,
-          ]),
-          isAdmin: faker.datatype.boolean(),
-          name: faker.word.sample(),
-          profileImage: faker.word.sample(),
-          userId: faker.helpers.arrayElement([faker.string.uuid(), undefined]),
-        })),
-        undefined,
-      ]),
-    },
-    undefined,
-  ]),
-  statusCode: faker.helpers.arrayElement([
-    faker.helpers.arrayElement(Object.values(HttpStatusCode)),
-    undefined,
-  ]),
-  successMessage: faker.helpers.arrayElement([
-    faker.helpers.arrayElement([faker.word.sample(), null]),
-    undefined,
-  ]),
-  ...overrideResponse,
-});
-
-export const getAdminUpdateUserResponseMock = (
-  overrideResponse: Partial<AdminUpdateUserResponseApiResult> = {}
-): AdminUpdateUserResponseApiResult => ({
-  error: faker.helpers.arrayElement([
-    {
-      message: faker.helpers.arrayElement([
-        faker.helpers.arrayElement([faker.word.sample(), null]),
-        undefined,
-      ]),
-      validationErrors: faker.helpers.arrayElement([
-        Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
-          message: faker.helpers.arrayElement([
-            faker.helpers.arrayElement([faker.word.sample(), null]),
-            undefined,
-          ]),
-          property: faker.helpers.arrayElement([
-            faker.helpers.arrayElement([faker.word.sample(), null]),
-            undefined,
-          ]),
-          validationErrors: faker.helpers.arrayElement([[], undefined]),
-        })),
-        undefined,
-      ]),
-    },
-    undefined,
-  ]),
-  isSuccess: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
-  responseBody: faker.helpers.arrayElement([
-    {
-      discordId: faker.helpers.arrayElement([
-        faker.helpers.arrayElement([faker.word.sample(), null]),
-        undefined,
-      ]),
-      email: faker.helpers.arrayElement([
-        faker.helpers.arrayElement([faker.word.sample(), null]),
-        undefined,
-      ]),
-      isAdmin: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
-      name: faker.helpers.arrayElement([
-        faker.helpers.arrayElement([faker.word.sample(), null]),
-        undefined,
-      ]),
-      profileImage: faker.helpers.arrayElement([
-        faker.helpers.arrayElement([faker.word.sample(), null]),
-        undefined,
-      ]),
-      userId: faker.helpers.arrayElement([faker.string.uuid(), undefined]),
-    },
-    undefined,
-  ]),
-  statusCode: faker.helpers.arrayElement([
-    faker.helpers.arrayElement(Object.values(HttpStatusCode)),
-    undefined,
-  ]),
-  successMessage: faker.helpers.arrayElement([
-    faker.helpers.arrayElement([faker.word.sample(), null]),
-    undefined,
-  ]),
-  ...overrideResponse,
-});
-
-export const getAdminCreateSeasonResponseMock = (
-  overrideResponse: Partial<AdminCreateSeasonResponseApiResult> = {}
-): AdminCreateSeasonResponseApiResult => ({
-  error: faker.helpers.arrayElement([
-    {
-      message: faker.helpers.arrayElement([
-        faker.helpers.arrayElement([faker.word.sample(), null]),
-        undefined,
-      ]),
-      validationErrors: faker.helpers.arrayElement([
-        Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
-          message: faker.helpers.arrayElement([
-            faker.helpers.arrayElement([faker.word.sample(), null]),
-            undefined,
-          ]),
-          property: faker.helpers.arrayElement([
-            faker.helpers.arrayElement([faker.word.sample(), null]),
-            undefined,
-          ]),
-          validationErrors: faker.helpers.arrayElement([[], undefined]),
-        })),
-        undefined,
-      ]),
-    },
-    undefined,
-  ]),
-  isSuccess: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
-  responseBody: faker.helpers.arrayElement([
-    {
-      endDate: faker.helpers.arrayElement([
-        `${faker.date.past().toISOString().split('.')[0]}Z`,
-        undefined,
-      ]),
-      imageUrl: faker.helpers.arrayElement([
-        faker.helpers.arrayElement([faker.word.sample(), null]),
-        undefined,
-      ]),
-      location: faker.helpers.arrayElement([
-        faker.helpers.arrayElement([faker.word.sample(), null]),
-        undefined,
-      ]),
-      name: faker.helpers.arrayElement([
-        faker.helpers.arrayElement([faker.word.sample(), null]),
-        undefined,
-      ]),
-      seasonId: faker.helpers.arrayElement([faker.string.uuid(), undefined]),
-      startDate: faker.helpers.arrayElement([
-        `${faker.date.past().toISOString().split('.')[0]}Z`,
-        undefined,
-      ]),
-    },
-    undefined,
-  ]),
-  statusCode: faker.helpers.arrayElement([
-    faker.helpers.arrayElement(Object.values(HttpStatusCode)),
-    undefined,
-  ]),
-  successMessage: faker.helpers.arrayElement([
-    faker.helpers.arrayElement([faker.word.sample(), null]),
-    undefined,
-  ]),
-  ...overrideResponse,
-});
-
-export const getAdminDeleteSeasonResponseMock = (
-  overrideResponse: Partial<AdminDeleteSeasonResponseApiResult> = {}
-): AdminDeleteSeasonResponseApiResult => ({
-  error: faker.helpers.arrayElement([
-    {
-      message: faker.helpers.arrayElement([
-        faker.helpers.arrayElement([faker.word.sample(), null]),
-        undefined,
-      ]),
-      validationErrors: faker.helpers.arrayElement([
-        Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
-          message: faker.helpers.arrayElement([
-            faker.helpers.arrayElement([faker.word.sample(), null]),
-            undefined,
-          ]),
-          property: faker.helpers.arrayElement([
-            faker.helpers.arrayElement([faker.word.sample(), null]),
-            undefined,
-          ]),
-          validationErrors: faker.helpers.arrayElement([[], undefined]),
-        })),
-        undefined,
-      ]),
-    },
-    undefined,
-  ]),
-  isSuccess: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
-  responseBody: faker.helpers.arrayElement([{}, undefined]),
-  statusCode: faker.helpers.arrayElement([
-    faker.helpers.arrayElement(Object.values(HttpStatusCode)),
-    undefined,
-  ]),
-  successMessage: faker.helpers.arrayElement([
-    faker.helpers.arrayElement([faker.word.sample(), null]),
-    undefined,
-  ]),
-  ...overrideResponse,
-});
-
-export const getAdminListSeasonResponseMock = (
-  overrideResponse: Partial<AdminListSeasonResponseApiResult> = {}
-): AdminListSeasonResponseApiResult => ({
-  error: faker.helpers.arrayElement([
-    {
-      message: faker.helpers.arrayElement([
-        faker.helpers.arrayElement([faker.word.sample(), null]),
-        undefined,
-      ]),
-      validationErrors: faker.helpers.arrayElement([
-        Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
-          message: faker.helpers.arrayElement([
-            faker.helpers.arrayElement([faker.word.sample(), null]),
-            undefined,
-          ]),
-          property: faker.helpers.arrayElement([
-            faker.helpers.arrayElement([faker.word.sample(), null]),
-            undefined,
-          ]),
-          validationErrors: faker.helpers.arrayElement([[], undefined]),
-        })),
-        undefined,
-      ]),
-    },
-    undefined,
-  ]),
-  isSuccess: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
-  responseBody: faker.helpers.arrayElement([
-    {
-      seasons: faker.helpers.arrayElement([
-        Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
-          endDate: `${faker.date.past().toISOString().split('.')[0]}Z`,
-          enrollments: faker.helpers.arrayElement([
-            Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
-              () => ({
-                enrollmentId: faker.helpers.arrayElement([faker.string.uuid(), undefined]),
-                role: faker.helpers.arrayElement([
-                  {
-                    enrollments: faker.helpers.arrayElement([[], undefined]),
-                    name: faker.word.sample(),
-                    roleId: faker.string.uuid(),
-                  },
-                  undefined,
-                ]),
-                roleId: faker.helpers.arrayElement([faker.string.uuid(), undefined]),
-                seasonId: faker.helpers.arrayElement([faker.string.uuid(), undefined]),
-                user: faker.helpers.arrayElement([
-                  {
-                    discordId: faker.word.sample(),
-                    email: faker.word.sample(),
-                    enrollments: faker.helpers.arrayElement([[], undefined]),
-                    isAdmin: faker.datatype.boolean(),
-                    name: faker.word.sample(),
-                    profileImage: faker.word.sample(),
-                    userId: faker.helpers.arrayElement([faker.string.uuid(), undefined]),
-                  },
-                  undefined,
-                ]),
-                userId: faker.helpers.arrayElement([faker.string.uuid(), undefined]),
-              })
-            ),
-            undefined,
-          ]),
-          imageUrl: faker.word.sample(),
-          location: faker.word.sample(),
-          name: faker.word.sample(),
-          seasonId: faker.helpers.arrayElement([faker.string.uuid(), undefined]),
-          startDate: `${faker.date.past().toISOString().split('.')[0]}Z`,
-        })),
-        undefined,
-      ]),
-    },
-    undefined,
-  ]),
-  statusCode: faker.helpers.arrayElement([
-    faker.helpers.arrayElement(Object.values(HttpStatusCode)),
-    undefined,
-  ]),
-  successMessage: faker.helpers.arrayElement([
-    faker.helpers.arrayElement([faker.word.sample(), null]),
-    undefined,
-  ]),
-  ...overrideResponse,
-});
-
-export const getAdminUpdateSeasonResponseMock = (
-  overrideResponse: Partial<AdminUpdateSeasonResponseApiResult> = {}
-): AdminUpdateSeasonResponseApiResult => ({
-  error: faker.helpers.arrayElement([
-    {
-      message: faker.helpers.arrayElement([
-        faker.helpers.arrayElement([faker.word.sample(), null]),
-        undefined,
-      ]),
-      validationErrors: faker.helpers.arrayElement([
-        Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
-          message: faker.helpers.arrayElement([
-            faker.helpers.arrayElement([faker.word.sample(), null]),
-            undefined,
-          ]),
-          property: faker.helpers.arrayElement([
-            faker.helpers.arrayElement([faker.word.sample(), null]),
-            undefined,
-          ]),
-          validationErrors: faker.helpers.arrayElement([[], undefined]),
-        })),
-        undefined,
-      ]),
-    },
-    undefined,
-  ]),
-  isSuccess: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
-  responseBody: faker.helpers.arrayElement([
-    {
-      endDate: faker.helpers.arrayElement([
-        `${faker.date.past().toISOString().split('.')[0]}Z`,
-        undefined,
-      ]),
-      imageUrl: faker.helpers.arrayElement([
-        faker.helpers.arrayElement([faker.word.sample(), null]),
-        undefined,
-      ]),
-      location: faker.helpers.arrayElement([
-        faker.helpers.arrayElement([faker.word.sample(), null]),
-        undefined,
-      ]),
-      name: faker.helpers.arrayElement([
-        faker.helpers.arrayElement([faker.word.sample(), null]),
-        undefined,
-      ]),
-      seasonId: faker.helpers.arrayElement([faker.string.uuid(), undefined]),
-      startDate: faker.helpers.arrayElement([
-        `${faker.date.past().toISOString().split('.')[0]}Z`,
-        undefined,
-      ]),
-    },
-    undefined,
-  ]),
-  statusCode: faker.helpers.arrayElement([
-    faker.helpers.arrayElement(Object.values(HttpStatusCode)),
-    undefined,
-  ]),
-  successMessage: faker.helpers.arrayElement([
-    faker.helpers.arrayElement([faker.word.sample(), null]),
-    undefined,
-  ]),
-  ...overrideResponse,
-});
-
-export const getAdminCreateRoleResponseMock = (
-  overrideResponse: Partial<AdminCreateRoleResponseApiResult> = {}
-): AdminCreateRoleResponseApiResult => ({
-  error: faker.helpers.arrayElement([
-    {
-      message: faker.helpers.arrayElement([
-        faker.helpers.arrayElement([faker.word.sample(), null]),
-        undefined,
-      ]),
-      validationErrors: faker.helpers.arrayElement([
-        Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
-          message: faker.helpers.arrayElement([
-            faker.helpers.arrayElement([faker.word.sample(), null]),
-            undefined,
-          ]),
-          property: faker.helpers.arrayElement([
-            faker.helpers.arrayElement([faker.word.sample(), null]),
-            undefined,
-          ]),
-          validationErrors: faker.helpers.arrayElement([[], undefined]),
-        })),
-        undefined,
-      ]),
-    },
-    undefined,
-  ]),
-  isSuccess: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
-  responseBody: faker.helpers.arrayElement([
-    {
-      name: faker.helpers.arrayElement([
-        faker.helpers.arrayElement([faker.word.sample(), null]),
-        undefined,
-      ]),
-      roleId: faker.helpers.arrayElement([faker.string.uuid(), undefined]),
-    },
-    undefined,
-  ]),
-  statusCode: faker.helpers.arrayElement([
-    faker.helpers.arrayElement(Object.values(HttpStatusCode)),
-    undefined,
-  ]),
-  successMessage: faker.helpers.arrayElement([
-    faker.helpers.arrayElement([faker.word.sample(), null]),
-    undefined,
-  ]),
-  ...overrideResponse,
-});
-
-export const getAdminDeleteRoleResponseMock = (
-  overrideResponse: Partial<AdminDeleteRoleResponseApiResult> = {}
-): AdminDeleteRoleResponseApiResult => ({
-  error: faker.helpers.arrayElement([
-    {
-      message: faker.helpers.arrayElement([
-        faker.helpers.arrayElement([faker.word.sample(), null]),
-        undefined,
-      ]),
-      validationErrors: faker.helpers.arrayElement([
-        Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
-          message: faker.helpers.arrayElement([
-            faker.helpers.arrayElement([faker.word.sample(), null]),
-            undefined,
-          ]),
-          property: faker.helpers.arrayElement([
-            faker.helpers.arrayElement([faker.word.sample(), null]),
-            undefined,
-          ]),
-          validationErrors: faker.helpers.arrayElement([[], undefined]),
-        })),
-        undefined,
-      ]),
-    },
-    undefined,
-  ]),
-  isSuccess: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
-  responseBody: faker.helpers.arrayElement([{}, undefined]),
-  statusCode: faker.helpers.arrayElement([
-    faker.helpers.arrayElement(Object.values(HttpStatusCode)),
-    undefined,
-  ]),
-  successMessage: faker.helpers.arrayElement([
-    faker.helpers.arrayElement([faker.word.sample(), null]),
-    undefined,
-  ]),
-  ...overrideResponse,
-});
-
-export const getAdminListRoleResponseMock = (
-  overrideResponse: Partial<AdminListRoleResponseApiResult> = {}
-): AdminListRoleResponseApiResult => ({
-  error: faker.helpers.arrayElement([
-    {
-      message: faker.helpers.arrayElement([
-        faker.helpers.arrayElement([faker.word.sample(), null]),
-        undefined,
-      ]),
-      validationErrors: faker.helpers.arrayElement([
-        Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
-          message: faker.helpers.arrayElement([
-            faker.helpers.arrayElement([faker.word.sample(), null]),
-            undefined,
-          ]),
-          property: faker.helpers.arrayElement([
-            faker.helpers.arrayElement([faker.word.sample(), null]),
-            undefined,
-          ]),
-          validationErrors: faker.helpers.arrayElement([[], undefined]),
-        })),
-        undefined,
-      ]),
-    },
-    undefined,
-  ]),
-  isSuccess: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
-  responseBody: faker.helpers.arrayElement([
-    {
-      roles: faker.helpers.arrayElement([
-        Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
-          enrollments: faker.helpers.arrayElement([
-            Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
-              () => ({
-                enrollmentId: faker.helpers.arrayElement([faker.string.uuid(), undefined]),
-                roleId: faker.helpers.arrayElement([faker.string.uuid(), undefined]),
-                season: faker.helpers.arrayElement([
-                  {
-                    endDate: `${faker.date.past().toISOString().split('.')[0]}Z`,
-                    enrollments: faker.helpers.arrayElement([[], undefined]),
-                    imageUrl: faker.word.sample(),
-                    location: faker.word.sample(),
-                    name: faker.word.sample(),
-                    seasonId: faker.helpers.arrayElement([faker.string.uuid(), undefined]),
-                    startDate: `${faker.date.past().toISOString().split('.')[0]}Z`,
-                  },
-                  undefined,
-                ]),
-                seasonId: faker.helpers.arrayElement([faker.string.uuid(), undefined]),
-                user: faker.helpers.arrayElement([
-                  {
-                    discordId: faker.word.sample(),
-                    email: faker.word.sample(),
-                    enrollments: faker.helpers.arrayElement([[], undefined]),
-                    isAdmin: faker.datatype.boolean(),
-                    name: faker.word.sample(),
-                    profileImage: faker.word.sample(),
-                    userId: faker.helpers.arrayElement([faker.string.uuid(), undefined]),
-                  },
-                  undefined,
-                ]),
-                userId: faker.helpers.arrayElement([faker.string.uuid(), undefined]),
-              })
-            ),
-            undefined,
-          ]),
-          name: faker.word.sample(),
-          roleId: faker.string.uuid(),
-        })),
-        undefined,
-      ]),
-    },
-    undefined,
-  ]),
-  statusCode: faker.helpers.arrayElement([
-    faker.helpers.arrayElement(Object.values(HttpStatusCode)),
-    undefined,
-  ]),
-  successMessage: faker.helpers.arrayElement([
-    faker.helpers.arrayElement([faker.word.sample(), null]),
-    undefined,
-  ]),
-  ...overrideResponse,
-});
-
-export const getAdminUpdateRoleResponseMock = (
-  overrideResponse: Partial<AdminUpdateRoleResponseApiResult> = {}
-): AdminUpdateRoleResponseApiResult => ({
-  error: faker.helpers.arrayElement([
-    {
-      message: faker.helpers.arrayElement([
-        faker.helpers.arrayElement([faker.word.sample(), null]),
-        undefined,
-      ]),
-      validationErrors: faker.helpers.arrayElement([
-        Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
-          message: faker.helpers.arrayElement([
-            faker.helpers.arrayElement([faker.word.sample(), null]),
-            undefined,
-          ]),
-          property: faker.helpers.arrayElement([
-            faker.helpers.arrayElement([faker.word.sample(), null]),
-            undefined,
-          ]),
-          validationErrors: faker.helpers.arrayElement([[], undefined]),
-        })),
-        undefined,
-      ]),
-    },
-    undefined,
-  ]),
-  isSuccess: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
-  responseBody: faker.helpers.arrayElement([
-    {
-      name: faker.helpers.arrayElement([
-        faker.helpers.arrayElement([faker.word.sample(), null]),
-        undefined,
-      ]),
-      roleId: faker.helpers.arrayElement([faker.string.uuid(), undefined]),
-    },
-    undefined,
-  ]),
-  statusCode: faker.helpers.arrayElement([
-    faker.helpers.arrayElement(Object.values(HttpStatusCode)),
-    undefined,
-  ]),
-  successMessage: faker.helpers.arrayElement([
-    faker.helpers.arrayElement([faker.word.sample(), null]),
-    undefined,
-  ]),
-  ...overrideResponse,
-});
-
-export const getAdminCreateUserMockHandler = (
-  overrideResponse?:
-    | AdminCreateUserResponseApiResult
-    | ((
-        info: Parameters<Parameters<typeof http.post>[1]>[0]
-      ) => Promise<AdminCreateUserResponseApiResult> | AdminCreateUserResponseApiResult)
-) => {
-  return http.post('*/api/admin/users', async (info) => {
-    await delay(1000);
-
-    return new HttpResponse(
-      JSON.stringify(
-        overrideResponse !== undefined
-          ? typeof overrideResponse === 'function'
-            ? await overrideResponse(info)
-            : overrideResponse
-          : getAdminCreateUserResponseMock()
-      ),
-      { status: 200, headers: { 'Content-Type': 'application/json' } }
-    );
-  });
-};
-
-export const getAdminDeleteUserMockHandler = (
-  overrideResponse?:
-    | AdminDeleteUserResponseApiResult
-    | ((
-        info: Parameters<Parameters<typeof http.delete>[1]>[0]
-      ) => Promise<AdminDeleteUserResponseApiResult> | AdminDeleteUserResponseApiResult)
-) => {
-  return http.delete('*/api/admin/users', async (info) => {
-    await delay(1000);
-
-    return new HttpResponse(
-      JSON.stringify(
-        overrideResponse !== undefined
-          ? typeof overrideResponse === 'function'
-            ? await overrideResponse(info)
-            : overrideResponse
-          : getAdminDeleteUserResponseMock()
-      ),
-      { status: 200, headers: { 'Content-Type': 'application/json' } }
-    );
-  });
-};
-
-export const getAdminListUserMockHandler = (
-  overrideResponse?:
-    | AdminListUserResponseApiResult
-    | ((
-        info: Parameters<Parameters<typeof http.get>[1]>[0]
-      ) => Promise<AdminListUserResponseApiResult> | AdminListUserResponseApiResult)
-) => {
-  return http.get('*/api/admin/users', async (info) => {
-    await delay(1000);
-
-    return new HttpResponse(
-      JSON.stringify(
-        overrideResponse !== undefined
-          ? typeof overrideResponse === 'function'
-            ? await overrideResponse(info)
-            : overrideResponse
-          : getAdminListUserResponseMock()
-      ),
-      { status: 200, headers: { 'Content-Type': 'application/json' } }
-    );
-  });
-};
-
-export const getAdminUpdateUserMockHandler = (
-  overrideResponse?:
-    | AdminUpdateUserResponseApiResult
-    | ((
-        info: Parameters<Parameters<typeof http.put>[1]>[0]
-      ) => Promise<AdminUpdateUserResponseApiResult> | AdminUpdateUserResponseApiResult)
-) => {
-  return http.put('*/api/admin/users', async (info) => {
-    await delay(1000);
-
-    return new HttpResponse(
-      JSON.stringify(
-        overrideResponse !== undefined
-          ? typeof overrideResponse === 'function'
-            ? await overrideResponse(info)
-            : overrideResponse
-          : getAdminUpdateUserResponseMock()
-      ),
-      { status: 200, headers: { 'Content-Type': 'application/json' } }
-    );
-  });
-};
-
-export const getCreateUserIfNotExistsMockHandler = (
-  overrideResponse?:
-    | void
-    | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<void> | void)
-) => {
-  return http.post('*/api/users/create-if-not-exists', async (info) => {
-    await delay(1000);
-    if (typeof overrideResponse === 'function') {
-      await overrideResponse(info);
-    }
-    return new HttpResponse(null, { status: 200 });
-  });
-};
-
-export const getAdminCreateSeasonMockHandler = (
-  overrideResponse?:
-    | AdminCreateSeasonResponseApiResult
-    | ((
-        info: Parameters<Parameters<typeof http.post>[1]>[0]
-      ) => Promise<AdminCreateSeasonResponseApiResult> | AdminCreateSeasonResponseApiResult)
-) => {
-  return http.post('*/api/admin/seasons', async (info) => {
-    await delay(1000);
-
-    return new HttpResponse(
-      JSON.stringify(
-        overrideResponse !== undefined
-          ? typeof overrideResponse === 'function'
-            ? await overrideResponse(info)
-            : overrideResponse
-          : getAdminCreateSeasonResponseMock()
-      ),
-      { status: 200, headers: { 'Content-Type': 'application/json' } }
-    );
-  });
-};
-
-export const getAdminDeleteSeasonMockHandler = (
-  overrideResponse?:
-    | AdminDeleteSeasonResponseApiResult
-    | ((
-        info: Parameters<Parameters<typeof http.delete>[1]>[0]
-      ) => Promise<AdminDeleteSeasonResponseApiResult> | AdminDeleteSeasonResponseApiResult)
-) => {
-  return http.delete('*/api/admin/seasons', async (info) => {
-    await delay(1000);
-
-    return new HttpResponse(
-      JSON.stringify(
-        overrideResponse !== undefined
-          ? typeof overrideResponse === 'function'
-            ? await overrideResponse(info)
-            : overrideResponse
-          : getAdminDeleteSeasonResponseMock()
-      ),
-      { status: 200, headers: { 'Content-Type': 'application/json' } }
-    );
-  });
-};
-
-export const getAdminListSeasonMockHandler = (
-  overrideResponse?:
-    | AdminListSeasonResponseApiResult
-    | ((
-        info: Parameters<Parameters<typeof http.get>[1]>[0]
-      ) => Promise<AdminListSeasonResponseApiResult> | AdminListSeasonResponseApiResult)
-) => {
-  return http.get('*/api/admin/seasons', async (info) => {
-    await delay(1000);
-
-    return new HttpResponse(
-      JSON.stringify(
-        overrideResponse !== undefined
-          ? typeof overrideResponse === 'function'
-            ? await overrideResponse(info)
-            : overrideResponse
-          : getAdminListSeasonResponseMock()
-      ),
-      { status: 200, headers: { 'Content-Type': 'application/json' } }
-    );
-  });
-};
-
-export const getAdminUpdateSeasonMockHandler = (
-  overrideResponse?:
-    | AdminUpdateSeasonResponseApiResult
-    | ((
-        info: Parameters<Parameters<typeof http.put>[1]>[0]
-      ) => Promise<AdminUpdateSeasonResponseApiResult> | AdminUpdateSeasonResponseApiResult)
-) => {
-  return http.put('*/api/admin/seasons', async (info) => {
-    await delay(1000);
-
-    return new HttpResponse(
-      JSON.stringify(
-        overrideResponse !== undefined
-          ? typeof overrideResponse === 'function'
-            ? await overrideResponse(info)
-            : overrideResponse
-          : getAdminUpdateSeasonResponseMock()
-      ),
-      { status: 200, headers: { 'Content-Type': 'application/json' } }
-    );
-  });
-};
-
-export const getAdminCreateRoleMockHandler = (
-  overrideResponse?:
-    | AdminCreateRoleResponseApiResult
-    | ((
-        info: Parameters<Parameters<typeof http.post>[1]>[0]
-      ) => Promise<AdminCreateRoleResponseApiResult> | AdminCreateRoleResponseApiResult)
-) => {
-  return http.post('*/api/admin/roles', async (info) => {
-    await delay(1000);
-
-    return new HttpResponse(
-      JSON.stringify(
-        overrideResponse !== undefined
-          ? typeof overrideResponse === 'function'
-            ? await overrideResponse(info)
-            : overrideResponse
-          : getAdminCreateRoleResponseMock()
-      ),
-      { status: 200, headers: { 'Content-Type': 'application/json' } }
-    );
-  });
-};
-
-export const getAdminDeleteRoleMockHandler = (
-  overrideResponse?:
-    | AdminDeleteRoleResponseApiResult
-    | ((
-        info: Parameters<Parameters<typeof http.delete>[1]>[0]
-      ) => Promise<AdminDeleteRoleResponseApiResult> | AdminDeleteRoleResponseApiResult)
-) => {
-  return http.delete('*/api/admin/roles', async (info) => {
-    await delay(1000);
-
-    return new HttpResponse(
-      JSON.stringify(
-        overrideResponse !== undefined
-          ? typeof overrideResponse === 'function'
-            ? await overrideResponse(info)
-            : overrideResponse
-          : getAdminDeleteRoleResponseMock()
-      ),
-      { status: 200, headers: { 'Content-Type': 'application/json' } }
-    );
-  });
-};
-
-export const getAdminListRoleMockHandler = (
-  overrideResponse?:
-    | AdminListRoleResponseApiResult
-    | ((
-        info: Parameters<Parameters<typeof http.get>[1]>[0]
-      ) => Promise<AdminListRoleResponseApiResult> | AdminListRoleResponseApiResult)
-) => {
-  return http.get('*/api/admin/roles', async (info) => {
-    await delay(1000);
-
-    return new HttpResponse(
-      JSON.stringify(
-        overrideResponse !== undefined
-          ? typeof overrideResponse === 'function'
-            ? await overrideResponse(info)
-            : overrideResponse
-          : getAdminListRoleResponseMock()
-      ),
-      { status: 200, headers: { 'Content-Type': 'application/json' } }
-    );
-  });
-};
-
-export const getAdminUpdateRoleMockHandler = (
-  overrideResponse?:
-    | AdminUpdateRoleResponseApiResult
-    | ((
-        info: Parameters<Parameters<typeof http.put>[1]>[0]
-      ) => Promise<AdminUpdateRoleResponseApiResult> | AdminUpdateRoleResponseApiResult)
-) => {
-  return http.put('*/api/admin/roles', async (info) => {
-    await delay(1000);
-
-    return new HttpResponse(
-      JSON.stringify(
-        overrideResponse !== undefined
-          ? typeof overrideResponse === 'function'
-            ? await overrideResponse(info)
-            : overrideResponse
-          : getAdminUpdateRoleResponseMock()
-      ),
-      { status: 200, headers: { 'Content-Type': 'application/json' } }
-    );
-  });
-};
-
-export const getAdminCreateEnrollmentMockHandler = (
-  overrideResponse?:
-    | void
-    | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<void> | void)
-) => {
-  return http.post('*/api/admin/enrollments', async (info) => {
-    await delay(1000);
-    if (typeof overrideResponse === 'function') {
-      await overrideResponse(info);
-    }
-    return new HttpResponse(null, { status: 200 });
-  });
-};
-
-export const getAdminDeleteEnrollmentMockHandler = (
-  overrideResponse?:
-    | void
-    | ((info: Parameters<Parameters<typeof http.delete>[1]>[0]) => Promise<void> | void)
-) => {
-  return http.delete('*/api/admin/enrollments', async (info) => {
-    await delay(1000);
-    if (typeof overrideResponse === 'function') {
-      await overrideResponse(info);
-    }
-    return new HttpResponse(null, { status: 200 });
-  });
-};
-
-export const getAdminUpdateEnrollmentMockHandler = (
-  overrideResponse?:
-    | void
-    | ((info: Parameters<Parameters<typeof http.put>[1]>[0]) => Promise<void> | void)
-) => {
-  return http.put('*/api/admin/enrollments', async (info) => {
-    await delay(1000);
-    if (typeof overrideResponse === 'function') {
-      await overrideResponse(info);
-    }
-    return new HttpResponse(null, { status: 200 });
-  });
-};
-export const getClientMock = () => [
-  getAdminCreateUserMockHandler(),
-  getAdminDeleteUserMockHandler(),
-  getAdminListUserMockHandler(),
-  getAdminUpdateUserMockHandler(),
-  getCreateUserIfNotExistsMockHandler(),
-  getAdminCreateSeasonMockHandler(),
-  getAdminDeleteSeasonMockHandler(),
-  getAdminListSeasonMockHandler(),
-  getAdminUpdateSeasonMockHandler(),
-  getAdminCreateRoleMockHandler(),
-  getAdminDeleteRoleMockHandler(),
-  getAdminListRoleMockHandler(),
-  getAdminUpdateRoleMockHandler(),
-  getAdminCreateEnrollmentMockHandler(),
-  getAdminDeleteEnrollmentMockHandler(),
-  getAdminUpdateEnrollmentMockHandler(),
-];
