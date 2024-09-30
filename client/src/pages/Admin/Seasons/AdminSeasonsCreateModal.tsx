@@ -22,6 +22,13 @@ const locationImages: { [key: string]: string } = {
 const schema = z
   .object({
     name: z.string().min(1),
+    slug: z
+      .string()
+      .min(1)
+      .regex(/^[A-Za-z]{3}-\d{4}-\d{4}$/, {
+        message:
+          'Invalid format, expected XXX-YYYY-YYYY where X is letters and Y is numbers. Eg ADL-2023-2024.',
+      }),
     startDate: z.date(),
     endDate: z.date(),
     location: z.string().min(1),
@@ -41,6 +48,7 @@ export const AdminSeasonsCreateModal = ({
     mode: 'uncontrolled',
     initialValues: {
       name: '',
+      slug: '',
       startDate: new Date(),
       endDate: new Date(),
       location: '',
@@ -51,6 +59,7 @@ export const AdminSeasonsCreateModal = ({
 
   const handleSubmit = async (values: {
     name: string;
+    slug: string;
     startDate: Date;
     endDate: Date;
     location: string;

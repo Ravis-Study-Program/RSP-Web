@@ -45,6 +45,39 @@ export interface ValidationError {
   validationErrors?: ValidationError[] | null;
 }
 
+export interface User {
+  /** @minLength 1 */
+  discordId: string;
+  /** @minLength 1 */
+  email: string;
+  isAdmin: boolean;
+  /** @minLength 1 */
+  name: string;
+  /** @minLength 1 */
+  profileImage: string;
+  userId?: string;
+}
+
+export interface Season {
+  endDate: string;
+  /** @minLength 1 */
+  imageUrl: string;
+  /** @minLength 1 */
+  location: string;
+  /** @minLength 1 */
+  name: string;
+  seasonId?: string;
+  /** @minLength 1 */
+  slug: string;
+  startDate: string;
+}
+
+export interface Role {
+  /** @minLength 1 */
+  name: string;
+  roleId: string;
+}
+
 export type HttpStatusCode = (typeof HttpStatusCode)[keyof typeof HttpStatusCode];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
@@ -139,41 +172,9 @@ export interface Enrollment {
   userId: string;
 }
 
-export interface User {
-  /** @minLength 1 */
-  discordId: string;
-  /** @minLength 1 */
-  email: string;
+export interface GetCurrentUserEnrollmentsResponse {
   /** @nullable */
   enrollments?: Enrollment[] | null;
-  isAdmin: boolean;
-  /** @minLength 1 */
-  name: string;
-  /** @minLength 1 */
-  profileImage: string;
-  userId?: string;
-}
-
-export interface Season {
-  endDate: string;
-  /** @nullable */
-  enrollments?: Enrollment[] | null;
-  /** @minLength 1 */
-  imageUrl: string;
-  /** @minLength 1 */
-  location: string;
-  /** @minLength 1 */
-  name: string;
-  seasonId?: string;
-  startDate: string;
-}
-
-export interface Role {
-  /** @nullable */
-  enrollments?: Enrollment[] | null;
-  /** @minLength 1 */
-  name: string;
-  roleId: string;
 }
 
 export interface CreateUserIfNotExistsResponse {
@@ -200,6 +201,15 @@ export interface GetCurrentUserResponseApiResult {
   error?: ApiError;
   readonly isSuccess?: boolean;
   responseBody?: GetCurrentUserResponse;
+  statusCode?: HttpStatusCode;
+  /** @nullable */
+  successMessage?: string | null;
+}
+
+export interface GetCurrentUserEnrollmentsResponseApiResult {
+  error?: ApiError;
+  readonly isSuccess?: boolean;
+  responseBody?: GetCurrentUserEnrollmentsResponse;
   statusCode?: HttpStatusCode;
   /** @nullable */
   successMessage?: string | null;
@@ -257,6 +267,8 @@ export interface AdminUpdateSeasonResponse {
   /** @nullable */
   name?: string | null;
   seasonId?: string;
+  /** @nullable */
+  slug?: string | null;
   startDate?: string;
 }
 
@@ -278,6 +290,8 @@ export interface AdminUpdateSeasonRequest {
   /** @nullable */
   name?: string | null;
   seasonId?: string;
+  /** @nullable */
+  slug?: string | null;
   startDate?: string;
 }
 
@@ -476,6 +490,8 @@ export interface AdminCreateSeasonResponse {
   /** @nullable */
   name?: string | null;
   seasonId?: string;
+  /** @nullable */
+  slug?: string | null;
   startDate?: string;
 }
 
@@ -496,6 +512,8 @@ export interface AdminCreateSeasonRequest {
   location?: string | null;
   /** @nullable */
   name?: string | null;
+  /** @nullable */
+  slug?: string | null;
   startDate?: string;
 }
 
@@ -1906,3 +1924,112 @@ export const useAdminUpdateEnrollment = <
 
   return useMutation(mutationOptions);
 };
+
+export const getCurrentUserEnrollments = (
+  options?: SecondParameter<typeof CustomAxiosInstance>,
+  signal?: AbortSignal
+) => {
+  return CustomAxiosInstance<GetCurrentUserEnrollmentsResponseApiResult>(
+    {
+      url: `http://localhost:4000/api/enrollments/get-current-user-enrollments`,
+      method: 'GET',
+      signal,
+    },
+    options
+  );
+};
+
+export const getGetCurrentUserEnrollmentsQueryKey = () => {
+  return [`http://localhost:4000/api/enrollments/get-current-user-enrollments`] as const;
+};
+
+export const getGetCurrentUserEnrollmentsQueryOptions = <
+  TData = Awaited<ReturnType<typeof getCurrentUserEnrollments>>,
+  TError = GetCurrentUserEnrollmentsResponseApiResult,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<Awaited<ReturnType<typeof getCurrentUserEnrollments>>, TError, TData>
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetCurrentUserEnrollmentsQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getCurrentUserEnrollments>>> = ({
+    signal,
+  }) => getCurrentUserEnrollments(requestOptions, signal);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getCurrentUserEnrollments>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetCurrentUserEnrollmentsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getCurrentUserEnrollments>>
+>;
+export type GetCurrentUserEnrollmentsQueryError = GetCurrentUserEnrollmentsResponseApiResult;
+
+export function useGetCurrentUserEnrollments<
+  TData = Awaited<ReturnType<typeof getCurrentUserEnrollments>>,
+  TError = GetCurrentUserEnrollmentsResponseApiResult,
+>(options: {
+  query: Partial<
+    UseQueryOptions<Awaited<ReturnType<typeof getCurrentUserEnrollments>>, TError, TData>
+  > &
+    Pick<
+      DefinedInitialDataOptions<
+        Awaited<ReturnType<typeof getCurrentUserEnrollments>>,
+        TError,
+        TData
+      >,
+      'initialData'
+    >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): DefinedUseQueryResult<TData, TError> & { queryKey: QueryKey };
+export function useGetCurrentUserEnrollments<
+  TData = Awaited<ReturnType<typeof getCurrentUserEnrollments>>,
+  TError = GetCurrentUserEnrollmentsResponseApiResult,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<Awaited<ReturnType<typeof getCurrentUserEnrollments>>, TError, TData>
+  > &
+    Pick<
+      UndefinedInitialDataOptions<
+        Awaited<ReturnType<typeof getCurrentUserEnrollments>>,
+        TError,
+        TData
+      >,
+      'initialData'
+    >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey };
+export function useGetCurrentUserEnrollments<
+  TData = Awaited<ReturnType<typeof getCurrentUserEnrollments>>,
+  TError = GetCurrentUserEnrollmentsResponseApiResult,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<Awaited<ReturnType<typeof getCurrentUserEnrollments>>, TError, TData>
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+export function useGetCurrentUserEnrollments<
+  TData = Awaited<ReturnType<typeof getCurrentUserEnrollments>>,
+  TError = GetCurrentUserEnrollmentsResponseApiResult,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<Awaited<ReturnType<typeof getCurrentUserEnrollments>>, TError, TData>
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetCurrentUserEnrollmentsQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}

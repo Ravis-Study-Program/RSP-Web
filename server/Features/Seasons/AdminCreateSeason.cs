@@ -22,6 +22,7 @@ public static class AdminCreateSeason
   public class Command : AdminAuthRequest<ApiResult<AdminCreateSeasonResponse>>
   {
     public string Name { get; set; } = string.Empty;
+    public string Slug { get; set; } = string.Empty;
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }
     public string Location { get; set; } = string.Empty;
@@ -33,6 +34,7 @@ public static class AdminCreateSeason
     public Validator()
     {
       RuleFor(c => c.Name).NotEmpty();
+      RuleFor(c => c.Slug).NotEmpty();
       RuleFor(c => c.StartDate).NotEmpty();
       RuleFor(c => c.EndDate)
             .NotEmpty()
@@ -62,6 +64,7 @@ public static class AdminCreateSeason
       var season = new Season
       {
         Name = request.Name,
+        Slug = request.Slug,
         StartDate = request.StartDate,
         EndDate = request.EndDate,
         Location = request.Location,
@@ -114,6 +117,7 @@ public class AdminCreateSeasonEndpoint : ICarterModule
            var command = new AdminCreateSeason.Command
            {
              Name = request.Name,
+             Slug = request.Slug,
              StartDate = request.StartDate,
              EndDate = request.EndDate,
              Location = request.Location,
@@ -131,6 +135,7 @@ public class AdminCreateSeasonEndpoint : ICarterModule
 public record AdminCreateSeasonRequest
 {
   public string Name { get; set; } = string.Empty;
+  public string Slug { get; set; } = string.Empty;
   public DateTime StartDate { get; set; }
   public DateTime EndDate { get; set; }
   public string Location { get; set; } = string.Empty;
@@ -141,6 +146,7 @@ public class AdminCreateSeasonResponse
 {
   public Guid SeasonId { get; set; }
   public string Name { get; set; } = string.Empty;
+  public string Slug { get; set; } = string.Empty;
   public DateTime StartDate { get; set; }
   public DateTime EndDate { get; set; }
   public string Location { get; set; } = string.Empty;
