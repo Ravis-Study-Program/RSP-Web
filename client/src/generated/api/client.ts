@@ -45,6 +45,20 @@ export interface ValidationError {
   validationErrors?: ValidationError[] | null;
 }
 
+export interface Season {
+  endDate: string;
+  /** @nullable */
+  enrollments?: Enrollment[] | null;
+  /** @minLength 1 */
+  imageUrl: string;
+  /** @minLength 1 */
+  location: string;
+  /** @minLength 1 */
+  name: string;
+  seasonId?: string;
+  startDate: string;
+}
+
 export type HttpStatusCode = (typeof HttpStatusCode)[keyof typeof HttpStatusCode];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
@@ -150,26 +164,16 @@ export interface User {
   userId?: string;
 }
 
-export interface Season {
-  endDate: string;
-  /** @nullable */
-  enrollments?: Enrollment[] | null;
-  /** @minLength 1 */
-  imageUrl: string;
-  /** @minLength 1 */
-  location: string;
-  /** @minLength 1 */
-  name: string;
-  seasonId?: string;
-  startDate: string;
-}
-
 export interface Role {
   /** @nullable */
   enrollments?: Enrollment[] | null;
   /** @minLength 1 */
   name: string;
   roleId: string;
+}
+
+export interface CreateUserIfNotExistsResponse {
+  [key: string]: unknown;
 }
 
 export interface CreateUserIfNotExistsRequest {
@@ -186,6 +190,15 @@ export interface ApiError {
   message?: string | null;
   /** @nullable */
   validationErrors?: ValidationError[] | null;
+}
+
+export interface CreateUserIfNotExistsResponseApiResult {
+  error?: ApiError;
+  readonly isSuccess?: boolean;
+  responseBody?: CreateUserIfNotExistsResponse;
+  statusCode?: HttpStatusCode;
+  /** @nullable */
+  successMessage?: string | null;
 }
 
 export interface AdminUpdateUserResponse {
@@ -822,7 +835,7 @@ export const createUserIfNotExists = (
   createUserIfNotExistsRequest: CreateUserIfNotExistsRequest,
   options?: SecondParameter<typeof CustomAxiosInstance>
 ) => {
-  return CustomAxiosInstance<void>(
+  return CustomAxiosInstance<CreateUserIfNotExistsResponseApiResult>(
     {
       url: `http://localhost:4000/api/users/create-if-not-exists`,
       method: 'POST',
@@ -834,7 +847,7 @@ export const createUserIfNotExists = (
 };
 
 export const getCreateUserIfNotExistsMutationOptions = <
-  TError = unknown,
+  TError = CreateUserIfNotExistsResponseApiResult,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -868,9 +881,12 @@ export type CreateUserIfNotExistsMutationResult = NonNullable<
   Awaited<ReturnType<typeof createUserIfNotExists>>
 >;
 export type CreateUserIfNotExistsMutationBody = CreateUserIfNotExistsRequest;
-export type CreateUserIfNotExistsMutationError = unknown;
+export type CreateUserIfNotExistsMutationError = CreateUserIfNotExistsResponseApiResult;
 
-export const useCreateUserIfNotExists = <TError = unknown, TContext = unknown>(options?: {
+export const useCreateUserIfNotExists = <
+  TError = CreateUserIfNotExistsResponseApiResult,
+  TContext = unknown,
+>(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof createUserIfNotExists>>,
     TError,

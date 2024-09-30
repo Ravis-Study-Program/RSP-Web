@@ -1,10 +1,15 @@
+import { useEffect, useState } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import { Navigate } from 'react-router-dom';
 import { Button, Container, Text, Title } from '@mantine/core';
+import { CreateUserIfNotExistsRequest, useCreateUserIfNotExists } from '@/generated/api/client';
 import classes from './Login.module.css';
 
 export function LoginPage() {
-  const { loginWithRedirect, isLoading, isAuthenticated } = useAuth0();
+  const { loginWithRedirect, isLoading, isAuthenticated, user } = useAuth0();
+  const [shouldRedirect, setShouldRedirect] = useState(false);
+  const [isUserCreated, setIsUserCreated] = useState(false);
+  const { mutateAsync: createUser } = useCreateUserIfNotExists();
 
   const handleLogin = () => {
     loginWithRedirect()
@@ -16,11 +21,33 @@ export function LoginPage() {
       });
   };
 
+  useEffect(() => {
+    const createUserIfNotExists = async () => {
+      if (isAuthenticated) {
+        if (user && !isUserCreated) {
+          try {
+            const request: CreateUserIfNotExistsRequest = {
+              profileImage: user.picture,
+              name: user.given_name,
+            };
+            await createUser({ data: request });
+            setIsUserCreated(true);
+          } catch (err) {
+            // eslint-disable-next-line no-console
+            console.error(err);
+          }
+        }
+        setShouldRedirect(true);
+      }
+    };
+    createUserIfNotExists();
+  }, [isAuthenticated, user, isUserCreated, createUser]);
+
   if (isLoading) {
     return null;
   }
 
-  if (isAuthenticated) {
+  if (shouldRedirect) {
     return <Navigate to="/seasons" />;
   }
 
