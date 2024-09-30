@@ -21,6 +21,7 @@ public static class AdminUpdateSeason
   {
     public Guid SeasonId { get; set; }
     public string Name { get; set; } = string.Empty;
+    public string Slug { get; set; } = string.Empty;
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }
     public string Location { get; set; } = string.Empty;
@@ -33,6 +34,7 @@ public static class AdminUpdateSeason
     {
       RuleFor(c => c.SeasonId).NotEmpty();
       RuleFor(c => c.Name).NotEmpty();
+      RuleFor(c => c.Slug).NotEmpty();
       RuleFor(c => c.StartDate).NotEmpty();
       RuleFor(c => c.EndDate).NotEmpty();
       RuleFor(c => c.Location).NotEmpty();
@@ -68,6 +70,7 @@ public static class AdminUpdateSeason
       }
 
       existingSeason.Name = request.Name;
+      existingSeason.Slug = request.Slug;
       existingSeason.StartDate = request.StartDate;
       existingSeason.EndDate = request.EndDate;
       existingSeason.Location = request.Location;
@@ -85,6 +88,7 @@ public static class AdminUpdateSeason
           {
             SeasonId = existingSeason.SeasonId,
             Name = existingSeason.Name,
+            Slug = existingSeason.Slug,
             StartDate = existingSeason.StartDate,
             EndDate = existingSeason.EndDate,
             Location = existingSeason.Location,
@@ -119,6 +123,7 @@ public class AdminUpdateSeasonEndpoint : ICarterModule
            {
              SeasonId = request.SeasonId,
              Name = request.Name,
+             Slug = request.Slug,
              StartDate = request.StartDate,
              EndDate = request.EndDate,
              Location = request.Location,
@@ -137,6 +142,7 @@ public record AdminUpdateSeasonRequest
 {
   public Guid SeasonId { get; set; }
   public string Name { get; set; } = string.Empty;
+  public string Slug { get; set; } = string.Empty;
   public DateTime StartDate { get; set; }
   public DateTime EndDate { get; set; }
   public string Location { get; set; } = string.Empty;
@@ -147,6 +153,7 @@ public class AdminUpdateSeasonResponse
 {
   public Guid SeasonId { get; set; }
   public string Name { get; set; } = string.Empty;
+  public string Slug { get; set; } = string.Empty;
   public DateTime StartDate { get; set; }
   public DateTime EndDate { get; set; }
   public string Location { get; set; } = string.Empty;

@@ -55,6 +55,10 @@ export const AdminSeasonsTable = () => {
         header: 'Name',
       },
       {
+        accessorKey: 'slug',
+        header: 'Slug',
+      },
+      {
         accessorKey: 'startDate',
         header: 'Start Date',
         Cell: ({ row }) => {

@@ -1,6 +1,7 @@
 using System.Net;
 using Carter;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using RSPWebAPI.Database;
 using RSPWebAPI.Entities;
 using RSPWebAPI.Features.Constants;
@@ -38,7 +39,7 @@ public static class AdminListSeason
     {
       try
       {
-        var seasons = _dbContext.Seasons.ToList();
+        var seasons = await _dbContext.Seasons.ToListAsync(cancellationToken);
 
         return new ApiResult<AdminListSeasonResponse>
         {

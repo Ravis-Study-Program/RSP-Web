@@ -25,6 +25,7 @@ public class AdminCreateSeasonTests: TestsHelper
     return new AdminCreateSeason.Command
     {
       Name = DummyName,
+      Slug = DummySlug,
       StartDate = DummyStartDate,
       EndDate = DummyEndDate,
       Location = DummyLocation,

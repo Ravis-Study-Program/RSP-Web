@@ -20,6 +20,4 @@ public class User
     
     [Required] 
     public string ProfileImage { get; set; } = string.Empty;
-    
-    public ICollection<Enrollment> Enrollments { get; set; } = new List<Enrollment>();
 }
