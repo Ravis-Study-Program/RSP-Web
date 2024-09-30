@@ -45,20 +45,6 @@ export interface ValidationError {
   validationErrors?: ValidationError[] | null;
 }
 
-export interface Season {
-  endDate: string;
-  /** @nullable */
-  enrollments?: Enrollment[] | null;
-  /** @minLength 1 */
-  imageUrl: string;
-  /** @minLength 1 */
-  location: string;
-  /** @minLength 1 */
-  name: string;
-  seasonId?: string;
-  startDate: string;
-}
-
 export type HttpStatusCode = (typeof HttpStatusCode)[keyof typeof HttpStatusCode];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
@@ -126,6 +112,10 @@ export const HttpStatusCode = {
   NUMBER_511: 511,
 } as const;
 
+export interface GetCurrentUserResponse {
+  user?: User;
+}
+
 export interface EnrollmentResponse {
   enrollmentId: string;
   /** @minLength 1 */
@@ -164,6 +154,20 @@ export interface User {
   userId?: string;
 }
 
+export interface Season {
+  endDate: string;
+  /** @nullable */
+  enrollments?: Enrollment[] | null;
+  /** @minLength 1 */
+  imageUrl: string;
+  /** @minLength 1 */
+  location: string;
+  /** @minLength 1 */
+  name: string;
+  seasonId?: string;
+  startDate: string;
+}
+
 export interface Role {
   /** @nullable */
   enrollments?: Enrollment[] | null;
@@ -190,6 +194,15 @@ export interface ApiError {
   message?: string | null;
   /** @nullable */
   validationErrors?: ValidationError[] | null;
+}
+
+export interface GetCurrentUserResponseApiResult {
+  error?: ApiError;
+  readonly isSuccess?: boolean;
+  responseBody?: GetCurrentUserResponse;
+  statusCode?: HttpStatusCode;
+  /** @nullable */
+  successMessage?: string | null;
 }
 
 export interface CreateUserIfNotExistsResponseApiResult {
@@ -904,6 +917,90 @@ export const useCreateUserIfNotExists = <
 
   return useMutation(mutationOptions);
 };
+
+export const getCurrentUser = (
+  options?: SecondParameter<typeof CustomAxiosInstance>,
+  signal?: AbortSignal
+) => {
+  return CustomAxiosInstance<GetCurrentUserResponseApiResult>(
+    { url: `http://localhost:4000/api/users/get-current-user`, method: 'GET', signal },
+    options
+  );
+};
+
+export const getGetCurrentUserQueryKey = () => {
+  return [`http://localhost:4000/api/users/get-current-user`] as const;
+};
+
+export const getGetCurrentUserQueryOptions = <
+  TData = Awaited<ReturnType<typeof getCurrentUser>>,
+  TError = GetCurrentUserResponseApiResult,
+>(options?: {
+  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getCurrentUser>>, TError, TData>>;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetCurrentUserQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getCurrentUser>>> = ({ signal }) =>
+    getCurrentUser(requestOptions, signal);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getCurrentUser>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetCurrentUserQueryResult = NonNullable<Awaited<ReturnType<typeof getCurrentUser>>>;
+export type GetCurrentUserQueryError = GetCurrentUserResponseApiResult;
+
+export function useGetCurrentUser<
+  TData = Awaited<ReturnType<typeof getCurrentUser>>,
+  TError = GetCurrentUserResponseApiResult,
+>(options: {
+  query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getCurrentUser>>, TError, TData>> &
+    Pick<
+      DefinedInitialDataOptions<Awaited<ReturnType<typeof getCurrentUser>>, TError, TData>,
+      'initialData'
+    >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): DefinedUseQueryResult<TData, TError> & { queryKey: QueryKey };
+export function useGetCurrentUser<
+  TData = Awaited<ReturnType<typeof getCurrentUser>>,
+  TError = GetCurrentUserResponseApiResult,
+>(options?: {
+  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getCurrentUser>>, TError, TData>> &
+    Pick<
+      UndefinedInitialDataOptions<Awaited<ReturnType<typeof getCurrentUser>>, TError, TData>,
+      'initialData'
+    >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey };
+export function useGetCurrentUser<
+  TData = Awaited<ReturnType<typeof getCurrentUser>>,
+  TError = GetCurrentUserResponseApiResult,
+>(options?: {
+  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getCurrentUser>>, TError, TData>>;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+export function useGetCurrentUser<
+  TData = Awaited<ReturnType<typeof getCurrentUser>>,
+  TError = GetCurrentUserResponseApiResult,
+>(options?: {
+  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getCurrentUser>>, TError, TData>>;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetCurrentUserQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
 
 export const adminCreateSeason = (
   adminCreateSeasonRequest: AdminCreateSeasonRequest,
