@@ -32,7 +32,13 @@ const routes = (queryClient: QueryClient) => {
     <>
       {/* Authenticated Routes */}
       <Route element={<AuthRouteGuard />}>
-        <Route path="/test-backend" element={placeholderPage('Test Backend')} />
+        {/* Admin Routes */}
+        <Route path="admin" element={<AdminRouteGuard />}>
+          <Route path="seasons" element={<AdminSeasonsPage />} />
+          <Route path="users" element={<AdminUsersPage />} />
+          <Route path="roles" element={<AdminRolesPage />} />
+          <Route path="enrollments" element={<AdminEnrollmentsPage />} />
+        </Route>
 
         <Route path="/profile" element={placeholderPage('Profile Page')} />
         <Route path="/seasons" element={<SeasonsPage />} />
@@ -42,20 +48,11 @@ const routes = (queryClient: QueryClient) => {
         <Route path="/leetcode" element={<LeetcodePage />} />
         <Route path="/mocks" element={placeholderPage('Mock Interviews Page')} />
 
-        {/* Admin Routes */}
-        <Route path="admin" element={<AdminRouteGuard />}>
-          <Route path="seasons" element={<AdminSeasonsPage />} />
-          <Route path="users" element={<AdminUsersPage />} />
-          <Route path="roles" element={<AdminRolesPage />} />
-          <Route path="enrollments" element={<AdminEnrollmentsPage />} />
-        </Route>
-
         {/* Season Routes */}
         <Route
-          path=":seasonSlug"
+          path="season/:seasonSlug"
           element={<SeasonRouteGuard />}
           loader={getSeasonRoleLoader(queryClient)}
-          id="season"
         >
           <Route path="students" element={placeholderPage('StudentList Page')} />
           <Route path="mentees" element={placeholderPage('MenteesList Page')} />

@@ -4,10 +4,9 @@ import { SeasonRole } from '../../shared/Season';
 
 export const getSeasonRole = (seasonSlug: string) => {
   // Hardcoded values that will be deleted and be replaced with actual API calls
-  const base = 'adl-2023';
-  const studentSeason = `${base}-student`;
-  const mentorSeason = `${base}-mentor`;
-  const coordinatorSeason = `${base}-coordinator`;
+  const studentSeason = `ADL-2022-2023`;
+  const mentorSeason = `ADL-2023-2024`;
+  const coordinatorSeason = `SYD-2024-2025`;
 
   switch (seasonSlug) {
     case studentSeason:

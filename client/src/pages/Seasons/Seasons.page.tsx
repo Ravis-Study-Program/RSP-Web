@@ -55,9 +55,9 @@ const SeasonsGridCards = ({ enrollments }: SeasonsListProps) => {
 
   const rolesSelectDestination = (seasonSlug: string): Record<string, string> => {
     return {
-      Coordinator: `/${seasonSlug}/admin/students`,
-      Mentor: `/${seasonSlug}/mentees`,
-      Student: `/${seasonSlug}/leetcode`,
+      Coordinator: `/season/${seasonSlug}/admin/students`,
+      Mentor: `/season/${seasonSlug}/mentees`,
+      Student: `/season/${seasonSlug}/leetcode`,
     };
   };
 
