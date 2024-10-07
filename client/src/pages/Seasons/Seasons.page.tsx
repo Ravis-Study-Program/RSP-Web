@@ -47,20 +47,6 @@ const SeasonsSkeletonCards = () => {
 };
 
 const SeasonsGridCards = ({ enrollments }: SeasonsListProps) => {
-  const rolesPillColor: Record<string, string> = {
-    Coordinator: 'red.8',
-    Mentor: 'green.8',
-    Student: 'gray.8',
-  };
-
-  const rolesSelectDestination = (seasonSlug: string): Record<string, string> => {
-    return {
-      Coordinator: `/season/${seasonSlug}/admin/students`,
-      Mentor: `/season/${seasonSlug}/mentees`,
-      Student: `/season/${seasonSlug}/leetcode`,
-    };
-  };
-
   return (
     <>
       {enrollments?.map((enrollment, key) => (
@@ -76,7 +62,7 @@ const SeasonsGridCards = ({ enrollments }: SeasonsListProps) => {
 
             <Group justify="space-between" mt="md" mb="xs">
               <Text fw={500}>{enrollment.season.name}</Text>
-              <Badge color={rolesPillColor[enrollment.role.name] || 'gray'}>
+              <Badge color="yellow.6" autoContrast>
                 {enrollment.role.name}
               </Badge>
             </Group>
@@ -87,7 +73,7 @@ const SeasonsGridCards = ({ enrollments }: SeasonsListProps) => {
               mt="md"
               radius="md"
               component={Link}
-              to={rolesSelectDestination(enrollment.season.slug)[enrollment.role.name] || '#'}
+              to={`/seasons/${enrollment.season.slug}`}
             >
               Select
             </Button>

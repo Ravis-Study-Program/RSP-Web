@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { Button, Container, Group, Text, Title } from '@mantine/core';
+import { Anchor, Button, Container, Group, Text, Title } from '@mantine/core';
 import classes from './NotFound.module.css';
 
 export function NotFoundPage() {
@@ -19,9 +19,12 @@ export function NotFoundPage() {
             You may have mistyped the address, or the page has been moved to another URL.
           </Text>
           <Group justify="center">
-            <Button onClick={goBack} size="md">
+            <Button onClick={goBack} size="md" color="gray">
               Go Back
             </Button>
+            <Anchor href="/seasons" size="md">
+              <Button size="md">Seasons List</Button>
+            </Anchor>
           </Group>
         </div>
       </div>

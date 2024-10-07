@@ -1,24 +1,23 @@
+import { QueryObserverResult, RefetchOptions, UseMutateAsyncFunction } from '@tanstack/react-query';
+import { zodResolver } from 'mantine-form-zod-resolver';
+import { MRT_TableInstance } from 'mantine-react-table';
+import { z } from 'zod';
+import { Button, Checkbox, Flex, Stack, TextInput, Title } from '@mantine/core';
+import { useForm } from '@mantine/form';
 import {
   AdminCreateUserRequest,
   AdminCreateUserResponseApiResult,
   AdminListUserResponseApiResult,
   User,
 } from '@/generated/api/client';
-import { Button, Checkbox, Flex, Stack, TextInput, Title } from '@mantine/core';
-import { useForm } from '@mantine/form';
-import { QueryObserverResult, RefetchOptions, UseMutateAsyncFunction } from '@tanstack/react-query';
-import { zodResolver } from 'mantine-form-zod-resolver';
-import { MRT_TableInstance } from 'mantine-react-table';
-import { z } from 'zod';
 
-const schema = z
-  .object({
-    name: z.string().min(1),
-    email: z.string().email().min(1),
-    isAdmin: z.boolean(),
-    discordId: z.string().min(1),
-    profileImage: z.string().url(),
-  });
+const schema = z.object({
+  name: z.string().min(1),
+  email: z.string().email().min(1),
+  isAdmin: z.boolean(),
+  discordId: z.string().min(1),
+  profileImage: z.string().url(),
+});
 
 export const AdminUsersCreateModal = ({
   table,
@@ -113,7 +112,5 @@ type AdminUsersCreateModalProps = {
   >;
   refetchUsers: (
     options?: RefetchOptions
-  ) => Promise<
-    QueryObserverResult<AdminListUserResponseApiResult, AdminListUserResponseApiResult>
-  >;
+  ) => Promise<QueryObserverResult<AdminListUserResponseApiResult, AdminListUserResponseApiResult>>;
 };
