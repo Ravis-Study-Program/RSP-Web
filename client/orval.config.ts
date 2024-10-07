@@ -12,7 +12,7 @@ export default defineConfig({
       clean: true,
       target: 'src/generated/api',
       client: 'react-query',
-      mock: false,
+      mock: true,
       baseUrl: serverUrl,
       override: {
         title() {
@@ -21,6 +21,13 @@ export default defineConfig({
         mutator: {
           path: 'src/shared/api/AxiosCustomInstance.ts',
           name: 'CustomAxiosInstance',
+        },
+        query: {
+          useQuery: true,
+          options: {
+            staleTime: 8000, // TODO: need to tweak this properly
+          },
+          signal: true,
         },
       },
     },

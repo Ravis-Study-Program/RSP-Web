@@ -8,9 +8,10 @@ import {
   IconSun,
   IconUser,
 } from '@tabler/icons-react';
-import { useLocation } from 'react-router-dom';
 import {
+  Anchor,
   Avatar,
+  Badge,
   Box,
   Flex,
   Group,
@@ -25,71 +26,21 @@ import {
   useComputedColorScheme,
   useMantineColorScheme,
 } from '@mantine/core';
-import { useGetCurrentUser, useGetCurrentUserEnrollments, User } from '@/generated/api/client';
+import { User } from '@/generated/api/client';
 import { LinksGroup } from '../NavbarLinksGroup/NavbarLinksGroup';
-import { getTabs, Tabs } from './NavbarRoutes';
+import { Tabs } from './NavbarRoutes';
 import classes from './Navbar.module.css';
 
-export function Navbar() {
-  const {
-    data: userResponse,
-    isError: isLoadingUserError,
-    isFetching: isFetchingUser,
-    isLoading: isLoadingUser,
-  } = useGetCurrentUser();
-  const {
-    data: enrollmentsResponse,
-    isError: isLoadingEnrollmentsError,
-    isFetching: isFetchingEnrollments,
-    isLoading: isLoadingEnrollments,
-  } = useGetCurrentUserEnrollments(); // TODO: create another backend route instead of listing all enrollments
-
-  // Find season slug
-  const location = useLocation();
-  const pathSegments = location.pathname.split('/').filter(Boolean);
-  const seasonIndex = pathSegments.findIndex((segment) => segment === 'season');
-  const seasonSlug =
-    seasonIndex !== -1 && seasonIndex + 1 < pathSegments.length
-      ? pathSegments[seasonIndex + 1]
-      : null;
-
-  const user = userResponse?.responseBody?.user;
-  const enrollments = enrollmentsResponse?.responseBody?.enrollments;
-  const isAdmin = user?.isAdmin || false;
-  const role =
-    (seasonSlug && enrollments?.find((e) => e.season?.slug === seasonSlug)?.role) || null;
-  const roleName = role?.name || '';
-
-  const isLoading =
-    isLoadingUser ||
-    isFetchingUser ||
-    isLoadingUserError ||
-    isLoadingEnrollments ||
-    isLoadingEnrollmentsError ||
-    isFetchingEnrollments;
-
-  return (
-    <NavbarContent
-      isLoading={isLoading}
-      user={user}
-      tabs={getTabs(seasonSlug, isAdmin, roleName)}
-    />
-  );
-}
-
-type NavbarContentProps = {
-  isLoading: boolean;
-  user: User | undefined;
-  tabs: Tabs | null;
-};
-
-const NavbarContent = ({ isLoading, user, tabs }: NavbarContentProps) => {
+export function Navbar({ isLoading, user, tabs }: NavbarProps) {
   const { setColorScheme } = useMantineColorScheme();
   const [section, setSection] = useState<'general' | 'season'>('general');
   const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
   const { logout } = useAuth0();
 
-  const links = tabs?.[section]?.map((item) => <LinksGroup {...item} key={item.label} />) ?? [];
+  const links =
+    tabs?.[section]
+      ?.filter((item) => !item.hidden)
+      ?.map((item) => <LinksGroup {...item} key={item.label} />) ?? [];
 
   if (isLoading) {
     return <NavbarSkeleton />;
@@ -98,14 +49,25 @@ const NavbarContent = ({ isLoading, user, tabs }: NavbarContentProps) => {
   return (
     <nav className={classes.navbar}>
       <div className={classes.header}>
-        <Group justify="center">
-          <Title order={1} size="h3" ta="center">
-            Ravi Study Program
-          </Title>
-        </Group>
+        <Flex justify="center" align="center">
+          <Anchor
+            href="/seasons"
+            underline="never"
+            c={computedColorScheme === 'light' ? 'dark' : 'white'}
+          >
+            <Title order={1} size="h3" ta="center">
+              Ravi Study Program
+            </Title>
+          </Anchor>
+          {user?.isAdmin ? (
+            <Badge color="red" size="xs" ml={8} mt={3}>
+              Admin
+            </Badge>
+          ) : null}
+        </Flex>
       </div>
 
-      {tabs?.season != null ? (
+      {tabs?.season != null && tabs.season.length > 0 ? (
         <SegmentedControl
           value={section}
           onChange={(value: any) => setSection(value)}
@@ -144,7 +106,11 @@ const NavbarContent = ({ isLoading, user, tabs }: NavbarContentProps) => {
 
           <Menu.Dropdown>
             <Menu.Label>Application</Menu.Label>
-            <Menu.Item leftSection={<IconUser style={{ width: rem(14), height: rem(14) }} />}>
+            <Menu.Item
+              leftSection={<IconUser style={{ width: rem(14), height: rem(14) }} />}
+              component="a"
+              href="/profile"
+            >
               Profile
             </Menu.Item>
             <Menu.Item
@@ -181,6 +147,12 @@ const NavbarContent = ({ isLoading, user, tabs }: NavbarContentProps) => {
       </div>
     </nav>
   );
+}
+
+type NavbarProps = {
+  isLoading: boolean;
+  user: User | undefined;
+  tabs: Tabs | null;
 };
 
 const NavbarSkeleton = () => {

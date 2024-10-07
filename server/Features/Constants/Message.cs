@@ -46,4 +46,5 @@ public static class Message
   public const string EnrollmentDeletedSuccessfully = "Enrollment deleted successfully.";
   public const string EnrollmentListSuccessfully = "List of Enrollment retrieved successfully.";
   public const string EnrollmentListUnexpectedError = "An unexpected error has occurred during enrollment list.";
+  public const string EnrollmentIsUserEnrolledError = "Checked if user is enrolled in a given season error";
 }

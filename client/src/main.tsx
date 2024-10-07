@@ -28,7 +28,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
               audience: import.meta.env.VITE_APP_AUTH0_AUDIENCE as string,
             }}
           >
-            <RouterProvider router={createBrowserRouter(routes(queryClient))} />
+            <RouterProvider router={createBrowserRouter(routes)} />
           </Auth0Provider>
         </ModalsProvider>
       </QueryClientProvider>

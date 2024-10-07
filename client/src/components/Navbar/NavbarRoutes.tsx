@@ -5,9 +5,12 @@ import {
   IconCode,
   IconFlag2,
   IconFolders,
+  IconLink,
   IconSchool,
   IconSeeding,
+  IconSettings,
   IconStar,
+  IconUser,
   IconUsersGroup,
   TablerIcon,
 } from '@tabler/icons-react';
@@ -16,6 +19,7 @@ export interface TabItem {
   label: string;
   icon: TablerIcon;
   link: string;
+  hidden: boolean;
 }
 
 export interface Tabs {
@@ -25,85 +29,146 @@ export interface Tabs {
 
 const noSeasonSelectedTabs: Tabs = {
   general: [
-    { label: 'Seasons', icon: IconCalendarMonth, link: '/seasons' },
-    { label: 'Graduates', icon: IconSchool, link: '/graduates' },
+    { label: 'Seasons', icon: IconCalendarMonth, link: '/seasons', hidden: false },
+    { label: 'Graduates', icon: IconSchool, link: '/graduates', hidden: false },
+    { label: 'All Leetcode', icon: IconCode, link: '/leetcode', hidden: false },
+    { label: 'All Mock Interviews', icon: IconChalkboard, link: '/mock-interviews', hidden: false },
+    { label: 'Settings', icon: IconSettings, link: '/settings', hidden: true },
+    { label: 'Profile', icon: IconUser, link: '/profile', hidden: true },
   ],
 };
 
 const adminNoSeasonSelectedTabs: Tabs = {
   general: [
-    { label: 'Seasons', icon: IconCalendarMonth, link: '/admin/seasons' },
-    { label: 'Users', icon: IconUsersGroup, link: '/admin/users' },
-    { label: 'Roles', icon: IconBadge, link: '/admin/roles' },
-    { label: 'Enrollments', icon: IconSchool, link: '/admin/enrollments' },
+    { label: 'Seasons', icon: IconCalendarMonth, link: '/admin/seasons', hidden: false },
+    { label: 'Users', icon: IconUsersGroup, link: '/admin/users', hidden: false },
+    { label: 'Roles', icon: IconBadge, link: '/admin/roles', hidden: false },
+    { label: 'Enrollments', icon: IconSchool, link: '/admin/enrollments', hidden: false },
+    { label: 'Settings', icon: IconSettings, link: '/settings', hidden: true },
+    { label: 'Profile', icon: IconUser, link: '/profile', hidden: true },
   ],
 };
 
 const getStudentTabs = (seasonSlug: string | null): Tabs => ({
   general: [
-    { label: 'Seasons', icon: IconCalendarMonth, link: '/seasons' },
-    { label: 'Graduates', icon: IconUsersGroup, link: '/graduates' },
-    { label: 'All Leetcode', icon: IconCode, link: '/leetcode' },
-    { label: 'All Mock Interviews', icon: IconChalkboard, link: '/mock-interviews' },
+    { label: 'Seasons', icon: IconCalendarMonth, link: '/seasons', hidden: false },
+    { label: 'Graduates', icon: IconUsersGroup, link: '/graduates', hidden: false },
+    { label: 'All Leetcode', icon: IconCode, link: '/leetcode', hidden: false },
+    { label: 'All Mock Interviews', icon: IconChalkboard, link: '/mock-interviews', hidden: false },
   ],
   season: seasonSlug
     ? [
-        { label: 'Leetcode', icon: IconCode, link: `/season/${seasonSlug}/leetcode` },
+        { label: seasonSlug, icon: IconLink, link: `/seasons/${seasonSlug}`, hidden: true },
+        {
+          label: 'Leetcode',
+          icon: IconCode,
+          link: `/seasons/${seasonSlug}/leetcode`,
+          hidden: false,
+        },
         {
           label: 'Mock Interviews',
           icon: IconChalkboard,
-          link: `/season/${seasonSlug}/mock-interviews`,
+          link: `/seasons/${seasonSlug}/mock-interviews`,
+          hidden: false,
         },
-        { label: 'All Students', icon: IconSeeding, link: `/season/${seasonSlug}/students` },
-        { label: 'Resources', icon: IconFolders, link: `/season/${seasonSlug}/resources` },
+        {
+          label: 'Students',
+          icon: IconSeeding,
+          link: `/seasons/${seasonSlug}/students`,
+          hidden: false,
+        },
+        {
+          label: 'Resources',
+          icon: IconFolders,
+          link: `/seasons/${seasonSlug}/resources`,
+          hidden: false,
+        },
       ]
     : [],
 });
 
 const getMentorTabs = (seasonSlug: string | null): Tabs => ({
   general: [
-    { label: 'Seasons', icon: IconCalendarMonth, link: '/seasons' },
-    { label: 'Graduates', icon: IconUsersGroup, link: '/graduates' },
-    { label: 'All Leetcode', icon: IconCode, link: '/leetcode' },
-    { label: 'All Mock Interviews', icon: IconChalkboard, link: '/mock-interviews' },
+    { label: 'Seasons', icon: IconCalendarMonth, link: '/seasons', hidden: false },
+    { label: 'Graduates', icon: IconUsersGroup, link: '/graduates', hidden: false },
+    { label: 'All Leetcode', icon: IconCode, link: '/leetcode', hidden: false },
+    { label: 'All Mock Interviews', icon: IconChalkboard, link: '/mock-interviews', hidden: false },
   ],
   season: seasonSlug
     ? [
-        { label: 'Students', icon: IconSeeding, link: `/season/${seasonSlug}/students` },
-        { label: 'Mentees', icon: IconFlag2, link: `/season/${seasonSlug}/mentees` },
-        { label: 'Resources', icon: IconFolders, link: `/season/${seasonSlug}/resources` },
+        { label: seasonSlug, icon: IconLink, link: `/seasons/${seasonSlug}`, hidden: true },
+        {
+          label: 'Students',
+          icon: IconSeeding,
+          link: `/seasons/${seasonSlug}/students`,
+          hidden: false,
+        },
+        {
+          label: 'Mentees',
+          icon: IconFlag2,
+          link: `/seasons/${seasonSlug}/mentees`,
+          hidden: false,
+        },
+        {
+          label: 'Resources',
+          icon: IconFolders,
+          link: `/seasons/${seasonSlug}/resources`,
+          hidden: false,
+        },
       ]
     : [],
 });
 
 const getCoordinatorTabs = (seasonSlug: string | null): Tabs => ({
   general: [
-    { label: 'Seasons', icon: IconCalendarMonth, link: '/seasons' },
-    { label: 'Graduates', icon: IconUsersGroup, link: '/graduates' },
-    { label: 'All Leetcode', icon: IconCode, link: '/leetcode' },
-    { label: 'All Mock Interviews', icon: IconChalkboard, link: '/mock-interviews' },
+    { label: 'Seasons', icon: IconCalendarMonth, link: '/seasons', hidden: false },
+    { label: 'Graduates', icon: IconUsersGroup, link: '/graduates', hidden: false },
+    { label: 'All Leetcode', icon: IconCode, link: '/leetcode', hidden: false },
+    { label: 'All Mock Interviews', icon: IconChalkboard, link: '/mock-interviews', hidden: false },
   ],
   season: seasonSlug
     ? [
-        { label: 'Students', icon: IconSeeding, link: `/season/${seasonSlug}/students` },
-        { label: 'Mentors', icon: IconCode, link: `/season/${seasonSlug}/mentors` },
-        { label: 'Resources', icon: IconFolders, link: `/season/${seasonSlug}/resources` },
+        { label: seasonSlug, icon: IconLink, link: `/seasons/${seasonSlug}`, hidden: true },
+        {
+          label: 'Students',
+          icon: IconSeeding,
+          link: `/seasons/${seasonSlug}/students`,
+          hidden: false,
+        },
+        { label: 'Mentors', icon: IconCode, link: `/seasons/${seasonSlug}/mentors`, hidden: false },
+        {
+          label: 'Resources',
+          icon: IconFolders,
+          link: `/seasons/${seasonSlug}/resources`,
+          hidden: false,
+        },
       ]
     : [],
 });
 
 const getAdminTabs = (seasonSlug: string | null): Tabs => ({
   general: [
-    { label: 'Seasons', icon: IconCalendarMonth, link: '/admin/seasons' },
-    { label: 'Users', icon: IconUsersGroup, link: '/admin/users' },
-    { label: 'Roles', icon: IconBadge, link: '/admin/roles' },
-    { label: 'Enrollments', icon: IconSchool, link: '/admin/enrollments' },
+    { label: 'Seasons', icon: IconCalendarMonth, link: '/admin/seasons', hidden: false },
+    { label: 'Users', icon: IconUsersGroup, link: '/admin/users', hidden: false },
+    { label: 'Roles', icon: IconBadge, link: '/admin/roles', hidden: false },
+    { label: 'Enrollments', icon: IconSchool, link: '/admin/enrollments', hidden: false },
   ],
   season: seasonSlug
     ? [
-        { label: 'Students', icon: IconSeeding, link: `/season/${seasonSlug}/students` },
-        { label: 'Mentors', icon: IconStar, link: `/season/${seasonSlug}/mentors` },
-        { label: 'Resources', icon: IconFolders, link: `/season/${seasonSlug}/resources` },
+        { label: seasonSlug, icon: IconLink, link: `/seasons/${seasonSlug}`, hidden: true },
+        {
+          label: 'Students',
+          icon: IconSeeding,
+          link: `/seasons/${seasonSlug}/students`,
+          hidden: false,
+        },
+        { label: 'Mentors', icon: IconStar, link: `/seasons/${seasonSlug}/mentors`, hidden: false },
+        {
+          label: 'Resources',
+          icon: IconFolders,
+          link: `/seasons/${seasonSlug}/resources`,
+          hidden: false,
+        },
       ]
     : [],
 });
@@ -129,4 +194,15 @@ export const getTabs = (seasonSlug: string | null, isAdmin: boolean, roleName: s
   }
 
   return tabs;
+};
+
+export const lookupTabByLink = (
+  link: string,
+  seasonSlug: string | null,
+  isAdmin: boolean,
+  roleName: string
+): TabItem | undefined => {
+  const tabs = getTabs(seasonSlug, isAdmin, roleName);
+  const tabsLink = [...tabs.general, ...(tabs?.season || [])];
+  return tabsLink.find((tab) => tab.link === link);
 };

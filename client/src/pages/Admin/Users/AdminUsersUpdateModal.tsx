@@ -1,24 +1,23 @@
+import { QueryObserverResult, RefetchOptions, UseMutateAsyncFunction } from '@tanstack/react-query';
+import { zodResolver } from 'mantine-form-zod-resolver';
+import { MRT_Row, MRT_TableInstance } from 'mantine-react-table';
+import { z } from 'zod';
+import { Button, Checkbox, Flex, Stack, TextInput, Title } from '@mantine/core';
+import { useForm } from '@mantine/form';
 import {
   AdminListUserResponseApiResult,
   AdminUpdateUserRequest,
   AdminUpdateUserResponseApiResult,
   User,
 } from '@/generated/api/client';
-import { Button, Checkbox, Flex, Stack, TextInput, Title } from '@mantine/core';
-import { useForm } from '@mantine/form';
-import { QueryObserverResult, RefetchOptions, UseMutateAsyncFunction } from '@tanstack/react-query';
-import { zodResolver } from 'mantine-form-zod-resolver';
-import { MRT_Row, MRT_TableInstance } from 'mantine-react-table';
-import { z } from 'zod';
 
-const schema = z
-  .object({
-    name: z.string().min(1),
-    email: z.string().email().min(1),
-    isAdmin: z.boolean(),
-    discordId: z.string().min(1),
-    profileImage: z.string().url(),
-  });
+const schema = z.object({
+  name: z.string().min(1),
+  email: z.string().email().min(1),
+  isAdmin: z.boolean(),
+  discordId: z.string().min(1),
+  profileImage: z.string().url(),
+});
 
 export const AdminUsersUpdateModal = ({
   table,
@@ -60,7 +59,7 @@ export const AdminUsersUpdateModal = ({
     <Stack>
       <Title order={3}>Update User</Title>
       <form onSubmit={form.onSubmit(handleSubmit)}>
-      <TextInput
+        <TextInput
           {...form.getInputProps('name')}
           label="Name"
           placeholder="Enter user name"
@@ -115,7 +114,5 @@ type AdminUsersUpdateModalProps = {
   row: MRT_Row<User>;
   refetchUsers: (
     options?: RefetchOptions
-  ) => Promise<
-    QueryObserverResult<AdminListUserResponseApiResult, AdminListUserResponseApiResult>
-  >;
+  ) => Promise<QueryObserverResult<AdminListUserResponseApiResult, AdminListUserResponseApiResult>>;
 };

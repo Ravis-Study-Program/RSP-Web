@@ -9,11 +9,11 @@ import {
 import { ActionIcon, Button, Flex, Text, Tooltip } from '@mantine/core';
 import { modals } from '@mantine/modals';
 import {
-  User,
   useAdminCreateUser,
   useAdminDeleteUser,
   useAdminListUser,
   useAdminUpdateUser,
+  User,
 } from '@/generated/api/client';
 import { AdminUsersCreateModal } from './AdminUsersCreateModal';
 import { AdminUsersUpdateModal } from './AdminUsersUpdateModal';
@@ -61,7 +61,7 @@ export const AdminUsersTable = () => {
         accessorKey: 'isAdmin',
         header: 'Is Admin',
         Cell: ({ row }) => {
-          return <Text size="sm">{row.original.isAdmin ? "Yes" : "No"}</Text>;
+          return <Text size="sm">{row.original.isAdmin ? 'Yes' : 'No'}</Text>;
         },
       },
       {
@@ -71,7 +71,7 @@ export const AdminUsersTable = () => {
       {
         accessorKey: 'profileImage',
         header: 'Profile Image',
-      }
+      },
     ],
     []
   );
@@ -118,11 +118,7 @@ export const AdminUsersTable = () => {
       : undefined,
     isMultiSortEvent: () => true,
     renderCreateRowModalContent: ({ table }) => (
-      <AdminUsersCreateModal
-        table={table}
-        createUser={createUser}
-        refetchUsers={refetchUsers}
-      />
+      <AdminUsersCreateModal table={table} createUser={createUser} refetchUsers={refetchUsers} />
     ),
     renderEditRowModalContent: ({ table, row }) => (
       <AdminUsersUpdateModal

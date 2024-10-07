@@ -3,8 +3,15 @@
 }
 
 .navbar {
+  padding: var(--mantine-spacing-md);
+  padding-top: 0;
+
   @mixin dark {
     background-color: var(--mantine-color-dark-6);
+  }
+
+  @media (max-width: $mantine-breakpoint-sm) {
+    padding-top: var(--mantine-spacing-md);
   }
 }
 
@@ -25,6 +32,10 @@
 
 .breadcrumb_links {
   font-weight: 600;
+
+  @mixin hover {
+    opacity: 0.85;
+  }
 }
 
 .main {
