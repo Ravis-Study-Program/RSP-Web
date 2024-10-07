@@ -24,6 +24,7 @@ public class AdminUpdateSeasonTests : TestsHelper
   {
     return new AdminUpdateSeason.Command
     {
+      SeasonId = DummyGuid,
       Name = DummyName,
       Slug = DummySlug,
       StartDate = DummyStartDate,

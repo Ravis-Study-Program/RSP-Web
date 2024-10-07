@@ -2,6 +2,7 @@ import {
   IconBadge,
   IconCalendarMonth,
   IconChalkboard,
+  IconChessKnight,
   IconCode,
   IconFlag2,
   IconFolders,
@@ -44,6 +45,7 @@ const adminNoSeasonSelectedTabs: Tabs = {
     { label: 'Users', icon: IconUsersGroup, link: '/admin/users', hidden: false },
     { label: 'Roles', icon: IconBadge, link: '/admin/roles', hidden: false },
     { label: 'Enrollments', icon: IconSchool, link: '/admin/enrollments', hidden: false },
+    { label: 'Mentorships', icon: IconChessKnight, link: '/admin/mentorships', hidden: false },
     { label: 'Settings', icon: IconSettings, link: '/settings', hidden: true },
     { label: 'Profile', icon: IconUser, link: '/profile', hidden: true },
   ],
@@ -152,6 +154,7 @@ const getAdminTabs = (seasonSlug: string | null): Tabs => ({
     { label: 'Users', icon: IconUsersGroup, link: '/admin/users', hidden: false },
     { label: 'Roles', icon: IconBadge, link: '/admin/roles', hidden: false },
     { label: 'Enrollments', icon: IconSchool, link: '/admin/enrollments', hidden: false },
+    { label: 'Mentorships', icon: IconChessKnight, link: '/admin/mentorships', hidden: false },
   ],
   season: seasonSlug
     ? [

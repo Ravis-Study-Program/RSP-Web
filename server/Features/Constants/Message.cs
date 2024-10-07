@@ -25,26 +25,39 @@ public static class Message
   public const string SeasonDeletedSuccessfully = "Season deleted successfully.";
   public const string SeasonListSuccessfully = "List of Season retrieved successfully.";
 
-  public const string RoleExists = "A season with this RoleId already exists.";
-  public const string RoleDoesNotExists = "No season found using the RoleId provided.";
+  public const string RoleExists = "A role with this RoleId already exists.";
+  public const string RoleDoesNotExists = "No role found using the RoleId provided.";
   public const string RoleCreatedSuccessfully = "Role created successfully.";
-  public const string RoleCreationUnexpectedError = "An unexpected error has occurred during season creation.";
-  public const string RoleUpdateUnexpectedError = "An unexpected error has occurred during season update.";
-  public const string RoleDeletionUnexpectedError = "An unexpected error has occurred during season deletion.";
+  public const string RoleCreationUnexpectedError = "An unexpected error has occurred during role creation.";
+  public const string RoleUpdateUnexpectedError = "An unexpected error has occurred during role update.";
+  public const string RoleDeletionUnexpectedError = "An unexpected error has occurred during role deletion.";
   public const string RoleUpdatedSuccessfully = "Role updated successfully.";
   public const string RoleDeletedSuccessfully = "Role deleted successfully.";
   public const string RoleListSuccessfully = "List of Role retrieved successfully.";
   public const string RoleListUnexpectedError = "An unexpected error has occurred during role list.";
 
-  public const string EnrollmentExists = "A season with this EnrollmentId already exists.";
-  public const string EnrollmentDoesNotExists = "No season found using the EnrollmentId provided.";
+  public const string EnrollmentExists = "A enrollment with this EnrollmentId already exists.";
+  public const string EnrollmentDoesNotExists = "No enrollment found using the EnrollmentId provided.";
   public const string EnrollmentCreatedSuccessfully = "Enrollment created successfully.";
-  public const string EnrollmentCreationUnexpectedError = "An unexpected error has occurred during season creation.";
-  public const string EnrollmentUpdateUnexpectedError = "An unexpected error has occurred during season update.";
-  public const string EnrollmentDeletionUnexpectedError = "An unexpected error has occurred during season deletion.";
+  public const string EnrollmentCreationUnexpectedError = "An unexpected error has occurred during enrollment creation.";
+  public const string EnrollmentUpdateUnexpectedError = "An unexpected error has occurred during enrollment update.";
+  public const string EnrollmentDeletionUnexpectedError = "An unexpected error has occurred during enrollment deletion.";
   public const string EnrollmentUpdatedSuccessfully = "Enrollment updated successfully.";
   public const string EnrollmentDeletedSuccessfully = "Enrollment deleted successfully.";
   public const string EnrollmentListSuccessfully = "List of Enrollment retrieved successfully.";
   public const string EnrollmentListUnexpectedError = "An unexpected error has occurred during enrollment list.";
   public const string EnrollmentIsUserEnrolledError = "Checked if user is enrolled in a given season error";
+  
+  public const string MentorshipExists = "A mentorship with this MentorshipId already exists.";
+  public const string MentorshipDoesNotExists = "No mentorship found using the MentorshipId provided.";
+  public const string MentorshipCreatedSuccessfully = "Mentorship created successfully.";
+  public const string MentorshipCreationUnexpectedError = "An unexpected error has occurred during mentorship creation.";
+  public const string MentorshipUpdateUnexpectedError = "An unexpected error has occurred during mentorship update.";
+  public const string MentorshipDeletionUnexpectedError = "An unexpected error has occurred during mentorship deletion.";
+  public const string MentorshipUpdatedSuccessfully = "Mentorship updated successfully.";
+  public const string MentorshipDeletedSuccessfully = "Mentorship deleted successfully.";
+  public const string MentorshipListSuccessfully = "List of Mentorship retrieved successfully.";
+  public const string MentorshipListUnexpectedError = "An unexpected error has occurred during mentorship list.";
+  public const string MentorshipNotPermittedDueToNullMentorOrMentee = "Mentor provided or Mentee provided do not exists";
+  public const string MentorshipNotPermittedDueToDifferentSeason = "Mentor season and Mentee season are not the same";
 }
