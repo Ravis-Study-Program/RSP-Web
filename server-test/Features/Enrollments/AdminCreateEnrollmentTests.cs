@@ -33,7 +33,13 @@ public class AdminCreateEnrollmentTests: TestsHelper
   [Fact]
   public async Task Handle_EntryAlreadyExists_BadRequest()
   {
-    var existingEnrollment = new Enrollment { EnrollmentId = DummyGuid };
+    var existingEnrollment = new Enrollment
+    {
+      EnrollmentId = DummyGuid,
+      SeasonId = DummyGuid,
+      RoleId = DummyGuid,
+      UserId = DummyGuid
+    };
     _dbContextMock.Setup(x => x.Enrollments)
                   .ReturnsDbSet(new List<Enrollment> { existingEnrollment });
 

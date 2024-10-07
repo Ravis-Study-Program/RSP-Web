@@ -24,6 +24,7 @@ public class AdminUpdateRoleTests : TestsHelper
   {
     return new AdminUpdateRole.Command
     {
+      RoleId = DummyGuid,
       Name = DummyName,
     };
   }

@@ -12,7 +12,7 @@ export default defineConfig({
       clean: true,
       target: 'src/generated/api',
       client: 'react-query',
-      mock: true,
+      mock: false,
       baseUrl: serverUrl,
       override: {
         title() {
