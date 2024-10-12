@@ -9,6 +9,7 @@ import { AdminUsersPage } from './pages/Admin/Users/AdminUsers.page';
 import { GraduatesPage } from './pages/Graduates/Graduates.page';
 import { LeetcodePage } from './pages/Leetcode/Leetcode.page';
 import { LoginPage } from './pages/Login/Login.page';
+import { MenteesPage } from './pages/Mentees/Mentees.page';
 import { NotFoundPage } from './pages/NotFound/NotFound.page';
 import { SeasonsPage } from './pages/Seasons/Seasons.page';
 import { SeasonsOverviewPage } from './pages/Seasons/SeasonsOverview.page';
@@ -16,6 +17,7 @@ import { SettingsPage } from './pages/Settings/Settings.page';
 import AdminRouteGuard from './shared/auth/AdminRouteGuard';
 import AuthRouteGuard from './shared/auth/AuthRouteGuard';
 import SeasonRouteGuard from './shared/auth/SeasonRouteGuard';
+import SeasonRoleViewRouter from './shared/auth/SeasonViewRouter';
 
 const placeholderPage = (title: string) => {
   return (
@@ -51,7 +53,7 @@ const routes = createRoutesFromElements(
       <Route path="seasons/:seasonSlug" element={<SeasonRouteGuard />}>
         <Route index element={<SeasonsOverviewPage />} />
         <Route path="students" element={placeholderPage('StudentList Page')} />
-        <Route path="mentees" element={placeholderPage('MenteesList Page')} />
+        <Route path="mentees" element={<SeasonRoleViewRouter mentorView={<MenteesPage />} />} />
         <Route path="mentors" element={placeholderPage('MentorsList Page')} />
         <Route path="leetcode" element={placeholderPage('Leetcode Page')} />
         <Route path="mock-interviews" element={placeholderPage('Mock Interviews Page')} />

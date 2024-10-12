@@ -6,9 +6,10 @@ import { CreateUserIfNotExistsRequest, useCreateUserIfNotExists } from '@/genera
 import classes from './Login.module.css';
 
 export function LoginPage() {
-  const { loginWithRedirect, isLoading, isAuthenticated, user } = useAuth0();
+  const { loginWithRedirect, isLoading: isAuthLoading, isAuthenticated, user } = useAuth0();
   const [shouldRedirect, setShouldRedirect] = useState(false);
   const [isUserCreated, setIsUserCreated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const { mutateAsync: createUser } = useCreateUserIfNotExists();
 
   const handleLogin = () => {
@@ -32,23 +33,26 @@ export function LoginPage() {
             };
             await createUser({ data: request });
             setIsUserCreated(true);
+            setIsLoading(false);
           } catch (err) {
             // eslint-disable-next-line no-console
             console.error(err);
           }
         }
         setShouldRedirect(true);
+      } else {
+        setIsLoading(false);
       }
     };
     createUserIfNotExists();
   }, [isAuthenticated, user, isUserCreated, createUser]);
 
-  if (isLoading) {
-    return null;
-  }
-
   if (shouldRedirect) {
     return <Navigate to="/seasons" />;
+  }
+
+  if (isAuthLoading || isLoading) {
+    return null;
   }
 
   return (
