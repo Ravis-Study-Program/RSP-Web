@@ -97,6 +97,25 @@ export interface Mentorship {
   mentorshipId: string;
 }
 
+export interface KickStudentResponse {
+  [key: string]: unknown;
+}
+
+export interface KickStudentResponseApiResult {
+  error?: ApiError;
+  readonly isSuccess?: boolean;
+  responseBody?: KickStudentResponse;
+  statusCode?: HttpStatusCode;
+  /** @nullable */
+  successMessage?: string | null;
+}
+
+export interface KickStudentRequest {
+  /** @nullable */
+  seasonSlug?: string | null;
+  studentEnrollmentId?: string;
+}
+
 export type HttpStatusCode = (typeof HttpStatusCode)[keyof typeof HttpStatusCode];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
@@ -171,15 +190,6 @@ export interface GetIsUserEnrolledResponse {
 
 export interface GetCurrentUserResponse {
   user?: User;
-}
-
-export interface GetCurrentUserResponseApiResult {
-  error?: ApiError;
-  readonly isSuccess?: boolean;
-  responseBody?: GetCurrentUserResponse;
-  statusCode?: HttpStatusCode;
-  /** @nullable */
-  successMessage?: string | null;
 }
 
 export interface GetCurrentUserMenteesListResponse {
@@ -266,6 +276,15 @@ export interface GetIsUserEnrolledResponseApiResult {
   error?: ApiError;
   readonly isSuccess?: boolean;
   responseBody?: GetIsUserEnrolledResponse;
+  statusCode?: HttpStatusCode;
+  /** @nullable */
+  successMessage?: string | null;
+}
+
+export interface GetCurrentUserResponseApiResult {
+  error?: ApiError;
+  readonly isSuccess?: boolean;
+  responseBody?: GetCurrentUserResponse;
   statusCode?: HttpStatusCode;
   /** @nullable */
   successMessage?: string | null;
@@ -2692,3 +2711,75 @@ export function useGetIsUserEnrolled<
 
   return query;
 }
+
+export const kickStudent = (
+  kickStudentRequest: KickStudentRequest,
+  options?: SecondParameter<typeof CustomAxiosInstance>
+) => {
+  return CustomAxiosInstance<KickStudentResponseApiResult>(
+    {
+      url: `http://localhost:4000/enrollments/kick-student`,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      data: kickStudentRequest,
+    },
+    options
+  );
+};
+
+export const getKickStudentMutationOptions = <
+  TError = KickStudentResponseApiResult,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof kickStudent>>,
+    TError,
+    { data: KickStudentRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof kickStudent>>,
+  TError,
+  { data: KickStudentRequest },
+  TContext
+> => {
+  const { mutation: mutationOptions, request: requestOptions } = options ?? {};
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof kickStudent>>,
+    { data: KickStudentRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return kickStudent(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type KickStudentMutationResult = NonNullable<Awaited<ReturnType<typeof kickStudent>>>;
+export type KickStudentMutationBody = KickStudentRequest;
+export type KickStudentMutationError = KickStudentResponseApiResult;
+
+export const useKickStudent = <
+  TError = KickStudentResponseApiResult,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof kickStudent>>,
+    TError,
+    { data: KickStudentRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof kickStudent>>,
+  TError,
+  { data: KickStudentRequest },
+  TContext
+> => {
+  const mutationOptions = getKickStudentMutationOptions(options);
+
+  return useMutation(mutationOptions);
+};

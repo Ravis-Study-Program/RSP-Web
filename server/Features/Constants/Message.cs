@@ -48,6 +48,11 @@ public static class Message
   public const string EnrollmentListUnexpectedError = "An unexpected error has occurred during enrollment list.";
   public const string EnrollmentIsUserEnrolledError = "Checked if user is enrolled in a given season error";
   
+  public const string KickStudentCurrentUserEnrollmentDoesNotExists = "No enrollment found using the provided current user details.";
+  public const string KickStudentMenteeDoesntExist = "No student enrollment found using the provided mentee details.";
+  public const string KickStudentSuccessfully = "Kick student successfully";
+  public const string KickStudentUnexpectedError = "An unexpected error has occurred during kick student process.";
+  
   public const string MentorshipExists = "A mentorship with this MentorshipId already exists.";
   public const string MentorshipDoesNotExists = "No mentorship found using the MentorshipId provided.";
   public const string MentorshipCreatedSuccessfully = "Mentorship created successfully.";

@@ -12,11 +12,6 @@ export const theme = createTheme({
   components: {
     Modal: {
       styles: {
-        header: {
-          minHeight: 0,
-          padding: 0,
-          paddingTop: 'var(--mantine-spacing-md)',
-        },
         close: {
           position: 'absolute',
           top: 'var(--mantine-spacing-md)',
