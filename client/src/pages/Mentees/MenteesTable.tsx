@@ -8,7 +8,7 @@ import {
 } from 'mantine-react-table';
 import { ActionIcon, Flex, Text, Tooltip } from '@mantine/core';
 import { modals } from '@mantine/modals';
-import { Mentorship, useGetCurrentUserMenteesList } from '@/generated/api/client';
+import { Mentorship, useGetCurrentUserMenteesList, useKickStudent } from '@/generated/api/client';
 import { useSeasonSlug } from '@/shared/hooks/useSeasonSlug';
 import classes from './MenteesTable.module.css';
 
@@ -21,9 +21,9 @@ export const MenteesTable = () => {
     isLoading: isLoadingMentees,
     refetch: refetchMentees,
   } = useGetCurrentUserMenteesList(seasonSlug);
+  const { mutateAsync: kickStudent, status: isKickingStudentStatus } = useKickStudent();
 
-  // TODO: Kick mentee
-  const openKickMenteeConfirmModal = (_: MRT_Row<Mentorship>) => {
+  const openKickMenteeConfirmModal = (row: MRT_Row<Mentorship>) => {
     modals.openConfirmModal({
       title: 'Delete Mentee',
       children: (
@@ -34,6 +34,12 @@ export const MenteesTable = () => {
       labels: { confirm: 'Kick Mentee', cancel: 'Cancel' },
       confirmProps: { color: 'red' },
       onConfirm: async () => {
+        await kickStudent({
+          data: {
+            seasonSlug,
+            studentEnrollmentId: row.original.menteeEnrollmentId,
+          },
+        });
         await refetchMentees();
         modals.closeAll();
       },
@@ -48,7 +54,7 @@ export const MenteesTable = () => {
       },
       {
         accessorKey: 'menteeEnrollment.user.email',
-        header: 'Name',
+        header: 'Email',
       },
     ],
     []
@@ -65,7 +71,7 @@ export const MenteesTable = () => {
       density: 'xs',
       sorting: [
         {
-          id: 'name',
+          id: 'menteeEnrollment.user.name',
           desc: true,
         },
       ],
@@ -90,6 +96,7 @@ export const MenteesTable = () => {
     ),
     state: {
       isLoading: isLoadingMentees,
+      isSaving: isKickingStudentStatus === 'pending',
       showAlertBanner: isLoadingMenteesError,
       showProgressBars: isFetchingMentees,
     },
