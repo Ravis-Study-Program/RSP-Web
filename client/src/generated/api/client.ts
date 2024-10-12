@@ -82,6 +82,21 @@ export interface Role {
   roleId: string;
 }
 
+export interface MentorshipResponse {
+  mentee: Enrollment;
+  mentor: Enrollment;
+  mentorshipId: string;
+  season: Season;
+}
+
+export interface Mentorship {
+  menteeEnrollment: Enrollment;
+  menteeEnrollmentId: string;
+  mentorEnrollment: Enrollment;
+  mentorEnrollmentId: string;
+  mentorshipId: string;
+}
+
 export type HttpStatusCode = (typeof HttpStatusCode)[keyof typeof HttpStatusCode];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
@@ -154,15 +169,6 @@ export interface GetIsUserEnrolledResponse {
   role?: Role;
 }
 
-export interface GetIsUserEnrolledResponseApiResult {
-  error?: ApiError;
-  readonly isSuccess?: boolean;
-  responseBody?: GetIsUserEnrolledResponse;
-  statusCode?: HttpStatusCode;
-  /** @nullable */
-  successMessage?: string | null;
-}
-
 export interface GetCurrentUserResponse {
   user?: User;
 }
@@ -171,6 +177,20 @@ export interface GetCurrentUserResponseApiResult {
   error?: ApiError;
   readonly isSuccess?: boolean;
   responseBody?: GetCurrentUserResponse;
+  statusCode?: HttpStatusCode;
+  /** @nullable */
+  successMessage?: string | null;
+}
+
+export interface GetCurrentUserMenteesListResponse {
+  /** @nullable */
+  mentees?: Mentorship[] | null;
+}
+
+export interface GetCurrentUserMenteesListResponseApiResult {
+  error?: ApiError;
+  readonly isSuccess?: boolean;
+  responseBody?: GetCurrentUserMenteesListResponse;
   statusCode?: HttpStatusCode;
   /** @nullable */
   successMessage?: string | null;
@@ -199,20 +219,31 @@ export interface Enrollment {
   userId: string;
 }
 
-export interface MentorshipResponse {
-  mentee: Enrollment;
-  mentor: Enrollment;
-  mentorshipId: string;
-  season: Season;
-}
-
 export interface GetCurrentUserEnrollmentsResponse {
   /** @nullable */
   enrollments?: Enrollment[] | null;
 }
 
+export interface GetCurrentUserEnrollmentsResponseApiResult {
+  error?: ApiError;
+  readonly isSuccess?: boolean;
+  responseBody?: GetCurrentUserEnrollmentsResponse;
+  statusCode?: HttpStatusCode;
+  /** @nullable */
+  successMessage?: string | null;
+}
+
 export interface CreateUserIfNotExistsResponse {
   [key: string]: unknown;
+}
+
+export interface CreateUserIfNotExistsResponseApiResult {
+  error?: ApiError;
+  readonly isSuccess?: boolean;
+  responseBody?: CreateUserIfNotExistsResponse;
+  statusCode?: HttpStatusCode;
+  /** @nullable */
+  successMessage?: string | null;
 }
 
 export interface CreateUserIfNotExistsRequest {
@@ -231,19 +262,10 @@ export interface ApiError {
   validationErrors?: ValidationError[] | null;
 }
 
-export interface GetCurrentUserEnrollmentsResponseApiResult {
+export interface GetIsUserEnrolledResponseApiResult {
   error?: ApiError;
   readonly isSuccess?: boolean;
-  responseBody?: GetCurrentUserEnrollmentsResponse;
-  statusCode?: HttpStatusCode;
-  /** @nullable */
-  successMessage?: string | null;
-}
-
-export interface CreateUserIfNotExistsResponseApiResult {
-  error?: ApiError;
-  readonly isSuccess?: boolean;
-  responseBody?: CreateUserIfNotExistsResponse;
+  responseBody?: GetIsUserEnrolledResponse;
   statusCode?: HttpStatusCode;
   /** @nullable */
   successMessage?: string | null;
@@ -2017,6 +2039,137 @@ export const useAdminUpdateMentorship = <
 
   return useMutation(mutationOptions);
 };
+
+export const getCurrentUserMenteesList = (
+  seasonSlug: string,
+  options?: SecondParameter<typeof CustomAxiosInstance>,
+  signal?: AbortSignal
+) => {
+  return CustomAxiosInstance<GetCurrentUserMenteesListResponseApiResult>(
+    {
+      url: `http://localhost:4000/api/mentorships/get-current-user-mentees-list/${seasonSlug}`,
+      method: 'GET',
+      signal,
+    },
+    options
+  );
+};
+
+export const getGetCurrentUserMenteesListQueryKey = (seasonSlug: string) => {
+  return [
+    `http://localhost:4000/api/mentorships/get-current-user-mentees-list/${seasonSlug}`,
+  ] as const;
+};
+
+export const getGetCurrentUserMenteesListQueryOptions = <
+  TData = Awaited<ReturnType<typeof getCurrentUserMenteesList>>,
+  TError = GetCurrentUserMenteesListResponseApiResult,
+>(
+  seasonSlug: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getCurrentUserMenteesList>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetCurrentUserMenteesListQueryKey(seasonSlug);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getCurrentUserMenteesList>>> = ({
+    signal,
+  }) => getCurrentUserMenteesList(seasonSlug, requestOptions, signal);
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!seasonSlug,
+    staleTime: 8000,
+    ...queryOptions,
+  } as UseQueryOptions<Awaited<ReturnType<typeof getCurrentUserMenteesList>>, TError, TData> & {
+    queryKey: QueryKey;
+  };
+};
+
+export type GetCurrentUserMenteesListQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getCurrentUserMenteesList>>
+>;
+export type GetCurrentUserMenteesListQueryError = GetCurrentUserMenteesListResponseApiResult;
+
+export function useGetCurrentUserMenteesList<
+  TData = Awaited<ReturnType<typeof getCurrentUserMenteesList>>,
+  TError = GetCurrentUserMenteesListResponseApiResult,
+>(
+  seasonSlug: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getCurrentUserMenteesList>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getCurrentUserMenteesList>>,
+          TError,
+          TData
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): DefinedUseQueryResult<TData, TError> & { queryKey: QueryKey };
+export function useGetCurrentUserMenteesList<
+  TData = Awaited<ReturnType<typeof getCurrentUserMenteesList>>,
+  TError = GetCurrentUserMenteesListResponseApiResult,
+>(
+  seasonSlug: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getCurrentUserMenteesList>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getCurrentUserMenteesList>>,
+          TError,
+          TData
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): UseQueryResult<TData, TError> & { queryKey: QueryKey };
+export function useGetCurrentUserMenteesList<
+  TData = Awaited<ReturnType<typeof getCurrentUserMenteesList>>,
+  TError = GetCurrentUserMenteesListResponseApiResult,
+>(
+  seasonSlug: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getCurrentUserMenteesList>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+export function useGetCurrentUserMenteesList<
+  TData = Awaited<ReturnType<typeof getCurrentUserMenteesList>>,
+  TError = GetCurrentUserMenteesListResponseApiResult,
+>(
+  seasonSlug: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getCurrentUserMenteesList>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetCurrentUserMenteesListQueryOptions(seasonSlug, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
 
 export const adminCreateEnrollment = (
   adminCreateEnrollmentRequest: AdminCreateEnrollmentRequest,
