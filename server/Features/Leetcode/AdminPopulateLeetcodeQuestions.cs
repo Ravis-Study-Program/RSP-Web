@@ -42,7 +42,8 @@ public static class AdminPopulateLeetcodeQuestions
       CancellationToken cancellationToken
     )
     {
-      var skipNumber = 0;
+      // TODO: Query current database count and use the skip number to obtain new results only
+      var skipNumber = 0; 
       var client = new HttpClient();
       var httpRequest = new HttpRequestMessage(HttpMethod.Post, "https://leetcode.com/graphql/");
 
