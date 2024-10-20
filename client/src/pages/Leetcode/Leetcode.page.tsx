@@ -1,32 +1,34 @@
-import { LineChart } from '@mantine/charts';
-import { Container } from '@mantine/core';
+import { useState } from 'react';
 import { Layout } from '@/components/Layout/Layout';
-import { mockProblems, transformData } from './Leetcode.data';
-import LeetcodeTable from './LeetcodeTable/LeetcodeTable';
-import classes from './Leetcode.module.css';
+import { useGetIsUserEnrolled, useGetProblemAttempts } from '@/generated/api/client';
+import { useSeasonSlug } from '@/shared/hooks/useSeasonSlug';
+import { LeetcodeTable } from './LeetcodeTable/LeetcodeTable';
+import { ProblemAttemptsGraph } from './ProblemAttemptsGraph/ProblemAttemptsGraph';
 
 export function LeetcodePage() {
+  const [isLeetcode, _] = useState(true);
+  const { seasonSlug } = useSeasonSlug();
+
+  // TODO: Handle error and loading states using skeleton
+  // TODO: Add Custom Problems support
+  const { data: userResponse } = useGetIsUserEnrolled(seasonSlug);
+
+  const { data: problemAttemptsResponse, refetch: refetchProblemAttempts } = useGetProblemAttempts({
+    enrollmentId: userResponse?.responseBody?.enrollmentId || undefined,
+    includeCustom: !isLeetcode,
+    includeLeetcode: isLeetcode,
+  });
+
   return (
     <Layout>
-      <Container fluid className={classes.graphContainer}>
-        <LineChart
-          h={300}
-          data={transformData(mockProblems)}
-          dataKey="date"
-          series={[
-            { name: 'Easy', color: 'green.6' },
-            { name: 'Medium', color: 'yellow.6' },
-            { name: 'Hard', color: 'red.6' },
-          ]}
-          curveType="linear"
-          tickLine="xy"
-          gridAxis="xy"
-          yAxisProps={{ domain: [0], minTickGap: 1 }}
-          withLegend
-          legendProps={{ verticalAlign: 'top', height: 50 }}
-        />
-      </Container>
-      <LeetcodeTable />
+      <ProblemAttemptsGraph
+        problemAttempts={problemAttemptsResponse?.responseBody?.problemAttempts}
+      />
+      <LeetcodeTable
+        refetchProblemAttempts={refetchProblemAttempts}
+        problemAttempts={problemAttemptsResponse?.responseBody?.problemAttempts}
+        enrollmentId={userResponse?.responseBody?.enrollmentId || ''}
+      />
     </Layout>
   );
 }

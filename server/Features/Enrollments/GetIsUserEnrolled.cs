@@ -61,7 +61,8 @@ public static class GetIsUserEnrolled
             ResponseBody = new GetIsUserEnrolledResponse
             {
               IsEnrolled = false,
-              Role = null
+              Role = null,
+              EnrollmentId = null
             }
           };
         }
@@ -72,7 +73,8 @@ public static class GetIsUserEnrolled
           ResponseBody = new GetIsUserEnrolledResponse
           {
             IsEnrolled = true,
-            Role = enrollments[0].Role
+            Role = enrollments[0].Role,
+            EnrollmentId = enrollments[0].EnrollmentId
           }
         };
       } 
@@ -118,4 +120,5 @@ public record GetIsUserEnrolledResponse
 {
   public bool IsEnrolled { get; set; }
   public Role? Role { get; set; }
+  public Guid? EnrollmentId { get; set; }
 }
