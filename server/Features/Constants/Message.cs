@@ -65,4 +65,17 @@ public static class Message
   public const string MentorshipListUnexpectedError = "An unexpected error has occurred during mentorship list.";
   public const string MentorshipNotPermittedDueToNullMentorOrMentee = "Mentor provided or Mentee provided do not exists";
   public const string MentorshipNotPermittedDueToDifferentSeason = "Mentor season and Mentee season are not the same";
+  
+  public const string ProblemAttemptCreatedSuccessfully = "ProblemAttempt created successfully.";
+  public const string ProblemAttemptDoesNotExists = "No mentorship found using the Problem Attempt Id provided.";
+  public const string ProblemAttemptUpdatedSuccessfully = "ProblemAttempt updated successfully.";
+  public const string ProblemAttemptCreationUnexpectedError = "An unexpected error has occurred during problem attempt creation.";
+  public const string ProblemAttemptDeletionUnexpectedError = "An unexpected error has occurred during prblem attempt deletion.";
+  public const string ProblemAttemptUpdateUnexpectedError = "An unexpected error has occurred during prblem attempt update.";
+  public const string ProblemAttemptDeletedSuccessfully = "ProblemAttempt deleted successfully.";
+  public const string ProblemAttemptListSuccessfully = "List of ProblemAttempt retrieved successfully.";
+  public const string ProblemAttemptListUnexpectedError = "An unexpected error has occurred during problem attempts list.";
+  
+  public const string LeetcodeProblemsListSuccessfully = "List of LeetcodeProblems retrieved successfully.";
+  public const string LeetcodeProblemsListUnexpectedError = "An unexpected error has occurred during leetcode problems list.";
 }

@@ -1,166 +1,117 @@
 import dayjs from 'dayjs';
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { IconEdit, IconTrash } from '@tabler/icons-react';
+import { QueryObserverResult, RefetchOptions } from '@tanstack/react-query';
 import {
   MantineReactTable,
-  MRT_EditActionButtons,
+  MRT_ColumnDef,
+  MRT_Row,
   useMantineReactTable,
-  type MRT_ColumnDef,
-  type MRT_Row,
-  type MRT_TableOptions,
 } from 'mantine-react-table';
 import {
   ActionIcon,
-  Autocomplete,
+  Anchor,
   Button,
   Flex,
   Pill,
-  Stack,
   Text,
-  Title,
   Tooltip,
+  useComputedColorScheme,
 } from '@mantine/core';
-import { DateTimePicker } from '@mantine/dates';
 import { modals } from '@mantine/modals';
-import { LeetcodeDifficulty, mockLeetcodes, Problem } from '../Leetcode.data';
 import {
-  useCreateProblem,
-  useDeleteProblem,
-  useGetProblems,
-  useUpdateProblem,
-} from './LeetcodeTable.hooks';
+  GetProblemAttemptsResponseApiResult,
+  ProblemAttempt,
+  useCreateProblemAttempt,
+  useDeleteProblemAttempt,
+  useGetLeetcodeProblems,
+  useUpdateProblemAttempt,
+} from '@/generated/api/client';
+import { LeetcodeProblemAttemptCreateModal } from './LeetcodeProblemAttemptCreateModal';
+import { LeetcodeProblemAttemptUpdateModal } from './LeetcodeProblemAttemptUpdateModal';
 import classes from './LeetcodeTable.module.css';
 
-const LeetcodeTable = () => {
-  const [validationErrors, setValidationErrors] = useState<Record<string, string | undefined>>({});
+export const LeetcodeTable = ({
+  refetchProblemAttempts,
+  enrollmentId,
+  problemAttempts,
+}: LeetcodeTableProps) => {
+  const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
 
-  const { mutateAsync: createProblem, status: isCreatingProblemStatus } = useCreateProblem();
   const {
-    data: fetchedProblems = [],
-    isError: isLoadingProblemsError,
-    isFetching: isFetchingProblems,
-    isLoading: isLoadingProblems,
-  } = useGetProblems();
-  const { mutateAsync: updateProblem, status: isUpdatingProblemStatus } = useUpdateProblem();
-  const { mutateAsync: deleteProblem, status: isDeletingProblemStatus } = useDeleteProblem();
+    data: leetcodeProblemsResponse,
+    isError: isLoadingLeetcodeProblemsError,
+    isFetching: isFetchingLeetcodeProblems,
+    isLoading: isLoadingLeetcodeProblems,
+  } = useGetLeetcodeProblems();
 
-  // CREATE action
-  const handleCreateProblem: MRT_TableOptions<Problem>['onCreatingRowSave'] = async ({
-    values,
-    exitCreatingMode,
-  }) => {
-    await createProblem(values);
-    exitCreatingMode();
-  };
+  const { mutateAsync: createProblemAttempt, status: isCreatingProblemAttemptStatus } =
+    useCreateProblemAttempt();
+  const { mutateAsync: updateProblemAttempt, status: isUpdatingProblemAttemptStatus } =
+    useUpdateProblemAttempt();
+  const { mutateAsync: deleteProblemAttempt, status: isDeletingProblemAttemptStatus } =
+    useDeleteProblemAttempt();
 
-  // UPDATE action
-  const handleSaveProblem: MRT_TableOptions<Problem>['onEditingRowSave'] = async ({
-    values,
-    table,
-  }) => {
-    await updateProblem(values);
-    table.setEditingRow(null); //Exit editing mode
-  };
-
-  // DELETE action
-  const openDeleteConfirmModal = (row: MRT_Row<Problem>) => {
+  const openDeleteConfirmModal = (row: MRT_Row<ProblemAttempt>) => {
     modals.openConfirmModal({
-      title: 'Delete Problem',
+      title: 'Delete Problem Attempt',
       children: (
         <Text>
-          Are you sure you want to delete {mockLeetcodes[row.original.LeetcodeId].Title}? This
-          action cannot be undone.
+          Are you sure you want to delete this problem attempt? This action cannot be undone.
         </Text>
       ),
       labels: { confirm: 'Delete', cancel: 'Cancel' },
       confirmProps: { color: 'red' },
       onConfirm: async () => {
-        await deleteProblem(row.original.ProblemId?.toString());
+        await deleteProblemAttempt({ params: { problemAttemptId: row.original.problemAttemptId } });
+        await refetchProblemAttempts();
         modals.closeAll();
       },
     });
   };
 
-  const columns = useMemo<MRT_ColumnDef<Problem>[]>(
+  const columns = useMemo<MRT_ColumnDef<ProblemAttempt>[]>(
     () => [
       {
-        accessorKey: 'StartDateTime',
         header: 'Attempt Date',
-        Cell: ({ row }) => {
-          const startFormatted = dayjs(row.original.StartDateTime).format('D MMM YYYY HH:mm:ss');
+        id: 'attemptStartDate',
+        accessorFn: (row) => {
+          const startFormatted = dayjs(row.attemptStartDate).format('D MMM YYYY HH:mm');
           return <Text size="sm">{startFormatted}</Text>;
         },
-        Edit: ({ cell }) => {
-          const date = cell.getValue<Date>() ?? null;
-          const dateValue = date ? new Date(date) : null;
-
-          return (
-            <DateTimePicker
-              withAsterisk
-              clearable
-              withSeconds
-              label="Attempt Date"
-              defaultValue={dateValue}
-            />
-          );
-        },
       },
       {
-        accessorKey: 'TimeTakenInMinutes',
         header: 'Time Taken (mins)',
-        accessorFn: (row) => row.TimeTakenInMinutes,
-        mantineEditTextInputProps: {
-          type: 'number',
-          required: true,
-          error: validationErrors?.email,
-          onFocus: () =>
-            setValidationErrors({
-              ...validationErrors,
-              email: undefined,
-            }),
-        },
+        accessorFn: (row) => row.timeTakenInMinutes,
       },
       {
-        accessorKey: 'LeetcodeId',
-        id: 'Title',
         header: 'Title',
-        Cell: ({ cell }) => {
-          const index = cell.getValue<number>();
-          const leetcode = mockLeetcodes[index];
-
-          return <Text size="sm">{leetcode.Title}</Text>;
-        },
-        Edit: ({ cell }) => {
-          const index = cell.getValue<number>();
-          const defaultValue = index != null ? mockLeetcodes[index].Title : '';
-
-          return (
-            <Autocomplete
-              withAsterisk
-              label="Leetcode"
-              data={mockLeetcodes.map((l) => l.Title)}
-              defaultValue={defaultValue}
-            />
-          );
-        },
+        accessorFn: (row) => (
+          <Anchor
+            href={row.leetcodeProblem?.problem.link}
+            target="_blank"
+            inherit
+            c={computedColorScheme === 'light' ? 'dark' : 'white'}
+            underline="always"
+          >
+            {row.leetcodeProblem?.problem.title}
+          </Anchor>
+        ),
       },
       {
-        accessorKey: 'LeetcodeId',
-        id: 'Difficulty',
         header: 'Difficulty',
-        Cell: ({ cell }) => {
-          const index = cell.getValue<number>();
-          const leetcode = mockLeetcodes[index];
+        accessorFn: (row) => {
+          const difficulty = row.leetcodeProblem?.leetcodeProblemDifficulty.name;
 
           let textClass = '';
-          switch (leetcode.LeetcodeDifficulty) {
-            case LeetcodeDifficulty.Easy:
+          switch (difficulty) {
+            case 'Easy':
               textClass = classes.textGreen;
               break;
-            case LeetcodeDifficulty.Medium:
+            case 'Medium':
               textClass = classes.textYellow;
               break;
-            case LeetcodeDifficulty.Hard:
+            case 'Hard':
               textClass = classes.textRed;
               break;
             default:
@@ -168,44 +119,44 @@ const LeetcodeTable = () => {
 
           return (
             <Text size="sm" className={textClass}>
-              {LeetcodeDifficulty[index]}
+              {difficulty}
             </Text>
           );
         },
-        Edit: () => null,
       },
       {
-        accessorKey: 'LeetcodeId',
-        id: 'Category',
         header: 'Category',
-        Cell: ({ cell }) => {
-          const index = cell.getValue<number>();
-          const leetcode = mockLeetcodes[index];
-
+        accessorFn: (row) => {
           return (
             <Flex className={classes.categoryContainer}>
-              {leetcode.LeetcodeCategories.map((category, index) => (
+              {row.leetcodeProblem?.leetcodeProblemCategories?.map((category, index) => (
                 <Pill size="sm" key={index} className={classes.category}>
-                  {category.Name}
+                  {category.name}
                 </Pill>
               ))}
             </Flex>
           );
         },
-        Edit: () => null,
       },
     ],
-    [validationErrors]
+    []
   );
 
   const table = useMantineReactTable({
     columns,
-    data: fetchedProblems,
+    data: problemAttempts ?? [],
     mantinePaperProps: {
       className: classes.table,
     },
     createDisplayMode: 'modal',
     mantineCreateRowModalProps: {
+      closeOnClickOutside: false,
+      withCloseButton: true,
+      closeButtonProps: {
+        className: classes.modalCloseButton,
+      },
+    },
+    mantineEditRowModalProps: {
       closeOnClickOutside: false,
       withCloseButton: true,
       closeButtonProps: {
@@ -218,41 +169,33 @@ const LeetcodeTable = () => {
       density: 'xs',
       sorting: [
         {
-          id: 'StartDateTime',
+          id: 'attemptStartDate',
           desc: true,
         },
       ],
     },
     positionActionsColumn: 'last',
-    getRowId: (row) => row.ProblemId?.toString(),
-    mantineToolbarAlertBannerProps: isLoadingProblemsError
-      ? {
-          color: 'red',
-          children: 'Error loading data',
-        }
-      : undefined,
+    getRowId: (row) => row.problemAttemptId?.toString(),
+    mantineToolbarAlertBannerProps: undefined,
     isMultiSortEvent: () => true,
-    onCreatingRowCancel: () => setValidationErrors({}),
-    onCreatingRowSave: handleCreateProblem,
-    onEditingRowCancel: () => setValidationErrors({}),
-    onEditingRowSave: handleSaveProblem,
-    renderCreateRowModalContent: ({ table, row, internalEditComponents }) => (
-      <Stack>
-        <Title order={3}>Create Problem</Title>
-        {internalEditComponents}
-        <Flex justify="flex-end" mt="xl">
-          <MRT_EditActionButtons variant="text" table={table} row={row} />
-        </Flex>
-      </Stack>
+    renderCreateRowModalContent: ({ table }) => (
+      <LeetcodeProblemAttemptCreateModal
+        table={table}
+        leetcodeProblems={leetcodeProblemsResponse?.responseBody?.leetcodeProblems}
+        enrollmentId={enrollmentId || ''}
+        createProblemAttempt={createProblemAttempt}
+        refetchProblemAttempts={refetchProblemAttempts}
+      />
     ),
-    renderEditRowModalContent: ({ table, row, internalEditComponents }) => (
-      <Stack>
-        <Title order={3}>Edit Problem</Title>
-        {internalEditComponents}
-        <Flex justify="flex-end" mt="xl">
-          <MRT_EditActionButtons variant="text" table={table} row={row} />
-        </Flex>
-      </Stack>
+    renderEditRowModalContent: ({ table, row }) => (
+      <LeetcodeProblemAttemptUpdateModal
+        table={table}
+        row={row}
+        leetcodeProblems={leetcodeProblemsResponse?.responseBody?.leetcodeProblems}
+        enrollmentId={enrollmentId || ''}
+        updateProblemAttempt={updateProblemAttempt}
+        refetchProblemAttempts={refetchProblemAttempts}
+      />
     ),
     renderRowActions: ({ row, table }) => (
       <Flex gap="md">
@@ -274,21 +217,29 @@ const LeetcodeTable = () => {
           table.setCreatingRow(true);
         }}
       >
-        Create New Problem
+        Create New Problem Attempt
       </Button>
     ),
     state: {
-      isLoading: isLoadingProblems,
+      isLoading: isLoadingLeetcodeProblems,
       isSaving:
-        isCreatingProblemStatus === 'pending' ||
-        isUpdatingProblemStatus === 'pending' ||
-        isDeletingProblemStatus === 'pending',
-      showAlertBanner: isLoadingProblemsError,
-      showProgressBars: isFetchingProblems,
+        isCreatingProblemAttemptStatus === 'pending' ||
+        isUpdatingProblemAttemptStatus === 'pending' ||
+        isDeletingProblemAttemptStatus === 'pending',
+      showAlertBanner: isLoadingLeetcodeProblemsError,
+      showProgressBars: isFetchingLeetcodeProblems,
     },
   });
 
   return <MantineReactTable table={table} />;
 };
 
-export default LeetcodeTable;
+type LeetcodeTableProps = {
+  refetchProblemAttempts: (
+    options?: RefetchOptions
+  ) => Promise<
+    QueryObserverResult<GetProblemAttemptsResponseApiResult, GetProblemAttemptsResponseApiResult>
+  >;
+  problemAttempts: ProblemAttempt[] | null | undefined;
+  enrollmentId: string;
+};
