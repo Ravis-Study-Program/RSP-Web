@@ -4,12 +4,13 @@ using System.Text.Json.Serialization;
 using Carter;
 using FluentValidation;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using RSPWebAPI.Database;
 using RSPWebAPI.Entities;
 using RSPWebAPI.Shared;
 using RSPWebAPI.Shared.Behaviours;
 
-namespace RSPWebAPI.Features.Roles;
+namespace RSPWebAPI.Features.Leetcode;
 
 public static class AdminPopulateLeetcodeQuestions
 {
@@ -25,16 +26,20 @@ public static class AdminPopulateLeetcodeQuestions
   {
     private readonly ApplicationDbContext _dbContext;
     private readonly ILogger<Handler> _logger;
+    public HttpClient _client { get; set; }
 
     public Handler(ApplicationDbContext dbContext, ILogger<Handler> logger)
     {
       _dbContext = dbContext;
       _logger = logger;
+      _client = new HttpClient();
     }
-    
-    private string getProblemTitle(LeetcodeProblemListQuestion question)
+
+    public Handler(ApplicationDbContext dbContext, ILogger<Handler> logger, HttpClient client)
     {
-      return $"{question.QuestionId}. {question.Title}";
+      _dbContext = dbContext;
+      _logger = logger;
+      _client = client;
     }
 
     public async Task<ApiResult<AdminPopulateLeetcodeQuestionsResponse>> Handle(
@@ -42,9 +47,10 @@ public static class AdminPopulateLeetcodeQuestions
       CancellationToken cancellationToken
     )
     {
-      // TODO: Query current database count and use the skip number to obtain new results only
+      // TODO: Implement a more optimal solution in querying. I tried skip parameter but GraphQL doesn't sort it for some reason.
       var skipNumber = 0; 
-      var client = new HttpClient();
+      
+      // Hit Leetcode endpoint to get data
       var httpRequest = new HttpRequestMessage(HttpMethod.Post, "https://leetcode.com/graphql/");
 
       var payload =
@@ -52,10 +58,9 @@ public static class AdminPopulateLeetcodeQuestions
 
       var content = new StringContent(payload, null, "application/json");
       httpRequest.Content = content;
-      var response = await client.SendAsync(httpRequest, cancellationToken);
+      var response = await _client.SendAsync(httpRequest, cancellationToken);
       response.EnsureSuccessStatusCode();
       var output = await response.Content.ReadAsStringAsync(cancellationToken);
-      Console.WriteLine(output);
 
       var jsonData = JsonSerializer.Deserialize<LeetcodeProblemListApiResponse>(output);
       if (jsonData == null)
@@ -67,7 +72,8 @@ public static class AdminPopulateLeetcodeQuestions
           Error = new ApiError("Failed to retrieve valid data from the Leetcode API.")
         };
       }
-
+      
+      // Process obtained data and save into database
       await using (var transaction = await _dbContext.Database.BeginTransactionAsync(cancellationToken))
       {
         try
@@ -106,11 +112,21 @@ public static class AdminPopulateLeetcodeQuestions
           // Add leetcode problem
           foreach (var question in jsonData.Data.ProblemsetQuestionList.Questions)
           {
+            var title = $"{question.QuestionId}. {question.Title}";
+            // Check if the leetcode problem exists (there's probably a better way in doing this for sure)
+            var existingLeetcode = await _dbContext
+                                         .Problems
+                                         .FirstOrDefaultAsync(p => p.Title == title, cancellationToken);
+            if (existingLeetcode != null)
+            {
+              continue;
+            }
+            
             var newLeetcodeProblem = new LeetcodeProblem
             {
               Problem = new Problem
               {
-                Title = $"{question.QuestionId}. {question.Title}",
+                Title = title,
                 Link = $"https://leetcode.com/problems/{question.TitleSlug}"
               },
               IsPremium = question.Premium,
