@@ -24,12 +24,19 @@ export type AdminDeleteEnrollmentParams = {
   enrollmentId: string;
 };
 
-export type AdminDeleteRoleParams = {
-  roleId: string;
-};
-
 export type AdminDeleteMentorshipParams = {
   mentorshipId: string;
+};
+
+export type GetMockInterviewsParams = {
+  enrollmentId?: string;
+  includeLeetcode: boolean;
+  includeCustom: boolean;
+  includeBehavioural: boolean;
+};
+
+export type DeleteMockInterviewParams = {
+  mockInterviewId: string;
 };
 
 export type GetProblemAttemptsParams = {
@@ -40,6 +47,10 @@ export type GetProblemAttemptsParams = {
 
 export type DeleteProblemAttemptParams = {
   problemAttemptId: string;
+};
+
+export type AdminDeleteRoleParams = {
+  roleId: string;
 };
 
 export type AdminDeleteSeasonParams = {
@@ -97,6 +108,30 @@ export interface UpdateProblemAttemptRequest {
   timeTakenInMinutes?: number;
 }
 
+export interface UpdateMockInterviewResponse {
+  [key: string]: unknown;
+}
+
+export interface UpdateMockInterviewResponseApiResult {
+  error?: ApiError;
+  readonly isSuccess?: boolean;
+  responseBody?: UpdateMockInterviewResponse;
+  statusCode?: HttpStatusCode;
+  /** @nullable */
+  successMessage?: string | null;
+}
+
+export interface UpdateMockInterviewRequest {
+  /** @nullable */
+  enrollmentId?: string | null;
+  interviewerUserId?: string;
+  mockInterviewId?: string;
+  /** @nullable */
+  mockInterviewRoundDtos?: MockInterviewRoundDto[] | null;
+  startDate?: string;
+  timeTakenInMinutes?: number;
+}
+
 export interface Season {
   endDate: string;
   /** @minLength 1 */
@@ -117,25 +152,6 @@ export interface Role {
   roleId: string;
 }
 
-export interface ProblemAttempt {
-  attemptStartDate: string;
-  customProblem?: CustomProblem;
-  /** @nullable */
-  customProblemId?: string | null;
-  enrollment?: Enrollment;
-  /** @nullable */
-  enrollmentId?: string | null;
-  leetcodeProblem?: LeetcodeProblem;
-  /** @nullable */
-  leetcodeProblemId?: string | null;
-  /** @minLength 1 */
-  notes: string;
-  problemAttemptId: string;
-  timeTakenInMinutes: number;
-  user: User;
-  userId: string;
-}
-
 export interface Problem {
   /** @nullable */
   leetcodeProblemCategories?: LeetcodeProblemCategory[] | null;
@@ -144,6 +160,60 @@ export interface Problem {
   problemId: string;
   /** @minLength 1 */
   title: string;
+}
+
+export interface MockInterviewRoundDto {
+  behaviouralMockInterviewRound?: BehaviouralMockInterviewRoundDto;
+  customMockInterviewRound?: CustomMockInterviewRoundDto;
+  leetcodeMockInterviewRound?: LeetcodeMockInterviewRoundDto;
+  /** @nullable */
+  mockInterviewRoundId?: string | null;
+}
+
+export interface MockInterviewRound {
+  behaviouralMockInterviewRound?: BehaviouralMockInterviewRound;
+  /** @nullable */
+  behaviouralMockInterviewRoundId?: string | null;
+  customMockInterviewRound?: CustomMockInterviewRound;
+  /** @nullable */
+  customMockInterviewRoundId?: string | null;
+  /** @nullable */
+  intervieweeComment?: string | null;
+  isReviewedByInterviewee?: boolean;
+  leetcodeMockInterviewRound?: LeetcodeMockInterviewRound;
+  /** @nullable */
+  leetcodeMockInterviewRoundId?: string | null;
+  mockInterviewId: string;
+  mockInterviewRoundId: string;
+}
+
+export interface MockInterview {
+  enrollment?: Enrollment;
+  /** @nullable */
+  enrollmentId?: string | null;
+  interviewee: User;
+  intervieweeUserId: string;
+  interviewer: User;
+  interviewerUserId: string;
+  isPass: boolean;
+  mockInterviewId: string;
+  /** @nullable */
+  mockInterviewRounds?: MockInterviewRound[] | null;
+  startDate: string;
+  timeTakenInMinutes: number;
+}
+
+export interface MockCreateMockInterviewResponse {
+  [key: string]: unknown;
+}
+
+export interface MockCreateMockInterviewResponseApiResult {
+  error?: ApiError;
+  readonly isSuccess?: boolean;
+  responseBody?: MockCreateMockInterviewResponse;
+  statusCode?: HttpStatusCode;
+  /** @nullable */
+  successMessage?: string | null;
 }
 
 export interface MentorshipResponse {
@@ -181,6 +251,46 @@ export interface LeetcodeProblem {
   leetcodeProblemId: string;
   problem: Problem;
   problemId: string;
+}
+
+export interface ProblemAttempt {
+  attemptStartDate: string;
+  customProblem?: CustomProblem;
+  /** @nullable */
+  customProblemId?: string | null;
+  enrollment?: Enrollment;
+  /** @nullable */
+  enrollmentId?: string | null;
+  leetcodeProblem?: LeetcodeProblem;
+  /** @nullable */
+  leetcodeProblemId?: string | null;
+  /** @minLength 1 */
+  notes: string;
+  problemAttemptId: string;
+  timeTakenInMinutes: number;
+  user: User;
+  userId: string;
+}
+
+export interface LeetcodeMockInterviewRoundDto {
+  algorithmDesignScore?: number;
+  codingScore?: number;
+  complexityAnalysisScore?: number;
+  confirmQuestionScore?: number;
+  leetcodeProblemId?: string;
+  testingScore?: number;
+}
+
+export interface LeetcodeMockInterviewRound {
+  algorithmDesignScore: number;
+  codingScore: number;
+  complexityAnalysisScore: number;
+  confirmQuestionScore: number;
+  leetcodeMockInterviewRoundId: string;
+  leetcodeProblem: LeetcodeProblem;
+  leetcodeProblemId: string;
+  mockInterviewId: string;
+  testingScore: number;
 }
 
 export interface KickStudentResponse {
@@ -269,6 +379,20 @@ export const HttpStatusCode = {
   NUMBER_511: 511,
 } as const;
 
+export interface GetUserListResponse {
+  /** @nullable */
+  users?: User[] | null;
+}
+
+export interface GetUserListResponseApiResult {
+  error?: ApiError;
+  readonly isSuccess?: boolean;
+  responseBody?: GetUserListResponse;
+  statusCode?: HttpStatusCode;
+  /** @nullable */
+  successMessage?: string | null;
+}
+
 export interface GetProblemAttemptsResponse {
   /** @nullable */
   problemAttempts?: ProblemAttempt[] | null;
@@ -278,6 +402,20 @@ export interface GetProblemAttemptsResponseApiResult {
   error?: ApiError;
   readonly isSuccess?: boolean;
   responseBody?: GetProblemAttemptsResponse;
+  statusCode?: HttpStatusCode;
+  /** @nullable */
+  successMessage?: string | null;
+}
+
+export interface GetMockInterviewsResponse {
+  /** @nullable */
+  mockInterviews?: MockInterview[] | null;
+}
+
+export interface GetMockInterviewsResponseApiResult {
+  error?: ApiError;
+  readonly isSuccess?: boolean;
+  responseBody?: GetMockInterviewsResponse;
   statusCode?: HttpStatusCode;
   /** @nullable */
   successMessage?: string | null;
@@ -340,15 +478,6 @@ export interface GetCurrentUserMenteesListResponseApiResult {
   successMessage?: string | null;
 }
 
-export interface GetCurrentUserEnrollmentsResponseApiResult {
-  error?: ApiError;
-  readonly isSuccess?: boolean;
-  responseBody?: GetCurrentUserEnrollmentsResponse;
-  statusCode?: HttpStatusCode;
-  /** @nullable */
-  successMessage?: string | null;
-}
-
 export interface EnrollmentResponse {
   enrollmentId: string;
   /** @minLength 1 */
@@ -377,6 +506,15 @@ export interface GetCurrentUserEnrollmentsResponse {
   enrollments?: Enrollment[] | null;
 }
 
+export interface GetCurrentUserEnrollmentsResponseApiResult {
+  error?: ApiError;
+  readonly isSuccess?: boolean;
+  responseBody?: GetCurrentUserEnrollmentsResponse;
+  statusCode?: HttpStatusCode;
+  /** @nullable */
+  successMessage?: string | null;
+}
+
 export interface DeleteProblemAttemptResponse {
   [key: string]: unknown;
 }
@@ -390,6 +528,19 @@ export interface DeleteProblemAttemptResponseApiResult {
   successMessage?: string | null;
 }
 
+export interface DeleteMockInterviewResponse {
+  [key: string]: unknown;
+}
+
+export interface DeleteMockInterviewResponseApiResult {
+  error?: ApiError;
+  readonly isSuccess?: boolean;
+  responseBody?: DeleteMockInterviewResponse;
+  statusCode?: HttpStatusCode;
+  /** @nullable */
+  successMessage?: string | null;
+}
+
 export interface CustomProblem {
   customProblemId: string;
   /** @minLength 1 */
@@ -398,6 +549,24 @@ export interface CustomProblem {
   problemId: string;
   /** @minLength 1 */
   question: string;
+}
+
+export interface CustomMockInterviewRoundDto {
+  /** @nullable */
+  content?: string | null;
+  /** @nullable */
+  link?: string | null;
+  score?: number;
+}
+
+export interface CustomMockInterviewRound {
+  /** @minLength 1 */
+  content: string;
+  customMockInterviewRoundId: string;
+  /** @minLength 1 */
+  link: string;
+  mockInterviewId: string;
+  score: number;
 }
 
 export interface CreateUserIfNotExistsResponse {
@@ -435,6 +604,39 @@ export interface CreateProblemAttemptRequest {
   /** @nullable */
   notes?: string | null;
   timeTakenInMinutes?: number;
+}
+
+export interface CreateMockInterviewResponse {
+  [key: string]: unknown;
+}
+
+export interface CreateMockInterviewResponseApiResult {
+  error?: ApiError;
+  readonly isSuccess?: boolean;
+  responseBody?: CreateMockInterviewResponse;
+  statusCode?: HttpStatusCode;
+  /** @nullable */
+  successMessage?: string | null;
+}
+
+export interface CreateMockInterviewRequest {
+  /** @nullable */
+  enrollmentId?: string | null;
+  interviewerUserId?: string;
+  /** @nullable */
+  mockInterviewRoundDtos?: MockInterviewRoundDto[] | null;
+  startDate?: string;
+  timeTakenInMinutes?: number;
+}
+
+export interface BehaviouralMockInterviewRoundDto {
+  behavioralScore?: number;
+}
+
+export interface BehaviouralMockInterviewRound {
+  behavioralScore: number;
+  behaviouralMockInterviewRoundId: string;
+  mockInterviewId: string;
 }
 
 export interface ApiError {
@@ -1330,6 +1532,90 @@ export function useGetCurrentUser<
   return query;
 }
 
+export const getUserList = (
+  options?: SecondParameter<typeof CustomAxiosInstance>,
+  signal?: AbortSignal
+) => {
+  return CustomAxiosInstance<GetUserListResponseApiResult>(
+    { url: `http://localhost:4000/api/users-list`, method: 'GET', signal },
+    options
+  );
+};
+
+export const getGetUserListQueryKey = () => {
+  return [`http://localhost:4000/api/users-list`] as const;
+};
+
+export const getGetUserListQueryOptions = <
+  TData = Awaited<ReturnType<typeof getUserList>>,
+  TError = GetUserListResponseApiResult,
+>(options?: {
+  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserList>>, TError, TData>>;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetUserListQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getUserList>>> = ({ signal }) =>
+    getUserList(requestOptions, signal);
+
+  return { queryKey, queryFn, staleTime: 8000, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getUserList>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetUserListQueryResult = NonNullable<Awaited<ReturnType<typeof getUserList>>>;
+export type GetUserListQueryError = GetUserListResponseApiResult;
+
+export function useGetUserList<
+  TData = Awaited<ReturnType<typeof getUserList>>,
+  TError = GetUserListResponseApiResult,
+>(options: {
+  query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserList>>, TError, TData>> &
+    Pick<
+      DefinedInitialDataOptions<Awaited<ReturnType<typeof getUserList>>, TError, TData>,
+      'initialData'
+    >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): DefinedUseQueryResult<TData, TError> & { queryKey: QueryKey };
+export function useGetUserList<
+  TData = Awaited<ReturnType<typeof getUserList>>,
+  TError = GetUserListResponseApiResult,
+>(options?: {
+  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserList>>, TError, TData>> &
+    Pick<
+      UndefinedInitialDataOptions<Awaited<ReturnType<typeof getUserList>>, TError, TData>,
+      'initialData'
+    >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey };
+export function useGetUserList<
+  TData = Awaited<ReturnType<typeof getUserList>>,
+  TError = GetUserListResponseApiResult,
+>(options?: {
+  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserList>>, TError, TData>>;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+export function useGetUserList<
+  TData = Awaited<ReturnType<typeof getUserList>>,
+  TError = GetUserListResponseApiResult,
+>(options?: {
+  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserList>>, TError, TData>>;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetUserListQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
 export const adminCreateSeason = (
   adminCreateSeasonRequest: AdminCreateSeasonRequest,
   options?: SecondParameter<typeof CustomAxiosInstance>
@@ -1627,6 +1913,307 @@ export const useAdminUpdateSeason = <
   TContext
 > => {
   const mutationOptions = getAdminUpdateSeasonMutationOptions(options);
+
+  return useMutation(mutationOptions);
+};
+
+export const adminCreateRole = (
+  adminCreateRoleRequest: AdminCreateRoleRequest,
+  options?: SecondParameter<typeof CustomAxiosInstance>
+) => {
+  return CustomAxiosInstance<AdminCreateRoleResponseApiResult>(
+    {
+      url: `http://localhost:4000/api/admin/roles`,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      data: adminCreateRoleRequest,
+    },
+    options
+  );
+};
+
+export const getAdminCreateRoleMutationOptions = <
+  TError = AdminCreateRoleResponseApiResult,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof adminCreateRole>>,
+    TError,
+    { data: AdminCreateRoleRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof adminCreateRole>>,
+  TError,
+  { data: AdminCreateRoleRequest },
+  TContext
+> => {
+  const { mutation: mutationOptions, request: requestOptions } = options ?? {};
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof adminCreateRole>>,
+    { data: AdminCreateRoleRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return adminCreateRole(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type AdminCreateRoleMutationResult = NonNullable<
+  Awaited<ReturnType<typeof adminCreateRole>>
+>;
+export type AdminCreateRoleMutationBody = AdminCreateRoleRequest;
+export type AdminCreateRoleMutationError = AdminCreateRoleResponseApiResult;
+
+export const useAdminCreateRole = <
+  TError = AdminCreateRoleResponseApiResult,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof adminCreateRole>>,
+    TError,
+    { data: AdminCreateRoleRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof adminCreateRole>>,
+  TError,
+  { data: AdminCreateRoleRequest },
+  TContext
+> => {
+  const mutationOptions = getAdminCreateRoleMutationOptions(options);
+
+  return useMutation(mutationOptions);
+};
+
+export const adminDeleteRole = (
+  params: AdminDeleteRoleParams,
+  options?: SecondParameter<typeof CustomAxiosInstance>
+) => {
+  return CustomAxiosInstance<AdminDeleteRoleResponseApiResult>(
+    { url: `http://localhost:4000/api/admin/roles`, method: 'DELETE', params },
+    options
+  );
+};
+
+export const getAdminDeleteRoleMutationOptions = <
+  TError = AdminDeleteRoleResponseApiResult,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof adminDeleteRole>>,
+    TError,
+    { params: AdminDeleteRoleParams },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof adminDeleteRole>>,
+  TError,
+  { params: AdminDeleteRoleParams },
+  TContext
+> => {
+  const { mutation: mutationOptions, request: requestOptions } = options ?? {};
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof adminDeleteRole>>,
+    { params: AdminDeleteRoleParams }
+  > = (props) => {
+    const { params } = props ?? {};
+
+    return adminDeleteRole(params, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type AdminDeleteRoleMutationResult = NonNullable<
+  Awaited<ReturnType<typeof adminDeleteRole>>
+>;
+
+export type AdminDeleteRoleMutationError = AdminDeleteRoleResponseApiResult;
+
+export const useAdminDeleteRole = <
+  TError = AdminDeleteRoleResponseApiResult,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof adminDeleteRole>>,
+    TError,
+    { params: AdminDeleteRoleParams },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof adminDeleteRole>>,
+  TError,
+  { params: AdminDeleteRoleParams },
+  TContext
+> => {
+  const mutationOptions = getAdminDeleteRoleMutationOptions(options);
+
+  return useMutation(mutationOptions);
+};
+
+export const adminListRole = (
+  options?: SecondParameter<typeof CustomAxiosInstance>,
+  signal?: AbortSignal
+) => {
+  return CustomAxiosInstance<AdminListRoleResponseApiResult>(
+    { url: `http://localhost:4000/api/admin/roles`, method: 'GET', signal },
+    options
+  );
+};
+
+export const getAdminListRoleQueryKey = () => {
+  return [`http://localhost:4000/api/admin/roles`] as const;
+};
+
+export const getAdminListRoleQueryOptions = <
+  TData = Awaited<ReturnType<typeof adminListRole>>,
+  TError = AdminListRoleResponseApiResult,
+>(options?: {
+  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof adminListRole>>, TError, TData>>;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getAdminListRoleQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof adminListRole>>> = ({ signal }) =>
+    adminListRole(requestOptions, signal);
+
+  return { queryKey, queryFn, staleTime: 8000, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof adminListRole>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type AdminListRoleQueryResult = NonNullable<Awaited<ReturnType<typeof adminListRole>>>;
+export type AdminListRoleQueryError = AdminListRoleResponseApiResult;
+
+export function useAdminListRole<
+  TData = Awaited<ReturnType<typeof adminListRole>>,
+  TError = AdminListRoleResponseApiResult,
+>(options: {
+  query: Partial<UseQueryOptions<Awaited<ReturnType<typeof adminListRole>>, TError, TData>> &
+    Pick<
+      DefinedInitialDataOptions<Awaited<ReturnType<typeof adminListRole>>, TError, TData>,
+      'initialData'
+    >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): DefinedUseQueryResult<TData, TError> & { queryKey: QueryKey };
+export function useAdminListRole<
+  TData = Awaited<ReturnType<typeof adminListRole>>,
+  TError = AdminListRoleResponseApiResult,
+>(options?: {
+  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof adminListRole>>, TError, TData>> &
+    Pick<
+      UndefinedInitialDataOptions<Awaited<ReturnType<typeof adminListRole>>, TError, TData>,
+      'initialData'
+    >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey };
+export function useAdminListRole<
+  TData = Awaited<ReturnType<typeof adminListRole>>,
+  TError = AdminListRoleResponseApiResult,
+>(options?: {
+  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof adminListRole>>, TError, TData>>;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+export function useAdminListRole<
+  TData = Awaited<ReturnType<typeof adminListRole>>,
+  TError = AdminListRoleResponseApiResult,
+>(options?: {
+  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof adminListRole>>, TError, TData>>;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getAdminListRoleQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+export const adminUpdateRole = (
+  adminUpdateRoleRequest: AdminUpdateRoleRequest,
+  options?: SecondParameter<typeof CustomAxiosInstance>
+) => {
+  return CustomAxiosInstance<AdminUpdateRoleResponseApiResult>(
+    {
+      url: `http://localhost:4000/api/admin/roles`,
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      data: adminUpdateRoleRequest,
+    },
+    options
+  );
+};
+
+export const getAdminUpdateRoleMutationOptions = <
+  TError = AdminUpdateRoleResponseApiResult,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof adminUpdateRole>>,
+    TError,
+    { data: AdminUpdateRoleRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof adminUpdateRole>>,
+  TError,
+  { data: AdminUpdateRoleRequest },
+  TContext
+> => {
+  const { mutation: mutationOptions, request: requestOptions } = options ?? {};
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof adminUpdateRole>>,
+    { data: AdminUpdateRoleRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return adminUpdateRole(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type AdminUpdateRoleMutationResult = NonNullable<
+  Awaited<ReturnType<typeof adminUpdateRole>>
+>;
+export type AdminUpdateRoleMutationBody = AdminUpdateRoleRequest;
+export type AdminUpdateRoleMutationError = AdminUpdateRoleResponseApiResult;
+
+export const useAdminUpdateRole = <
+  TError = AdminUpdateRoleResponseApiResult,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof adminUpdateRole>>,
+    TError,
+    { data: AdminUpdateRoleRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof adminUpdateRole>>,
+  TError,
+  { data: AdminUpdateRoleRequest },
+  TContext
+> => {
+  const mutationOptions = getAdminUpdateRoleMutationOptions(options);
 
   return useMutation(mutationOptions);
 };
@@ -1948,6 +2535,389 @@ export const useUpdateProblemAttempt = <
   TContext
 > => {
   const mutationOptions = getUpdateProblemAttemptMutationOptions(options);
+
+  return useMutation(mutationOptions);
+};
+
+export const createMockInterview = (
+  createMockInterviewRequest: CreateMockInterviewRequest,
+  options?: SecondParameter<typeof CustomAxiosInstance>
+) => {
+  return CustomAxiosInstance<CreateMockInterviewResponseApiResult>(
+    {
+      url: `http://localhost:4000/api/mock-interview`,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      data: createMockInterviewRequest,
+    },
+    options
+  );
+};
+
+export const getCreateMockInterviewMutationOptions = <
+  TError = CreateMockInterviewResponseApiResult,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createMockInterview>>,
+    TError,
+    { data: CreateMockInterviewRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof createMockInterview>>,
+  TError,
+  { data: CreateMockInterviewRequest },
+  TContext
+> => {
+  const { mutation: mutationOptions, request: requestOptions } = options ?? {};
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof createMockInterview>>,
+    { data: CreateMockInterviewRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return createMockInterview(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CreateMockInterviewMutationResult = NonNullable<
+  Awaited<ReturnType<typeof createMockInterview>>
+>;
+export type CreateMockInterviewMutationBody = CreateMockInterviewRequest;
+export type CreateMockInterviewMutationError = CreateMockInterviewResponseApiResult;
+
+export const useCreateMockInterview = <
+  TError = CreateMockInterviewResponseApiResult,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createMockInterview>>,
+    TError,
+    { data: CreateMockInterviewRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof createMockInterview>>,
+  TError,
+  { data: CreateMockInterviewRequest },
+  TContext
+> => {
+  const mutationOptions = getCreateMockInterviewMutationOptions(options);
+
+  return useMutation(mutationOptions);
+};
+
+export const updateMockInterview = (
+  updateMockInterviewRequest: UpdateMockInterviewRequest,
+  options?: SecondParameter<typeof CustomAxiosInstance>
+) => {
+  return CustomAxiosInstance<UpdateMockInterviewResponseApiResult>(
+    {
+      url: `http://localhost:4000/api/mock-interview`,
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      data: updateMockInterviewRequest,
+    },
+    options
+  );
+};
+
+export const getUpdateMockInterviewMutationOptions = <
+  TError = UpdateMockInterviewResponseApiResult,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updateMockInterview>>,
+    TError,
+    { data: UpdateMockInterviewRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof updateMockInterview>>,
+  TError,
+  { data: UpdateMockInterviewRequest },
+  TContext
+> => {
+  const { mutation: mutationOptions, request: requestOptions } = options ?? {};
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof updateMockInterview>>,
+    { data: UpdateMockInterviewRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return updateMockInterview(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type UpdateMockInterviewMutationResult = NonNullable<
+  Awaited<ReturnType<typeof updateMockInterview>>
+>;
+export type UpdateMockInterviewMutationBody = UpdateMockInterviewRequest;
+export type UpdateMockInterviewMutationError = UpdateMockInterviewResponseApiResult;
+
+export const useUpdateMockInterview = <
+  TError = UpdateMockInterviewResponseApiResult,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updateMockInterview>>,
+    TError,
+    { data: UpdateMockInterviewRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof updateMockInterview>>,
+  TError,
+  { data: UpdateMockInterviewRequest },
+  TContext
+> => {
+  const mutationOptions = getUpdateMockInterviewMutationOptions(options);
+
+  return useMutation(mutationOptions);
+};
+
+export const deleteMockInterview = (
+  params: DeleteMockInterviewParams,
+  options?: SecondParameter<typeof CustomAxiosInstance>
+) => {
+  return CustomAxiosInstance<DeleteMockInterviewResponseApiResult>(
+    { url: `http://localhost:4000/api/mock-interviews`, method: 'DELETE', params },
+    options
+  );
+};
+
+export const getDeleteMockInterviewMutationOptions = <
+  TError = DeleteMockInterviewResponseApiResult,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteMockInterview>>,
+    TError,
+    { params: DeleteMockInterviewParams },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof deleteMockInterview>>,
+  TError,
+  { params: DeleteMockInterviewParams },
+  TContext
+> => {
+  const { mutation: mutationOptions, request: requestOptions } = options ?? {};
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof deleteMockInterview>>,
+    { params: DeleteMockInterviewParams }
+  > = (props) => {
+    const { params } = props ?? {};
+
+    return deleteMockInterview(params, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type DeleteMockInterviewMutationResult = NonNullable<
+  Awaited<ReturnType<typeof deleteMockInterview>>
+>;
+
+export type DeleteMockInterviewMutationError = DeleteMockInterviewResponseApiResult;
+
+export const useDeleteMockInterview = <
+  TError = DeleteMockInterviewResponseApiResult,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteMockInterview>>,
+    TError,
+    { params: DeleteMockInterviewParams },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof deleteMockInterview>>,
+  TError,
+  { params: DeleteMockInterviewParams },
+  TContext
+> => {
+  const mutationOptions = getDeleteMockInterviewMutationOptions(options);
+
+  return useMutation(mutationOptions);
+};
+
+export const getMockInterviews = (
+  params: GetMockInterviewsParams,
+  options?: SecondParameter<typeof CustomAxiosInstance>,
+  signal?: AbortSignal
+) => {
+  return CustomAxiosInstance<GetMockInterviewsResponseApiResult>(
+    { url: `http://localhost:4000/api/mock-interviews`, method: 'GET', params, signal },
+    options
+  );
+};
+
+export const getGetMockInterviewsQueryKey = (params: GetMockInterviewsParams) => {
+  return [`http://localhost:4000/api/mock-interviews`, ...(params ? [params] : [])] as const;
+};
+
+export const getGetMockInterviewsQueryOptions = <
+  TData = Awaited<ReturnType<typeof getMockInterviews>>,
+  TError = GetMockInterviewsResponseApiResult,
+>(
+  params: GetMockInterviewsParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMockInterviews>>, TError, TData>>;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetMockInterviewsQueryKey(params);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getMockInterviews>>> = ({ signal }) =>
+    getMockInterviews(params, requestOptions, signal);
+
+  return { queryKey, queryFn, staleTime: 8000, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getMockInterviews>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetMockInterviewsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getMockInterviews>>
+>;
+export type GetMockInterviewsQueryError = GetMockInterviewsResponseApiResult;
+
+export function useGetMockInterviews<
+  TData = Awaited<ReturnType<typeof getMockInterviews>>,
+  TError = GetMockInterviewsResponseApiResult,
+>(
+  params: GetMockInterviewsParams,
+  options: {
+    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMockInterviews>>, TError, TData>> &
+      Pick<
+        DefinedInitialDataOptions<Awaited<ReturnType<typeof getMockInterviews>>, TError, TData>,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): DefinedUseQueryResult<TData, TError> & { queryKey: QueryKey };
+export function useGetMockInterviews<
+  TData = Awaited<ReturnType<typeof getMockInterviews>>,
+  TError = GetMockInterviewsResponseApiResult,
+>(
+  params: GetMockInterviewsParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMockInterviews>>, TError, TData>> &
+      Pick<
+        UndefinedInitialDataOptions<Awaited<ReturnType<typeof getMockInterviews>>, TError, TData>,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): UseQueryResult<TData, TError> & { queryKey: QueryKey };
+export function useGetMockInterviews<
+  TData = Awaited<ReturnType<typeof getMockInterviews>>,
+  TError = GetMockInterviewsResponseApiResult,
+>(
+  params: GetMockInterviewsParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMockInterviews>>, TError, TData>>;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+export function useGetMockInterviews<
+  TData = Awaited<ReturnType<typeof getMockInterviews>>,
+  TError = GetMockInterviewsResponseApiResult,
+>(
+  params: GetMockInterviewsParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMockInterviews>>, TError, TData>>;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetMockInterviewsQueryOptions(params, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+export const mockCreateMockInterview = (options?: SecondParameter<typeof CustomAxiosInstance>) => {
+  return CustomAxiosInstance<MockCreateMockInterviewResponseApiResult>(
+    { url: `http://localhost:4000/api/mock-interview/mock-create`, method: 'POST' },
+    options
+  );
+};
+
+export const getMockCreateMockInterviewMutationOptions = <
+  TError = MockCreateMockInterviewResponseApiResult,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof mockCreateMockInterview>>,
+    TError,
+    void,
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof mockCreateMockInterview>>,
+  TError,
+  void,
+  TContext
+> => {
+  const { mutation: mutationOptions, request: requestOptions } = options ?? {};
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof mockCreateMockInterview>>,
+    void
+  > = () => {
+    return mockCreateMockInterview(requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type MockCreateMockInterviewMutationResult = NonNullable<
+  Awaited<ReturnType<typeof mockCreateMockInterview>>
+>;
+
+export type MockCreateMockInterviewMutationError = MockCreateMockInterviewResponseApiResult;
+
+export const useMockCreateMockInterview = <
+  TError = MockCreateMockInterviewResponseApiResult,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof mockCreateMockInterview>>,
+    TError,
+    void,
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof mockCreateMockInterview>>,
+  TError,
+  void,
+  TContext
+> => {
+  const mutationOptions = getMockCreateMockInterviewMutationOptions(options);
 
   return useMutation(mutationOptions);
 };
@@ -2386,92 +3356,6 @@ export function useGetCurrentUserMenteesList<
   return query;
 }
 
-export const getLeetcodeProblems = (
-  options?: SecondParameter<typeof CustomAxiosInstance>,
-  signal?: AbortSignal
-) => {
-  return CustomAxiosInstance<GetLeetcodeProblemsResponseApiResult>(
-    { url: `http://localhost:4000/api/leetcode-problems`, method: 'GET', signal },
-    options
-  );
-};
-
-export const getGetLeetcodeProblemsQueryKey = () => {
-  return [`http://localhost:4000/api/leetcode-problems`] as const;
-};
-
-export const getGetLeetcodeProblemsQueryOptions = <
-  TData = Awaited<ReturnType<typeof getLeetcodeProblems>>,
-  TError = GetLeetcodeProblemsResponseApiResult,
->(options?: {
-  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getLeetcodeProblems>>, TError, TData>>;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {};
-
-  const queryKey = queryOptions?.queryKey ?? getGetLeetcodeProblemsQueryKey();
-
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof getLeetcodeProblems>>> = ({ signal }) =>
-    getLeetcodeProblems(requestOptions, signal);
-
-  return { queryKey, queryFn, staleTime: 8000, ...queryOptions } as UseQueryOptions<
-    Awaited<ReturnType<typeof getLeetcodeProblems>>,
-    TError,
-    TData
-  > & { queryKey: QueryKey };
-};
-
-export type GetLeetcodeProblemsQueryResult = NonNullable<
-  Awaited<ReturnType<typeof getLeetcodeProblems>>
->;
-export type GetLeetcodeProblemsQueryError = GetLeetcodeProblemsResponseApiResult;
-
-export function useGetLeetcodeProblems<
-  TData = Awaited<ReturnType<typeof getLeetcodeProblems>>,
-  TError = GetLeetcodeProblemsResponseApiResult,
->(options: {
-  query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getLeetcodeProblems>>, TError, TData>> &
-    Pick<
-      DefinedInitialDataOptions<Awaited<ReturnType<typeof getLeetcodeProblems>>, TError, TData>,
-      'initialData'
-    >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): DefinedUseQueryResult<TData, TError> & { queryKey: QueryKey };
-export function useGetLeetcodeProblems<
-  TData = Awaited<ReturnType<typeof getLeetcodeProblems>>,
-  TError = GetLeetcodeProblemsResponseApiResult,
->(options?: {
-  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getLeetcodeProblems>>, TError, TData>> &
-    Pick<
-      UndefinedInitialDataOptions<Awaited<ReturnType<typeof getLeetcodeProblems>>, TError, TData>,
-      'initialData'
-    >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseQueryResult<TData, TError> & { queryKey: QueryKey };
-export function useGetLeetcodeProblems<
-  TData = Awaited<ReturnType<typeof getLeetcodeProblems>>,
-  TError = GetLeetcodeProblemsResponseApiResult,
->(options?: {
-  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getLeetcodeProblems>>, TError, TData>>;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseQueryResult<TData, TError> & { queryKey: QueryKey };
-
-export function useGetLeetcodeProblems<
-  TData = Awaited<ReturnType<typeof getLeetcodeProblems>>,
-  TError = GetLeetcodeProblemsResponseApiResult,
->(options?: {
-  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getLeetcodeProblems>>, TError, TData>>;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
-  const queryOptions = getGetLeetcodeProblemsQueryOptions(options);
-
-  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & { queryKey: QueryKey };
-
-  query.queryKey = queryOptions.queryKey;
-
-  return query;
-}
-
 export const adminPopulateLeetcodeQuestions = (
   options?: SecondParameter<typeof CustomAxiosInstance>,
   signal?: AbortSignal
@@ -2578,225 +3462,84 @@ export function useAdminPopulateLeetcodeQuestions<
   return query;
 }
 
-export const adminCreateRole = (
-  adminCreateRoleRequest: AdminCreateRoleRequest,
-  options?: SecondParameter<typeof CustomAxiosInstance>
-) => {
-  return CustomAxiosInstance<AdminCreateRoleResponseApiResult>(
-    {
-      url: `http://localhost:4000/api/admin/roles`,
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      data: adminCreateRoleRequest,
-    },
-    options
-  );
-};
-
-export const getAdminCreateRoleMutationOptions = <
-  TError = AdminCreateRoleResponseApiResult,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof adminCreateRole>>,
-    TError,
-    { data: AdminCreateRoleRequest },
-    TContext
-  >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof adminCreateRole>>,
-  TError,
-  { data: AdminCreateRoleRequest },
-  TContext
-> => {
-  const { mutation: mutationOptions, request: requestOptions } = options ?? {};
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof adminCreateRole>>,
-    { data: AdminCreateRoleRequest }
-  > = (props) => {
-    const { data } = props ?? {};
-
-    return adminCreateRole(data, requestOptions);
-  };
-
-  return { mutationFn, ...mutationOptions };
-};
-
-export type AdminCreateRoleMutationResult = NonNullable<
-  Awaited<ReturnType<typeof adminCreateRole>>
->;
-export type AdminCreateRoleMutationBody = AdminCreateRoleRequest;
-export type AdminCreateRoleMutationError = AdminCreateRoleResponseApiResult;
-
-export const useAdminCreateRole = <
-  TError = AdminCreateRoleResponseApiResult,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof adminCreateRole>>,
-    TError,
-    { data: AdminCreateRoleRequest },
-    TContext
-  >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseMutationResult<
-  Awaited<ReturnType<typeof adminCreateRole>>,
-  TError,
-  { data: AdminCreateRoleRequest },
-  TContext
-> => {
-  const mutationOptions = getAdminCreateRoleMutationOptions(options);
-
-  return useMutation(mutationOptions);
-};
-
-export const adminDeleteRole = (
-  params: AdminDeleteRoleParams,
-  options?: SecondParameter<typeof CustomAxiosInstance>
-) => {
-  return CustomAxiosInstance<AdminDeleteRoleResponseApiResult>(
-    { url: `http://localhost:4000/api/admin/roles`, method: 'DELETE', params },
-    options
-  );
-};
-
-export const getAdminDeleteRoleMutationOptions = <
-  TError = AdminDeleteRoleResponseApiResult,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof adminDeleteRole>>,
-    TError,
-    { params: AdminDeleteRoleParams },
-    TContext
-  >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof adminDeleteRole>>,
-  TError,
-  { params: AdminDeleteRoleParams },
-  TContext
-> => {
-  const { mutation: mutationOptions, request: requestOptions } = options ?? {};
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof adminDeleteRole>>,
-    { params: AdminDeleteRoleParams }
-  > = (props) => {
-    const { params } = props ?? {};
-
-    return adminDeleteRole(params, requestOptions);
-  };
-
-  return { mutationFn, ...mutationOptions };
-};
-
-export type AdminDeleteRoleMutationResult = NonNullable<
-  Awaited<ReturnType<typeof adminDeleteRole>>
->;
-
-export type AdminDeleteRoleMutationError = AdminDeleteRoleResponseApiResult;
-
-export const useAdminDeleteRole = <
-  TError = AdminDeleteRoleResponseApiResult,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof adminDeleteRole>>,
-    TError,
-    { params: AdminDeleteRoleParams },
-    TContext
-  >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseMutationResult<
-  Awaited<ReturnType<typeof adminDeleteRole>>,
-  TError,
-  { params: AdminDeleteRoleParams },
-  TContext
-> => {
-  const mutationOptions = getAdminDeleteRoleMutationOptions(options);
-
-  return useMutation(mutationOptions);
-};
-
-export const adminListRole = (
+export const getLeetcodeProblems = (
   options?: SecondParameter<typeof CustomAxiosInstance>,
   signal?: AbortSignal
 ) => {
-  return CustomAxiosInstance<AdminListRoleResponseApiResult>(
-    { url: `http://localhost:4000/api/admin/roles`, method: 'GET', signal },
+  return CustomAxiosInstance<GetLeetcodeProblemsResponseApiResult>(
+    { url: `http://localhost:4000/api/leetcode-problems`, method: 'GET', signal },
     options
   );
 };
 
-export const getAdminListRoleQueryKey = () => {
-  return [`http://localhost:4000/api/admin/roles`] as const;
+export const getGetLeetcodeProblemsQueryKey = () => {
+  return [`http://localhost:4000/api/leetcode-problems`] as const;
 };
 
-export const getAdminListRoleQueryOptions = <
-  TData = Awaited<ReturnType<typeof adminListRole>>,
-  TError = AdminListRoleResponseApiResult,
+export const getGetLeetcodeProblemsQueryOptions = <
+  TData = Awaited<ReturnType<typeof getLeetcodeProblems>>,
+  TError = GetLeetcodeProblemsResponseApiResult,
 >(options?: {
-  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof adminListRole>>, TError, TData>>;
+  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getLeetcodeProblems>>, TError, TData>>;
   request?: SecondParameter<typeof CustomAxiosInstance>;
 }) => {
   const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey = queryOptions?.queryKey ?? getAdminListRoleQueryKey();
+  const queryKey = queryOptions?.queryKey ?? getGetLeetcodeProblemsQueryKey();
 
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof adminListRole>>> = ({ signal }) =>
-    adminListRole(requestOptions, signal);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getLeetcodeProblems>>> = ({ signal }) =>
+    getLeetcodeProblems(requestOptions, signal);
 
   return { queryKey, queryFn, staleTime: 8000, ...queryOptions } as UseQueryOptions<
-    Awaited<ReturnType<typeof adminListRole>>,
+    Awaited<ReturnType<typeof getLeetcodeProblems>>,
     TError,
     TData
   > & { queryKey: QueryKey };
 };
 
-export type AdminListRoleQueryResult = NonNullable<Awaited<ReturnType<typeof adminListRole>>>;
-export type AdminListRoleQueryError = AdminListRoleResponseApiResult;
+export type GetLeetcodeProblemsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getLeetcodeProblems>>
+>;
+export type GetLeetcodeProblemsQueryError = GetLeetcodeProblemsResponseApiResult;
 
-export function useAdminListRole<
-  TData = Awaited<ReturnType<typeof adminListRole>>,
-  TError = AdminListRoleResponseApiResult,
+export function useGetLeetcodeProblems<
+  TData = Awaited<ReturnType<typeof getLeetcodeProblems>>,
+  TError = GetLeetcodeProblemsResponseApiResult,
 >(options: {
-  query: Partial<UseQueryOptions<Awaited<ReturnType<typeof adminListRole>>, TError, TData>> &
+  query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getLeetcodeProblems>>, TError, TData>> &
     Pick<
-      DefinedInitialDataOptions<Awaited<ReturnType<typeof adminListRole>>, TError, TData>,
+      DefinedInitialDataOptions<Awaited<ReturnType<typeof getLeetcodeProblems>>, TError, TData>,
       'initialData'
     >;
   request?: SecondParameter<typeof CustomAxiosInstance>;
 }): DefinedUseQueryResult<TData, TError> & { queryKey: QueryKey };
-export function useAdminListRole<
-  TData = Awaited<ReturnType<typeof adminListRole>>,
-  TError = AdminListRoleResponseApiResult,
+export function useGetLeetcodeProblems<
+  TData = Awaited<ReturnType<typeof getLeetcodeProblems>>,
+  TError = GetLeetcodeProblemsResponseApiResult,
 >(options?: {
-  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof adminListRole>>, TError, TData>> &
+  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getLeetcodeProblems>>, TError, TData>> &
     Pick<
-      UndefinedInitialDataOptions<Awaited<ReturnType<typeof adminListRole>>, TError, TData>,
+      UndefinedInitialDataOptions<Awaited<ReturnType<typeof getLeetcodeProblems>>, TError, TData>,
       'initialData'
     >;
   request?: SecondParameter<typeof CustomAxiosInstance>;
 }): UseQueryResult<TData, TError> & { queryKey: QueryKey };
-export function useAdminListRole<
-  TData = Awaited<ReturnType<typeof adminListRole>>,
-  TError = AdminListRoleResponseApiResult,
+export function useGetLeetcodeProblems<
+  TData = Awaited<ReturnType<typeof getLeetcodeProblems>>,
+  TError = GetLeetcodeProblemsResponseApiResult,
 >(options?: {
-  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof adminListRole>>, TError, TData>>;
+  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getLeetcodeProblems>>, TError, TData>>;
   request?: SecondParameter<typeof CustomAxiosInstance>;
 }): UseQueryResult<TData, TError> & { queryKey: QueryKey };
 
-export function useAdminListRole<
-  TData = Awaited<ReturnType<typeof adminListRole>>,
-  TError = AdminListRoleResponseApiResult,
+export function useGetLeetcodeProblems<
+  TData = Awaited<ReturnType<typeof getLeetcodeProblems>>,
+  TError = GetLeetcodeProblemsResponseApiResult,
 >(options?: {
-  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof adminListRole>>, TError, TData>>;
+  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getLeetcodeProblems>>, TError, TData>>;
   request?: SecondParameter<typeof CustomAxiosInstance>;
 }): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
-  const queryOptions = getAdminListRoleQueryOptions(options);
+  const queryOptions = getGetLeetcodeProblemsQueryOptions(options);
 
   const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & { queryKey: QueryKey };
 
@@ -2804,80 +3547,6 @@ export function useAdminListRole<
 
   return query;
 }
-
-export const adminUpdateRole = (
-  adminUpdateRoleRequest: AdminUpdateRoleRequest,
-  options?: SecondParameter<typeof CustomAxiosInstance>
-) => {
-  return CustomAxiosInstance<AdminUpdateRoleResponseApiResult>(
-    {
-      url: `http://localhost:4000/api/admin/roles`,
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      data: adminUpdateRoleRequest,
-    },
-    options
-  );
-};
-
-export const getAdminUpdateRoleMutationOptions = <
-  TError = AdminUpdateRoleResponseApiResult,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof adminUpdateRole>>,
-    TError,
-    { data: AdminUpdateRoleRequest },
-    TContext
-  >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof adminUpdateRole>>,
-  TError,
-  { data: AdminUpdateRoleRequest },
-  TContext
-> => {
-  const { mutation: mutationOptions, request: requestOptions } = options ?? {};
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof adminUpdateRole>>,
-    { data: AdminUpdateRoleRequest }
-  > = (props) => {
-    const { data } = props ?? {};
-
-    return adminUpdateRole(data, requestOptions);
-  };
-
-  return { mutationFn, ...mutationOptions };
-};
-
-export type AdminUpdateRoleMutationResult = NonNullable<
-  Awaited<ReturnType<typeof adminUpdateRole>>
->;
-export type AdminUpdateRoleMutationBody = AdminUpdateRoleRequest;
-export type AdminUpdateRoleMutationError = AdminUpdateRoleResponseApiResult;
-
-export const useAdminUpdateRole = <
-  TError = AdminUpdateRoleResponseApiResult,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof adminUpdateRole>>,
-    TError,
-    { data: AdminUpdateRoleRequest },
-    TContext
-  >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseMutationResult<
-  Awaited<ReturnType<typeof adminUpdateRole>>,
-  TError,
-  { data: AdminUpdateRoleRequest },
-  TContext
-> => {
-  const mutationOptions = getAdminUpdateRoleMutationOptions(options);
-
-  return useMutation(mutationOptions);
-};
 
 export const adminCreateEnrollment = (
   adminCreateEnrollmentRequest: AdminCreateEnrollmentRequest,

@@ -1,0 +1,45 @@
+.textGreen {
+    color: var(--mantine-color-green-6);
+}
+
+.textYellow {
+    color: var(--mantine-color-yellow-6);
+}
+
+.textRed {
+    color: var(--mantine-color-red-6);
+}
+
+.category {
+    background-color: light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-5));
+}
+
+.categoryContainer {
+    gap: var(--mantine-spacing-xs);
+}
+
+.table {
+    padding: var(--mantine-spacing-md);
+    --table-highlight-on-hover-color: none;
+    --mrt-row-hover-background-color: none;
+}
+
+.scoreTextCircle {
+    border-radius: 50%;
+}
+
+.innerTable {
+    border-radius: var(--mantine-radius-md);
+
+    @mixin dark {
+        background-color: var(--mantine-color-dark-6);
+    };
+
+    @mixin light {
+        background-color: var(--mantine-color-gray-0);
+    };
+}
+
+.innerTableHeading  {
+    border-bottom: calc(0.0625rem * var(--mantine-scale)) solid var(--table-border-color);
+}

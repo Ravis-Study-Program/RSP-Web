@@ -20,6 +20,7 @@ public class ApplicationDbContext : DbContext
   public virtual DbSet<LeetcodeProblemCategory> LeetcodeProblemCategories { get; set; }
   public virtual DbSet<LeetcodeProblemDifficulty> LeetcodeProblemDifficulties { get; set; }
   public virtual DbSet<Mentorship> Mentorships { get; set; }
+  public virtual DbSet<MockInterview> MockInterviews { get; set; }
   public virtual DbSet<Problem> Problems { get; set; }
   public virtual DbSet<ProblemAttempt> ProblemAttempts { get; set; }
   public virtual DbSet<Role> Roles { get; set; }
