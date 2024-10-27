@@ -78,4 +78,15 @@ public static class Message
   
   public const string LeetcodeProblemsListSuccessfully = "List of LeetcodeProblems retrieved successfully.";
   public const string LeetcodeProblemsListUnexpectedError = "An unexpected error has occurred during leetcode problems list.";
+  
+  public const string MockInterviewCreatedSuccessfully = "Mock Interview created successfully.";
+  public const string MockInterviewDoesNotExists = "No mentorship found using the Mock Interview Id provided.";
+  public const string MockInterviewUpdatedSuccessfully = "Mock Interview updated successfully.";
+  public const string MockInterviewCreationUnexpectedError = "An unexpected error has occurred during mock interview creation.";
+  public const string MockInterviewDeletionUnexpectedError = "An unexpected error has occurred during mock interview deletion.";
+  public const string MockInterviewUpdateUnexpectedError = "An unexpected error has occurred during mock interview update.";
+  public const string MockInterviewDeletedSuccessfully = "Mock Interview deleted successfully.";
+  public const string MockInterviewListSuccessfully = "List of Mock Interview retrieved successfully.";
+  public const string MockInterviewListUnexpectedError = "An unexpected error has occurred during mock interviews list.";
+
 }

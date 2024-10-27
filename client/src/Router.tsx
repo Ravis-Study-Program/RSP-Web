@@ -10,6 +10,7 @@ import { GraduatesPage } from './pages/Graduates/Graduates.page';
 import { LeetcodePage } from './pages/Leetcode/Leetcode.page';
 import { LoginPage } from './pages/Login/Login.page';
 import { MenteesPage } from './pages/Mentees/Mentees.page';
+import { MockInterviewPage } from './pages/MockInterviews/MockInterview.page';
 import { NotFoundPage } from './pages/NotFound/NotFound.page';
 import { SeasonsPage } from './pages/Seasons/Seasons.page';
 import { SeasonsOverviewPage } from './pages/Seasons/SeasonsOverview.page';
@@ -47,7 +48,7 @@ const routes = createRoutesFromElements(
       <Route path="settings" element={<SettingsPage />} />
       <Route path="graduates" element={<GraduatesPage />} />
       <Route path="leetcode" element={<LeetcodePage />} />
-      <Route path="mock-interviews" element={placeholderPage('All Mock Interviews Page')} />
+      <Route path="mock-interviews" element={<MockInterviewPage />} />
 
       {/* Season Routes */}
       <Route path="seasons/:seasonSlug" element={<SeasonRouteGuard />}>
