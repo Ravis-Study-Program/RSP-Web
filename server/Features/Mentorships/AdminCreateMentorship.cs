@@ -15,8 +15,8 @@ public static class AdminCreateMentorship
 {
   public class Command : AdminAuthRequest<ApiResult<AdminCreateMentorshipResponse>>
   {
-    public Guid MentorEnrollmentId { get; set; }
-    public Guid MenteeEnrollmentId { get; set; }
+    public string MentorEnrollmentId { get; set; } = string.Empty;
+    public string MenteeEnrollmentId { get; set; } = string.Empty;
   }
 
   public class Validator : AbstractValidator<Command>
@@ -63,7 +63,7 @@ public static class AdminCreateMentorship
           Error = new ApiError(Message.MentorshipNotPermittedDueToNullMentorOrMentee)
         };
       }
-      
+
       // Reject if provided mentor and mentee doesn't belong to the same season
       if (mentor.Season.SeasonId != mentee.Season.SeasonId)
       {
@@ -73,12 +73,14 @@ public static class AdminCreateMentorship
           Error = new ApiError(Message.MentorshipNotPermittedDueToDifferentSeason)
         };
       }
-      
+
       // Reject if there is an existing mentorship
       var existingMentorship = await _dbContext
                                      .Mentorships
-                                     .FirstOrDefaultAsync(m => m.MentorEnrollmentId == request.MentorEnrollmentId && m.MenteeEnrollmentId == request.MenteeEnrollmentId,
-                                                          cancellationToken);
+                                     .FirstOrDefaultAsync(
+                                       m => m.MentorEnrollmentId == request.MentorEnrollmentId &&
+                                            m.MenteeEnrollmentId == request.MenteeEnrollmentId,
+                                       cancellationToken);
       if (existingMentorship != null)
       {
         return new ApiResult<AdminCreateMentorshipResponse>
@@ -87,9 +89,10 @@ public static class AdminCreateMentorship
           Error = new ApiError(Message.MentorshipExists)
         };
       }
-      
-      var mentorship = new Mentorship
+
+      var mentorship = new MentorshipEntity
       {
+        MentorshipId = Database.Constants.GeneratePrimaryKeyId(),
         MentorEnrollmentId = request.MentorEnrollmentId,
         MenteeEnrollmentId = request.MenteeEnrollmentId
       };
@@ -104,8 +107,9 @@ public static class AdminCreateMentorship
           StatusCode = HttpStatusCode.OK,
           ResponseBody = new AdminCreateMentorshipResponse
           {
-            MentorEnrollmentId = request.MentorEnrollmentId,
-            MenteeEnrollmentId = request.MenteeEnrollmentId
+            MentorshipId = mentorship.MentorshipId,
+            MentorEnrollmentId = mentorship.MentorEnrollmentId,
+            MenteeEnrollmentId = mentorship.MenteeEnrollmentId
           },
           SuccessMessage = Message.MentorshipCreatedSuccessfully
         };
@@ -148,13 +152,13 @@ public class AdminCreateMentorshipEndpoint : ICarterModule
 
 public record AdminCreateMentorshipRequest
 {
-  public Guid MentorEnrollmentId { get; set; }
-  public Guid MenteeEnrollmentId { get; set; }
+  public string MentorEnrollmentId { get; set; } = string.Empty;
+  public string MenteeEnrollmentId { get; set; } = string.Empty;
 }
 
 public class AdminCreateMentorshipResponse
 {
-  public Guid MentorshipId { get; set; }
-  public Guid MentorEnrollmentId { get; set; }
-  public Guid MenteeEnrollmentId { get; set; }
+  public string MentorshipId { get; set; } = string.Empty;
+  public string MentorEnrollmentId { get; set; } = string.Empty;
+  public string MenteeEnrollmentId { get; set; } = string.Empty;
 }

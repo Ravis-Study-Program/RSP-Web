@@ -18,10 +18,10 @@ public static class CreateProblemAttempt
     public DateTime AttemptStartDate { get; set; }
     public int TimeTakenInMinutes { get; set; }
     public string Notes { get; set; } = string.Empty;
-    public Guid? LeetcodeProblemId { get; set; }
-    public Guid? CustomProblemId { get; set; }
-    public Guid? EnrollmentId { get; set; }
-    public string Email { get; set; }
+    public string? LeetcodeProblemId { get; set; }
+    public string? CustomProblemId { get; set; }
+    public string? EnrollmentId { get; set; }
+    public string Email { get; set; } = string.Empty;
   }
 
   public class Validator : AbstractValidator<Command>
@@ -58,7 +58,8 @@ public static class CreateProblemAttempt
           var existingEnrollment = await _dbContext
                                          .Enrollments
                                          .Include(e => e.User)
-                                         .FirstOrDefaultAsync(e => e.EnrollmentId == request.EnrollmentId, cancellationToken);
+                                         .FirstOrDefaultAsync(e => e.EnrollmentId == request.EnrollmentId,
+                                                              cancellationToken);
           if (existingEnrollment == null || existingEnrollment.User.Email != request.Email)
           {
             return new ApiResult<CreateProblemAttemptResponse>
@@ -68,22 +69,22 @@ public static class CreateProblemAttempt
             };
           }
         }
-        
+
         // Leetcode should take precedence if CustomProblem is present for some reason
         if (request.CustomProblemId != null && request.LeetcodeProblemId != null)
         {
           request.CustomProblemId = null;
         }
-        
+
         // Get user. At this point, it should have exists based on authentication middleware
         var existingUser = await _dbContext
-                                       .Users
-                                       .Where(u => u.Email == request.Email)
-                                       .Select(u => new User
-                                       {
-                                         UserId = u.UserId
-                                       })
-                                       .FirstOrDefaultAsync(cancellationToken);
+                                 .Users
+                                 .Where(u => u.Email == request.Email)
+                                 .Select(u => new UserEntity
+                                 {
+                                   UserId = u.UserId
+                                 })
+                                 .FirstOrDefaultAsync(cancellationToken);
         if (existingUser == null)
         {
           return new ApiResult<CreateProblemAttemptResponse>
@@ -92,10 +93,11 @@ public static class CreateProblemAttempt
             Error = new ApiError(Message.UserEmailDoesNotExists)
           };
         }
-        
-        var problemAttempt = new ProblemAttempt
+
+        var problemAttempt = new ProblemAttemptEntity
         {
-          AttemptStartDate = request.AttemptStartDate,
+          ProblemAttemptId = Database.Constants.GeneratePrimaryKeyId(),
+          AttemptStartDateUtc = request.AttemptStartDate,
           TimeTakenInMinutes = request.TimeTakenInMinutes,
           LeetcodeProblemId = request.LeetcodeProblemId,
           CustomProblemId = request.CustomProblemId,
@@ -103,7 +105,7 @@ public static class CreateProblemAttempt
           EnrollmentId = request.EnrollmentId,
           UserId = existingUser.UserId
         };
-        
+
         _dbContext.Add(problemAttempt);
         await _dbContext.SaveChangesAsync(cancellationToken);
 
@@ -136,7 +138,7 @@ public class CreateProblemAttemptEndpoint : ICarterModule
          async (CreateProblemAttemptRequest request, ISender sender, HttpContext httpContext) =>
          {
            var email = httpContext?.User?.Identity?.Name ?? "";
-           
+
            var command = new CreateProblemAttempt.Command
            {
              AttemptStartDate = request.AttemptStartDate,
@@ -160,10 +162,10 @@ public record CreateProblemAttemptRequest
 {
   public DateTime AttemptStartDate { get; set; }
   public int TimeTakenInMinutes { get; set; }
-  public string Notes { get; set; }
-  public Guid LeetcodeProblemId { get; set; }
-  public Guid CustomProblemId { get; set; }
-  public Guid? EnrollmentId { get; set; }
+  public string Notes { get; set; } = string.Empty;
+  public string LeetcodeProblemId { get; set; } = string.Empty;
+  public string CustomProblemId { get; set; } = string.Empty;
+  public string? EnrollmentId { get; set; }
 }
 
 public class CreateProblemAttemptResponse

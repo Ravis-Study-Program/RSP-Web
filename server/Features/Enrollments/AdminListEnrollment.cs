@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using System.Net;
 using Carter;
 using MediatR;
@@ -36,20 +35,14 @@ public static class AdminListEnrollment
       try
       {
         var enrollments = await _dbContext.Enrollments
-                                    .Include(e => e.Season)
-                                    .Include(e => e.Role)
-                                    .Include(e => e.User)
-                                    .Select(e => new EnrollmentResponse
-                                    {
-                                      EnrollmentId = e.EnrollmentId,
-                                      RoleId = e.RoleId,
-                                      UserId = e.UserId,
-                                      SeasonId = e.SeasonId,
-                                      Role = e.Role.Name,
-                                      Season = e.Season.Name,
-                                      User = e.User.Name
-                                    })
-                                    .ToListAsync(cancellationToken);
+                                          .Select(e => new EnrollmentResponse
+                                          {
+                                            EnrollmentId = e.EnrollmentId,
+                                            Role = e.Role,
+                                            Season = e.Season.Name,
+                                            User = e.User.Name
+                                          })
+                                          .ToListAsync(cancellationToken);
 
         return new ApiResult<AdminListEnrollmentResponse>
         {
@@ -95,13 +88,10 @@ public class AdminListEnrollmentEndpoint : ICarterModule
 
 public record EnrollmentResponse
 {
-  [Required] public Guid EnrollmentId { get; set; }
-  [Required] public Guid RoleId { get; set; }
-  [Required] public Guid UserId { get; set; }
-  [Required] public Guid SeasonId { get; set; }
-  [Required] public string Role { get; set; } = string.Empty;
-  [Required] public string Season { get; set; } = string.Empty;
-  [Required] public string User { get; set; } = string.Empty;
+  public string EnrollmentId { get; set; } = string.Empty;
+  public SeasonRole Role { get; set; }
+  public string Season { get; set; } = string.Empty;
+  public string User { get; set; } = string.Empty;
 }
 
 public class AdminListEnrollmentResponse

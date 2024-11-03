@@ -11,7 +11,7 @@ using Xunit;
 
 namespace RSPWebAPI.Tests.Features.Mentorships;
 
-public class GetCurrentUserMenteesListTests: TestsHelper
+public class GetCurrentUserMenteesListTests : TestsHelper
 {
   private readonly Mock<ApplicationDbContext> _dbContextMock;
 
@@ -33,56 +33,44 @@ public class GetCurrentUserMenteesListTests: TestsHelper
   public async Task Handle_Success_OK()
   {
     _dbContextMock.Setup(x => x.Mentorships)
-                  .ReturnsDbSet(new List<Mentorship>
+                  .ReturnsDbSet(new List<MentorshipEntity>
                   {
-                    new Mentorship
+                    new()
                     {
-                      MentorshipId = DummyGuid,
-                      MentorEnrollmentId = DummyGuid,
-                      MenteeEnrollmentId = DummyGuid2,
-                      MentorEnrollment = new Enrollment
+                      MentorshipId = DummyId1,
+                      MentorEnrollmentId = DummyId1,
+                      MenteeEnrollmentId = DummyId2,
+                      MentorEnrollment = new EnrollmentEntity
                       {
-                        EnrollmentId = DummyGuid,
-                        SeasonId = DummyGuid,
-                        UserId = DummyGuid,
-                        RoleId = DummyGuid,
-                        Season = new Season
+                        EnrollmentId = DummyId1,
+                        SeasonId = DummyId1,
+                        UserId = DummyId1,
+                        Season = new SeasonEntity
                         {
-                          SeasonId = DummyGuid,
-                          Name = "Season Name",
-                          Slug = DummySlug,
-                        },
-                        Role = new Role()
-                        {
-                          RoleId = DummyGuid,
-                          Name = "Mentor Role Name"
-                        },
-                        User = new User()
-                        {
-                          UserId = DummyGuid,
-                          Email = DummyEmail
-                        }
-                      },
-                      MenteeEnrollment = new Enrollment
-                      {
-                        EnrollmentId = DummyGuid2,
-                        SeasonId = DummyGuid2,
-                        UserId = DummyGuid2,
-                        RoleId = DummyGuid2,
-                        Season = new Season
-                        {
-                          SeasonId = DummyGuid,
+                          SeasonId = DummyId1,
                           Name = "Season Name",
                           Slug = DummySlug
                         },
-                        Role = new Role
+                        User = new UserEntity
                         {
-                          RoleId = DummyGuid,
-                          Name = "Mentee Role Name"
+                          UserId = DummyId1,
+                          Email = DummyEmail
+                        }
+                      },
+                      MenteeEnrollment = new EnrollmentEntity
+                      {
+                        EnrollmentId = DummyId2,
+                        SeasonId = DummyId2,
+                        UserId = DummyId2,
+                        Season = new SeasonEntity
+                        {
+                          SeasonId = DummyId1,
+                          Name = "Season Name",
+                          Slug = DummySlug
                         },
-                        User = new User
+                        User = new UserEntity
                         {
-                          UserId = DummyGuid2,
+                          UserId = DummyId2,
                           Email = "mentee_email@gmail.com",
                           Name = DummyName
                         }
@@ -91,7 +79,9 @@ public class GetCurrentUserMenteesListTests: TestsHelper
                   });
 
     var command = ListDummyCommand();
-    var handler = new GetCurrentUserMenteesList.Handler(_dbContextMock.Object, Mock.Of<ILogger<GetCurrentUserMenteesList.Handler>>());
+    var handler =
+      new GetCurrentUserMenteesList.Handler(_dbContextMock.Object,
+                                            Mock.Of<ILogger<GetCurrentUserMenteesList.Handler>>());
 
     var result = await handler.Handle(command, CancellationToken.None);
     Assert.Equal(HttpStatusCode.OK, result.StatusCode);
@@ -104,7 +94,6 @@ public class GetCurrentUserMenteesListTests: TestsHelper
     Assert.Equal(DummyName, mentorship.MenteeEnrollment.User.Name);
     Assert.Equal("mentee_email@gmail.com", mentorship.MenteeEnrollment.User.Email);
     Assert.Equal("Season Name", mentorship.MenteeEnrollment.Season.Name);
-    Assert.Equal(DummyGuid, mentorship.MenteeEnrollment.Season.SeasonId);
-
+    Assert.Equal(DummyId1, mentorship.MenteeEnrollment.Season.SeasonId);
   }
 }

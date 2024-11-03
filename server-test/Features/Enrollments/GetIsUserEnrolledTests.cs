@@ -31,28 +31,23 @@ public class GetIsUserEnrolledTests : TestsHelper
   [Fact]
   public async Task Handle_UserEnrollmentExists_OK()
   {
-    var dummyEnrollment = new Enrollment
+    var dummyEnrollment = new EnrollmentEntity
     {
-      EnrollmentId = DummyGuid,
-      Season = new Season
+      EnrollmentId = DummyId1,
+      Season = new SeasonEntity
       {
-        SeasonId = DummyGuid,
+        SeasonId = DummyId1,
         Name = "Season Name",
         Slug = "Season Slug"
       },
-      User = new User
+      User = new UserEntity
       {
-        UserId = DummyGuid,
+        UserId = DummyId1,
         Email = DummyEmail
-      },
-      Role = new Role()
-      {
-        RoleId = DummyGuid,
-        Name = DummyName
       }
     };
     _dbContextMock.Setup(x => x.Enrollments)
-                  .ReturnsDbSet(new List<Enrollment> { dummyEnrollment });
+                  .ReturnsDbSet(new List<EnrollmentEntity> { dummyEnrollment });
 
     var command = CreateDummyCommand();
     var handler =
@@ -62,14 +57,13 @@ public class GetIsUserEnrolledTests : TestsHelper
     var response = result.ResponseBody;
     Assert.Equal(HttpStatusCode.OK, result.StatusCode);
     Assert.Equal(true, response?.IsEnrolled);
-    Assert.Equal(DummyName, response?.Role?.Name);
   }
 
   [Fact]
   public async Task Handle_UserEnrollmentDoesNotExists_OK()
   {
     _dbContextMock.Setup(x => x.Enrollments)
-                  .ReturnsDbSet(new List<Enrollment>());
+                  .ReturnsDbSet(new List<EnrollmentEntity>());
 
     var command = CreateDummyCommand();
     var handler =
@@ -79,6 +73,5 @@ public class GetIsUserEnrolledTests : TestsHelper
     var response = result.ResponseBody;
     Assert.Equal(HttpStatusCode.OK, result.StatusCode);
     Assert.Equal(false, response?.IsEnrolled);
-    Assert.Null(response?.Role?.Name);
   }
 }

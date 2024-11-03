@@ -11,7 +11,7 @@ using Xunit;
 
 namespace RSPWebAPI.Tests.Features.Enrollments;
 
-public class AdminListEnrollmentTests: TestsHelper
+public class AdminListEnrollmentTests : TestsHelper
 {
   private readonly Mock<ApplicationDbContext> _dbContextMock;
 
@@ -22,44 +22,37 @@ public class AdminListEnrollmentTests: TestsHelper
 
   private AdminListEnrollment.Command ListDummyCommand()
   {
-    return new AdminListEnrollment.Command
-    {
-    };
+    return new AdminListEnrollment.Command();
   }
 
   [Fact]
   public async Task Handle_Success_OK()
   {
     _dbContextMock.Setup(x => x.Enrollments)
-                  .ReturnsDbSet(new List<Enrollment>()
+                  .ReturnsDbSet(new List<EnrollmentEntity>
                   {
-                    new Enrollment()
+                    new()
                     {
-                      EnrollmentId = DummyGuid,
-                      SeasonId = DummyGuid,
-                      UserId = DummyGuid,
-                      RoleId = DummyGuid,
-                      Season = new Season()
+                      EnrollmentId = DummyId1,
+                      SeasonId = DummyId1,
+                      UserId = DummyId1,
+                      Season = new SeasonEntity
                       {
-                        SeasonId = DummyGuid,
+                        SeasonId = DummyId1,
                         Name = "Season Name",
                         Location = DummyLocation
                       },
-                      User = new User()
+                      User = new UserEntity
                       {
                         Name = "User Name",
                         Email = DummyEmail
-                      },
-                      Role = new Role()
-                      {
-                        RoleId = DummyGuid,
-                        Name = "Role Name"
                       }
                     }
                   });
 
     var command = ListDummyCommand();
-    var handler = new AdminListEnrollment.Handler(_dbContextMock.Object, Mock.Of<ILogger<AdminListEnrollment.Handler>>());
+    var handler =
+      new AdminListEnrollment.Handler(_dbContextMock.Object, Mock.Of<ILogger<AdminListEnrollment.Handler>>());
 
     var result = await handler.Handle(command, CancellationToken.None);
     Assert.Equal(HttpStatusCode.OK, result.StatusCode);
@@ -69,11 +62,7 @@ public class AdminListEnrollmentTests: TestsHelper
 
     var enrollments = result.ResponseBody.Enrollments.ToList();
     var enrollment = enrollments[0];
-    Assert.Equal(DummyGuid, enrollment.EnrollmentId);
-    Assert.Equal(DummyGuid, enrollment.RoleId);
-    Assert.Equal(DummyGuid, enrollment.UserId);
-    Assert.Equal(DummyGuid, enrollment.SeasonId);
-    Assert.Equal("Role Name", enrollment.Role);
+    Assert.Equal(DummyId1, enrollment.EnrollmentId);
     Assert.Equal("User Name", enrollment.User);
     Assert.Equal("Season Name", enrollment.Season);
   }

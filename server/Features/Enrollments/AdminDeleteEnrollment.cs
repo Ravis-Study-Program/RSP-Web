@@ -14,7 +14,7 @@ public static class AdminDeleteEnrollment
 {
   public class Command : AdminAuthRequest<ApiResult<AdminDeleteEnrollmentResponse>>
   {
-    public Guid EnrollmentId { get; set; }
+    public string EnrollmentId { get; set; } = string.Empty;
   }
 
   public class Validator : AbstractValidator<Command>
@@ -84,7 +84,7 @@ public class AdminDeleteEnrollmentEndpoint : ICarterModule
   {
     app.MapDelete(
          "api/admin/enrollments",
-         async (Guid enrollmentId, ISender sender) =>
+         async (string enrollmentId, ISender sender) =>
          {
            var command = new AdminDeleteEnrollment.Command
            {

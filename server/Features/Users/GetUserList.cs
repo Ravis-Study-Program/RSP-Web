@@ -80,5 +80,5 @@ public class GetUserListEndpoint : ICarterModule
 
 public class GetUserListResponse
 {
-  public ICollection<User> Users { get; set; } = new List<User>();
+  public ICollection<UserEntity> Users { get; set; } = new List<UserEntity>();
 }

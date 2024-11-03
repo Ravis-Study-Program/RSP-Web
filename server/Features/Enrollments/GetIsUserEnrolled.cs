@@ -3,7 +3,6 @@ using Carter;
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using RSPWebAPI.Database;
 using RSPWebAPI.Entities;
 using RSPWebAPI.Features.Constants;
@@ -48,10 +47,9 @@ public static class GetIsUserEnrolled
       try
       {
         var enrollments = await _dbContext
-                                 .Enrollments
-                                 .Where(e => e.User.Email == request.Email && e.Season.Slug == request.SeasonSlug)
-                                 .Include(e => e.Role)
-                                 .ToListAsync(cancellationToken);
+                                .Enrollments
+                                .Where(e => e.User.Email == request.Email && e.Season.Slug == request.SeasonSlug)
+                                .ToListAsync(cancellationToken);
 
         if (enrollments.Count == 0)
         {
@@ -66,7 +64,7 @@ public static class GetIsUserEnrolled
             }
           };
         }
-        
+
         return new ApiResult<GetIsUserEnrolledResponse>
         {
           StatusCode = HttpStatusCode.OK,
@@ -77,7 +75,7 @@ public static class GetIsUserEnrolled
             EnrollmentId = enrollments[0].EnrollmentId
           }
         };
-      } 
+      }
       catch (Exception ex)
       {
         _logger.LogError(ex, Message.EnrollmentIsUserEnrolledError);
@@ -119,6 +117,6 @@ public class GetIsUserEnrolledEndpoint : ICarterModule
 public record GetIsUserEnrolledResponse
 {
   public bool IsEnrolled { get; set; }
-  public Role? Role { get; set; }
-  public Guid? EnrollmentId { get; set; }
+  public SeasonRole? Role { get; set; }
+  public string? EnrollmentId { get; set; }
 }

@@ -11,7 +11,7 @@ using Xunit;
 
 namespace RSPWebAPI.Tests.Features.Users;
 
-public class AdminListUserTests: TestsHelper
+public class AdminListUserTests : TestsHelper
 {
   private readonly Mock<ApplicationDbContext> _dbContextMock;
 
@@ -22,16 +22,14 @@ public class AdminListUserTests: TestsHelper
 
   private AdminListUser.Command ListDummyCommand()
   {
-    return new AdminListUser.Command
-    {
-    };
+    return new AdminListUser.Command();
   }
 
   [Fact]
   public async Task Handle_Success_OK()
   {
     _dbContextMock.Setup(x => x.Users)
-                  .ReturnsDbSet(new List<User>());
+                  .ReturnsDbSet(new List<UserEntity>());
 
     var command = ListDummyCommand();
     var handler = new AdminListUser.Handler(_dbContextMock.Object, Mock.Of<ILogger<AdminListUser.Handler>>());

@@ -14,7 +14,7 @@ public static class DeleteMockInterview
 {
   public class Command : AuthRequest<ApiResult<DeleteMockInterviewResponse>>
   {
-    public Guid MockInterviewId { get; set; }
+    public string MockInterviewId { get; set; } = string.Empty;
   }
 
   public class Validator : AbstractValidator<Command>
@@ -42,8 +42,8 @@ public static class DeleteMockInterview
     )
     {
       var existingMockInterview = await _dbContext
-                                     .MockInterviews.FirstOrDefaultAsync(
-                                       u => u.MockInterviewId == request.MockInterviewId, cancellationToken);
+                                        .MockInterviews.FirstOrDefaultAsync(
+                                          u => u.MockInterviewId == request.MockInterviewId, cancellationToken);
       if (existingMockInterview == null)
       {
         return new ApiResult<DeleteMockInterviewResponse>
@@ -84,7 +84,7 @@ public class DeleteMockInterviewEndpoint : ICarterModule
   {
     app.MapDelete(
          "api/mock-interviews",
-         async (Guid mockInterviewId, ISender sender) =>
+         async (string mockInterviewId, ISender sender) =>
          {
            var command = new DeleteMockInterview.Command
            {

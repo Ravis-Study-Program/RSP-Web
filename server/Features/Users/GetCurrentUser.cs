@@ -54,7 +54,7 @@ public static class GetCurrentUser
             Error = new ApiError(Message.UserEmailDoesNotExists)
           };
         }
-        
+
         return new ApiResult<GetCurrentUserResponse>
         {
           StatusCode = HttpStatusCode.OK,
@@ -63,7 +63,7 @@ public static class GetCurrentUser
             User = existingUser
           }
         };
-      } 
+      }
       catch (Exception ex)
       {
         _logger.LogError(ex, Message.UserListUnexpectedError);
@@ -90,7 +90,7 @@ public class GetCurrentUserEndpoint : ICarterModule
 
            var command = new GetCurrentUser.Command
            {
-             Email = email,
+             Email = email
            };
            var response = await sender.Send(command);
 
@@ -103,5 +103,5 @@ public class GetCurrentUserEndpoint : ICarterModule
 
 public record GetCurrentUserResponse
 {
-  public User User { get; set; }
+  public UserEntity User { get; set; }
 }

@@ -7,11 +7,14 @@ using RSPWebAPI.Database;
 using RSPWebAPI.Features.Constants;
 using RSPWebAPI.Shared;
 using RSPWebAPI.Shared.Behaviours;
-using AdminUpdateSeasonResult = Microsoft.AspNetCore.Http.HttpResults.Results<
-  Microsoft.AspNetCore.Http.HttpResults.Ok<RSPWebAPI.Shared.ApiResult<RSPWebAPI.Features.Seasons.AdminUpdateSeasonResponse>>,
-  Microsoft.AspNetCore.Http.HttpResults.NotFound<RSPWebAPI.Shared.ApiResult<RSPWebAPI.Features.Seasons.AdminUpdateSeasonResponse>>,
-  Microsoft.AspNetCore.Http.HttpResults.BadRequest<RSPWebAPI.Shared.ApiResult<RSPWebAPI.Features.Seasons.AdminUpdateSeasonResponse>>
->;
+using AdminUpdateSeasonResult =
+  Microsoft.AspNetCore.Http.HttpResults.Results<
+    Microsoft.AspNetCore.Http.HttpResults.Ok<
+      RSPWebAPI.Shared.ApiResult<RSPWebAPI.Features.Seasons.AdminUpdateSeasonResponse>>,
+    Microsoft.AspNetCore.Http.HttpResults.NotFound<
+      RSPWebAPI.Shared.ApiResult<RSPWebAPI.Features.Seasons.AdminUpdateSeasonResponse>>, Microsoft.AspNetCore.Http.
+    HttpResults.BadRequest<RSPWebAPI.Shared.ApiResult<RSPWebAPI.Features.Seasons.AdminUpdateSeasonResponse>>
+  >;
 
 namespace RSPWebAPI.Features.Seasons;
 
@@ -19,11 +22,11 @@ public static class AdminUpdateSeason
 {
   public class Command : AdminAuthRequest<ApiResult<AdminUpdateSeasonResponse>>
   {
-    public Guid SeasonId { get; set; }
+    public string SeasonId { get; set; } = string.Empty;
     public string Name { get; set; } = string.Empty;
     public string Slug { get; set; } = string.Empty;
-    public DateTime StartDate { get; set; }
-    public DateTime EndDate { get; set; }
+    public DateTime StartDateInclusiveUtc { get; set; }
+    public DateTime EndDateInclusiveUtc { get; set; }
     public string Location { get; set; } = string.Empty;
     public string ImageUrl { get; set; } = string.Empty;
   }
@@ -35,8 +38,8 @@ public static class AdminUpdateSeason
       RuleFor(c => c.SeasonId).NotEmpty();
       RuleFor(c => c.Name).NotEmpty();
       RuleFor(c => c.Slug).NotEmpty();
-      RuleFor(c => c.StartDate).NotEmpty();
-      RuleFor(c => c.EndDate).NotEmpty();
+      RuleFor(c => c.StartDateInclusiveUtc).NotEmpty();
+      RuleFor(c => c.EndDateInclusiveUtc).NotEmpty();
       RuleFor(c => c.Location).NotEmpty();
       RuleFor(c => c.ImageUrl).NotEmpty();
     }
@@ -71,8 +74,8 @@ public static class AdminUpdateSeason
 
       existingSeason.Name = request.Name;
       existingSeason.Slug = request.Slug;
-      existingSeason.StartDate = request.StartDate;
-      existingSeason.EndDate = request.EndDate;
+      existingSeason.StartDateInclusiveUtc = request.StartDateInclusiveUtc;
+      existingSeason.EndDateInclusiveUtc = request.EndDateInclusiveUtc;
       existingSeason.Location = request.Location;
       existingSeason.ImageUrl = request.ImageUrl;
 
@@ -89,8 +92,8 @@ public static class AdminUpdateSeason
             SeasonId = existingSeason.SeasonId,
             Name = existingSeason.Name,
             Slug = existingSeason.Slug,
-            StartDate = existingSeason.StartDate,
-            EndDate = existingSeason.EndDate,
+            StartDateInclusiveUtc = existingSeason.StartDateInclusiveUtc,
+            EndDateInclusiveUtc = existingSeason.EndDateInclusiveUtc,
             Location = existingSeason.Location,
             ImageUrl = existingSeason.ImageUrl
           },
@@ -124,8 +127,8 @@ public class AdminUpdateSeasonEndpoint : ICarterModule
              SeasonId = request.SeasonId,
              Name = request.Name,
              Slug = request.Slug,
-             StartDate = request.StartDate,
-             EndDate = request.EndDate,
+             StartDateInclusiveUtc = request.StartDateInclusiveUtc,
+             EndDateInclusiveUtc = request.EndDateInclusiveUtc,
              Location = request.Location,
              ImageUrl = request.ImageUrl
            };
@@ -140,22 +143,22 @@ public class AdminUpdateSeasonEndpoint : ICarterModule
 
 public record AdminUpdateSeasonRequest
 {
-  public Guid SeasonId { get; set; }
+  public string SeasonId { get; set; } = string.Empty;
   public string Name { get; set; } = string.Empty;
   public string Slug { get; set; } = string.Empty;
-  public DateTime StartDate { get; set; }
-  public DateTime EndDate { get; set; }
+  public DateTime StartDateInclusiveUtc { get; set; }
+  public DateTime EndDateInclusiveUtc { get; set; }
   public string Location { get; set; } = string.Empty;
   public string ImageUrl { get; set; } = string.Empty;
 }
 
 public class AdminUpdateSeasonResponse
 {
-  public Guid SeasonId { get; set; }
+  public string SeasonId { get; set; } = string.Empty;
   public string Name { get; set; } = string.Empty;
   public string Slug { get; set; } = string.Empty;
-  public DateTime StartDate { get; set; }
-  public DateTime EndDate { get; set; }
+  public DateTime StartDateInclusiveUtc { get; set; }
+  public DateTime EndDateInclusiveUtc { get; set; }
   public string Location { get; set; } = string.Empty;
   public string ImageUrl { get; set; } = string.Empty;
 }

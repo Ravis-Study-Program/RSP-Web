@@ -131,7 +131,7 @@ public record AdminUpdateUserRequest
 
 public class AdminUpdateUserResponse
 {
-  public Guid UserId { get; set; }
+  public string UserId { get; set; } = string.Empty;
   public string DiscordId { get; set; } = string.Empty;
   public string Email { get; set; } = string.Empty;
   public string Name { get; set; } = string.Empty;

@@ -1,19 +1,20 @@
-using System.ComponentModel.DataAnnotations;
 using System.Net;
 using Carter;
 using FluentValidation;
 using MediatR;
-using Microsoft.AspNetCore.Http.HttpResults;
 using RSPWebAPI.Database;
 using RSPWebAPI.Entities;
 using RSPWebAPI.Features.Constants;
 using RSPWebAPI.Shared;
 using RSPWebAPI.Shared.Behaviours;
-using AdminCreateSeasonResult = Microsoft.AspNetCore.Http.HttpResults.Results<
-  Microsoft.AspNetCore.Http.HttpResults.Ok<RSPWebAPI.Shared.ApiResult<RSPWebAPI.Features.Seasons.AdminCreateSeasonResponse>>,
-  Microsoft.AspNetCore.Http.HttpResults.NotFound<RSPWebAPI.Shared.ApiResult<RSPWebAPI.Features.Seasons.AdminCreateSeasonResponse>>,
-  Microsoft.AspNetCore.Http.HttpResults.BadRequest<RSPWebAPI.Shared.ApiResult<RSPWebAPI.Features.Seasons.AdminCreateSeasonResponse>>
->;
+using AdminCreateSeasonResult =
+  Microsoft.AspNetCore.Http.HttpResults.Results<
+    Microsoft.AspNetCore.Http.HttpResults.Ok<
+      RSPWebAPI.Shared.ApiResult<RSPWebAPI.Features.Seasons.AdminCreateSeasonResponse>>,
+    Microsoft.AspNetCore.Http.HttpResults.NotFound<
+      RSPWebAPI.Shared.ApiResult<RSPWebAPI.Features.Seasons.AdminCreateSeasonResponse>>, Microsoft.AspNetCore.Http.
+    HttpResults.BadRequest<RSPWebAPI.Shared.ApiResult<RSPWebAPI.Features.Seasons.AdminCreateSeasonResponse>>
+  >;
 
 namespace RSPWebAPI.Features.Seasons;
 
@@ -23,8 +24,8 @@ public static class AdminCreateSeason
   {
     public string Name { get; set; } = string.Empty;
     public string Slug { get; set; } = string.Empty;
-    public DateTime StartDate { get; set; }
-    public DateTime EndDate { get; set; }
+    public DateTime StartDateInclusiveUtc { get; set; }
+    public DateTime EndDateInclusiveUtc { get; set; }
     public string Location { get; set; } = string.Empty;
     public string ImageUrl { get; set; } = string.Empty;
   }
@@ -35,11 +36,11 @@ public static class AdminCreateSeason
     {
       RuleFor(c => c.Name).NotEmpty();
       RuleFor(c => c.Slug).NotEmpty();
-      RuleFor(c => c.StartDate).NotEmpty();
-      RuleFor(c => c.EndDate)
-            .NotEmpty()
-            .GreaterThan(c => c.StartDate)
-            .WithMessage("End date must be greater than start date.");
+      RuleFor(c => c.StartDateInclusiveUtc).NotEmpty();
+      RuleFor(c => c.EndDateInclusiveUtc)
+        .NotEmpty()
+        .GreaterThan(c => c.StartDateInclusiveUtc)
+        .WithMessage("End date must be greater than start date.");
       RuleFor(c => c.Location).NotEmpty();
       RuleFor(c => c.ImageUrl).NotEmpty();
     }
@@ -61,12 +62,13 @@ public static class AdminCreateSeason
       CancellationToken cancellationToken
     )
     {
-      var season = new Season
+      var season = new SeasonEntity
       {
+        SeasonId = Database.Constants.GeneratePrimaryKeyId(),
         Name = request.Name,
         Slug = request.Slug,
-        StartDate = request.StartDate,
-        EndDate = request.EndDate,
+        StartDateInclusiveUtc = request.StartDateInclusiveUtc,
+        EndDateInclusiveUtc = request.EndDateInclusiveUtc,
         Location = request.Location,
         ImageUrl = request.ImageUrl
       };
@@ -83,8 +85,8 @@ public static class AdminCreateSeason
           {
             SeasonId = season.SeasonId,
             Name = season.Name,
-            StartDate = season.StartDate,
-            EndDate = season.EndDate,
+            StartDateInclusiveUtc = season.StartDateInclusiveUtc,
+            EndDateInclusiveUtc = season.EndDateInclusiveUtc,
             Location = season.Location,
             ImageUrl = season.ImageUrl
           },
@@ -118,8 +120,8 @@ public class AdminCreateSeasonEndpoint : ICarterModule
            {
              Name = request.Name,
              Slug = request.Slug,
-             StartDate = request.StartDate,
-             EndDate = request.EndDate,
+             StartDateInclusiveUtc = request.StartDateInclusiveUtc,
+             EndDateInclusiveUtc = request.EndDateInclusiveUtc,
              Location = request.Location,
              ImageUrl = request.ImageUrl
            };
@@ -136,19 +138,19 @@ public record AdminCreateSeasonRequest
 {
   public string Name { get; set; } = string.Empty;
   public string Slug { get; set; } = string.Empty;
-  public DateTime StartDate { get; set; }
-  public DateTime EndDate { get; set; }
+  public DateTime StartDateInclusiveUtc { get; set; }
+  public DateTime EndDateInclusiveUtc { get; set; }
   public string Location { get; set; } = string.Empty;
   public string ImageUrl { get; set; } = string.Empty;
 }
 
 public class AdminCreateSeasonResponse
 {
-  public Guid SeasonId { get; set; }
+  public string SeasonId { get; set; } = string.Empty;
   public string Name { get; set; } = string.Empty;
   public string Slug { get; set; } = string.Empty;
-  public DateTime StartDate { get; set; }
-  public DateTime EndDate { get; set; }
+  public DateTime StartDateInclusiveUtc { get; set; }
+  public DateTime EndDateInclusiveUtc { get; set; }
   public string Location { get; set; } = string.Empty;
   public string ImageUrl { get; set; } = string.Empty;
 }

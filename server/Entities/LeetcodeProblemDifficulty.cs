@@ -1,10 +1,8 @@
-using System.ComponentModel.DataAnnotations;
-
 namespace RSPWebAPI.Entities;
 
-public class LeetcodeProblemDifficulty
+public enum LeetcodeProblemDifficulty
 {
-  [Required] public Guid LeetcodeProblemDifficultyId { get; set; }
-  [Required] public string Name { get; set; }
+  Easy = 0,
+  Medium = 1,
+  Hard = 2
 }
-

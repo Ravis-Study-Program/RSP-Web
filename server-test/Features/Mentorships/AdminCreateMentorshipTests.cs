@@ -11,7 +11,7 @@ using Xunit;
 
 namespace RSPWebAPI.Tests.Features.Mentorships;
 
-public class AdminCreateMentorshipTests: TestsHelper
+public class AdminCreateMentorshipTests : TestsHelper
 {
   private readonly Mock<ApplicationDbContext> _dbContextMock;
 
@@ -24,119 +24,123 @@ public class AdminCreateMentorshipTests: TestsHelper
   {
     return new AdminCreateMentorship.Command
     {
-      MentorEnrollmentId = DummyGuid,
-      MenteeEnrollmentId = DummyGuid2
+      MentorEnrollmentId = DummyId1,
+      MenteeEnrollmentId = DummyId2
     };
   }
-  
+
   [Fact]
   public async Task Handle_EntryAlreadyExists_BadRequest()
   {
-    var mentorEnrollment = new Enrollment
+    var mentorEnrollment = new EnrollmentEntity
     {
-      EnrollmentId = DummyGuid,
-      Season = new Season
+      EnrollmentId = DummyId1,
+      Season = new SeasonEntity
       {
-        SeasonId = DummyGuid
+        SeasonId = DummyId1
       }
     };
-    var menteeEnrollment = new Enrollment
+    var menteeEnrollment = new EnrollmentEntity
     {
-      EnrollmentId = DummyGuid2,
-      Season = new Season
+      EnrollmentId = DummyId2,
+      Season = new SeasonEntity
       {
-        SeasonId = DummyGuid
+        SeasonId = DummyId1
       }
     };
-    var existingMentorship = new Mentorship
+    var existingMentorship = new MentorshipEntity
     {
-      MentorshipId = DummyGuid,
-      MentorEnrollmentId = DummyGuid,
+      MentorshipId = DummyId1,
+      MentorEnrollmentId = DummyId1,
       MentorEnrollment = mentorEnrollment,
-      MenteeEnrollmentId = DummyGuid2,
+      MenteeEnrollmentId = DummyId2,
       MenteeEnrollment = menteeEnrollment
     };
     _dbContextMock.Setup(x => x.Enrollments)
-                  .ReturnsDbSet(new List<Enrollment> { menteeEnrollment, mentorEnrollment });
+                  .ReturnsDbSet(new List<EnrollmentEntity> { menteeEnrollment, mentorEnrollment });
     _dbContextMock.Setup(x => x.Mentorships)
-                  .ReturnsDbSet(new List<Mentorship> { existingMentorship });
+                  .ReturnsDbSet(new List<MentorshipEntity> { existingMentorship });
 
     var command = CreateDummyCommand();
-    var handler = new AdminCreateMentorship.Handler(_dbContextMock.Object, Mock.Of<ILogger<AdminCreateMentorship.Handler>>());
+    var handler =
+      new AdminCreateMentorship.Handler(_dbContextMock.Object, Mock.Of<ILogger<AdminCreateMentorship.Handler>>());
 
     var result = await handler.Handle(command, CancellationToken.None);
     Assert.Equal(HttpStatusCode.BadRequest, result.StatusCode);
     Assert.Equal(Message.MentorshipExists, result?.Error?.Message);
   }
-  
+
   [Fact]
   public async Task Handle_SeasonDoesNotMatch_BadRequest()
   {
-    var mentorEnrollment = new Enrollment
+    var mentorEnrollment = new EnrollmentEntity
     {
-      EnrollmentId = DummyGuid,
-      Season = new Season
+      EnrollmentId = DummyId1,
+      Season = new SeasonEntity
       {
-        SeasonId = DummyGuid
+        SeasonId = DummyId1
       }
     };
-    var menteeEnrollment = new Enrollment
+    var menteeEnrollment = new EnrollmentEntity
     {
-      EnrollmentId = DummyGuid2,
-      Season = new Season
+      EnrollmentId = DummyId2,
+      Season = new SeasonEntity
       {
-        SeasonId = DummyGuid2
+        SeasonId = DummyId2
       }
     };
     _dbContextMock.Setup(x => x.Enrollments)
-                  .ReturnsDbSet(new List<Enrollment> { menteeEnrollment, mentorEnrollment });
+                  .ReturnsDbSet(new List<EnrollmentEntity> { menteeEnrollment, mentorEnrollment });
 
     var command = CreateDummyCommand();
-    var handler = new AdminCreateMentorship.Handler(_dbContextMock.Object, Mock.Of<ILogger<AdminCreateMentorship.Handler>>());
+    var handler =
+      new AdminCreateMentorship.Handler(_dbContextMock.Object, Mock.Of<ILogger<AdminCreateMentorship.Handler>>());
 
     var result = await handler.Handle(command, CancellationToken.None);
     Assert.Equal(HttpStatusCode.BadRequest, result.StatusCode);
     Assert.Equal(Message.MentorshipNotPermittedDueToDifferentSeason, result?.Error?.Message);
   }
-  
+
   [Fact]
   public async Task Handle_MentorDoesNotExist_BadRequest()
   {
-    var menteeEnrollment = new Enrollment
+    var menteeEnrollment = new EnrollmentEntity
     {
-      EnrollmentId = DummyGuid2,
-      Season = new Season
+      EnrollmentId = DummyId2,
+      Season = new SeasonEntity
       {
-        SeasonId = DummyGuid2
+        SeasonId = DummyId2
       }
     };
     _dbContextMock.Setup(x => x.Enrollments)
-                  .ReturnsDbSet(new List<Enrollment> { menteeEnrollment });
+                  .ReturnsDbSet(new List<EnrollmentEntity> { menteeEnrollment });
 
     var command = CreateDummyCommand();
-    var handler = new AdminCreateMentorship.Handler(_dbContextMock.Object, Mock.Of<ILogger<AdminCreateMentorship.Handler>>());
+    var handler =
+      new AdminCreateMentorship.Handler(_dbContextMock.Object, Mock.Of<ILogger<AdminCreateMentorship.Handler>>());
 
     var result = await handler.Handle(command, CancellationToken.None);
     Assert.Equal(HttpStatusCode.BadRequest, result.StatusCode);
     Assert.Equal(Message.MentorshipNotPermittedDueToNullMentorOrMentee, result?.Error?.Message);
   }
-  
+
   [Fact]
   public async Task Handle_MenteeDoesNotExist_BadRequest()
   {
-    var mentorEnrollment = new Enrollment
+    var mentorEnrollment = new EnrollmentEntity
     {
-      EnrollmentId = DummyGuid,
-      Season = new Season
+      EnrollmentId = DummyId1,
+      Season = new SeasonEntity
       {
-        SeasonId = DummyGuid
+        SeasonId = DummyId1
       }
     };
     _dbContextMock.Setup(x => x.Enrollments)
-                  .ReturnsDbSet(new List<Enrollment> { mentorEnrollment });
+                  .ReturnsDbSet(new List<EnrollmentEntity> { mentorEnrollment });
 
     var command = CreateDummyCommand();
-    var handler = new AdminCreateMentorship.Handler(_dbContextMock.Object, Mock.Of<ILogger<AdminCreateMentorship.Handler>>());
+    var handler =
+      new AdminCreateMentorship.Handler(_dbContextMock.Object, Mock.Of<ILogger<AdminCreateMentorship.Handler>>());
 
     var result = await handler.Handle(command, CancellationToken.None);
     Assert.Equal(HttpStatusCode.BadRequest, result.StatusCode);
@@ -146,29 +150,30 @@ public class AdminCreateMentorshipTests: TestsHelper
   [Fact]
   public async Task Handle_Success_OK()
   {
-    var mentorEnrollment = new Enrollment
+    var mentorEnrollment = new EnrollmentEntity
     {
-      EnrollmentId = DummyGuid,
-      Season = new Season
+      EnrollmentId = DummyId1,
+      Season = new SeasonEntity
       {
-        SeasonId = DummyGuid
+        SeasonId = DummyId1
       }
     };
-    var menteeEnrollment = new Enrollment
+    var menteeEnrollment = new EnrollmentEntity
     {
-      EnrollmentId = DummyGuid2,
-      Season = new Season
+      EnrollmentId = DummyId2,
+      Season = new SeasonEntity
       {
-        SeasonId = DummyGuid
+        SeasonId = DummyId1
       }
     };
     _dbContextMock.Setup(x => x.Enrollments)
-                  .ReturnsDbSet(new List<Enrollment> { menteeEnrollment, mentorEnrollment });
+                  .ReturnsDbSet(new List<EnrollmentEntity> { menteeEnrollment, mentorEnrollment });
     _dbContextMock.Setup(x => x.Mentorships)
-                  .ReturnsDbSet(new List<Mentorship>() );
+                  .ReturnsDbSet(new List<MentorshipEntity>());
 
     var command = CreateDummyCommand();
-    var handler = new AdminCreateMentorship.Handler(_dbContextMock.Object, Mock.Of<ILogger<AdminCreateMentorship.Handler>>());
+    var handler =
+      new AdminCreateMentorship.Handler(_dbContextMock.Object, Mock.Of<ILogger<AdminCreateMentorship.Handler>>());
 
     var result = await handler.Handle(command, CancellationToken.None);
     Assert.Equal(HttpStatusCode.OK, result.StatusCode);

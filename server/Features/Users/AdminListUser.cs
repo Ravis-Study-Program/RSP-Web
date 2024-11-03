@@ -1,6 +1,7 @@
 using System.Net;
 using Carter;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using RSPWebAPI.Database;
 using RSPWebAPI.Entities;
 using RSPWebAPI.Features.Constants;
@@ -33,7 +34,7 @@ public static class AdminListUser
     {
       try
       {
-        var users = _dbContext.Users.ToList();
+        var users = await _dbContext.Users.ToListAsync(cancellationToken);
 
         return new ApiResult<AdminListUserResponse>
         {
@@ -79,5 +80,5 @@ public class AdminListUserEndpoint : ICarterModule
 
 public class AdminListUserResponse
 {
-  public ICollection<User> Users { get; set; } = new List<User>();
+  public ICollection<UserEntity> Users { get; set; } = new List<UserEntity>();
 }

@@ -24,7 +24,7 @@ public class AdminDeleteMentorshipTests : TestsHelper
   {
     return new AdminDeleteMentorship.Command
     {
-      MentorshipId = DummyGuid
+      MentorshipId = DummyId1
     };
   }
 
@@ -32,10 +32,11 @@ public class AdminDeleteMentorshipTests : TestsHelper
   public async Task Handle_MentorshipDoesNotExists_BadRequest()
   {
     _dbContextMock.Setup(x => x.Mentorships)
-                  .ReturnsDbSet(new List<Mentorship>());
+                  .ReturnsDbSet(new List<MentorshipEntity>());
 
     var command = DeleteDummyCommand();
-    var handler = new AdminDeleteMentorship.Handler(_dbContextMock.Object, Mock.Of<ILogger<AdminDeleteMentorship.Handler>>());
+    var handler =
+      new AdminDeleteMentorship.Handler(_dbContextMock.Object, Mock.Of<ILogger<AdminDeleteMentorship.Handler>>());
 
     var result = await handler.Handle(command, CancellationToken.None);
     Assert.Equal(HttpStatusCode.BadRequest, result.StatusCode);
@@ -45,17 +46,18 @@ public class AdminDeleteMentorshipTests : TestsHelper
   [Fact]
   public async Task Handle_Success_OK()
   {
-    var existingMentorship = new Mentorship
+    var existingMentorship = new MentorshipEntity
     {
-      MentorshipId = DummyGuid, 
-      MentorEnrollmentId = DummyGuid,
-      MenteeEnrollmentId = DummyGuid2
+      MentorshipId = DummyId1,
+      MentorEnrollmentId = DummyId1,
+      MenteeEnrollmentId = DummyId2
     };
     _dbContextMock.Setup(x => x.Mentorships)
-                  .ReturnsDbSet(new List<Mentorship> { existingMentorship });
+                  .ReturnsDbSet(new List<MentorshipEntity> { existingMentorship });
 
     var command = DeleteDummyCommand();
-    var handler = new AdminDeleteMentorship.Handler(_dbContextMock.Object, Mock.Of<ILogger<AdminDeleteMentorship.Handler>>());
+    var handler =
+      new AdminDeleteMentorship.Handler(_dbContextMock.Object, Mock.Of<ILogger<AdminDeleteMentorship.Handler>>());
 
     var result = await handler.Handle(command, CancellationToken.None);
     Assert.Equal(HttpStatusCode.OK, result.StatusCode);

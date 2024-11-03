@@ -15,10 +15,10 @@ public static class GetProblemAttempts
 {
   public class Command : AuthRequest<ApiResult<GetProblemAttemptsResponse>>
   {
-    public string Email { get; set; }
-    public Guid? EnrollmentId { get; set; }
-    public bool IncludeLeetcode { get; set; } = false;
-    public bool IncludeCustom { get; set; } = false;
+    public string Email { get; set; } = string.Empty;
+    public string? EnrollmentId { get; set; }
+    public bool IncludeLeetcode { get; set; }
+    public bool IncludeCustom { get; set; }
   }
 
   public class Validator : AbstractValidator<Command>
@@ -48,14 +48,15 @@ public static class GetProblemAttempts
       try
       {
         var query = _dbContext.ProblemAttempts.AsQueryable();
-        
+
         // Check if the enrollment exists
         if (request.EnrollmentId != null)
         {
           var existingEnrollment = await _dbContext
                                          .Enrollments
                                          .Include(e => e.User)
-                                         .FirstOrDefaultAsync(e => e.EnrollmentId == request.EnrollmentId, cancellationToken);
+                                         .FirstOrDefaultAsync(e => e.EnrollmentId == request.EnrollmentId,
+                                                              cancellationToken);
           if (existingEnrollment == null || existingEnrollment.User.Email != request.Email)
           {
             return new ApiResult<GetProblemAttemptsResponse>
@@ -71,23 +72,23 @@ public static class GetProblemAttempts
         if (request.IncludeLeetcode)
         {
           query = query
-            .Include(p => p.LeetcodeProblem)
-            .ThenInclude(l => l.LeetcodeProblemCategories)
-            .Include(p => p.LeetcodeProblem)
-            .ThenInclude(l => l.LeetcodeProblemDifficulty)
-            .Include(p => p.LeetcodeProblem)
-            .ThenInclude(l => l.Problem);
+                  .Include(p => p.LeetcodeProblem)
+                  .ThenInclude(l => l.LeetcodeProblemCategories)
+                  .Include(p => p.LeetcodeProblem)
+                  .ThenInclude(l => l.LeetcodeProblemDifficulty)
+                  .Include(p => p.LeetcodeProblem)
+                  .ThenInclude(l => l.Problem);
         }
-        
+
         if (request.IncludeCustom)
         {
           query = query
                   .Include(p => p.CustomProblem)
                   .ThenInclude(c => c.Problem);
         }
-        
+
         var result = await query.ToListAsync(cancellationToken);
-        
+
         return new ApiResult<GetProblemAttemptsResponse>
         {
           StatusCode = HttpStatusCode.OK,
@@ -118,10 +119,11 @@ public class GetProblemAttemptsEndpoint : ICarterModule
   {
     app.MapGet(
          "api/problem-attempts",
-         async (Guid? enrollmentId, bool includeLeetcode, bool includeCustom, ISender sender, HttpContext httpContext) =>
+         async (string? enrollmentId, bool includeLeetcode, bool includeCustom, ISender sender,
+           HttpContext httpContext) =>
          {
            var email = httpContext?.User?.Identity?.Name ?? "";
-           
+
            var command = new GetProblemAttempts.Command
            {
              EnrollmentId = enrollmentId,
@@ -140,13 +142,13 @@ public class GetProblemAttemptsEndpoint : ICarterModule
 
 public record GetProblemAttemptsRequest
 {
-  public string Email { get; set; }
-  public Guid? EnrollmentId { get; set; }
+  public string Email { get; set; } = string.Empty;
+  public string? EnrollmentId { get; set; }
   public bool IncludeLeetcode { get; set; } = false;
   public bool IncludeCustom { get; set; } = false;
 }
 
 public class GetProblemAttemptsResponse
 {
-  public IList<ProblemAttempt> ProblemAttempts { get; set; } = new List<ProblemAttempt>();
+  public IList<ProblemAttemptEntity> ProblemAttempts { get; set; } = new List<ProblemAttemptEntity>();
 }
