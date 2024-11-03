@@ -16,11 +16,8 @@ public static class CreateUserIfNotExists
   public class Command : AuthRequest<ApiResult<CreateUserIfNotExistsResponse>>
   {
     public string DiscordId { get; set; } = string.Empty;
-
     public string Email { get; set; } = string.Empty;
-
     public string Name { get; set; } = string.Empty;
-
     public string ProfileImage { get; set; } = string.Empty;
   }
 
@@ -52,8 +49,9 @@ public static class CreateUserIfNotExists
                                .Users.FirstOrDefaultAsync(u => u.Email == request.Email, cancellationToken);
       if (existingUser == null)
       {
-        var user = new User
+        var user = new UserEntity
         {
+          UserId = Database.Constants.GeneratePrimaryKeyId(),
           DiscordId = request.DiscordId,
           Email = request.Email,
           Name = request.Name,

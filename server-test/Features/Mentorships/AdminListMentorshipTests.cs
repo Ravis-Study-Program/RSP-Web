@@ -11,7 +11,7 @@ using Xunit;
 
 namespace RSPWebAPI.Tests.Features.Mentorships;
 
-public class AdminListMentorshipTests: TestsHelper
+public class AdminListMentorshipTests : TestsHelper
 {
   private readonly Mock<ApplicationDbContext> _dbContextMock;
 
@@ -22,61 +22,50 @@ public class AdminListMentorshipTests: TestsHelper
 
   private AdminListMentorship.Command ListDummyCommand()
   {
-    return new AdminListMentorship.Command
-    {
-    };
+    return new AdminListMentorship.Command();
   }
 
   [Fact]
   public async Task Handle_Success_OK()
   {
     _dbContextMock.Setup(x => x.Mentorships)
-                  .ReturnsDbSet(new List<Mentorship>
+                  .ReturnsDbSet(new List<MentorshipEntity>
                   {
-                    new Mentorship
+                    new()
                     {
-                      MentorshipId = DummyGuid,
-                      MentorEnrollmentId = DummyGuid,
-                      MenteeEnrollmentId = DummyGuid2,
-                      MentorEnrollment = new Enrollment
+                      MentorshipId = DummyId1,
+                      MentorEnrollmentId = DummyId1,
+                      MenteeEnrollmentId = DummyId2,
+                      MentorEnrollment = new EnrollmentEntity
                       {
-                        EnrollmentId = DummyGuid,
-                        SeasonId = DummyGuid,
-                        UserId = DummyGuid,
-                        RoleId = DummyGuid,
-                        Season = new Season
+                        EnrollmentId = DummyId1,
+                        SeasonId = DummyId1,
+                        UserId = DummyId1,
+                        Season = new SeasonEntity
                         {
-                          SeasonId = DummyGuid,
-                          Name = "Season Name",
+                          SeasonId = DummyId1,
+                          Name = "Season Name"
                         },
-                        Role = new Role()
-                        {
-                          RoleId = DummyGuid,
-                          Name = "Mentor Role Name"
-                        }
+                        Role = SeasonRole.Coordinator
                       },
-                      MenteeEnrollment = new Enrollment
+                      MenteeEnrollment = new EnrollmentEntity
                       {
-                        EnrollmentId = DummyGuid2,
-                        SeasonId = DummyGuid2,
-                        UserId = DummyGuid2,
-                        RoleId = DummyGuid2,
-                        Season = new Season
+                        EnrollmentId = DummyId2,
+                        SeasonId = DummyId2,
+                        UserId = DummyId2,
+                        Season = new SeasonEntity
                         {
-                          SeasonId = DummyGuid,
-                          Name = "Season Name",
+                          SeasonId = DummyId1,
+                          Name = "Season Name"
                         },
-                        Role = new Role
-                        {
-                          RoleId = DummyGuid,
-                          Name = "Mentee Role Name"
-                        }
+                        Role = SeasonRole.Mentor
                       }
                     }
                   });
 
     var command = ListDummyCommand();
-    var handler = new AdminListMentorship.Handler(_dbContextMock.Object, Mock.Of<ILogger<AdminListMentorship.Handler>>());
+    var handler =
+      new AdminListMentorship.Handler(_dbContextMock.Object, Mock.Of<ILogger<AdminListMentorship.Handler>>());
 
     var result = await handler.Handle(command, CancellationToken.None);
     Assert.Equal(HttpStatusCode.OK, result.StatusCode);
@@ -86,11 +75,9 @@ public class AdminListMentorshipTests: TestsHelper
 
     var mentorships = result.ResponseBody.Mentorships.ToList();
     var mentorship = mentorships[0];
-    Assert.Equal(DummyGuid, mentorship.MentorshipId);
-    Assert.Equal(DummyGuid, mentorship.Mentor.EnrollmentId);
-    Assert.Equal(DummyGuid2, mentorship.Mentee.EnrollmentId);
-    Assert.Equal("Mentor Role Name", mentorship.Mentor.Role.Name);
-    Assert.Equal("Mentee Role Name", mentorship.Mentee.Role.Name);
+    Assert.Equal(DummyId1, mentorship.MentorshipId);
+    Assert.Equal(DummyId1, mentorship.Mentor.EnrollmentId);
+    Assert.Equal(DummyId2, mentorship.Mentee.EnrollmentId);
     Assert.Equal("Season Name", mentorship.Mentor.Season.Name);
     Assert.Equal("Season Name", mentorship.Mentee.Season.Name);
   }

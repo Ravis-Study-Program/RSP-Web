@@ -24,7 +24,7 @@ public class AdminDeleteSeasonTests : TestsHelper
   {
     return new AdminDeleteSeason.Command
     {
-      SeasonId = DummyGuid
+      SeasonId = DummyId1
     };
   }
 
@@ -32,7 +32,7 @@ public class AdminDeleteSeasonTests : TestsHelper
   public async Task Handle_SeasonDoesNotExists_BadRequest()
   {
     _dbContextMock.Setup(x => x.Seasons)
-                  .ReturnsDbSet(new List<Season>());
+                  .ReturnsDbSet(new List<SeasonEntity>());
 
     var command = DeleteDummyCommand();
     var handler = new AdminDeleteSeason.Handler(_dbContextMock.Object, Mock.Of<ILogger<AdminDeleteSeason.Handler>>());
@@ -45,9 +45,9 @@ public class AdminDeleteSeasonTests : TestsHelper
   [Fact]
   public async Task Handle_Success_OK()
   {
-    var existingSeason = new Season { SeasonId = DummyGuid };
+    var existingSeason = new SeasonEntity { SeasonId = DummyId1 };
     _dbContextMock.Setup(x => x.Seasons)
-                  .ReturnsDbSet(new List<Season> { existingSeason });
+                  .ReturnsDbSet(new List<SeasonEntity> { existingSeason });
 
     var command = DeleteDummyCommand();
     var handler = new AdminDeleteSeason.Handler(_dbContextMock.Object, Mock.Of<ILogger<AdminDeleteSeason.Handler>>());

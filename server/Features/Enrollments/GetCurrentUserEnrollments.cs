@@ -45,12 +45,12 @@ public static class GetCurrentUserEnrollments
       try
       {
         var enrollments = await _dbContext
-                                 .Enrollments
-                                 .Where(e => e.User.Email == request.Email)
-                                 .Include(e => e.Season)
-                                 .Include(e => e.Role)
-                                 .ToListAsync(cancellationToken);
-        
+                                .Enrollments
+                                .Where(e => e.User.Email == request.Email)
+                                .Include(e => e.Season)
+                                .Include(e => e.Role)
+                                .ToListAsync(cancellationToken);
+
         return new ApiResult<GetCurrentUserEnrollmentsResponse>
         {
           StatusCode = HttpStatusCode.OK,
@@ -59,7 +59,7 @@ public static class GetCurrentUserEnrollments
             Enrollments = enrollments
           }
         };
-      } 
+      }
       catch (Exception ex)
       {
         _logger.LogError(ex, Message.EnrollmentListSuccessfully);
@@ -86,7 +86,7 @@ public class GetCurrentUserEnrollmentsEndpoint : ICarterModule
 
            var command = new GetCurrentUserEnrollments.Command
            {
-             Email = email,
+             Email = email
            };
            var response = await sender.Send(command);
 
@@ -99,5 +99,5 @@ public class GetCurrentUserEnrollmentsEndpoint : ICarterModule
 
 public record GetCurrentUserEnrollmentsResponse
 {
-  public IList<Enrollment> Enrollments { get; set; } = new List<Enrollment>();
+  public IList<EnrollmentEntity> Enrollments { get; set; } = new List<EnrollmentEntity>();
 }

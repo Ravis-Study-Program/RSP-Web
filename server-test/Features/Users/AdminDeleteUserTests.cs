@@ -32,7 +32,7 @@ public class AdminDeleteUserTests : TestsHelper
   public async Task Handle_UserDoesNotExists_BadRequest()
   {
     _dbContextMock.Setup(x => x.Users)
-                  .ReturnsDbSet(new List<User>());
+                  .ReturnsDbSet(new List<UserEntity>());
 
     var command = DeleteDummyCommand();
     var handler = new AdminDeleteUser.Handler(_dbContextMock.Object, Mock.Of<ILogger<AdminDeleteUser.Handler>>());
@@ -45,9 +45,9 @@ public class AdminDeleteUserTests : TestsHelper
   [Fact]
   public async Task Handle_Success_OK()
   {
-    var existingUser = new User { Email = DummyEmail };
+    var existingUser = new UserEntity { Email = DummyEmail };
     _dbContextMock.Setup(x => x.Users)
-                  .ReturnsDbSet(new List<User> { existingUser });
+                  .ReturnsDbSet(new List<UserEntity> { existingUser });
 
     var command = DeleteDummyCommand();
     var handler = new AdminDeleteUser.Handler(_dbContextMock.Object, Mock.Of<ILogger<AdminDeleteUser.Handler>>());

@@ -15,7 +15,7 @@ public static class MockCreateMockInterview
 {
   public class Command : AuthRequest<ApiResult<MockCreateMockInterviewResponse>>
   {
-    public string Email { get; set; }
+    public string Email { get; set; } = string.Empty;
   }
 
   public class Validator : AbstractValidator<Command>
@@ -47,7 +47,7 @@ public static class MockCreateMockInterview
         var interviewee = await _dbContext
                                 .Users
                                 .Where(u => u.Email == request.Email)
-                                .Select(u => new User
+                                .Select(u => new UserEntity
                                 {
                                   UserId = u.UserId
                                 })
@@ -60,20 +60,20 @@ public static class MockCreateMockInterview
             Error = new ApiError(Message.UserEmailDoesNotExists)
           };
         }
-        
+
         // Process each mock interview round
-        var mockInterviewRounds = new List<MockInterviewRound>();
-        for (int j = 0; j < 6; j++)
+        var mockInterviewRounds = new List<MockInterviewRoundEntity>();
+        for (var j = 0; j < 6; j++)
         {
-          var mockInterviewRound = new MockInterviewRound
+          var mockInterviewRound = new MockInterviewRoundEntity
           {
             IsReviewedByInterviewee = false,
-            IntervieweeComment = "My own comment",
+            IntervieweeComment = "My own comment"
           };
 
           if (j == 0)
           {
-            mockInterviewRound.BehaviouralMockInterviewRound = new BehaviouralMockInterviewRound
+            mockInterviewRound.BehaviouralMockInterviewRound = new BehaviouralMockInterviewRoundEntity
             {
               BehavioralScore = 8
             };
@@ -84,14 +84,14 @@ public static class MockCreateMockInterview
             var leetcode = await _dbContext.LeetcodeProblems.Take(1).ToListAsync(cancellationToken);
             if (leetcode.Count == 0)
             {
-              return new ApiResult<MockCreateMockInterviewResponse>()
+              return new ApiResult<MockCreateMockInterviewResponse>
               {
                 StatusCode = HttpStatusCode.BadRequest,
                 Error = new ApiError("Something went wrong")
               };
-            } 
-            
-            mockInterviewRound.LeetcodeMockInterviewRound = new LeetcodeMockInterviewRound
+            }
+
+            mockInterviewRound.LeetcodeMockInterviewRound = new LeetcodeMockInterviewRoundEntity
             {
               AlgorithmDesignScore = 8,
               ConfirmQuestionScore = 10,
@@ -103,17 +103,17 @@ public static class MockCreateMockInterview
           }
           else if (j == 1)
           {
-            mockInterviewRound.CustomMockInterviewRound = new CustomMockInterviewRound
+            mockInterviewRound.CustomMockInterviewRound = new CustomMockInterviewRoundEntity
             {
               Content = "Some random content",
               Link = "google.com"
             };
           }
-          
+
           mockInterviewRounds.Add(mockInterviewRound);
         }
-        
-        var mockInterview = new MockInterview
+
+        var mockInterview = new MockInterviewEntity
         {
           IsPass = true,
           InterviewerUserId = interviewee.UserId,
@@ -122,7 +122,7 @@ public static class MockCreateMockInterview
           StartDate = DateTime.UtcNow,
           TimeTakenInMinutes = 120
         };
-        
+
         _dbContext.Add(mockInterview);
         await _dbContext.SaveChangesAsync(cancellationToken);
 
@@ -155,10 +155,10 @@ public class MockCreateMockInterviewEndpoint : ICarterModule
          async (ISender sender, HttpContext httpContext) =>
          {
            var email = httpContext?.User?.Identity?.Name ?? "";
-           
+
            var command = new MockCreateMockInterview.Command
            {
-             Email = email,
+             Email = email
            };
            var response = await sender.Send(command);
 

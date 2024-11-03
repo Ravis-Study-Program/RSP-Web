@@ -14,7 +14,7 @@ public static class DeleteProblemAttempt
 {
   public class Command : AuthRequest<ApiResult<DeleteProblemAttemptResponse>>
   {
-    public Guid ProblemAttemptId { get; set; }
+    public string ProblemAttemptId { get; set; } = string.Empty;
   }
 
   public class Validator : AbstractValidator<Command>
@@ -42,8 +42,8 @@ public static class DeleteProblemAttempt
     )
     {
       var existingProblemAttempt = await _dbContext
-                                     .ProblemAttempts.FirstOrDefaultAsync(
-                                       u => u.ProblemAttemptId == request.ProblemAttemptId, cancellationToken);
+                                         .ProblemAttempts.FirstOrDefaultAsync(
+                                           u => u.ProblemAttemptId == request.ProblemAttemptId, cancellationToken);
       if (existingProblemAttempt == null)
       {
         return new ApiResult<DeleteProblemAttemptResponse>
@@ -84,7 +84,7 @@ public class DeleteProblemAttemptEndpoint : ICarterModule
   {
     app.MapDelete(
          "api/problem-attempts",
-         async (Guid problemAttemptId, ISender sender) =>
+         async (string problemAttemptId, ISender sender) =>
          {
            var command = new DeleteProblemAttempt.Command
            {

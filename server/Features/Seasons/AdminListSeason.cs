@@ -7,11 +7,14 @@ using RSPWebAPI.Entities;
 using RSPWebAPI.Features.Constants;
 using RSPWebAPI.Shared;
 using RSPWebAPI.Shared.Behaviours;
-using AdminListSeasonResult = Microsoft.AspNetCore.Http.HttpResults.Results<
-  Microsoft.AspNetCore.Http.HttpResults.Ok<RSPWebAPI.Shared.ApiResult<RSPWebAPI.Features.Seasons.AdminListSeasonResponse>>,
-  Microsoft.AspNetCore.Http.HttpResults.NotFound<RSPWebAPI.Shared.ApiResult<RSPWebAPI.Features.Seasons.AdminListSeasonResponse>>,
-  Microsoft.AspNetCore.Http.HttpResults.BadRequest<RSPWebAPI.Shared.ApiResult<RSPWebAPI.Features.Seasons.AdminListSeasonResponse>>
->;
+using AdminListSeasonResult =
+  Microsoft.AspNetCore.Http.HttpResults.Results<
+    Microsoft.AspNetCore.Http.HttpResults.Ok<
+      RSPWebAPI.Shared.ApiResult<RSPWebAPI.Features.Seasons.AdminListSeasonResponse>>,
+    Microsoft.AspNetCore.Http.HttpResults.NotFound<
+      RSPWebAPI.Shared.ApiResult<RSPWebAPI.Features.Seasons.AdminListSeasonResponse>>, Microsoft.AspNetCore.Http.
+    HttpResults.BadRequest<RSPWebAPI.Shared.ApiResult<RSPWebAPI.Features.Seasons.AdminListSeasonResponse>>
+  >;
 
 namespace RSPWebAPI.Features.Seasons;
 
@@ -85,5 +88,5 @@ public class AdminListSeasonEndpoint : ICarterModule
 
 public class AdminListSeasonResponse
 {
-  public ICollection<Season> Seasons { get; set; } = new List<Season>();
+  public ICollection<SeasonEntity> Seasons { get; set; } = new List<SeasonEntity>();
 }

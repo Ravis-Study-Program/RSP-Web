@@ -11,7 +11,7 @@ using Xunit;
 
 namespace RSPWebAPI.Tests.Features.Seasons;
 
-public class AdminCreateSeasonTests: TestsHelper
+public class AdminCreateSeasonTests : TestsHelper
 {
   private readonly Mock<ApplicationDbContext> _dbContextMock;
 
@@ -26,8 +26,8 @@ public class AdminCreateSeasonTests: TestsHelper
     {
       Name = DummyName,
       Slug = DummySlug,
-      StartDate = DummyStartDate,
-      EndDate = DummyEndDate,
+      StartDateInclusiveUtc = DummyStartDate,
+      EndDateInclusiveUtc = DummyEndDate,
       Location = DummyLocation,
       ImageUrl = DummyImageUrl
     };
@@ -37,7 +37,7 @@ public class AdminCreateSeasonTests: TestsHelper
   public async Task Handle_Success_OK()
   {
     _dbContextMock.Setup(x => x.Seasons)
-                  .ReturnsDbSet(new List<Season>());
+                  .ReturnsDbSet(new List<SeasonEntity>());
 
     var command = CreateDummyCommand();
     var handler = new AdminCreateSeason.Handler(_dbContextMock.Object, Mock.Of<ILogger<AdminCreateSeason.Handler>>());

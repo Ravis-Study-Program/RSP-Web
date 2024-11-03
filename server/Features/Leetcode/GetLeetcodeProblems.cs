@@ -19,9 +19,6 @@ public static class GetLeetcodeProblems
 
   public class Validator : AbstractValidator<Command>
   {
-    public Validator()
-    {
-    }
   }
 
   public class Handler : IRequestHandler<Command, ApiResult<GetLeetcodeProblemsResponse>>
@@ -43,12 +40,12 @@ public static class GetLeetcodeProblems
       try
       {
         var leetcodeProblems = await _dbContext
-                            .LeetcodeProblems
-                            .Include(l => l.LeetcodeProblemCategories)
-                            .Include(l => l.LeetcodeProblemDifficulty)
-                            .Include(l => l.Problem)
-                            .ToListAsync(cancellationToken);
-        
+                                     .LeetcodeProblems
+                                     .Include(l => l.LeetcodeProblemCategories)
+                                     .Include(l => l.LeetcodeProblemDifficulty)
+                                     .Include(l => l.Problem)
+                                     .ToListAsync(cancellationToken);
+
         return new ApiResult<GetLeetcodeProblemsResponse>
         {
           StatusCode = HttpStatusCode.OK,
@@ -97,5 +94,5 @@ public record GetLeetcodeProblemsRequest
 
 public class GetLeetcodeProblemsResponse
 {
-  public IList<LeetcodeProblem> LeetcodeProblems { get; set; } = new List<LeetcodeProblem>();
+  public IList<LeetcodeProblemEntity> LeetcodeProblems { get; set; } = new List<LeetcodeProblemEntity>();
 }

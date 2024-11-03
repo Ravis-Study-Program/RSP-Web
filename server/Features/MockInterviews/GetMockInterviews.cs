@@ -15,11 +15,11 @@ public static class GetMockInterviews
 {
   public class Command : AuthRequest<ApiResult<GetMockInterviewsResponse>>
   {
-    public string Email { get; set; }
-    public Guid? EnrollmentId { get; set; }
-    public bool IncludeBehavioural { get; set; } = false;
-    public bool IncludeLeetcode { get; set; } = false;
-    public bool IncludeCustom { get; set; } = false;
+    public string Email { get; set; } = string.Empty;
+    public string? EnrollmentId { get; set; }
+    public bool IncludeBehavioural { get; set; }
+    public bool IncludeLeetcode { get; set; }
+    public bool IncludeCustom { get; set; }
   }
 
   public class Validator : AbstractValidator<Command>
@@ -49,14 +49,15 @@ public static class GetMockInterviews
       try
       {
         var query = _dbContext.MockInterviews.AsQueryable();
-        
+
         // Check if the enrollment exists
         if (request.EnrollmentId != null)
         {
           var existingEnrollment = await _dbContext
                                          .Enrollments
                                          .Include(e => e.User)
-                                         .FirstOrDefaultAsync(e => e.EnrollmentId == request.EnrollmentId, cancellationToken);
+                                         .FirstOrDefaultAsync(e => e.EnrollmentId == request.EnrollmentId,
+                                                              cancellationToken);
           if (existingEnrollment == null || existingEnrollment.User.Email != request.Email)
           {
             return new ApiResult<GetMockInterviewsResponse>
@@ -68,7 +69,7 @@ public static class GetMockInterviews
 
           query = query.Where(p => p.EnrollmentId == request.EnrollmentId);
         }
-        
+
         if (request.IncludeBehavioural)
         {
           query = query
@@ -84,18 +85,18 @@ public static class GetMockInterviews
                   .ThenInclude(l => l.LeetcodeProblem)
                   .ThenInclude(l => l.Problem);
         }
-        
+
         if (request.IncludeCustom)
         {
           query = query
                   .Include(m => m.MockInterviewRounds)
                   .ThenInclude(mr => mr.CustomMockInterviewRound);
         }
-        
+
         var result = await query
                            .Include(m => m.Interviewer)
                            .ToListAsync(cancellationToken);
-        
+
         return new ApiResult<GetMockInterviewsResponse>
         {
           StatusCode = HttpStatusCode.OK,
@@ -126,10 +127,11 @@ public class GetMockInterviewsEndpoint : ICarterModule
   {
     app.MapGet(
          "api/mock-interviews",
-         async (Guid? enrollmentId, bool includeLeetcode, bool includeCustom, bool includeBehavioural, ISender sender, HttpContext httpContext) =>
+         async (string? enrollmentId, bool includeLeetcode, bool includeCustom, bool includeBehavioural, ISender sender,
+           HttpContext httpContext) =>
          {
            var email = httpContext?.User?.Identity?.Name ?? "";
-           
+
            var command = new GetMockInterviews.Command
            {
              EnrollmentId = enrollmentId,
@@ -149,5 +151,5 @@ public class GetMockInterviewsEndpoint : ICarterModule
 
 public class GetMockInterviewsResponse
 {
-  public IList<MockInterview> MockInterviews { get; set; } = new List<MockInterview>();
+  public IList<MockInterviewEntity> MockInterviews { get; set; } = new List<MockInterviewEntity>();
 }

@@ -4,6 +4,7 @@ using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using RSPWebAPI.Database;
+using RSPWebAPI.Entities;
 using RSPWebAPI.Features.Constants;
 using RSPWebAPI.Shared;
 using RSPWebAPI.Shared.Behaviours;
@@ -14,10 +15,10 @@ public static class AdminUpdateEnrollment
 {
   public class Command : AdminAuthRequest<ApiResult<AdminUpdateEnrollmentResponse>>
   {
-    public Guid EnrollmentId { get; set; }
-    public Guid SeasonId { get; set; }
-    public Guid UserId { get; set; }
-    public Guid RoleId { get; set; }
+    public string EnrollmentId { get; set; } = string.Empty;
+    public string SeasonId { get; set; } = string.Empty;
+    public string UserId { get; set; } = string.Empty;
+    public SeasonRole Role { get; set; }
   }
 
   public class Validator : AbstractValidator<Command>
@@ -27,7 +28,7 @@ public static class AdminUpdateEnrollment
       RuleFor(c => c.EnrollmentId).NotEmpty();
       RuleFor(c => c.SeasonId).NotEmpty();
       RuleFor(c => c.UserId).NotEmpty();
-      RuleFor(c => c.RoleId).NotEmpty();
+      RuleFor(c => c.Role).NotEmpty();
     }
   }
 
@@ -62,7 +63,7 @@ public static class AdminUpdateEnrollment
 
       existingEnrollment.SeasonId = request.SeasonId;
       existingEnrollment.UserId = request.UserId;
-      existingEnrollment.RoleId = request.RoleId;
+      existingEnrollment.Role = request.Role;
 
       try
       {
@@ -77,7 +78,7 @@ public static class AdminUpdateEnrollment
             EnrollmentId = existingEnrollment.EnrollmentId,
             SeasonId = existingEnrollment.SeasonId,
             UserId = existingEnrollment.UserId,
-            RoleId = existingEnrollment.RoleId
+            Role = existingEnrollment.Role
           },
           SuccessMessage = Message.EnrollmentUpdatedSuccessfully
         };
@@ -109,7 +110,7 @@ public class AdminUpdateEnrollmentEndpoint : ICarterModule
              EnrollmentId = request.EnrollmentId,
              SeasonId = request.SeasonId,
              UserId = request.UserId,
-             RoleId = request.RoleId
+             Role = request.Role
            };
            var response = await sender.Send(command);
 
@@ -122,16 +123,16 @@ public class AdminUpdateEnrollmentEndpoint : ICarterModule
 
 public record AdminUpdateEnrollmentRequest
 {
-  public Guid EnrollmentId { get; set; }
-  public Guid SeasonId { get; set; }
-  public Guid UserId { get; set; }
-  public Guid RoleId { get; set; }
+  public string EnrollmentId { get; set; } = string.Empty;
+  public string SeasonId { get; set; } = string.Empty;
+  public string UserId { get; set; } = string.Empty;
+  public SeasonRole Role { get; set; }
 }
 
 public class AdminUpdateEnrollmentResponse
 {
-  public Guid EnrollmentId { get; set; }
-  public Guid SeasonId { get; set; }
-  public Guid UserId { get; set; }
-  public Guid RoleId { get; set; }
+  public string EnrollmentId { get; set; } = string.Empty;
+  public string SeasonId { get; set; } = string.Empty;
+  public string UserId { get; set; } = string.Empty;
+  public SeasonRole Role { get; set; }
 }

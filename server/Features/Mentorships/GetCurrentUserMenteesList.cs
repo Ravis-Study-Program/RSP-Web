@@ -47,12 +47,13 @@ public static class GetCurrentUserMenteesList
       try
       {
         var mentees = await _dbContext
-                                 .Mentorships
-                                 .Where(m => m.MentorEnrollment.User.Email == request.Email && m.MentorEnrollment.Season.Slug == request.SeasonSlug)
-                                 .Include(m => m.MenteeEnrollment)
-                                 .ThenInclude(m => m.User)
-                                 .ToListAsync(cancellationToken);
-        
+                            .Mentorships
+                            .Where(m => m.MentorEnrollment.User.Email == request.Email &&
+                                        m.MentorEnrollment.Season.Slug == request.SeasonSlug)
+                            .Include(m => m.MenteeEnrollment)
+                            .ThenInclude(m => m.User)
+                            .ToListAsync(cancellationToken);
+
         return new ApiResult<GetCurrentUserMenteesListResponse>
         {
           StatusCode = HttpStatusCode.OK,
@@ -62,7 +63,7 @@ public static class GetCurrentUserMenteesList
             Mentees = mentees
           }
         };
-      } 
+      }
       catch (Exception ex)
       {
         _logger.LogError(ex, Message.MentorshipListUnexpectedError);
@@ -103,5 +104,5 @@ public class GetCurrentUserMenteesListEndpoint : ICarterModule
 
 public record GetCurrentUserMenteesListResponse
 {
-  public IList<Mentorship> Mentees { get; set; } = new List<Mentorship>();
+  public IList<MentorshipEntity> Mentees { get; set; } = new List<MentorshipEntity>();
 }

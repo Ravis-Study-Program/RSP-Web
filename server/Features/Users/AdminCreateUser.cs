@@ -59,8 +59,9 @@ public static class AdminCreateUser
         };
       }
 
-      var user = new User
+      var user = new UserEntity
       {
+        UserId = Database.Constants.GeneratePrimaryKeyId(),
         DiscordId = request.DiscordId,
         Email = request.Email,
         Name = request.Name,
@@ -138,7 +139,7 @@ public record AdminCreateUserRequest
 
 public class AdminCreateUserResponse
 {
-  public Guid UserId { get; set; }
+  public string UserId { get; set; } = string.Empty;
   public string DiscordId { get; set; } = string.Empty;
   public string Email { get; set; } = string.Empty;
   public string Name { get; set; } = string.Empty;

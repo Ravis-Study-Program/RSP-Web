@@ -35,7 +35,7 @@ public class AdminUpdateUserTests : TestsHelper
   public async Task Handle_UserDoesNotExists_BadRequest()
   {
     _dbContextMock.Setup(x => x.Users)
-                  .ReturnsDbSet(new List<User>());
+                  .ReturnsDbSet(new List<UserEntity>());
 
     var command = UpdateDummyCommand();
     var handler = new AdminUpdateUser.Handler(_dbContextMock.Object, Mock.Of<ILogger<AdminUpdateUser.Handler>>());
@@ -48,9 +48,9 @@ public class AdminUpdateUserTests : TestsHelper
   [Fact]
   public async Task Handle_Success_OK()
   {
-    var existingUser = new User { Email = DummyEmail };
+    var existingUser = new UserEntity { Email = DummyEmail };
     _dbContextMock.Setup(x => x.Users)
-                  .ReturnsDbSet(new List<User> { existingUser });
+                  .ReturnsDbSet(new List<UserEntity> { existingUser });
 
     var command = UpdateDummyCommand();
     var handler = new AdminUpdateUser.Handler(_dbContextMock.Object, Mock.Of<ILogger<AdminUpdateUser.Handler>>());

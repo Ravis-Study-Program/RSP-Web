@@ -14,9 +14,9 @@ public static class AdminUpdateMentorship
 {
   public class Command : AdminAuthRequest<ApiResult<AdminUpdateMentorshipResponse>>
   {
-    public Guid MentorshipId { get; set; }
-    public Guid MentorEnrollmentId { get; set; }
-    public Guid MenteeEnrollmentId { get; set; }
+    public string MentorshipId { get; set; } = string.Empty;
+    public string MentorEnrollmentId { get; set; } = string.Empty;
+    public string MenteeEnrollmentId { get; set; } = string.Empty;
   }
 
   public class Validator : AbstractValidator<Command>
@@ -57,7 +57,7 @@ public static class AdminUpdateMentorship
           Error = new ApiError(Message.MentorshipDoesNotExists)
         };
       }
-      
+
       // Reject if any of the provided mentor or mentee doesn't exist
       var mentor = await _dbContext
                          .Enrollments
@@ -76,7 +76,7 @@ public static class AdminUpdateMentorship
           Error = new ApiError(Message.MentorshipNotPermittedDueToNullMentorOrMentee)
         };
       }
-      
+
       // Reject if provided mentor and mentee doesn't belong to the same season
       if (mentor.Season.SeasonId != mentee.Season.SeasonId)
       {
@@ -86,7 +86,7 @@ public static class AdminUpdateMentorship
           Error = new ApiError(Message.MentorshipNotPermittedDueToDifferentSeason)
         };
       }
-      
+
       existingMentorship.MentorEnrollmentId = request.MentorEnrollmentId;
       existingMentorship.MenteeEnrollmentId = request.MenteeEnrollmentId;
 
@@ -146,14 +146,14 @@ public class AdminUpdateMentorshipEndpoint : ICarterModule
 
 public record AdminUpdateMentorshipRequest
 {
-  public Guid MentorshipId { get; set; }
-  public Guid MentorEnrollmentId { get; set; }
-  public Guid MenteeEnrollmentId { get; set; }
+  public string MentorshipId { get; set; } = string.Empty;
+  public string MentorEnrollmentId { get; set; } = string.Empty;
+  public string MenteeEnrollmentId { get; set; } = string.Empty;
 }
 
 public class AdminUpdateMentorshipResponse
 {
-  public Guid MentorshipId { get; set; }
-  public Guid MentorEnrollmentId { get; set; }
-  public Guid MenteeEnrollmentId { get; set; }
+  public string MentorshipId { get; set; } = string.Empty;
+  public string MentorEnrollmentId { get; set; } = string.Empty;
+  public string MenteeEnrollmentId { get; set; } = string.Empty;
 }

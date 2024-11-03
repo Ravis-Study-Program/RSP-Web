@@ -24,10 +24,9 @@ public class AdminUpdateEnrollmentTests : TestsHelper
   {
     return new AdminUpdateEnrollment.Command
     {
-      EnrollmentId = DummyGuid,
-      SeasonId = DummyGuid,
-      RoleId = DummyGuid,
-      UserId = DummyGuid
+      EnrollmentId = DummyId1,
+      SeasonId = DummyId1,
+      UserId = DummyId1
     };
   }
 
@@ -35,10 +34,11 @@ public class AdminUpdateEnrollmentTests : TestsHelper
   public async Task Handle_EnrollmentDoesNotExists_BadRequest()
   {
     _dbContextMock.Setup(x => x.Enrollments)
-                  .ReturnsDbSet(new List<Enrollment>());
+                  .ReturnsDbSet(new List<EnrollmentEntity>());
 
     var command = UpdateDummyCommand();
-    var handler = new AdminUpdateEnrollment.Handler(_dbContextMock.Object, Mock.Of<ILogger<AdminUpdateEnrollment.Handler>>());
+    var handler =
+      new AdminUpdateEnrollment.Handler(_dbContextMock.Object, Mock.Of<ILogger<AdminUpdateEnrollment.Handler>>());
 
     var result = await handler.Handle(command, CancellationToken.None);
     Assert.Equal(HttpStatusCode.BadRequest, result.StatusCode);
@@ -48,16 +48,17 @@ public class AdminUpdateEnrollmentTests : TestsHelper
   [Fact]
   public async Task Handle_Success_OK()
   {
-    var existingEnrollment = new Enrollment { EnrollmentId = DummyGuid };
+    var existingEnrollment = new EnrollmentEntity { EnrollmentId = DummyId1 };
     _dbContextMock.Setup(x => x.Enrollments)
-                  .ReturnsDbSet(new List<Enrollment> { existingEnrollment });
+                  .ReturnsDbSet(new List<EnrollmentEntity> { existingEnrollment });
 
     var command = UpdateDummyCommand();
-    var handler = new AdminUpdateEnrollment.Handler(_dbContextMock.Object, Mock.Of<ILogger<AdminUpdateEnrollment.Handler>>());
+    var handler =
+      new AdminUpdateEnrollment.Handler(_dbContextMock.Object, Mock.Of<ILogger<AdminUpdateEnrollment.Handler>>());
 
     var result = await handler.Handle(command, CancellationToken.None);
     Assert.Equal(HttpStatusCode.OK, result.StatusCode);
     Assert.Equal(Message.EnrollmentUpdatedSuccessfully, result.SuccessMessage);
-    Assert.Equal(DummyGuid, result?.ResponseBody?.UserId);
+    Assert.Equal(DummyId1, result?.ResponseBody?.UserId);
   }
 }

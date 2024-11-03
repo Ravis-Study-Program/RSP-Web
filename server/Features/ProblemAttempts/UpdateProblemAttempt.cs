@@ -4,7 +4,6 @@ using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using RSPWebAPI.Database;
-using RSPWebAPI.Entities;
 using RSPWebAPI.Features.Constants;
 using RSPWebAPI.Shared;
 using RSPWebAPI.Shared.Behaviours;
@@ -15,14 +14,14 @@ public static class UpdateProblemAttempt
 {
   public class Command : AuthRequest<ApiResult<UpdateProblemAttemptResponse>>
   {
-    public Guid ProblemAttemptId { get; set; }
+    public string ProblemAttemptId { get; set; } = string.Empty;
     public DateTime AttemptStartDate { get; set; }
     public int TimeTakenInMinutes { get; set; }
     public string Notes { get; set; } = string.Empty;
-    public Guid? LeetcodeProblemId { get; set; }
-    public Guid? CustomProblemId { get; set; }
-    public Guid? EnrollmentId { get; set; }
-    public string Email { get; set; }
+    public string? LeetcodeProblemId { get; set; }
+    public string? CustomProblemId { get; set; }
+    public string? EnrollmentId { get; set; }
+    public string Email { get; set; } = string.Empty;
   }
 
   public class Validator : AbstractValidator<Command>
@@ -56,10 +55,12 @@ public static class UpdateProblemAttempt
       {
         // Check if the problemAttempt exists and if it matches with the enrollment ID
         var existingProblemAttempt = await _dbContext
-                                       .ProblemAttempts
-                                       .Include(p => p.Enrollment)
-                                       .FirstOrDefaultAsync(e => e.ProblemAttemptId == request.ProblemAttemptId, cancellationToken);
-        if (existingProblemAttempt == null || (request.EnrollmentId != null && existingProblemAttempt.Enrollment?.EnrollmentId != request.EnrollmentId))
+                                           .ProblemAttempts
+                                           .Include(p => p.Enrollment)
+                                           .FirstOrDefaultAsync(e => e.ProblemAttemptId == request.ProblemAttemptId,
+                                                                cancellationToken);
+        if (existingProblemAttempt == null || (request.EnrollmentId != null &&
+                                               existingProblemAttempt.Enrollment?.EnrollmentId != request.EnrollmentId))
         {
           return new ApiResult<UpdateProblemAttemptResponse>
           {
@@ -67,14 +68,14 @@ public static class UpdateProblemAttempt
             Error = new ApiError(Message.ProblemAttemptDoesNotExists)
           };
         }
-        
+
         // Leetcode should take precedence if CustomProblem is present for some reason
         if (request.CustomProblemId != null && request.LeetcodeProblemId != null)
         {
           request.CustomProblemId = null;
         }
-        
-        existingProblemAttempt.AttemptStartDate = request.AttemptStartDate;
+
+        existingProblemAttempt.AttemptStartDateUtc = request.AttemptStartDate;
         existingProblemAttempt.TimeTakenInMinutes = request.TimeTakenInMinutes;
         existingProblemAttempt.LeetcodeProblemId = request.LeetcodeProblemId;
         existingProblemAttempt.CustomProblemId = request.CustomProblemId;
@@ -112,7 +113,7 @@ public class UpdateProblemAttemptEndpoint : ICarterModule
          async (UpdateProblemAttemptRequest request, ISender sender, HttpContext httpContext) =>
          {
            var email = httpContext?.User?.Identity?.Name ?? "";
-           
+
            var command = new UpdateProblemAttempt.Command
            {
              ProblemAttemptId = request.ProblemAttemptId,
@@ -135,13 +136,13 @@ public class UpdateProblemAttemptEndpoint : ICarterModule
 
 public record UpdateProblemAttemptRequest
 {
-  public Guid ProblemAttemptId { get; set; }
+  public string ProblemAttemptId { get; set; } = string.Empty;
   public DateTime AttemptStartDate { get; set; }
   public int TimeTakenInMinutes { get; set; }
-  public string Notes { get; set; }
-  public Guid LeetcodeProblemId { get; set; }
-  public Guid CustomProblemId { get; set; }
-  public Guid? EnrollmentId { get; set; }
+  public string Notes { get; set; } = string.Empty;
+  public string LeetcodeProblemId { get; set; } = string.Empty;
+  public string CustomProblemId { get; set; } = string.Empty;
+  public string? EnrollmentId { get; set; }
 }
 
 public class UpdateProblemAttemptResponse

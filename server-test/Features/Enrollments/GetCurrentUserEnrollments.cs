@@ -4,9 +4,7 @@ using Moq;
 using Moq.EntityFrameworkCore;
 using RSPWebAPI.Database;
 using RSPWebAPI.Entities;
-using RSPWebAPI.Features.Constants;
 using RSPWebAPI.Features.Enrollments;
-using RSPWebAPI.Features.Users;
 using RSPWebAPI.Tests.Shared;
 using Xunit;
 
@@ -25,45 +23,40 @@ public class GetCurrentUserEnrollmentsTests : TestsHelper
   {
     return new GetCurrentUserEnrollments.Command
     {
-      Email = DummyEmail,
+      Email = DummyEmail
     };
   }
 
   [Fact]
   public async Task Handle_EnrollmentExists_OK()
   {
-    var dummyEnrollment = new Enrollment
+    var dummyEnrollment = new EnrollmentEntity
     {
-      EnrollmentId = DummyGuid,
-      Season = new Season
+      EnrollmentId = DummyId1,
+      Season = new SeasonEntity
       {
-        SeasonId = DummyGuid,
+        SeasonId = DummyId1,
         Name = "Season Name"
       },
-      Role = new Role
+      User = new UserEntity
       {
-        RoleId = DummyGuid,
-        Name = "Role Name"
-      },
-      User = new User
-      {
-        UserId = DummyGuid,
+        UserId = DummyId1,
         Email = DummyEmail
       }
     };
     _dbContextMock.Setup(x => x.Enrollments)
-                  .ReturnsDbSet(new List<Enrollment> { dummyEnrollment });
+                  .ReturnsDbSet(new List<EnrollmentEntity> { dummyEnrollment });
 
     var command = CreateDummyCommand();
     var handler =
-      new GetCurrentUserEnrollments.Handler(_dbContextMock.Object, Mock.Of<ILogger<GetCurrentUserEnrollments.Handler>>());
+      new GetCurrentUserEnrollments.Handler(_dbContextMock.Object,
+                                            Mock.Of<ILogger<GetCurrentUserEnrollments.Handler>>());
 
     var result = await handler.Handle(command, CancellationToken.None);
     var enrollments = result.ResponseBody?.Enrollments.ToList();
     var enrollment = enrollments?[0];
     Assert.Equal(HttpStatusCode.OK, result.StatusCode);
-    Assert.Equal(DummyGuid, enrollment?.EnrollmentId);
+    Assert.Equal(DummyId1, enrollment?.EnrollmentId);
     Assert.Equal("Season Name", enrollment?.Season.Name);
-    Assert.Equal("Role Name", enrollment?.Role.Name);
   }
 }

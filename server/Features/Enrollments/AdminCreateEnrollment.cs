@@ -15,9 +15,9 @@ public static class AdminCreateEnrollment
 {
   public class Command : AdminAuthRequest<ApiResult<AdminCreateEnrollmentResponse>>
   {
-    public Guid SeasonId { get; set; }
-    public Guid UserId { get; set; }
-    public Guid RoleId { get; set; }
+    public string SeasonId { get; set; } = string.Empty;
+    public string UserId { get; set; } = string.Empty;
+    public SeasonRole Role { get; set; }
   }
 
   public class Validator : AbstractValidator<Command>
@@ -26,7 +26,7 @@ public static class AdminCreateEnrollment
     {
       RuleFor(c => c.SeasonId).NotEmpty();
       RuleFor(c => c.UserId).NotEmpty();
-      RuleFor(c => c.RoleId).NotEmpty();
+      RuleFor(c => c.Role).NotEmpty();
     }
   }
 
@@ -48,8 +48,10 @@ public static class AdminCreateEnrollment
     {
       var existingEnrollment = await _dbContext
                                      .Enrollments
-                                     .FirstOrDefaultAsync(u => u.SeasonId == request.SeasonId && u.UserId == request.UserId && u.RoleId == request.RoleId,
-                                                          cancellationToken);
+                                     .FirstOrDefaultAsync(
+                                       e => e.SeasonId == request.SeasonId && e.UserId == request.UserId && e.Role ==
+                                            request.Role,
+                                       cancellationToken);
       if (existingEnrollment != null)
       {
         return new ApiResult<AdminCreateEnrollmentResponse>
@@ -58,12 +60,13 @@ public static class AdminCreateEnrollment
           Error = new ApiError(Message.EnrollmentExists)
         };
       }
-      
-      var enrollment = new Enrollment
+
+      var enrollment = new EnrollmentEntity
       {
+        EnrollmentId = Database.Constants.GeneratePrimaryKeyId(),
         SeasonId = request.SeasonId,
         UserId = request.UserId,
-        RoleId = request.RoleId
+        Role = request.Role
       };
 
       try
@@ -78,8 +81,8 @@ public static class AdminCreateEnrollment
           {
             SeasonId = enrollment.SeasonId,
             UserId = enrollment.UserId,
-            RoleId = enrollment.RoleId,
-            EnrollmentId = enrollment.EnrollmentId
+            EnrollmentId = enrollment.EnrollmentId,
+            Role = enrollment.Role
           },
           SuccessMessage = Message.EnrollmentCreatedSuccessfully
         };
@@ -110,7 +113,7 @@ public class AdminCreateEnrollmentEndpoint : ICarterModule
            {
              SeasonId = request.SeasonId,
              UserId = request.UserId,
-             RoleId = request.RoleId
+             Role = request.Role
            };
            var response = await sender.Send(command);
 
@@ -123,15 +126,15 @@ public class AdminCreateEnrollmentEndpoint : ICarterModule
 
 public record AdminCreateEnrollmentRequest
 {
-  public Guid SeasonId { get; set; }
-  public Guid UserId { get; set; }
-  public Guid RoleId { get; set; }
+  public string SeasonId { get; set; } = string.Empty;
+  public string UserId { get; set; } = string.Empty;
+  public SeasonRole Role { get; set; }
 }
 
 public class AdminCreateEnrollmentResponse
 {
-  public Guid EnrollmentId { get; set; }
-  public Guid SeasonId { get; set; }
-  public Guid UserId { get; set; }
-  public Guid RoleId { get; set; }
+  public string EnrollmentId { get; set; } = string.Empty;
+  public string SeasonId { get; set; } = string.Empty;
+  public string UserId { get; set; } = string.Empty;
+  public SeasonRole Role { get; set; }
 }

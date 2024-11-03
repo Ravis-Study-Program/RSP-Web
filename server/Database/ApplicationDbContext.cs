@@ -1,3 +1,4 @@
+using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 using RSPWebAPI.Entities;
 
@@ -14,16 +15,21 @@ public class ApplicationDbContext : DbContext
   {
   }
 
-  public virtual DbSet<CustomProblem> CustomProblems { get; set; }
-  public virtual DbSet<Enrollment> Enrollments { get; set; }
-  public virtual DbSet<LeetcodeProblem> LeetcodeProblems { get; set; }
-  public virtual DbSet<LeetcodeProblemCategory> LeetcodeProblemCategories { get; set; }
-  public virtual DbSet<LeetcodeProblemDifficulty> LeetcodeProblemDifficulties { get; set; }
-  public virtual DbSet<Mentorship> Mentorships { get; set; }
-  public virtual DbSet<MockInterview> MockInterviews { get; set; }
-  public virtual DbSet<Problem> Problems { get; set; }
-  public virtual DbSet<ProblemAttempt> ProblemAttempts { get; set; }
-  public virtual DbSet<Role> Roles { get; set; }
-  public virtual DbSet<Season> Seasons { get; set; }
-  public virtual DbSet<User> Users { get; set; }
+  public virtual DbSet<CustomProblemEntity> CustomProblems { get; set; }
+  public virtual DbSet<EnrollmentEntity> Enrollments { get; set; }
+  public virtual DbSet<LeetcodeProblemEntity> LeetcodeProblems { get; set; }
+  public virtual DbSet<LeetcodeProblemCategoryEntity> LeetcodeProblemCategories { get; set; }
+  public virtual DbSet<MentorshipEntity> Mentorships { get; set; }
+  public virtual DbSet<MockInterviewEntity> MockInterviews { get; set; }
+  public virtual DbSet<ProblemEntity> Problems { get; set; }
+  public virtual DbSet<ProblemAttemptEntity> ProblemAttempts { get; set; }
+  public virtual DbSet<SeasonEntity> Seasons { get; set; }
+  public virtual DbSet<UserEntity> Users { get; set; }
+
+  protected override void OnModelCreating(ModelBuilder modelBuilder)
+  {
+    modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+
+    base.OnModelCreating(modelBuilder);
+  }
 }

@@ -26,7 +26,6 @@ public static class AdminPopulateLeetcodeQuestions
   {
     private readonly ApplicationDbContext _dbContext;
     private readonly ILogger<Handler> _logger;
-    public HttpClient _client { get; set; }
 
     public Handler(ApplicationDbContext dbContext, ILogger<Handler> logger)
     {
@@ -42,14 +41,16 @@ public static class AdminPopulateLeetcodeQuestions
       _client = client;
     }
 
+    public HttpClient _client { get; set; }
+
     public async Task<ApiResult<AdminPopulateLeetcodeQuestionsResponse>> Handle(
       Command request,
       CancellationToken cancellationToken
     )
     {
       // TODO: Implement a more optimal solution in querying. I tried skip parameter but GraphQL doesn't sort it for some reason.
-      var skipNumber = 0; 
-      
+      var skipNumber = 0;
+
       // Hit Leetcode endpoint to get data
       var httpRequest = new HttpRequestMessage(HttpMethod.Post, "https://leetcode.com/graphql/");
 
@@ -72,7 +73,7 @@ public static class AdminPopulateLeetcodeQuestions
           Error = new ApiError("Failed to retrieve valid data from the Leetcode API.")
         };
       }
-      
+
       // Process obtained data and save into database
       await using (var transaction = await _dbContext.Database.BeginTransactionAsync(cancellationToken))
       {
@@ -80,33 +81,24 @@ public static class AdminPopulateLeetcodeQuestions
         {
           // Gather all unique values
           var categorySet = new HashSet<string>();
-          var difficultySet = new HashSet<string>();
           foreach (var question in jsonData.Data.ProblemsetQuestionList.Questions)
           {
             foreach (var category in question.TopicTags)
             {
               categorySet.Add(category.Name);
             }
-            difficultySet.Add(question.Difficulty);
           }
-          
+
           // Add to database if it doesn't exist
           foreach (var category in categorySet)
           {
             if (!_dbContext.LeetcodeProblemCategories.Any(c => c.Name == category))
             {
-              var newCategory = new LeetcodeProblemCategory { Name = category };
+              var newCategory = new LeetcodeProblemCategoryEntity { Name = category };
               _dbContext.LeetcodeProblemCategories.Add(newCategory);
             }
           }
-          foreach (var difficulty in difficultySet)
-          {
-            if (!_dbContext.LeetcodeProblemDifficulties.Any(d => d.Name == difficulty))
-            {
-              var newDifficulty = new LeetcodeProblemDifficulty { Name = difficulty };
-              _dbContext.LeetcodeProblemDifficulties.Add(newDifficulty);
-            }
-          }
+
           await _dbContext.SaveChangesAsync(cancellationToken);
 
           // Add leetcode problem
@@ -121,26 +113,32 @@ public static class AdminPopulateLeetcodeQuestions
             {
               continue;
             }
-            
-            var newLeetcodeProblem = new LeetcodeProblem
+
+            var newLeetcodeProblem = new LeetcodeProblemEntity
             {
-              Problem = new Problem
+              Problem = new ProblemEntity
               {
                 Title = title,
                 Link = $"https://leetcode.com/problems/{question.TitleSlug}"
               },
               IsPremium = question.Premium,
-              LeetcodeProblemCategories = new List<LeetcodeProblemCategory>()
+              LeetcodeProblemCategories = new List<LeetcodeProblemCategoryEntity>()
             };
 
             // Add difficulty
-            var existingDifficulty =
-              _dbContext.LeetcodeProblemDifficulties.FirstOrDefault(d => d.Name == question.Difficulty);
-            if (existingDifficulty != null)
+            switch (question.Difficulty)
             {
-              newLeetcodeProblem.LeetcodeProblemDifficulty = existingDifficulty;
+              case "Easy":
+                newLeetcodeProblem.LeetcodeProblemDifficulty = LeetcodeProblemDifficulty.Easy;
+                break;
+              case "Medium":
+                newLeetcodeProblem.LeetcodeProblemDifficulty = LeetcodeProblemDifficulty.Medium;
+                break;
+              case "Hard":
+                newLeetcodeProblem.LeetcodeProblemDifficulty = LeetcodeProblemDifficulty.Hard;
+                break;
             }
-            
+
             // Add categories
             foreach (var category in question.TopicTags)
             {
@@ -151,7 +149,7 @@ public static class AdminPopulateLeetcodeQuestions
                 newLeetcodeProblem.LeetcodeProblemCategories.Add(existingCategory);
               }
             }
-            
+
             _dbContext.LeetcodeProblems.Add(newLeetcodeProblem);
           }
 
@@ -197,42 +195,32 @@ public class AdminPopulateLeetcodeQuestionsResponse
 
 public class LeetcodeCategory
 {
-  [JsonPropertyName("name")]
-  public string Name { get; set; }
+  [JsonPropertyName("name")] public string Name { get; set; }
 }
 
 public class LeetcodeProblemListQuestion
 {
-  [JsonPropertyName("difficulty")]
-  public string Difficulty { get; set; }
-  [JsonPropertyName("premium")]
-  public bool Premium { get; set; }
-  [JsonPropertyName("questionId")]
-  public string QuestionId { get; set; }
-  [JsonPropertyName("title")]
-  public string Title { get; set; }
-  [JsonPropertyName("titleSlug")]
-  public string TitleSlug { get; set; }
-  [JsonPropertyName("topicTags")]
-  public List<LeetcodeCategory> TopicTags { get; set; }
+  [JsonPropertyName("difficulty")] public string Difficulty { get; set; } = string.Empty;
+  [JsonPropertyName("premium")] public bool Premium { get; set; }
+  [JsonPropertyName("questionId")] public string QuestionId { get; set; } = string.Empty;
+  [JsonPropertyName("title")] public string Title { get; set; } = string.Empty;
+  [JsonPropertyName("titleSlug")] public string TitleSlug { get; set; } = string.Empty;
+  [JsonPropertyName("topicTags")] public List<LeetcodeCategory> TopicTags { get; set; } = new();
 }
 
 public class LeetcodeProblemList
 {
-  [JsonPropertyName("total")]
-  public int Total { get; set; }
-  [JsonPropertyName("questions")]
-  public List<LeetcodeProblemListQuestion> Questions { get; set; }
+  [JsonPropertyName("total")] public int Total { get; set; }
+  [JsonPropertyName("questions")] public List<LeetcodeProblemListQuestion> Questions { get; set; } = new();
 }
 
 public class LeetcodeProblemListApiResponseData
 {
   [JsonPropertyName("problemsetQuestionList")]
-  public LeetcodeProblemList ProblemsetQuestionList { get; set; }
+  public LeetcodeProblemList ProblemsetQuestionList { get; set; } = new();
 }
 
 public class LeetcodeProblemListApiResponse
 {
-  [JsonPropertyName("data")]
-  public LeetcodeProblemListApiResponseData Data { get; set; }
+  [JsonPropertyName("data")] public LeetcodeProblemListApiResponseData Data { get; set; } = new();
 }

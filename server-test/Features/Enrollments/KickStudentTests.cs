@@ -24,7 +24,7 @@ public class KickStudentTests : TestsHelper
   {
     return new KickStudent.Command
     {
-      MenteeEnrollmentId = DummyGuid,
+      MenteeEnrollmentId = DummyId1,
       Email = DummyEmail,
       SeasonSlug = DummySlug
     };
@@ -34,7 +34,7 @@ public class KickStudentTests : TestsHelper
   public async Task Handle_CurrentUserEnrollmentDoesNotExists_BadRequest()
   {
     _dbContextMock.Setup(x => x.Enrollments)
-                  .ReturnsDbSet(new List<Enrollment>());
+                  .ReturnsDbSet(new List<EnrollmentEntity>());
 
     var command = DeleteDummyCommand();
     var handler = new KickStudent.Handler(_dbContextMock.Object, Mock.Of<ILogger<KickStudent.Handler>>());
@@ -43,44 +43,37 @@ public class KickStudentTests : TestsHelper
     Assert.Equal(HttpStatusCode.BadRequest, result.StatusCode);
     Assert.Equal(Message.KickStudentCurrentUserEnrollmentDoesNotExists, result?.Error?.Message);
   }
-  
+
   [Fact]
   public async Task Handle_CurrentUserIsNotMentorOrCoordinator_BadRequest()
   {
-    var currentUserEnrollmentStudent = new Enrollment
+    var currentUserEnrollmentStudent = new EnrollmentEntity
     {
-      EnrollmentId = DummyGuid2, 
-      Season = new Season
+      EnrollmentId = DummyId2,
+      Season = new SeasonEntity
       {
         Slug = DummySlug
-      }, 
-      Role = new Role
-      {
-        Name = "Student"
       },
-      User = new User
+      Role = SeasonRole.Student,
+      User = new UserEntity
       {
         Email = DummyEmail
       }
     };
-    var menteeEnrollment = new Enrollment
+    var menteeEnrollment = new EnrollmentEntity
     {
-      EnrollmentId = DummyGuid, 
-      Season = new Season
+      EnrollmentId = DummyId1,
+      Season = new SeasonEntity
       {
         Slug = DummySlug
-      }, 
-      Role = new Role
-      {
-        Name = "Student"
       },
-      User = new User
+      User = new UserEntity
       {
         Email = "mentee@email.com"
       }
     };
     _dbContextMock.Setup(x => x.Enrollments)
-                  .ReturnsDbSet(new List<Enrollment> { currentUserEnrollmentStudent, menteeEnrollment });
+                  .ReturnsDbSet(new List<EnrollmentEntity> { currentUserEnrollmentStudent, menteeEnrollment });
 
     var command = DeleteDummyCommand();
     var handler = new KickStudent.Handler(_dbContextMock.Object, Mock.Of<ILogger<KickStudent.Handler>>());
@@ -90,44 +83,38 @@ public class KickStudentTests : TestsHelper
     Assert.Equal(Message.KickStudentCurrentUserEnrollmentDoesNotExists, result?.Error?.Message);
   }
 
-  
+
   [Fact]
   public async Task Handle_MenteeIsNotStudent_BadRequest()
   {
-    var currentUserEnrollmentCoordinator = new Enrollment
+    var currentUserEnrollmentCoordinator = new EnrollmentEntity
     {
-      EnrollmentId = DummyGuid2, 
-      Season = new Season
+      EnrollmentId = DummyId2,
+      Season = new SeasonEntity
       {
         Slug = DummySlug
-      }, 
-      Role = new Role
-      {
-        Name = "Coordinator"
       },
-      User = new User
+      Role = SeasonRole.Coordinator,
+      User = new UserEntity
       {
         Email = DummyEmail
       }
     };
-    var menteeEnrollment = new Enrollment
+    var menteeEnrollment = new EnrollmentEntity
     {
-      EnrollmentId = DummyGuid, 
-      Season = new Season
+      EnrollmentId = DummyId1,
+      Season = new SeasonEntity
       {
         Slug = DummySlug
-      }, 
-      Role = new Role
-      {
-        Name = "Mentor"
       },
-      User = new User
+      Role = SeasonRole.Mentor,
+      User = new UserEntity
       {
         Email = "mentee@email.com"
       }
     };
     _dbContextMock.Setup(x => x.Enrollments)
-                  .ReturnsDbSet(new List<Enrollment> { currentUserEnrollmentCoordinator, menteeEnrollment });
+                  .ReturnsDbSet(new List<EnrollmentEntity> { currentUserEnrollmentCoordinator, menteeEnrollment });
 
     var command = DeleteDummyCommand();
     var handler = new KickStudent.Handler(_dbContextMock.Object, Mock.Of<ILogger<KickStudent.Handler>>());
@@ -137,40 +124,34 @@ public class KickStudentTests : TestsHelper
     Assert.Equal(Message.KickStudentMenteeDoesntExist, result?.Error?.Message);
   }
 
-  
+
   [Fact]
   public async Task Handle_Success_Coordinator_OK()
   {
-    var currentUserEnrollmentCoordinator = new Enrollment
+    var currentUserEnrollmentCoordinator = new EnrollmentEntity
     {
-      EnrollmentId = DummyGuid2, 
-      Season = new Season
+      EnrollmentId = DummyId2,
+      Season = new SeasonEntity
       {
         Slug = DummySlug
-      }, 
-      Role = new Role
-      {
-        Name = "Coordinator"
       },
-      User = new User
+      Role = SeasonRole.Coordinator,
+      User = new UserEntity
       {
         Email = DummyEmail
       }
     };
-    var menteeEnrollment = new Enrollment
+    var menteeEnrollment = new EnrollmentEntity
     {
-      EnrollmentId = DummyGuid, 
-      Season = new Season
+      EnrollmentId = DummyId1,
+      Role = SeasonRole.Student,
+      Season = new SeasonEntity
       {
         Slug = DummySlug
-      }, 
-      Role = new Role
-      {
-        Name = "Student"
       }
     };
     _dbContextMock.Setup(x => x.Enrollments)
-                  .ReturnsDbSet(new List<Enrollment> { currentUserEnrollmentCoordinator, menteeEnrollment });
+                  .ReturnsDbSet(new List<EnrollmentEntity> { currentUserEnrollmentCoordinator, menteeEnrollment });
 
     var command = DeleteDummyCommand();
     var handler = new KickStudent.Handler(_dbContextMock.Object, Mock.Of<ILogger<KickStudent.Handler>>());
@@ -183,40 +164,34 @@ public class KickStudentTests : TestsHelper
   [Fact]
   public async Task Handle_Success_Mentor_OK()
   {
-    var currentUserEnrollmentMentor = new Enrollment
+    var currentUserEnrollmentMentor = new EnrollmentEntity
     {
-      EnrollmentId = DummyGuid2, 
-      Season = new Season
+      EnrollmentId = DummyId2,
+      Season = new SeasonEntity
       {
         Slug = DummySlug
-      }, 
-      Role = new Role
-      {
-        Name = "Mentor"
       },
-      User = new User
+      Role = SeasonRole.Mentor,
+      User = new UserEntity
       {
         Email = DummyEmail
       }
     };
-    var menteeEnrollment = new Enrollment
+    var menteeEnrollment = new EnrollmentEntity
     {
-      EnrollmentId = DummyGuid, 
-      Season = new Season
+      EnrollmentId = DummyId1,
+      Season = new SeasonEntity
       {
         Slug = DummySlug
-      }, 
-      Role = new Role
-      {
-        Name = "Student"
       },
-      User = new User
+      Role = SeasonRole.Student,
+      User = new UserEntity
       {
         Email = "mentee@email.com"
       }
     };
     _dbContextMock.Setup(x => x.Enrollments)
-                  .ReturnsDbSet(new List<Enrollment> { currentUserEnrollmentMentor, menteeEnrollment });
+                  .ReturnsDbSet(new List<EnrollmentEntity> { currentUserEnrollmentMentor, menteeEnrollment });
 
     var command = DeleteDummyCommand();
     var handler = new KickStudent.Handler(_dbContextMock.Object, Mock.Of<ILogger<KickStudent.Handler>>());

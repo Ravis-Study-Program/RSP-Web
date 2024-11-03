@@ -22,217 +22,262 @@ namespace RSPWebAPI.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("LeetcodeProblemLeetcodeProblemCategory", b =>
+            modelBuilder.Entity("LeetcodeProblemCategoryEntityLeetcodeProblemEntity", b =>
                 {
-                    b.Property<Guid>("LeetcodeProblemCategoriesLeetcodeProblemCategoryId")
-                        .HasColumnType("uuid");
+                    b.Property<string>("LeetcodeProblemCategoriesLeetcodeProblemCategoryId")
+                        .HasColumnType("varchar(32)");
 
-                    b.Property<Guid>("LeetcodeProblemsLeetcodeProblemId")
-                        .HasColumnType("uuid");
+                    b.Property<string>("LeetcodeProblemEntityLeetcodeProblemId")
+                        .HasColumnType("varchar(16)");
 
-                    b.HasKey("LeetcodeProblemCategoriesLeetcodeProblemCategoryId", "LeetcodeProblemsLeetcodeProblemId");
+                    b.HasKey("LeetcodeProblemCategoriesLeetcodeProblemCategoryId", "LeetcodeProblemEntityLeetcodeProblemId");
 
-                    b.HasIndex("LeetcodeProblemsLeetcodeProblemId");
+                    b.HasIndex("LeetcodeProblemEntityLeetcodeProblemId");
 
-                    b.ToTable("LeetcodeProblemLeetcodeProblemCategory");
+                    b.ToTable("LeetcodeProblemCategoryMapping", (string)null);
                 });
 
-            modelBuilder.Entity("RSPWebAPI.Entities.BehaviouralMockInterviewRound", b =>
+            modelBuilder.Entity("RSPWebAPI.Entities.BehaviouralMockInterviewRoundEntity", b =>
                 {
-                    b.Property<Guid>("BehaviouralMockInterviewRoundId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                    b.Property<string>("BehaviouralMockInterviewRoundId")
+                        .HasColumnType("varchar(32)")
+                        .HasColumnName("BehaviouralMockInterviewRoundId");
 
                     b.Property<int>("BehavioralScore")
-                        .HasColumnType("integer");
+                        .HasColumnType("int")
+                        .HasColumnName("BehavioralScore");
 
-                    b.Property<Guid>("MockInterviewId")
-                        .HasColumnType("uuid");
+                    b.Property<string>("MockInterviewId")
+                        .IsRequired()
+                        .HasColumnType("varchar(16)")
+                        .HasColumnName("MockInterviewId");
+
+                    b.Property<string>("MockInterviewRoundId")
+                        .IsRequired()
+                        .HasColumnType("varchar(16)")
+                        .HasColumnName("MockInterviewRoundId");
 
                     b.HasKey("BehaviouralMockInterviewRoundId");
 
-                    b.ToTable("BehaviouralMockInterviewRound");
+                    b.HasIndex("MockInterviewId");
+
+                    b.HasIndex("MockInterviewRoundId")
+                        .IsUnique();
+
+                    b.ToTable("BehaviouralMockInterviewRound", (string)null);
                 });
 
-            modelBuilder.Entity("RSPWebAPI.Entities.CustomMockInterviewRound", b =>
+            modelBuilder.Entity("RSPWebAPI.Entities.CustomMockInterviewRoundEntity", b =>
                 {
-                    b.Property<Guid>("CustomMockInterviewRoundId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                    b.Property<string>("CustomMockInterviewRoundId")
+                        .HasColumnType("varchar(32)")
+                        .HasColumnName("CustomMockInterviewRoundId");
 
                     b.Property<string>("Content")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("varchar(10000)")
+                        .HasColumnName("Content");
 
                     b.Property<string>("Link")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("Link");
 
-                    b.Property<Guid>("MockInterviewId")
-                        .HasColumnType("uuid");
+                    b.Property<string>("MockInterviewId")
+                        .IsRequired()
+                        .HasColumnType("varchar(16)")
+                        .HasColumnName("MockInterviewId");
+
+                    b.Property<string>("MockInterviewRoundId")
+                        .IsRequired()
+                        .HasColumnType("varchar(16)")
+                        .HasColumnName("MockInterviewRoundId");
 
                     b.Property<int>("Score")
-                        .HasColumnType("integer");
+                        .HasColumnType("int")
+                        .HasColumnName("Score");
 
                     b.HasKey("CustomMockInterviewRoundId");
 
-                    b.ToTable("CustomMockInterviewRound");
+                    b.HasIndex("MockInterviewId");
+
+                    b.HasIndex("MockInterviewRoundId")
+                        .IsUnique();
+
+                    b.ToTable("CustomMockInterviewRound", (string)null);
                 });
 
-            modelBuilder.Entity("RSPWebAPI.Entities.CustomProblem", b =>
+            modelBuilder.Entity("RSPWebAPI.Entities.CustomProblemEntity", b =>
                 {
-                    b.Property<Guid>("CustomProblemId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                    b.Property<string>("CustomProblemId")
+                        .HasColumnType("varchar(16)")
+                        .HasColumnName("CustomProblemId");
 
                     b.Property<string>("Difficulty")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("Difficulty");
 
-                    b.Property<Guid>("ProblemId")
-                        .HasColumnType("uuid");
+                    b.Property<string>("ProblemId")
+                        .IsRequired()
+                        .HasColumnType("varchar(16)")
+                        .HasColumnName("ProblemId");
 
                     b.Property<string>("Question")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("Question");
 
                     b.HasKey("CustomProblemId");
 
-                    b.HasIndex("ProblemId");
+                    b.HasIndex("ProblemId")
+                        .IsUnique();
 
-                    b.ToTable("CustomProblems");
+                    b.ToTable("CustomProblem", (string)null);
                 });
 
-            modelBuilder.Entity("RSPWebAPI.Entities.Enrollment", b =>
+            modelBuilder.Entity("RSPWebAPI.Entities.EnrollmentEntity", b =>
                 {
-                    b.Property<Guid>("EnrollmentId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                    b.Property<string>("EnrollmentId")
+                        .HasColumnType("varchar(16)")
+                        .HasColumnName("EnrollmentId");
 
-                    b.Property<Guid>("RoleId")
-                        .HasColumnType("uuid");
+                    b.Property<int>("Role")
+                        .HasColumnType("integer")
+                        .HasColumnName("Role");
 
-                    b.Property<Guid>("SeasonId")
-                        .HasColumnType("uuid");
+                    b.Property<string>("SeasonId")
+                        .IsRequired()
+                        .HasColumnType("varchar(16)")
+                        .HasColumnName("SeasonId");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("varchar(16)")
+                        .HasColumnName("UserId");
 
                     b.HasKey("EnrollmentId");
-
-                    b.HasIndex("RoleId");
 
                     b.HasIndex("SeasonId");
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Enrollments");
+                    b.HasIndex("SeasonId", "UserId")
+                        .IsUnique();
+
+                    b.ToTable("Enrollment", (string)null);
                 });
 
-            modelBuilder.Entity("RSPWebAPI.Entities.LeetcodeMockInterviewRound", b =>
+            modelBuilder.Entity("RSPWebAPI.Entities.LeetcodeMockInterviewRoundEntity", b =>
                 {
-                    b.Property<Guid>("LeetcodeMockInterviewRoundId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                    b.Property<string>("LeetcodeMockInterviewRoundId")
+                        .HasColumnType("varchar(32)")
+                        .HasColumnName("LeetcodeMockInterviewRoundId");
 
                     b.Property<int>("AlgorithmDesignScore")
-                        .HasColumnType("integer");
+                        .HasColumnType("int")
+                        .HasColumnName("AlgorithmDesignScore");
 
                     b.Property<int>("CodingScore")
-                        .HasColumnType("integer");
+                        .HasColumnType("int")
+                        .HasColumnName("CodingScore");
 
                     b.Property<int>("ComplexityAnalysisScore")
-                        .HasColumnType("integer");
+                        .HasColumnType("int")
+                        .HasColumnName("ComplexityAnalysisScore");
 
                     b.Property<int>("ConfirmQuestionScore")
-                        .HasColumnType("integer");
+                        .HasColumnType("int")
+                        .HasColumnName("ConfirmQuestionScore");
 
-                    b.Property<Guid>("LeetcodeProblemId")
-                        .HasColumnType("uuid");
+                    b.Property<string>("LeetcodeProblemId")
+                        .IsRequired()
+                        .HasColumnType("varchar(16)")
+                        .HasColumnName("LeetcodeProblemId");
 
-                    b.Property<Guid>("MockInterviewId")
-                        .HasColumnType("uuid");
+                    b.Property<string>("MockInterviewId")
+                        .IsRequired()
+                        .HasColumnType("varchar(16)")
+                        .HasColumnName("MockInterviewId");
+
+                    b.Property<string>("MockInterviewRoundId")
+                        .IsRequired()
+                        .HasColumnType("varchar(16)")
+                        .HasColumnName("MockInterviewRoundId");
 
                     b.Property<int>("TestingScore")
-                        .HasColumnType("integer");
+                        .HasColumnType("int")
+                        .HasColumnName("TestingScore");
 
                     b.HasKey("LeetcodeMockInterviewRoundId");
 
                     b.HasIndex("LeetcodeProblemId");
 
-                    b.ToTable("LeetcodeMockInterviewRound");
+                    b.HasIndex("MockInterviewId");
+
+                    b.HasIndex("MockInterviewRoundId")
+                        .IsUnique();
+
+                    b.ToTable("LeetcodeMockInterviewRound", (string)null);
                 });
 
-            modelBuilder.Entity("RSPWebAPI.Entities.LeetcodeProblem", b =>
+            modelBuilder.Entity("RSPWebAPI.Entities.LeetcodeProblemCategoryEntity", b =>
                 {
-                    b.Property<Guid>("LeetcodeProblemId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<bool>("IsPremium")
-                        .HasColumnType("boolean");
-
-                    b.Property<Guid>("LeetcodeProblemDifficultyId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("ProblemId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("LeetcodeProblemId");
-
-                    b.HasIndex("LeetcodeProblemDifficultyId");
-
-                    b.HasIndex("ProblemId");
-
-                    b.ToTable("LeetcodeProblems");
-                });
-
-            modelBuilder.Entity("RSPWebAPI.Entities.LeetcodeProblemCategory", b =>
-                {
-                    b.Property<Guid>("LeetcodeProblemCategoryId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                    b.Property<string>("LeetcodeProblemCategoryId")
+                        .HasColumnType("varchar(32)")
+                        .HasColumnName("LeetcodeProblemCategoryId");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<Guid?>("ProblemId")
-                        .HasColumnType("uuid");
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("Name");
 
                     b.HasKey("LeetcodeProblemCategoryId");
 
+                    b.ToTable("LeetcodeProblemCategory", (string)null);
+                });
+
+            modelBuilder.Entity("RSPWebAPI.Entities.LeetcodeProblemEntity", b =>
+                {
+                    b.Property<string>("LeetcodeProblemId")
+                        .HasColumnType("varchar(16)")
+                        .HasColumnName("LeetcodeProblemId");
+
+                    b.Property<bool>("IsPremium")
+                        .HasColumnType("boolean")
+                        .HasColumnName("IsPremium");
+
+                    b.Property<int>("LeetcodeProblemDifficulty")
+                        .HasColumnType("int")
+                        .HasColumnName("LeetcodeProblemDifficulty");
+
+                    b.Property<string>("ProblemId")
+                        .IsRequired()
+                        .HasColumnType("varchar(16)")
+                        .HasColumnName("ProblemId");
+
+                    b.HasKey("LeetcodeProblemId");
+
                     b.HasIndex("ProblemId");
 
-                    b.ToTable("LeetcodeProblemCategories");
+                    b.ToTable("LeetcodeProblem", (string)null);
                 });
 
-            modelBuilder.Entity("RSPWebAPI.Entities.LeetcodeProblemDifficulty", b =>
+            modelBuilder.Entity("RSPWebAPI.Entities.MentorshipEntity", b =>
                 {
-                    b.Property<Guid>("LeetcodeProblemDifficultyId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                    b.Property<string>("MentorshipId")
+                        .HasColumnType("varchar(16)")
+                        .HasColumnName("MentorshipId");
 
-                    b.Property<string>("Name")
+                    b.Property<string>("MenteeEnrollmentId")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("varchar(16)")
+                        .HasColumnName("MenteeEnrollmentId");
 
-                    b.HasKey("LeetcodeProblemDifficultyId");
-
-                    b.ToTable("LeetcodeProblemDifficulties");
-                });
-
-            modelBuilder.Entity("RSPWebAPI.Entities.Mentorship", b =>
-                {
-                    b.Property<Guid>("MentorshipId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("MenteeEnrollmentId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("MentorEnrollmentId")
-                        .HasColumnType("uuid");
+                    b.Property<string>("MentorEnrollmentId")
+                        .IsRequired()
+                        .HasColumnType("varchar(16)")
+                        .HasColumnName("MentorEnrollmentId");
 
                     b.HasKey("MentorshipId");
 
@@ -240,32 +285,44 @@ namespace RSPWebAPI.Migrations
 
                     b.HasIndex("MentorEnrollmentId");
 
-                    b.ToTable("Mentorships");
+                    b.ToTable("Mentorship", (string)null);
                 });
 
-            modelBuilder.Entity("RSPWebAPI.Entities.MockInterview", b =>
+            modelBuilder.Entity("RSPWebAPI.Entities.MockInterviewEntity", b =>
                 {
-                    b.Property<Guid>("MockInterviewId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                    b.Property<string>("MockInterviewId")
+                        .HasMaxLength(32)
+                        .HasColumnType("varchar(16)")
+                        .HasColumnName("MockInterviewId");
 
-                    b.Property<Guid?>("EnrollmentId")
-                        .HasColumnType("uuid");
+                    b.Property<string>("EnrollmentId")
+                        .HasMaxLength(32)
+                        .HasColumnType("varchar(16)")
+                        .HasColumnName("EnrollmentId");
 
-                    b.Property<Guid>("IntervieweeUserId")
-                        .HasColumnType("uuid");
+                    b.Property<string>("IntervieweeUserId")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("varchar(16)")
+                        .HasColumnName("IntervieweeUserId");
 
-                    b.Property<Guid>("InterviewerUserId")
-                        .HasColumnType("uuid");
+                    b.Property<string>("InterviewerUserId")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("varchar(16)")
+                        .HasColumnName("InterviewerUserId");
 
                     b.Property<bool>("IsPass")
-                        .HasColumnType("boolean");
+                        .HasColumnType("boolean")
+                        .HasColumnName("IsPass");
 
                     b.Property<DateTime>("StartDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp")
+                        .HasColumnName("StartDate");
 
                     b.Property<int>("TimeTakenInMinutes")
-                        .HasColumnType("integer");
+                        .HasColumnType("int")
+                        .HasColumnName("TimeTakenInMinutes");
 
                     b.HasKey("MockInterviewId");
 
@@ -275,93 +332,98 @@ namespace RSPWebAPI.Migrations
 
                     b.HasIndex("InterviewerUserId");
 
-                    b.ToTable("MockInterviews");
+                    b.ToTable("MockInterview", (string)null);
                 });
 
-            modelBuilder.Entity("RSPWebAPI.Entities.MockInterviewRound", b =>
+            modelBuilder.Entity("RSPWebAPI.Entities.MockInterviewRoundEntity", b =>
                 {
-                    b.Property<Guid>("MockInterviewRoundId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                    b.Property<string>("MockInterviewRoundId")
+                        .HasColumnType("varchar(16)")
+                        .HasColumnName("MockInterviewRoundId");
 
-                    b.Property<Guid?>("BehaviouralMockInterviewRoundId")
-                        .HasColumnType("uuid");
+                    b.Property<string>("BehaviouralMockInterviewRoundId")
+                        .HasColumnType("varchar(32)")
+                        .HasColumnName("BehaviouralMockInterviewRoundId");
 
-                    b.Property<Guid?>("CustomMockInterviewRoundId")
-                        .HasColumnType("uuid");
+                    b.Property<string>("CustomMockInterviewRoundId")
+                        .HasColumnType("varchar(32)")
+                        .HasColumnName("CustomMockInterviewRoundId");
 
                     b.Property<string>("IntervieweeComment")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("varchar(1000)")
+                        .HasColumnName("IntervieweeComment");
 
                     b.Property<bool>("IsReviewedByInterviewee")
-                        .HasColumnType("boolean");
+                        .HasColumnType("boolean")
+                        .HasColumnName("IsReviewedByInterviewee");
 
-                    b.Property<Guid?>("LeetcodeMockInterviewRoundId")
-                        .HasColumnType("uuid");
+                    b.Property<string>("LeetcodeMockInterviewRoundId")
+                        .HasColumnType("varchar(32)")
+                        .HasColumnName("LeetcodeMockInterviewRoundId");
 
-                    b.Property<Guid>("MockInterviewId")
-                        .HasColumnType("uuid");
+                    b.Property<string>("MockInterviewId")
+                        .IsRequired()
+                        .HasColumnType("varchar(16)")
+                        .HasColumnName("MockInterviewId");
 
                     b.HasKey("MockInterviewRoundId");
 
-                    b.HasIndex("BehaviouralMockInterviewRoundId");
+                    b.HasIndex("BehaviouralMockInterviewRoundId")
+                        .IsUnique();
 
-                    b.HasIndex("CustomMockInterviewRoundId");
+                    b.HasIndex("CustomMockInterviewRoundId")
+                        .IsUnique();
 
-                    b.HasIndex("LeetcodeMockInterviewRoundId");
+                    b.HasIndex("LeetcodeMockInterviewRoundId")
+                        .IsUnique();
 
                     b.HasIndex("MockInterviewId");
 
-                    b.ToTable("MockInterviewRound");
+                    b.ToTable("MockInterviewRound", (string)null);
                 });
 
-            modelBuilder.Entity("RSPWebAPI.Entities.Problem", b =>
+            modelBuilder.Entity("RSPWebAPI.Entities.ProblemAttemptEntity", b =>
                 {
-                    b.Property<Guid>("ProblemId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                    b.Property<string>("ProblemAttemptId")
+                        .HasMaxLength(32)
+                        .HasColumnType("varchar(16)")
+                        .HasColumnName("ProblemAttemptId");
 
-                    b.Property<string>("Link")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<DateTime>("AttemptStartDateUtc")
+                        .HasColumnType("timestamp")
+                        .HasColumnName("AttemptStartDateUtc");
 
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<string>("CustomProblemId")
+                        .HasMaxLength(32)
+                        .HasColumnType("varchar(16)")
+                        .HasColumnName("CustomProblemId");
 
-                    b.HasKey("ProblemId");
+                    b.Property<string>("EnrollmentId")
+                        .HasMaxLength(32)
+                        .HasColumnType("varchar(16)")
+                        .HasColumnName("EnrollmentId");
 
-                    b.ToTable("Problems");
-                });
-
-            modelBuilder.Entity("RSPWebAPI.Entities.ProblemAttempt", b =>
-                {
-                    b.Property<Guid>("ProblemAttemptId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("AttemptStartDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid?>("CustomProblemId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid?>("EnrollmentId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid?>("LeetcodeProblemId")
-                        .HasColumnType("uuid");
+                    b.Property<string>("LeetcodeProblemId")
+                        .HasMaxLength(32)
+                        .HasColumnType("varchar(16)")
+                        .HasColumnName("LeetcodeProblemId");
 
                     b.Property<string>("Notes")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(10000)
+                        .HasColumnType("varchar(16)")
+                        .HasColumnName("Notes");
 
                     b.Property<int>("TimeTakenInMinutes")
-                        .HasColumnType("integer");
+                        .HasColumnType("int")
+                        .HasColumnName("TimeTakenInMinutes");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("varchar(16)")
+                        .HasColumnName("UserId");
 
                     b.HasKey("ProblemAttemptId");
 
@@ -373,186 +435,240 @@ namespace RSPWebAPI.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("ProblemAttempts");
+                    b.ToTable("ProblemAttempt", (string)null);
                 });
 
-            modelBuilder.Entity("RSPWebAPI.Entities.Role", b =>
+            modelBuilder.Entity("RSPWebAPI.Entities.ProblemEntity", b =>
                 {
-                    b.Property<Guid>("RoleId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                    b.Property<string>("ProblemId")
+                        .HasColumnType("varchar(16)")
+                        .HasColumnName("ProblemId");
 
-                    b.Property<string>("Name")
+                    b.Property<string>("Link")
+                        .HasMaxLength(510)
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("Link");
+
+                    b.Property<string>("Title")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("Title");
 
-                    b.HasKey("RoleId");
+                    b.HasKey("ProblemId");
 
-                    b.ToTable("Roles");
+                    b.ToTable("Problem", (string)null);
                 });
 
-            modelBuilder.Entity("RSPWebAPI.Entities.Season", b =>
+            modelBuilder.Entity("RSPWebAPI.Entities.SeasonEntity", b =>
                 {
-                    b.Property<Guid>("SeasonId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                    b.Property<string>("SeasonId")
+                        .HasColumnType("varchar(16)")
+                        .HasColumnName("SeasonId");
 
-                    b.Property<DateTime>("EndDate")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<DateTime>("EndDateInclusiveUtc")
+                        .HasColumnType("timestamp")
+                        .HasColumnName("EndDateInclusiveUTC");
 
                     b.Property<string>("ImageUrl")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("ImageUrl");
 
                     b.Property<string>("Location")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("Location");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("Name");
 
                     b.Property<string>("Slug")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("varchar(32)")
+                        .HasColumnName("Slug");
 
-                    b.Property<DateTime>("StartDate")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<DateTime>("StartDateInclusiveUtc")
+                        .HasColumnType("timestamp")
+                        .HasColumnName("StartDateInclusiveUTC");
 
                     b.HasKey("SeasonId");
 
-                    b.ToTable("Seasons");
+                    b.HasIndex("Slug")
+                        .IsUnique();
+
+                    b.ToTable("Season", (string)null);
                 });
 
-            modelBuilder.Entity("RSPWebAPI.Entities.User", b =>
+            modelBuilder.Entity("RSPWebAPI.Entities.UserEntity", b =>
                 {
-                    b.Property<Guid>("UserId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                    b.Property<string>("UserId")
+                        .HasColumnType("varchar(16)")
+                        .HasColumnName("UserId");
 
                     b.Property<string>("DiscordId")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("varchar(16)")
+                        .HasColumnName("DiscordId");
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("Email");
 
                     b.Property<bool>("IsAdmin")
-                        .HasColumnType("boolean");
+                        .HasColumnType("boolean")
+                        .HasColumnName("IsAdmin");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("Name");
 
                     b.Property<string>("ProfileImage")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("ProfileImage");
 
                     b.HasKey("UserId");
 
-                    b.ToTable("Users");
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.ToTable("User", (string)null);
                 });
 
-            modelBuilder.Entity("LeetcodeProblemLeetcodeProblemCategory", b =>
+            modelBuilder.Entity("LeetcodeProblemCategoryEntityLeetcodeProblemEntity", b =>
                 {
-                    b.HasOne("RSPWebAPI.Entities.LeetcodeProblemCategory", null)
+                    b.HasOne("RSPWebAPI.Entities.LeetcodeProblemCategoryEntity", null)
                         .WithMany()
                         .HasForeignKey("LeetcodeProblemCategoriesLeetcodeProblemCategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("RSPWebAPI.Entities.LeetcodeProblem", null)
+                    b.HasOne("RSPWebAPI.Entities.LeetcodeProblemEntity", null)
                         .WithMany()
-                        .HasForeignKey("LeetcodeProblemsLeetcodeProblemId")
+                        .HasForeignKey("LeetcodeProblemEntityLeetcodeProblemId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("RSPWebAPI.Entities.CustomProblem", b =>
+            modelBuilder.Entity("RSPWebAPI.Entities.BehaviouralMockInterviewRoundEntity", b =>
                 {
-                    b.HasOne("RSPWebAPI.Entities.Problem", "Problem")
+                    b.HasOne("RSPWebAPI.Entities.MockInterviewEntity", "MockInterview")
                         .WithMany()
-                        .HasForeignKey("ProblemId")
+                        .HasForeignKey("MockInterviewId")
                         .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("RSPWebAPI.Entities.MockInterviewRoundEntity", "MockInterviewRound")
+                        .WithOne()
+                        .HasForeignKey("RSPWebAPI.Entities.BehaviouralMockInterviewRoundEntity", "MockInterviewRoundId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("MockInterview");
+
+                    b.Navigation("MockInterviewRound");
+                });
+
+            modelBuilder.Entity("RSPWebAPI.Entities.CustomMockInterviewRoundEntity", b =>
+                {
+                    b.HasOne("RSPWebAPI.Entities.MockInterviewEntity", "MockInterview")
+                        .WithMany()
+                        .HasForeignKey("MockInterviewId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("RSPWebAPI.Entities.MockInterviewRoundEntity", "MockInterviewRound")
+                        .WithOne()
+                        .HasForeignKey("RSPWebAPI.Entities.CustomMockInterviewRoundEntity", "MockInterviewRoundId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("MockInterview");
+
+                    b.Navigation("MockInterviewRound");
+                });
+
+            modelBuilder.Entity("RSPWebAPI.Entities.CustomProblemEntity", b =>
+                {
+                    b.HasOne("RSPWebAPI.Entities.ProblemEntity", "Problem")
+                        .WithOne()
+                        .HasForeignKey("RSPWebAPI.Entities.CustomProblemEntity", "ProblemId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Problem");
                 });
 
-            modelBuilder.Entity("RSPWebAPI.Entities.Enrollment", b =>
+            modelBuilder.Entity("RSPWebAPI.Entities.EnrollmentEntity", b =>
                 {
-                    b.HasOne("RSPWebAPI.Entities.Role", "Role")
-                        .WithMany()
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("RSPWebAPI.Entities.Season", "Season")
+                    b.HasOne("RSPWebAPI.Entities.SeasonEntity", "Season")
                         .WithMany()
                         .HasForeignKey("SeasonId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("RSPWebAPI.Entities.User", "User")
+                    b.HasOne("RSPWebAPI.Entities.UserEntity", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.Navigation("Role");
 
                     b.Navigation("Season");
 
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("RSPWebAPI.Entities.LeetcodeMockInterviewRound", b =>
+            modelBuilder.Entity("RSPWebAPI.Entities.LeetcodeMockInterviewRoundEntity", b =>
                 {
-                    b.HasOne("RSPWebAPI.Entities.LeetcodeProblem", "LeetcodeProblem")
+                    b.HasOne("RSPWebAPI.Entities.LeetcodeProblemEntity", "LeetcodeProblem")
                         .WithMany()
                         .HasForeignKey("LeetcodeProblemId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("RSPWebAPI.Entities.MockInterviewEntity", "MockInterview")
+                        .WithMany()
+                        .HasForeignKey("MockInterviewId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("RSPWebAPI.Entities.MockInterviewRoundEntity", "MockInterviewRound")
+                        .WithOne()
+                        .HasForeignKey("RSPWebAPI.Entities.LeetcodeMockInterviewRoundEntity", "MockInterviewRoundId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("LeetcodeProblem");
+
+                    b.Navigation("MockInterview");
+
+                    b.Navigation("MockInterviewRound");
                 });
 
-            modelBuilder.Entity("RSPWebAPI.Entities.LeetcodeProblem", b =>
+            modelBuilder.Entity("RSPWebAPI.Entities.LeetcodeProblemEntity", b =>
                 {
-                    b.HasOne("RSPWebAPI.Entities.LeetcodeProblemDifficulty", "LeetcodeProblemDifficulty")
-                        .WithMany()
-                        .HasForeignKey("LeetcodeProblemDifficultyId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("RSPWebAPI.Entities.Problem", "Problem")
+                    b.HasOne("RSPWebAPI.Entities.ProblemEntity", "Problem")
                         .WithMany()
                         .HasForeignKey("ProblemId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.Navigation("LeetcodeProblemDifficulty");
 
                     b.Navigation("Problem");
                 });
 
-            modelBuilder.Entity("RSPWebAPI.Entities.LeetcodeProblemCategory", b =>
+            modelBuilder.Entity("RSPWebAPI.Entities.MentorshipEntity", b =>
                 {
-                    b.HasOne("RSPWebAPI.Entities.Problem", null)
-                        .WithMany("LeetcodeProblemCategories")
-                        .HasForeignKey("ProblemId");
-                });
-
-            modelBuilder.Entity("RSPWebAPI.Entities.Mentorship", b =>
-                {
-                    b.HasOne("RSPWebAPI.Entities.Enrollment", "MenteeEnrollment")
+                    b.HasOne("RSPWebAPI.Entities.EnrollmentEntity", "MenteeEnrollment")
                         .WithMany()
                         .HasForeignKey("MenteeEnrollmentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("RSPWebAPI.Entities.Enrollment", "MentorEnrollment")
+                    b.HasOne("RSPWebAPI.Entities.EnrollmentEntity", "MentorEnrollment")
                         .WithMany()
                         .HasForeignKey("MentorEnrollmentId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -563,22 +679,23 @@ namespace RSPWebAPI.Migrations
                     b.Navigation("MentorEnrollment");
                 });
 
-            modelBuilder.Entity("RSPWebAPI.Entities.MockInterview", b =>
+            modelBuilder.Entity("RSPWebAPI.Entities.MockInterviewEntity", b =>
                 {
-                    b.HasOne("RSPWebAPI.Entities.Enrollment", "Enrollment")
+                    b.HasOne("RSPWebAPI.Entities.EnrollmentEntity", "Enrollment")
                         .WithMany()
-                        .HasForeignKey("EnrollmentId");
+                        .HasForeignKey("EnrollmentId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("RSPWebAPI.Entities.User", "Interviewee")
+                    b.HasOne("RSPWebAPI.Entities.UserEntity", "Interviewee")
                         .WithMany()
                         .HasForeignKey("IntervieweeUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("RSPWebAPI.Entities.User", "Interviewer")
+                    b.HasOne("RSPWebAPI.Entities.UserEntity", "Interviewer")
                         .WithMany()
                         .HasForeignKey("InterviewerUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Enrollment");
@@ -588,21 +705,24 @@ namespace RSPWebAPI.Migrations
                     b.Navigation("Interviewer");
                 });
 
-            modelBuilder.Entity("RSPWebAPI.Entities.MockInterviewRound", b =>
+            modelBuilder.Entity("RSPWebAPI.Entities.MockInterviewRoundEntity", b =>
                 {
-                    b.HasOne("RSPWebAPI.Entities.BehaviouralMockInterviewRound", "BehaviouralMockInterviewRound")
-                        .WithMany()
-                        .HasForeignKey("BehaviouralMockInterviewRoundId");
+                    b.HasOne("RSPWebAPI.Entities.BehaviouralMockInterviewRoundEntity", "BehaviouralMockInterviewRound")
+                        .WithOne()
+                        .HasForeignKey("RSPWebAPI.Entities.MockInterviewRoundEntity", "BehaviouralMockInterviewRoundId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("RSPWebAPI.Entities.CustomMockInterviewRound", "CustomMockInterviewRound")
-                        .WithMany()
-                        .HasForeignKey("CustomMockInterviewRoundId");
+                    b.HasOne("RSPWebAPI.Entities.CustomMockInterviewRoundEntity", "CustomMockInterviewRound")
+                        .WithOne()
+                        .HasForeignKey("RSPWebAPI.Entities.MockInterviewRoundEntity", "CustomMockInterviewRoundId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("RSPWebAPI.Entities.LeetcodeMockInterviewRound", "LeetcodeMockInterviewRound")
-                        .WithMany()
-                        .HasForeignKey("LeetcodeMockInterviewRoundId");
+                    b.HasOne("RSPWebAPI.Entities.LeetcodeMockInterviewRoundEntity", "LeetcodeMockInterviewRound")
+                        .WithOne()
+                        .HasForeignKey("RSPWebAPI.Entities.MockInterviewRoundEntity", "LeetcodeMockInterviewRoundId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("RSPWebAPI.Entities.MockInterview", null)
+                    b.HasOne("RSPWebAPI.Entities.MockInterviewEntity", "MockInterview")
                         .WithMany("MockInterviewRounds")
                         .HasForeignKey("MockInterviewId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -613,26 +733,31 @@ namespace RSPWebAPI.Migrations
                     b.Navigation("CustomMockInterviewRound");
 
                     b.Navigation("LeetcodeMockInterviewRound");
+
+                    b.Navigation("MockInterview");
                 });
 
-            modelBuilder.Entity("RSPWebAPI.Entities.ProblemAttempt", b =>
+            modelBuilder.Entity("RSPWebAPI.Entities.ProblemAttemptEntity", b =>
                 {
-                    b.HasOne("RSPWebAPI.Entities.CustomProblem", "CustomProblem")
+                    b.HasOne("RSPWebAPI.Entities.CustomProblemEntity", "CustomProblem")
                         .WithMany()
-                        .HasForeignKey("CustomProblemId");
+                        .HasForeignKey("CustomProblemId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("RSPWebAPI.Entities.Enrollment", "Enrollment")
+                    b.HasOne("RSPWebAPI.Entities.EnrollmentEntity", "Enrollment")
                         .WithMany()
-                        .HasForeignKey("EnrollmentId");
+                        .HasForeignKey("EnrollmentId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("RSPWebAPI.Entities.LeetcodeProblem", "LeetcodeProblem")
+                    b.HasOne("RSPWebAPI.Entities.LeetcodeProblemEntity", "LeetcodeProblem")
                         .WithMany()
-                        .HasForeignKey("LeetcodeProblemId");
+                        .HasForeignKey("LeetcodeProblemId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("RSPWebAPI.Entities.User", "User")
+                    b.HasOne("RSPWebAPI.Entities.UserEntity", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("CustomProblem");
@@ -644,14 +769,9 @@ namespace RSPWebAPI.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("RSPWebAPI.Entities.MockInterview", b =>
+            modelBuilder.Entity("RSPWebAPI.Entities.MockInterviewEntity", b =>
                 {
                     b.Navigation("MockInterviewRounds");
-                });
-
-            modelBuilder.Entity("RSPWebAPI.Entities.Problem", b =>
-                {
-                    b.Navigation("LeetcodeProblemCategories");
                 });
 #pragma warning restore 612, 618
         }

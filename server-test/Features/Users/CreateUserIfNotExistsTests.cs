@@ -33,9 +33,9 @@ public class CreateUserIfNotExistsTests : TestsHelper
   [Fact]
   public async Task Handle_UserExists_OK()
   {
-    var existingUser = new User { Email = DummyEmail };
+    var existingUser = new UserEntity { Email = DummyEmail };
     _dbContextMock.Setup(x => x.Users)
-                  .ReturnsDbSet(new List<User> { existingUser });
+                  .ReturnsDbSet(new List<UserEntity> { existingUser });
 
     var command = CreateDummyCommand();
     var handler =
@@ -50,7 +50,7 @@ public class CreateUserIfNotExistsTests : TestsHelper
   public async Task Handle_UserDoesNotExists_OK()
   {
     _dbContextMock.Setup(x => x.Users)
-                  .ReturnsDbSet(new List<User>());
+                  .ReturnsDbSet(new List<UserEntity>());
 
     var command = CreateDummyCommand();
     var handler =

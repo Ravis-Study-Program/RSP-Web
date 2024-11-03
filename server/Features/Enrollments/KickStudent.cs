@@ -4,6 +4,7 @@ using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using RSPWebAPI.Database;
+using RSPWebAPI.Entities;
 using RSPWebAPI.Features.Constants;
 using RSPWebAPI.Shared;
 using RSPWebAPI.Shared.Behaviours;
@@ -14,7 +15,7 @@ public static class KickStudent
 {
   public class Command : AdminAuthRequest<ApiResult<KickStudentResponse>>
   {
-    public Guid MenteeEnrollmentId { get; set; }
+    public string MenteeEnrollmentId { get; set; } = string.Empty;
     public string SeasonSlug { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
   }
@@ -50,7 +51,8 @@ public static class KickStudent
                                      .Enrollments.FirstOrDefaultAsync(
                                        e => e.Season.Slug == request.SeasonSlug &&
                                             e.User.Email == request.Email &&
-                                            (e.Role.Name == "Mentor" || e.Role.Name == "Coordinator"), cancellationToken);
+                                            (e.Role == SeasonRole.Mentor || e.Role == SeasonRole.Coordinator),
+                                       cancellationToken);
       if (existingEnrollment == null)
       {
         return new ApiResult<KickStudentResponse>
@@ -59,12 +61,12 @@ public static class KickStudent
           Error = new ApiError(Message.KickStudentCurrentUserEnrollmentDoesNotExists)
         };
       }
-      
+
       // Ensure the student we want to kick is an actual student
       var studentEnrollment = await _dbContext
-                                     .Enrollments.FirstOrDefaultAsync(
-                                       e => e.EnrollmentId == request.MenteeEnrollmentId &&
-                                            e.Role.Name == "Student", cancellationToken);
+                                    .Enrollments.FirstOrDefaultAsync(
+                                      e => e.EnrollmentId == request.MenteeEnrollmentId &&
+                                           e.Role == SeasonRole.Student, cancellationToken);
       if (studentEnrollment == null)
       {
         return new ApiResult<KickStudentResponse>
@@ -126,7 +128,7 @@ public class KickStudentEndpoint : ICarterModule
 
 public class KickStudentRequest
 {
-  public Guid StudentEnrollmentId { get; set; }
+  public string StudentEnrollmentId { get; set; } = string.Empty;
   public string SeasonSlug { get; set; } = string.Empty;
 }
 

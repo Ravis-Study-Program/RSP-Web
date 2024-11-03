@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using System.Net;
 using Carter;
 using MediatR;
@@ -36,20 +35,20 @@ public static class AdminListMentorship
       try
       {
         var mentorships = await _dbContext.Mentorships
-                                    .Include(m => m.MentorEnrollment)
-                                    .ThenInclude(m => m.User)
-                                    .Include(m => m.MentorEnrollment)
-                                    .ThenInclude(m => m.Season)
-                                    .Include(m => m.MenteeEnrollment)
-                                    .ThenInclude(m => m.User)
-                                    .Select(m => new MentorshipResponse
-                                    {
-                                      MentorshipId = m.MentorshipId,
-                                      Mentor = m.MentorEnrollment,
-                                      Mentee = m.MenteeEnrollment,
-                                      Season = m.MentorEnrollment.Season
-                                    })
-                                    .ToListAsync(cancellationToken);
+                                          .Include(m => m.MentorEnrollment)
+                                          .ThenInclude(m => m.User)
+                                          .Include(m => m.MentorEnrollment)
+                                          .ThenInclude(m => m.Season)
+                                          .Include(m => m.MenteeEnrollment)
+                                          .ThenInclude(m => m.User)
+                                          .Select(m => new MentorshipResponse
+                                          {
+                                            MentorshipId = m.MentorshipId,
+                                            Mentor = m.MentorEnrollment,
+                                            Mentee = m.MenteeEnrollment,
+                                            Season = m.MentorEnrollment.Season
+                                          })
+                                          .ToListAsync(cancellationToken);
 
         return new ApiResult<AdminListMentorshipResponse>
         {
@@ -95,10 +94,10 @@ public class AdminListMentorshipEndpoint : ICarterModule
 
 public record MentorshipResponse
 {
-  [Required] public Guid MentorshipId { get; set; }
-  [Required] public Season Season{ get; set; }
-  [Required] public Enrollment Mentor { get; set; }
-  [Required] public Enrollment Mentee { get; set; }
+  public string MentorshipId { get; set; } = string.Empty;
+  public SeasonEntity? Season { get; set; }
+  public EnrollmentEntity? Mentor { get; set; }
+  public EnrollmentEntity? Mentee { get; set; }
 }
 
 public class AdminListMentorshipResponse

@@ -11,7 +11,7 @@ using Xunit;
 
 namespace RSPWebAPI.Tests.Features.Enrollments;
 
-public class AdminCreateEnrollmentTests: TestsHelper
+public class AdminCreateEnrollmentTests : TestsHelper
 {
   private readonly Mock<ApplicationDbContext> _dbContextMock;
 
@@ -24,27 +24,26 @@ public class AdminCreateEnrollmentTests: TestsHelper
   {
     return new AdminCreateEnrollment.Command
     {
-      SeasonId = DummyGuid,
-      RoleId = DummyGuid,
-      UserId = DummyGuid
+      SeasonId = DummyId1,
+      UserId = DummyId1
     };
   }
-  
+
   [Fact]
   public async Task Handle_EntryAlreadyExists_BadRequest()
   {
-    var existingEnrollment = new Enrollment
+    var existingEnrollment = new EnrollmentEntity
     {
-      EnrollmentId = DummyGuid,
-      SeasonId = DummyGuid,
-      RoleId = DummyGuid,
-      UserId = DummyGuid
+      EnrollmentId = DummyId1,
+      SeasonId = DummyId1,
+      UserId = DummyId1
     };
     _dbContextMock.Setup(x => x.Enrollments)
-                  .ReturnsDbSet(new List<Enrollment> { existingEnrollment });
+                  .ReturnsDbSet(new List<EnrollmentEntity> { existingEnrollment });
 
     var command = CreateDummyCommand();
-    var handler = new AdminCreateEnrollment.Handler(_dbContextMock.Object, Mock.Of<ILogger<AdminCreateEnrollment.Handler>>());
+    var handler =
+      new AdminCreateEnrollment.Handler(_dbContextMock.Object, Mock.Of<ILogger<AdminCreateEnrollment.Handler>>());
 
     var result = await handler.Handle(command, CancellationToken.None);
     Assert.Equal(HttpStatusCode.BadRequest, result.StatusCode);
@@ -55,10 +54,11 @@ public class AdminCreateEnrollmentTests: TestsHelper
   public async Task Handle_Success_OK()
   {
     _dbContextMock.Setup(x => x.Enrollments)
-                  .ReturnsDbSet(new List<Enrollment>());
+                  .ReturnsDbSet(new List<EnrollmentEntity>());
 
     var command = CreateDummyCommand();
-    var handler = new AdminCreateEnrollment.Handler(_dbContextMock.Object, Mock.Of<ILogger<AdminCreateEnrollment.Handler>>());
+    var handler =
+      new AdminCreateEnrollment.Handler(_dbContextMock.Object, Mock.Of<ILogger<AdminCreateEnrollment.Handler>>());
 
     var result = await handler.Handle(command, CancellationToken.None);
     Assert.Equal(HttpStatusCode.OK, result.StatusCode);

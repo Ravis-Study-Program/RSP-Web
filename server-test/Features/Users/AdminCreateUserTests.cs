@@ -11,7 +11,7 @@ using Xunit;
 
 namespace RSPWebAPI.Tests.Features.Users;
 
-public class AdminCreateUserTests: TestsHelper
+public class AdminCreateUserTests : TestsHelper
 {
   private readonly Mock<ApplicationDbContext> _dbContextMock;
 
@@ -34,9 +34,9 @@ public class AdminCreateUserTests: TestsHelper
   [Fact]
   public async Task Handle_UserAlreadyExists_BadRequest()
   {
-    var existingUser = new User { Email = DummyEmail };
+    var existingUser = new UserEntity { Email = DummyEmail };
     _dbContextMock.Setup(x => x.Users)
-                  .ReturnsDbSet(new List<User> { existingUser });
+                  .ReturnsDbSet(new List<UserEntity> { existingUser });
 
     var command = CreateDummyCommand();
     var handler = new AdminCreateUser.Handler(_dbContextMock.Object, Mock.Of<ILogger<AdminCreateUser.Handler>>());
@@ -50,7 +50,7 @@ public class AdminCreateUserTests: TestsHelper
   public async Task Handle_Success_OK()
   {
     _dbContextMock.Setup(x => x.Users)
-                  .ReturnsDbSet(new List<User>());
+                  .ReturnsDbSet(new List<UserEntity>());
 
     var command = CreateDummyCommand();
     var handler = new AdminCreateUser.Handler(_dbContextMock.Object, Mock.Of<ILogger<AdminCreateUser.Handler>>());

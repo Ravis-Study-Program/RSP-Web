@@ -14,7 +14,7 @@ public static class AdminDeleteMentorship
 {
   public class Command : AdminAuthRequest<ApiResult<AdminDeleteMentorshipResponse>>
   {
-    public Guid MentorshipId { get; set; }
+    public string MentorshipId { get; set; } = string.Empty;
   }
 
   public class Validator : AbstractValidator<Command>
@@ -84,7 +84,7 @@ public class AdminDeleteMentorshipEndpoint : ICarterModule
   {
     app.MapDelete(
          "api/admin/mentorships",
-         async (Guid mentorshipId, ISender sender) =>
+         async (string mentorshipId, ISender sender) =>
          {
            var command = new AdminDeleteMentorship.Command
            {

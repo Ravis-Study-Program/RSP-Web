@@ -24,7 +24,7 @@ public class AdminDeleteEnrollmentTests : TestsHelper
   {
     return new AdminDeleteEnrollment.Command
     {
-      EnrollmentId = DummyGuid
+      EnrollmentId = DummyId1
     };
   }
 
@@ -32,10 +32,11 @@ public class AdminDeleteEnrollmentTests : TestsHelper
   public async Task Handle_EnrollmentDoesNotExists_BadRequest()
   {
     _dbContextMock.Setup(x => x.Enrollments)
-                  .ReturnsDbSet(new List<Enrollment>());
+                  .ReturnsDbSet(new List<EnrollmentEntity>());
 
     var command = DeleteDummyCommand();
-    var handler = new AdminDeleteEnrollment.Handler(_dbContextMock.Object, Mock.Of<ILogger<AdminDeleteEnrollment.Handler>>());
+    var handler =
+      new AdminDeleteEnrollment.Handler(_dbContextMock.Object, Mock.Of<ILogger<AdminDeleteEnrollment.Handler>>());
 
     var result = await handler.Handle(command, CancellationToken.None);
     Assert.Equal(HttpStatusCode.BadRequest, result.StatusCode);
@@ -45,12 +46,14 @@ public class AdminDeleteEnrollmentTests : TestsHelper
   [Fact]
   public async Task Handle_Success_OK()
   {
-    var existingEnrollment = new Enrollment { EnrollmentId = DummyGuid, SeasonId = DummyGuid, UserId = DummyGuid, RoleId = DummyGuid };
+    var existingEnrollment = new EnrollmentEntity
+      { EnrollmentId = DummyId1, SeasonId = DummyId1, UserId = DummyId1 };
     _dbContextMock.Setup(x => x.Enrollments)
-                  .ReturnsDbSet(new List<Enrollment> { existingEnrollment });
+                  .ReturnsDbSet(new List<EnrollmentEntity> { existingEnrollment });
 
     var command = DeleteDummyCommand();
-    var handler = new AdminDeleteEnrollment.Handler(_dbContextMock.Object, Mock.Of<ILogger<AdminDeleteEnrollment.Handler>>());
+    var handler =
+      new AdminDeleteEnrollment.Handler(_dbContextMock.Object, Mock.Of<ILogger<AdminDeleteEnrollment.Handler>>());
 
     var result = await handler.Handle(command, CancellationToken.None);
     Assert.Equal(HttpStatusCode.OK, result.StatusCode);

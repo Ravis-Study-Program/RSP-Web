@@ -11,7 +11,7 @@ using Xunit;
 
 namespace RSPWebAPI.Tests.Features.Seasons;
 
-public class AdminListSeasonTests: TestsHelper
+public class AdminListSeasonTests : TestsHelper
 {
   private readonly Mock<ApplicationDbContext> _dbContextMock;
 
@@ -22,16 +22,14 @@ public class AdminListSeasonTests: TestsHelper
 
   private AdminListSeason.Command ListDummyCommand()
   {
-    return new AdminListSeason.Command
-    {
-    };
+    return new AdminListSeason.Command();
   }
 
   [Fact]
   public async Task Handle_Success_OK()
   {
     _dbContextMock.Setup(x => x.Seasons)
-                  .ReturnsDbSet(new List<Season>());
+                  .ReturnsDbSet(new List<SeasonEntity>());
 
     var command = ListDummyCommand();
     var handler = new AdminListSeason.Handler(_dbContextMock.Object, Mock.Of<ILogger<AdminListSeason.Handler>>());
