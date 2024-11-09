@@ -1,6 +1,6 @@
 import { Outlet, useParams } from 'react-router-dom';
 import { useGetIsUserEnrolled } from '@/generated/api/client';
-import  NotFoundPage  from '@/pages/NotFound/NotFound.page';
+import NotFoundPage from '@/pages/NotFound/NotFound.page';
 
 const SeasonRouteGuard = () => {
   const { seasonSlug } = useParams<{ seasonSlug: string }>();
