@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { Anchor, Button, Container, Group, Text, Title } from '@mantine/core';
 import classes from './NotFound.module.css';
 
-export function NotFoundPage() {
+export default function NotFoundPage() {
   const navigate = useNavigate();
 
   const goBack = () => {

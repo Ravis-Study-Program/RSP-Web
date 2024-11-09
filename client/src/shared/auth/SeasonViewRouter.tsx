@@ -1,7 +1,7 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import { SeasonRole, useGetIsUserEnrolled } from '@/generated/api/client';
-import { NotFoundPage } from '@/pages/NotFound/NotFound.page';
+import NotFoundPage from '@/pages/NotFound/NotFound.page';
 
 const SeasonRoleViewRouter = ({
   studentView = null,

@@ -7,11 +7,11 @@ import React from 'react';
 import { Auth0Provider } from '@auth0/auth0-react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import ReactDOM from 'react-dom/client';
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { MantineProvider } from '@mantine/core';
 import { ModalsProvider } from '@mantine/modals';
-import routes from './Router';
+import AppRoutes from './Router';
 import { theme } from './theme';
+import { BrowserRouter } from 'react-router-dom';
 
 const queryClient = new QueryClient();
 
@@ -28,7 +28,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
               audience: import.meta.env.VITE_APP_AUTH0_AUDIENCE as string,
             }}
           >
-            <RouterProvider router={createBrowserRouter(routes)} />
+            <BrowserRouter>
+              <AppRoutes />
+            </BrowserRouter>
           </Auth0Provider>
         </ModalsProvider>
       </QueryClientProvider>

@@ -3,7 +3,7 @@ import { useGetIsUserEnrolled, useGetMockInterviews } from '@/generated/api/clie
 import { useSeasonSlug } from '@/shared/hooks/useSeasonSlug';
 import { MockInterviewTable } from './MockInterviewTable/MockInterviewTable';
 
-export function MockInterviewPage() {
+export default function MockInterviewPage() {
   const { seasonSlug } = useSeasonSlug();
 
   // TODO: Handle error and loading states using skeleton

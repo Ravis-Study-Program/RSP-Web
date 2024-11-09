@@ -23,7 +23,7 @@ const graduates: GraduateCardProps[] = [
   },
 ];
 
-export function GraduatesPage() {
+export default function GraduatesPage() {
   return (
     <Layout>
       <Grid gutter={{ base: 'md', xs: 'md', md: 'xl', xl: 50 }}>

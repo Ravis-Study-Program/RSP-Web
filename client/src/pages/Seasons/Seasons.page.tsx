@@ -5,7 +5,7 @@ import { EnrollmentResponseDto, useGetCurrentUserEnrollments } from '@/generated
 import { SeasonRoleReverseIndex } from '@/shared/entities/reverseIndex';
 import classes from './Seasons.module.css';
 
-export function SeasonsPage() {
+export default function SeasonsPage() {
   const {
     data: enrollmentsResponse,
     isError: isLoadingEnrollmentsError,
