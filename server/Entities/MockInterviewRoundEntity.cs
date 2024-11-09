@@ -18,8 +18,7 @@ public class MockInterviewRoundEntity
   public string? CustomMockInterviewRoundId { get; set; }
 
   // Navigation
-  [JsonIgnore]
-  public MockInterviewEntity MockInterview { get; set; } = null!;
+  [JsonIgnore] public MockInterviewEntity MockInterview { get; set; } = null!;
   public BehaviouralMockInterviewRoundEntity BehaviouralMockInterviewRound { get; set; } = null!;
   public LeetcodeMockInterviewRoundEntity LeetcodeMockInterviewRound { get; set; } = null!;
   public CustomMockInterviewRoundEntity CustomMockInterviewRound { get; set; } = null!;
