@@ -42,7 +42,7 @@ export default function LoginPage() {
         }
         setShouldRedirect(true);
       } else {
-        setIsLoading(false);
+        setIsLoading(true);
       }
     };
     createUserIfNotExists();

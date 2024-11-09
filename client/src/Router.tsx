@@ -25,7 +25,7 @@ const SettingsPage = lazy(() => import('./pages/Settings/Settings.page'));
 // Placeholder for simple pages
 const placeholderPage = (title: string) => (
   <Layout>
-    <Text size="lg" color="dimmed">
+    <Text size="lg" c="dimmed">
       {title}
     </Text>
   </Layout>
@@ -70,6 +70,6 @@ const routes = (
   </Routes>
 );
 
-const AppRoutes = () => <Suspense fallback={<Text>Loading...</Text>}>{routes}</Suspense>;
+const AppRoutes = () => <Suspense fallback={null}>{routes}</Suspense>;
 
 export default AppRoutes;
