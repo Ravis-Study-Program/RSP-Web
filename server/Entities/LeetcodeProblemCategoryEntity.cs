@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -5,8 +6,8 @@ namespace RSPWebAPI.Entities;
 
 public class LeetcodeProblemCategoryEntity
 {
-  public string LeetcodeProblemCategoryId { get; set; } = string.Empty;
-  public string Name { get; set; } = string.Empty;
+  [Required] public string LeetcodeProblemCategoryId { get; set; } = string.Empty;
+  [Required] public string Name { get; set; } = string.Empty;
 }
 
 public class LeetcodeProblemCategoryEntityConfiguration : IEntityTypeConfiguration<LeetcodeProblemCategoryEntity>

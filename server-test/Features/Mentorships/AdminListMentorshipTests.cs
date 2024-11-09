@@ -41,24 +41,33 @@ public class AdminListMentorshipTests : TestsHelper
                         EnrollmentId = DummyId1,
                         SeasonId = DummyId1,
                         UserId = DummyId1,
+                        User = new UserEntity
+                        {
+                          Name = "Mentor Name"
+                        },
                         Season = new SeasonEntity
                         {
                           SeasonId = DummyId1,
+                          Slug = "Season Slug",
                           Name = "Season Name"
                         },
-                        Role = SeasonRole.Coordinator
+                        Role = SeasonRole.Mentor
                       },
                       MenteeEnrollment = new EnrollmentEntity
                       {
                         EnrollmentId = DummyId2,
-                        SeasonId = DummyId2,
+                        SeasonId = DummyId1,
                         UserId = DummyId2,
+                        User = new UserEntity
+                        {
+                          Name = "Mentee Name"
+                        },
                         Season = new SeasonEntity
                         {
                           SeasonId = DummyId1,
                           Name = "Season Name"
                         },
-                        Role = SeasonRole.Mentor
+                        Role = SeasonRole.Student
                       }
                     }
                   });
@@ -76,9 +85,10 @@ public class AdminListMentorshipTests : TestsHelper
     var mentorships = result.ResponseBody.Mentorships.ToList();
     var mentorship = mentorships[0];
     Assert.Equal(DummyId1, mentorship.MentorshipId);
-    Assert.Equal(DummyId1, mentorship.Mentor.EnrollmentId);
-    Assert.Equal(DummyId2, mentorship.Mentee.EnrollmentId);
-    Assert.Equal("Season Name", mentorship.Mentor.Season.Name);
-    Assert.Equal("Season Name", mentorship.Mentee.Season.Name);
+    Assert.Equal(DummyId1, mentorship.MentorEnrollmentId);
+    Assert.Equal(DummyId2, mentorship.MenteeEnrollmentId);
+    Assert.Equal("Season Name", mentorship.SeasonName);
+    Assert.Equal("Mentor Name", mentorship.MentorName);
+    Assert.Equal("Mentee Name", mentorship.MenteeName);
   }
 }

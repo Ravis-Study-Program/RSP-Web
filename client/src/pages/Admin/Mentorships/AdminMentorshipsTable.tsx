@@ -68,15 +68,15 @@ export const AdminMentorshipsTable = () => {
     () => [
       {
         header: 'Season',
-        accessorFn: (row) => row.mentor?.season?.name || 'No season available',
+        accessorFn: (row) => row.seasonName,
       },
       {
         header: 'Mentor',
-        accessorFn: (row) => row.mentor?.user?.name || 'No mentor available',
+        accessorFn: (row) => row.mentorName,
       },
       {
         header: 'Mentee',
-        accessorFn: (row) => row.mentee?.user?.name || 'No mentee available',
+        accessorFn: (row) => row.menteeName,
       },
     ],
     []

@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -5,10 +7,10 @@ namespace RSPWebAPI.Entities;
 
 public class MockInterviewRoundEntity
 {
-  public string MockInterviewRoundId { get; set; } = string.Empty;
-  public string MockInterviewId { get; set; } = string.Empty;
-  public bool IsReviewedByInterviewee { get; set; }
-  public string IntervieweeComment { get; set; } = string.Empty;
+  [Required] public string MockInterviewRoundId { get; set; } = string.Empty;
+  [Required] public string MockInterviewId { get; set; } = string.Empty;
+  [Required] public bool IsReviewedByInterviewee { get; set; }
+  [Required] public string IntervieweeComment { get; set; } = string.Empty;
 
   // The actual mock interview could be one of the following listed below.
   public string? BehaviouralMockInterviewRoundId { get; set; }
@@ -16,10 +18,10 @@ public class MockInterviewRoundEntity
   public string? CustomMockInterviewRoundId { get; set; }
 
   // Navigation
-  public virtual MockInterviewEntity? MockInterview { get; set; }
-  public BehaviouralMockInterviewRoundEntity? BehaviouralMockInterviewRound { get; set; }
-  public LeetcodeMockInterviewRoundEntity? LeetcodeMockInterviewRound { get; set; }
-  public CustomMockInterviewRoundEntity? CustomMockInterviewRound { get; set; }
+  [JsonIgnore] public MockInterviewEntity MockInterview { get; set; } = null!;
+  public BehaviouralMockInterviewRoundEntity BehaviouralMockInterviewRound { get; set; } = null!;
+  public LeetcodeMockInterviewRoundEntity LeetcodeMockInterviewRound { get; set; } = null!;
+  public CustomMockInterviewRoundEntity CustomMockInterviewRound { get; set; } = null!;
 }
 
 public class MockInterviewRoundEntityConfiguration : IEntityTypeConfiguration<MockInterviewRoundEntity>
@@ -30,11 +32,13 @@ public class MockInterviewRoundEntityConfiguration : IEntityTypeConfiguration<Mo
     builder.HasKey(x => x.MockInterviewRoundId);
 
     // Fields
-    builder.Property(x => x.MockInterviewRoundId).HasColumnName("MockInterviewRoundId").HasColumnType("varchar(16)").ValueGeneratedNever().IsRequired();
+    builder.Property(x => x.MockInterviewRoundId).HasColumnName("MockInterviewRoundId").HasColumnType("varchar(16)")
+           .ValueGeneratedNever().IsRequired();
     builder.Property(x => x.MockInterviewId).HasColumnName("MockInterviewId").HasColumnType("varchar(16)")
            .IsRequired();
     builder.Property(x => x.IsReviewedByInterviewee).HasColumnName("IsReviewedByInterviewee").IsRequired();
-    builder.Property(x => x.IntervieweeComment).HasColumnName("IntervieweeComment").HasColumnType("varchar(1000)").IsRequired();
+    builder.Property(x => x.IntervieweeComment).HasColumnName("IntervieweeComment").HasColumnType("varchar(1000)")
+           .IsRequired();
     builder.Property(x => x.BehaviouralMockInterviewRoundId).HasColumnName("BehaviouralMockInterviewRoundId")
            .HasColumnType("varchar(32)");
     builder.Property(x => x.LeetcodeMockInterviewRoundId).HasColumnName("LeetcodeMockInterviewRoundId")

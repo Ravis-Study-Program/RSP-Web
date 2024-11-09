@@ -9,7 +9,7 @@ import {
   AdminListSeasonResponseApiResult,
   AdminUpdateSeasonRequest,
   AdminUpdateSeasonResponseApiResult,
-  Season,
+  SeasonEntity,
 } from '@/generated/api/client';
 
 const locationImages: { [key: string]: string } = {
@@ -29,14 +29,14 @@ const schema = z
         message:
           'Invalid format, expected XXX-YYYY-YYYY where X is letters and Y is numbers. Eg ADL-2023-2024.',
       }),
-    startDate: z.date(),
-    endDate: z.date(),
+    startDateInclusiveUtc: z.date(),
+    endDateInclusiveUtc: z.date(),
     location: z.string().min(1),
     imageUrl: z.string().min(1),
   })
-  .refine((data) => data.endDate > data.startDate, {
+  .refine((data) => data.endDateInclusiveUtc > data.startDateInclusiveUtc, {
     message: 'End date must be at least one day greater than start date',
-    path: ['endDate'],
+    path: ['endDateInclusiveUtc'],
   });
 
 export const AdminSeasonsUpdateModal = ({
@@ -50,8 +50,8 @@ export const AdminSeasonsUpdateModal = ({
     initialValues: {
       name: season.name,
       slug: season.slug,
-      startDate: new Date(season.startDate),
-      endDate: new Date(season.endDate),
+      startDateInclusiveUtc: new Date(season.startDateInclusiveUtc),
+      endDateInclusiveUtc: new Date(season.endDateInclusiveUtc),
       location: season.location,
       imageUrl: season.imageUrl,
     },
@@ -61,16 +61,16 @@ export const AdminSeasonsUpdateModal = ({
   const handleSubmit = async (values: {
     name: string;
     slug: string;
-    startDate: Date;
-    endDate: Date;
+    startDateInclusiveUtc: Date;
+    endDateInclusiveUtc: Date;
     location: string;
     imageUrl: string;
   }) => {
     try {
       const requestData: AdminUpdateSeasonRequest = {
         ...values,
-        startDate: values.startDate.toISOString(),
-        endDate: values.endDate.toISOString(),
+        startDateInclusiveUtc: values.startDateInclusiveUtc.toISOString(),
+        endDateInclusiveUtc: values.endDateInclusiveUtc.toISOString(),
         seasonId: season.seasonId,
       };
 
@@ -110,25 +110,25 @@ export const AdminSeasonsUpdateModal = ({
           withAsterisk
         />
         <DatePickerInput
-          {...form.getInputProps('startDate')}
+          {...form.getInputProps('startDateInclusiveUtc')}
           mt="sm"
           label="Start Date"
           placeholder="Pick a start date"
           valueFormat="YYYY-MM-DD"
           minDate={new Date()}
-          error={form.errors.startDate}
+          error={form.errors.startDateInclusiveUtc}
           withAsterisk
           highlightToday
           clearable
         />
         <DatePickerInput
-          {...form.getInputProps('endDate')}
+          {...form.getInputProps('endDateInclusiveUtc')}
           mt="sm"
           label="End Date"
           placeholder="Pick an end date"
           valueFormat="YYYY-MM-DD"
           minDate={new Date()}
-          error={form.errors.endDate}
+          error={form.errors.endDateInclusiveUtc}
           withAsterisk
           highlightToday
           clearable
@@ -163,7 +163,7 @@ export const AdminSeasonsUpdateModal = ({
 };
 
 type AdminSeasonsUpdateModalProps = {
-  table: MRT_TableInstance<Season>;
+  table: MRT_TableInstance<SeasonEntity>;
   updateSeason: UseMutateAsyncFunction<
     AdminUpdateSeasonResponseApiResult,
     AdminUpdateSeasonResponseApiResult,
@@ -172,7 +172,7 @@ type AdminSeasonsUpdateModalProps = {
     },
     unknown
   >;
-  row: MRT_Row<Season>;
+  row: MRT_Row<SeasonEntity>;
   refetchSeasons: (
     options?: RefetchOptions
   ) => Promise<

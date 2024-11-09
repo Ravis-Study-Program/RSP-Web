@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -5,14 +6,14 @@ namespace RSPWebAPI.Entities;
 
 public class EnrollmentEntity
 {
-  public string EnrollmentId { get; set; } = string.Empty;
-  public string SeasonId { get; set; } = string.Empty;
-  public string UserId { get; set; } = string.Empty;
-  public SeasonRole Role { get; set; }
+  [Required] public string EnrollmentId { get; set; } = string.Empty;
+  [Required] public string SeasonId { get; set; } = string.Empty;
+  [Required] public string UserId { get; set; } = string.Empty;
+  [Required] public SeasonRole Role { get; set; }
 
   // Navigation
-  public virtual SeasonEntity Season { get; set; } = null!;
-  public virtual UserEntity User { get; set; } = null!;
+  public SeasonEntity Season { get; set; } = null!;
+  public UserEntity User { get; set; } = null!;
 }
 
 public class EnrollmentEntityConfiguration : IEntityTypeConfiguration<EnrollmentEntity>

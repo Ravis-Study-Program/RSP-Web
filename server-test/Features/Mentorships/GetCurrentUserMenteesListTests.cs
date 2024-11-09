@@ -48,7 +48,6 @@ public class GetCurrentUserMenteesListTests : TestsHelper
                         Season = new SeasonEntity
                         {
                           SeasonId = DummyId1,
-                          Name = "Season Name",
                           Slug = DummySlug
                         },
                         User = new UserEntity
@@ -71,7 +70,6 @@ public class GetCurrentUserMenteesListTests : TestsHelper
                         User = new UserEntity
                         {
                           UserId = DummyId2,
-                          Email = "mentee_email@gmail.com",
                           Name = DummyName
                         }
                       }
@@ -91,9 +89,7 @@ public class GetCurrentUserMenteesListTests : TestsHelper
 
     var mentorships = result.ResponseBody.Mentees.ToList();
     var mentorship = mentorships[0];
-    Assert.Equal(DummyName, mentorship.MenteeEnrollment.User.Name);
-    Assert.Equal("mentee_email@gmail.com", mentorship.MenteeEnrollment.User.Email);
-    Assert.Equal("Season Name", mentorship.MenteeEnrollment.Season.Name);
-    Assert.Equal(DummyId1, mentorship.MenteeEnrollment.Season.SeasonId);
+    Assert.Equal(DummyName, mentorship.MenteeName);
+    Assert.Equal(DummyId2, mentorship.MenteeEnrollmentId);
   }
 }

@@ -10,10 +10,10 @@ import { ActionIcon, Button, Flex, Text, Tooltip } from '@mantine/core';
 import { modals } from '@mantine/modals';
 import {
   EnrollmentResponse,
+  SeasonRole,
   useAdminCreateEnrollment,
   useAdminDeleteEnrollment,
   useAdminListEnrollment,
-  useAdminListRole,
   useAdminListSeason,
   useAdminListUser,
   useAdminUpdateEnrollment,
@@ -43,12 +43,6 @@ export const AdminEnrollmentsTable = () => {
     isLoading: isLoadingSeasons,
   } = useAdminListSeason();
   const {
-    data: roleResponse,
-    isError: isLoadingRolesError,
-    isFetching: isFetchingRoles,
-    isLoading: isLoadingRoles,
-  } = useAdminListRole();
-  const {
     data: userResponse,
     isError: isLoadingUsersError,
     isFetching: isFetchingUsers,
@@ -74,16 +68,22 @@ export const AdminEnrollmentsTable = () => {
   const columns = useMemo<MRT_ColumnDef<EnrollmentResponse>[]>(
     () => [
       {
-        accessorKey: 'season',
+        accessorKey: 'seasonName',
         header: 'Season',
       },
       {
-        accessorKey: 'user',
+        accessorKey: 'userName',
         header: 'User',
       },
       {
-        accessorKey: 'role',
         header: 'Role',
+        accessorFn: (row) => {
+          const roleKey = Object.keys(SeasonRole).find(
+            (key) => SeasonRole[key as keyof typeof SeasonRole] === row.role
+          ) as keyof typeof SeasonRole;
+
+          return roleKey ? roleKey : 'Unknown Role';
+        },
       },
     ],
     []
@@ -116,7 +116,7 @@ export const AdminEnrollmentsTable = () => {
       density: 'xs',
       sorting: [
         {
-          id: 'season',
+          id: 'seasonName',
           desc: false,
         },
       ],
@@ -136,7 +136,6 @@ export const AdminEnrollmentsTable = () => {
         createEnrollment={createEnrollment}
         refetchEnrollments={refetchEnrollments}
         seasons={seasonResponse?.responseBody?.seasons}
-        roles={roleResponse?.responseBody?.roles}
         users={userResponse?.responseBody?.users}
       />
     ),
@@ -147,7 +146,6 @@ export const AdminEnrollmentsTable = () => {
         updateEnrollment={updateEnrollment}
         refetchEnrollments={refetchEnrollments}
         seasons={seasonResponse?.responseBody?.seasons}
-        roles={roleResponse?.responseBody?.roles}
         users={userResponse?.responseBody?.users}
       />
     ),
@@ -175,18 +173,13 @@ export const AdminEnrollmentsTable = () => {
       </Button>
     ),
     state: {
-      isLoading: isLoadingEnrollments || isLoadingRoles || isLoadingSeasons || isLoadingUsers,
+      isLoading: isLoadingEnrollments || isLoadingSeasons || isLoadingUsers,
       isSaving:
         isCreatingEnrollmentStatus === 'pending' ||
         isUpdatingEnrollmentStatus === 'pending' ||
         isDeletingEnrollmentStatus === 'pending',
-      showAlertBanner:
-        isLoadingEnrollmentsError ||
-        isLoadingRolesError ||
-        isLoadingSeasonsError ||
-        isLoadingUsersError,
-      showProgressBars:
-        isFetchingEnrollments || isFetchingRoles || isFetchingSeasons || isFetchingUsers,
+      showAlertBanner: isLoadingEnrollmentsError || isLoadingSeasonsError || isLoadingUsersError,
+      showProgressBars: isFetchingEnrollments || isFetchingSeasons || isFetchingUsers,
     },
   });
 

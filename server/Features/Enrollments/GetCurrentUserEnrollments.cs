@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Net;
 using Carter;
 using FluentValidation;
@@ -47,8 +48,14 @@ public static class GetCurrentUserEnrollments
         var enrollments = await _dbContext
                                 .Enrollments
                                 .Where(e => e.User.Email == request.Email)
-                                .Include(e => e.Season)
-                                .Include(e => e.Role)
+                                .Select(e => new EnrollmentResponseDto
+                                {
+                                  SeasonSlug = e.Season.Slug,
+                                  SeasonName = e.Season.Name,
+                                  SeasonImageUrl = e.Season.ImageUrl,
+                                  Role = e.Role
+                                })
+                                .AsNoTracking()
                                 .ToListAsync(cancellationToken);
 
         return new ApiResult<GetCurrentUserEnrollmentsResponse>
@@ -97,7 +104,15 @@ public class GetCurrentUserEnrollmentsEndpoint : ICarterModule
   }
 }
 
+public record EnrollmentResponseDto
+{
+  [Required] public string SeasonName { get; set; } = string.Empty;
+  [Required] public string SeasonImageUrl { get; set; } = string.Empty;
+  [Required] public string SeasonSlug { get; set; } = string.Empty;
+  [Required] public SeasonRole Role { get; set; }
+}
+
 public record GetCurrentUserEnrollmentsResponse
 {
-  public IList<EnrollmentEntity> Enrollments { get; set; } = new List<EnrollmentEntity>();
+  [Required] public IList<EnrollmentResponseDto> Enrollments { get; set; } = new List<EnrollmentResponseDto>();
 }

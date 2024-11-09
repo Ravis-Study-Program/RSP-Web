@@ -17,7 +17,10 @@ export const useUserAndEnrollment = (seasonSlug: string) => {
 
   const user = userResponse?.responseBody?.user;
   const isAdmin = user?.isAdmin || false;
-  const roleName = enrollmentsResponse?.responseBody?.role?.name || '';
+  const role =
+    enrollmentsResponse?.responseBody?.role !== undefined
+      ? enrollmentsResponse?.responseBody?.role
+      : null;
 
   const isLoading =
     isLoadingUser || isFetchingUser || isLoadingEnrollments || isFetchingEnrollments;
@@ -25,7 +28,7 @@ export const useUserAndEnrollment = (seasonSlug: string) => {
   return {
     user,
     isAdmin,
-    roleName,
+    role,
     isLoading,
     isError: isLoadingUserError || isLoadingEnrollmentsError,
   };

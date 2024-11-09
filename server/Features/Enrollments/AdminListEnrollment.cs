@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Net;
 using Carter;
 using MediatR;
@@ -39,9 +40,12 @@ public static class AdminListEnrollment
                                           {
                                             EnrollmentId = e.EnrollmentId,
                                             Role = e.Role,
-                                            Season = e.Season.Name,
-                                            User = e.User.Name
+                                            SeasonId = e.Season.SeasonId,
+                                            SeasonName = e.Season.Name,
+                                            UserId = e.User.UserId,
+                                            UserName = e.User.Name
                                           })
+                                          .AsNoTracking()
                                           .ToListAsync(cancellationToken);
 
         return new ApiResult<AdminListEnrollmentResponse>
@@ -86,15 +90,17 @@ public class AdminListEnrollmentEndpoint : ICarterModule
   }
 }
 
-public record EnrollmentResponse
+public class EnrollmentResponse
 {
-  public string EnrollmentId { get; set; } = string.Empty;
-  public SeasonRole Role { get; set; }
-  public string Season { get; set; } = string.Empty;
-  public string User { get; set; } = string.Empty;
+  [Required] public string EnrollmentId { get; set; } = string.Empty;
+  [Required] public SeasonRole Role { get; set; }
+  [Required] public string SeasonId { get; set; } = string.Empty;
+  [Required] public string SeasonName { get; set; } = string.Empty;
+  [Required] public string UserId { get; set; } = string.Empty;
+  [Required] public string UserName { get; set; } = string.Empty;
 }
 
 public class AdminListEnrollmentResponse
 {
-  public ICollection<EnrollmentResponse> Enrollments { get; set; } = new List<EnrollmentResponse>();
+  [Required] public ICollection<EnrollmentResponse> Enrollments { get; set; } = new List<EnrollmentResponse>();
 }

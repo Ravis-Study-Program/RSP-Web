@@ -7,15 +7,15 @@ import { DateTimePicker } from '@mantine/dates';
 import { useForm } from '@mantine/form';
 import {
   GetProblemAttemptsResponseApiResult,
-  LeetcodeProblem,
-  ProblemAttempt,
+  LeetcodeProblemDto,
+  ProblemAttemptEntity,
   UpdateProblemAttemptRequest,
   UpdateProblemAttemptResponseApiResult,
 } from '@/generated/api/client';
 
 const schema = z.object({
-  leetcodeProblemId: z.string().uuid().min(1),
-  attemptStartDate: z.date(),
+  leetcodeProblemId: z.string(),
+  attemptStartDateUtc: z.date(),
   timeTakenInMinutes: z
     .number()
     .min(1, {
@@ -38,8 +38,8 @@ export const LeetcodeProblemAttemptUpdateModal = ({
   const form = useForm({
     mode: 'uncontrolled',
     initialValues: {
-      leetcodeProblemId: problemAttempt.leetcodeProblemId || '',
-      attemptStartDate: new Date(problemAttempt.attemptStartDate),
+      leetcodeProblemId: problemAttempt.leetcodeProblemId,
+      attemptStartDateUtc: new Date(problemAttempt.attemptStartDateUtc),
       timeTakenInMinutes: problemAttempt.timeTakenInMinutes,
       notes: problemAttempt.notes,
     },
@@ -47,15 +47,15 @@ export const LeetcodeProblemAttemptUpdateModal = ({
   });
 
   const handleSubmit = async (values: {
-    leetcodeProblemId: string;
-    attemptStartDate: Date;
+    leetcodeProblemId: string | null | undefined;
+    attemptStartDateUtc: Date;
     timeTakenInMinutes: number;
     notes: string;
   }) => {
     try {
       const requestData: UpdateProblemAttemptRequest = {
         ...values,
-        attemptStartDate: values.attemptStartDate.toISOString(),
+        attemptStartDateUtc: values.attemptStartDateUtc.toISOString(),
         problemAttemptId: problemAttempt.problemAttemptId,
       };
       if (enrollmentId !== '') {
@@ -73,8 +73,8 @@ export const LeetcodeProblemAttemptUpdateModal = ({
 
   const leetcodeProblemOptions =
     leetcodeProblems?.map((leetcodeProblem) => ({
-      value: leetcodeProblem.leetcodeProblemId || '',
-      label: leetcodeProblem.problem.title,
+      value: leetcodeProblem.leetcodeProblemId,
+      label: leetcodeProblem.title,
     })) || [];
 
   const daysBeforeToday = (days: number) => {
@@ -99,7 +99,7 @@ export const LeetcodeProblemAttemptUpdateModal = ({
           error={form.errors.leetcodeProblemId}
         />
         <DateTimePicker
-          {...form.getInputProps('attemptStartDate')}
+          {...form.getInputProps('attemptStartDateUtc')}
           mt="sm"
           label="Attempt Start Date"
           placeholder="Pick a start date"
@@ -109,7 +109,7 @@ export const LeetcodeProblemAttemptUpdateModal = ({
           withAsterisk
           highlightToday
           clearable
-          error={form.errors.attemptStartDate}
+          error={form.errors.attemptStartDateUtc}
         />
         <NumberInput
           {...form.getInputProps('timeTakenInMinutes')}
@@ -140,7 +140,7 @@ export const LeetcodeProblemAttemptUpdateModal = ({
 };
 
 type LeetcodeProblemAttemptUpdateModalProps = {
-  table: MRT_TableInstance<ProblemAttempt>;
+  table: MRT_TableInstance<ProblemAttemptEntity>;
   updateProblemAttempt: UseMutateAsyncFunction<
     UpdateProblemAttemptResponseApiResult,
     UpdateProblemAttemptResponseApiResult,
@@ -149,12 +149,12 @@ type LeetcodeProblemAttemptUpdateModalProps = {
     },
     unknown
   >;
-  row: MRT_Row<ProblemAttempt>;
+  row: MRT_Row<ProblemAttemptEntity>;
   refetchProblemAttempts: (
     options?: RefetchOptions
   ) => Promise<
     QueryObserverResult<GetProblemAttemptsResponseApiResult, GetProblemAttemptsResponseApiResult>
   >;
-  leetcodeProblems: LeetcodeProblem[] | null | undefined;
+  leetcodeProblems: LeetcodeProblemDto[] | null | undefined;
   enrollmentId: string;
 };

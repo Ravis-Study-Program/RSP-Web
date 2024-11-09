@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Net;
 using Carter;
 using FluentValidation;
@@ -26,7 +27,7 @@ public static class AdminCreateEnrollment
     {
       RuleFor(c => c.SeasonId).NotEmpty();
       RuleFor(c => c.UserId).NotEmpty();
-      RuleFor(c => c.Role).NotEmpty();
+      RuleFor(c => c.Role).IsInEnum();
     }
   }
 
@@ -49,8 +50,9 @@ public static class AdminCreateEnrollment
       var existingEnrollment = await _dbContext
                                      .Enrollments
                                      .FirstOrDefaultAsync(
-                                       e => e.SeasonId == request.SeasonId && e.UserId == request.UserId && e.Role ==
-                                            request.Role,
+                                       e => e.SeasonId == request.SeasonId
+                                            && e.UserId == request.UserId
+                                            && e.Role == request.Role,
                                        cancellationToken);
       if (existingEnrollment != null)
       {
@@ -126,15 +128,15 @@ public class AdminCreateEnrollmentEndpoint : ICarterModule
 
 public record AdminCreateEnrollmentRequest
 {
-  public string SeasonId { get; set; } = string.Empty;
-  public string UserId { get; set; } = string.Empty;
-  public SeasonRole Role { get; set; }
+  [Required] public string SeasonId { get; set; } = string.Empty;
+  [Required] public string UserId { get; set; } = string.Empty;
+  [Required] public SeasonRole Role { get; set; }
 }
 
 public class AdminCreateEnrollmentResponse
 {
-  public string EnrollmentId { get; set; } = string.Empty;
-  public string SeasonId { get; set; } = string.Empty;
-  public string UserId { get; set; } = string.Empty;
-  public SeasonRole Role { get; set; }
+  [Required] public string EnrollmentId { get; set; } = string.Empty;
+  [Required] public string SeasonId { get; set; } = string.Empty;
+  [Required] public string UserId { get; set; } = string.Empty;
+  [Required] public SeasonRole Role { get; set; }
 }

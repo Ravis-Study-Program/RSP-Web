@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -5,14 +6,14 @@ namespace RSPWebAPI.Entities;
 
 public class LeetcodeProblemEntity
 {
-  public string LeetcodeProblemId { get; set; } = string.Empty;
-  public string ProblemId { get; set; } = string.Empty;
-  public LeetcodeProblemDifficulty LeetcodeProblemDifficulty { get; set; }
-  public bool IsPremium { get; set; }
+  [Required] public string LeetcodeProblemId { get; set; } = string.Empty;
+  [Required] public string ProblemId { get; set; } = string.Empty;
+  [Required] public LeetcodeProblemDifficulty LeetcodeProblemDifficulty { get; set; }
+  [Required] public bool IsPremium { get; set; }
 
   // Navigation
-  public virtual ProblemEntity? Problem { get; set; }
-  public virtual ICollection<LeetcodeProblemCategoryEntity>? LeetcodeProblemCategories { get; set; }
+  public ProblemEntity Problem { get; set; } = null!;
+  public ICollection<LeetcodeProblemCategoryEntity> LeetcodeProblemCategories { get; set; } = null!;
 }
 
 public class LeetcodeProblemEntityConfiguration : IEntityTypeConfiguration<LeetcodeProblemEntity>
@@ -23,7 +24,8 @@ public class LeetcodeProblemEntityConfiguration : IEntityTypeConfiguration<Leetc
     builder.HasKey(x => x.LeetcodeProblemId);
 
     // Fields
-    builder.Property(x => x.LeetcodeProblemId).HasColumnName("LeetcodeProblemId").HasColumnType("varchar(16)").ValueGeneratedNever().IsRequired();
+    builder.Property(x => x.LeetcodeProblemId).HasColumnName("LeetcodeProblemId").HasColumnType("varchar(16)")
+           .ValueGeneratedNever().IsRequired();
     builder.Property(x => x.ProblemId).HasColumnName("ProblemId").HasColumnType("varchar(16)")
            .IsRequired();
     builder.Property(x => x.LeetcodeProblemDifficulty).HasColumnName("LeetcodeProblemDifficulty").HasColumnType("int")

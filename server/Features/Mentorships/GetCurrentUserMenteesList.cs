@@ -1,10 +1,10 @@
+using System.ComponentModel.DataAnnotations;
 using System.Net;
 using Carter;
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using RSPWebAPI.Database;
-using RSPWebAPI.Entities;
 using RSPWebAPI.Features.Constants;
 using RSPWebAPI.Shared;
 using RSPWebAPI.Shared.Behaviours;
@@ -50,8 +50,12 @@ public static class GetCurrentUserMenteesList
                             .Mentorships
                             .Where(m => m.MentorEnrollment.User.Email == request.Email &&
                                         m.MentorEnrollment.Season.Slug == request.SeasonSlug)
-                            .Include(m => m.MenteeEnrollment)
-                            .ThenInclude(m => m.User)
+                            .Select(m => new MenteeResponseDto
+                            {
+                              MenteeName = m.MenteeEnrollment.User.Name,
+                              MenteeEnrollmentId = m.MenteeEnrollment.EnrollmentId
+                            })
+                            .AsNoTracking()
                             .ToListAsync(cancellationToken);
 
         return new ApiResult<GetCurrentUserMenteesListResponse>
@@ -102,7 +106,13 @@ public class GetCurrentUserMenteesListEndpoint : ICarterModule
   }
 }
 
+public record MenteeResponseDto
+{
+  [Required] public string MenteeEnrollmentId { get; set; } = string.Empty;
+  [Required] public string MenteeName { get; set; } = string.Empty;
+}
+
 public record GetCurrentUserMenteesListResponse
 {
-  public IList<MentorshipEntity> Mentees { get; set; } = new List<MentorshipEntity>();
+  [Required] public List<MenteeResponseDto> Mentees { get; set; } = new();
 }

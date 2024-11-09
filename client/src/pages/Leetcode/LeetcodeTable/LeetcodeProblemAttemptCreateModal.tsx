@@ -9,13 +9,13 @@ import {
   CreateProblemAttemptRequest,
   CreateProblemAttemptResponseApiResult,
   GetProblemAttemptsResponseApiResult,
-  LeetcodeProblem,
-  ProblemAttempt,
+  LeetcodeProblemDto,
+  ProblemAttemptEntity,
 } from '@/generated/api/client';
 
 const schema = z.object({
-  leetcodeProblemId: z.string().uuid().min(1),
-  attemptStartDate: z.date(),
+  leetcodeProblemId: z.string(),
+  attemptStartDateUtc: z.date(),
   timeTakenInMinutes: z
     .number()
     .min(1, {
@@ -38,7 +38,7 @@ export const LeetcodeProblemAttemptCreateModal = ({
     mode: 'uncontrolled',
     initialValues: {
       leetcodeProblemId: '',
-      attemptStartDate: new Date(),
+      attemptStartDateUtc: new Date(),
       timeTakenInMinutes: 0,
       notes: '',
     },
@@ -47,14 +47,14 @@ export const LeetcodeProblemAttemptCreateModal = ({
 
   const handleSubmit = async (values: {
     leetcodeProblemId: string;
-    attemptStartDate: Date;
+    attemptStartDateUtc: Date;
     timeTakenInMinutes: number;
     notes: string;
   }) => {
     try {
       const requestData: CreateProblemAttemptRequest = {
         ...values,
-        attemptStartDate: values.attemptStartDate.toISOString(),
+        attemptStartDateUtc: values.attemptStartDateUtc.toISOString(),
       };
       if (enrollmentId !== '') {
         requestData.enrollmentId = enrollmentId;
@@ -71,8 +71,8 @@ export const LeetcodeProblemAttemptCreateModal = ({
 
   const leetcodeProblemOptions =
     leetcodeProblems?.map((leetcodeProblem) => ({
-      value: leetcodeProblem.leetcodeProblemId || '',
-      label: leetcodeProblem.problem.title,
+      value: leetcodeProblem.leetcodeProblemId,
+      label: leetcodeProblem.title,
     })) || [];
 
   const daysBeforeToday = (days: number) => {
@@ -97,7 +97,7 @@ export const LeetcodeProblemAttemptCreateModal = ({
           error={form.errors.leetcodeProblemId}
         />
         <DateTimePicker
-          {...form.getInputProps('attemptStartDate')}
+          {...form.getInputProps('attemptStartDateUtc')}
           mt="sm"
           label="Attempt Start Date"
           placeholder="Pick a start date"
@@ -107,7 +107,7 @@ export const LeetcodeProblemAttemptCreateModal = ({
           withAsterisk
           highlightToday
           clearable
-          error={form.errors.attemptStartDate}
+          error={form.errors.attemptStartDateUtc}
         />
         <NumberInput
           {...form.getInputProps('timeTakenInMinutes')}
@@ -138,7 +138,7 @@ export const LeetcodeProblemAttemptCreateModal = ({
 };
 
 type LeetcodeProblemAttemptCreateModalProps = {
-  table: MRT_TableInstance<ProblemAttempt>;
+  table: MRT_TableInstance<ProblemAttemptEntity>;
   createProblemAttempt: UseMutateAsyncFunction<
     CreateProblemAttemptResponseApiResult,
     CreateProblemAttemptResponseApiResult,
@@ -152,6 +152,6 @@ type LeetcodeProblemAttemptCreateModalProps = {
   ) => Promise<
     QueryObserverResult<GetProblemAttemptsResponseApiResult, GetProblemAttemptsResponseApiResult>
   >;
-  leetcodeProblems: LeetcodeProblem[] | null | undefined;
+  leetcodeProblems: LeetcodeProblemDto[] | null | undefined;
   enrollmentId: string;
 };

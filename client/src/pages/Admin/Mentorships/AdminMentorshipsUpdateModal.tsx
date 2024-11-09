@@ -11,13 +11,14 @@ import {
   AdminUpdateMentorshipResponseApiResult,
   EnrollmentResponse,
   MentorshipResponse,
-  Season,
+  SeasonEntity,
+  SeasonRole,
 } from '@/generated/api/client';
 
 const schema = z.object({
-  seasonId: z.string().uuid().min(1),
-  mentorEnrollmentId: z.string().uuid().min(1),
-  menteeEnrollmentId: z.string().uuid().min(1),
+  seasonId: z.string(),
+  mentorEnrollmentId: z.string(),
+  menteeEnrollmentId: z.string(),
 });
 
 export const AdminMentorshipsUpdateModal = ({
@@ -31,21 +32,20 @@ export const AdminMentorshipsUpdateModal = ({
   const form = useForm({
     mode: 'uncontrolled',
     initialValues: {
-      seasonId: mentorship.mentor.seasonId,
-      mentorEnrollmentId: mentorship.mentor.enrollmentId,
-      menteeEnrollmentId: mentorship.mentee.enrollmentId,
+      seasonId: mentorship.seasonId,
+      mentorEnrollmentId: mentorship.mentorEnrollmentId,
+      menteeEnrollmentId: mentorship.menteeEnrollmentId,
     },
     validate: zodResolver(schema),
   });
 
   const handleSubmit = async (values: {
-    seasonId: string;
     mentorEnrollmentId: string;
     menteeEnrollmentId: string;
   }) => {
     try {
       const requestData: AdminUpdateMentorshipRequest = {
-        mentorshipId: mentorship.mentorshipId,
+        mentorshipId: mentorship.mentorshipId || '',
         mentorEnrollmentId: values.mentorEnrollmentId,
         menteeEnrollmentId: values.menteeEnrollmentId,
       };
@@ -60,18 +60,18 @@ export const AdminMentorshipsUpdateModal = ({
 
   const [mentorOptions, setMentorOptions] = useState<{ value: string; label: string }[]>(
     enrollments
-      ?.filter((e) => e.seasonId === mentorship.mentor.seasonId && e.role === 'Mentor')
+      ?.filter((e) => e.seasonId === mentorship.seasonId && e.role === SeasonRole.Mentor)
       .map((enrollment) => ({
         value: enrollment.enrollmentId,
-        label: enrollment.user,
+        label: enrollment.userName,
       })) || []
   );
   const [menteeOptions, setMenteeOptions] = useState<{ value: string; label: string }[]>(
     enrollments
-      ?.filter((e) => e.seasonId === mentorship.mentor.seasonId && e.role === 'Student')
+      ?.filter((e) => e.seasonId === mentorship.seasonId && e.role === SeasonRole.Student)
       .map((enrollment) => ({
         value: enrollment.enrollmentId,
-        label: enrollment.user,
+        label: enrollment.userName,
       })) || []
   );
 
@@ -81,18 +81,18 @@ export const AdminMentorshipsUpdateModal = ({
 
     const mentors =
       enrollments
-        ?.filter((e) => e.seasonId === value && e.role === 'Mentor')
+        ?.filter((e) => e.seasonId === value && e.role === SeasonRole.Mentor)
         .map((enrollment) => ({
           value: enrollment.enrollmentId,
-          label: enrollment.user,
+          label: enrollment.userName,
         })) || [];
 
     const mentees =
       enrollments
-        ?.filter((e) => e.seasonId === value && e.role === 'Student')
+        ?.filter((e) => e.seasonId === value && e.role === SeasonRole.Student)
         .map((enrollment) => ({
           value: enrollment.enrollmentId,
-          label: enrollment.user,
+          label: enrollment.userName,
         })) || [];
 
     setMentorOptions(mentors);
@@ -102,18 +102,18 @@ export const AdminMentorshipsUpdateModal = ({
   useEffect(() => {
     const mentors =
       enrollments
-        ?.filter((e) => e.seasonId === mentorship.mentor.seasonId && e.role === 'Mentor')
+        ?.filter((e) => e.seasonId === mentorship.seasonId && e.role === SeasonRole.Mentor)
         .map((enrollment) => ({
           value: enrollment.enrollmentId,
-          label: enrollment.user,
+          label: enrollment.userName,
         })) || [];
 
     const mentees =
       enrollments
-        ?.filter((e) => e.seasonId === mentorship.mentor.seasonId && e.role === 'Student')
+        ?.filter((e) => e.seasonId === mentorship.seasonId && e.role === SeasonRole.Student)
         .map((enrollment) => ({
           value: enrollment.enrollmentId,
-          label: enrollment.user,
+          label: enrollment.userName,
         })) || [];
 
     setMentorOptions(mentors);
@@ -122,7 +122,7 @@ export const AdminMentorshipsUpdateModal = ({
 
   const seasonOptions =
     seasons?.map((season) => ({
-      value: season.seasonId || '',
+      value: season.seasonId,
       label: season.name,
     })) || [];
 
@@ -184,6 +184,6 @@ type AdminMentorshipsUpdateModalProps = {
   ) => Promise<
     QueryObserverResult<AdminListMentorshipResponseApiResult, AdminListMentorshipResponseApiResult>
   >;
-  seasons: Season[] | null | undefined;
+  seasons: SeasonEntity[] | null | undefined;
   enrollments: EnrollmentResponse[] | null | undefined;
 };

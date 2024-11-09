@@ -1,9 +1,11 @@
+using System.ComponentModel.DataAnnotations;
 using System.Net;
 using Carter;
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using RSPWebAPI.Database;
+using RSPWebAPI.Entities;
 using RSPWebAPI.Features.Constants;
 using RSPWebAPI.Shared;
 using RSPWebAPI.Shared.Behaviours;
@@ -58,17 +60,22 @@ public static class AdminUpdateMentorship
         };
       }
 
-      // Reject if any of the provided mentor or mentee doesn't exist
-      var mentor = await _dbContext
-                         .Enrollments
-                         .Include(e => e.Season)
-                         .FirstOrDefaultAsync(e => e.EnrollmentId == request.MentorEnrollmentId, cancellationToken);
-      var mentee = await _dbContext
-                         .Enrollments
-                         .Include(e => e.Season)
-                         .FirstOrDefaultAsync(e => e.EnrollmentId == request.MenteeEnrollmentId, cancellationToken);
+      // Reject if any of the newly provided mentor or mentee doesn't exist
+      var mentorSeasonId = await _dbContext
+                                 .Enrollments
+                                 .Where(e => e.EnrollmentId == request.MentorEnrollmentId &&
+                                             e.Role == SeasonRole.Mentor)
+                                 .Select(e => e.Season.SeasonId)
+                                 .FirstOrDefaultAsync(cancellationToken);
 
-      if (mentor == null || mentee == null)
+      var menteeSeasonId = await _dbContext
+                                 .Enrollments
+                                 .Where(e => e.EnrollmentId == request.MenteeEnrollmentId &&
+                                             e.Role == SeasonRole.Student)
+                                 .Select(e => e.Season.SeasonId)
+                                 .FirstOrDefaultAsync(cancellationToken);
+
+      if (mentorSeasonId == null || menteeSeasonId == null)
       {
         return new ApiResult<AdminUpdateMentorshipResponse>
         {
@@ -77,8 +84,8 @@ public static class AdminUpdateMentorship
         };
       }
 
-      // Reject if provided mentor and mentee doesn't belong to the same season
-      if (mentor.Season.SeasonId != mentee.Season.SeasonId)
+      // Reject if newly provided mentor and mentee doesn't belong to the same season
+      if (mentorSeasonId != menteeSeasonId)
       {
         return new ApiResult<AdminUpdateMentorshipResponse>
         {
@@ -146,14 +153,14 @@ public class AdminUpdateMentorshipEndpoint : ICarterModule
 
 public record AdminUpdateMentorshipRequest
 {
-  public string MentorshipId { get; set; } = string.Empty;
-  public string MentorEnrollmentId { get; set; } = string.Empty;
-  public string MenteeEnrollmentId { get; set; } = string.Empty;
+  [Required] public string MentorshipId { get; set; } = string.Empty;
+  [Required] public string MentorEnrollmentId { get; set; } = string.Empty;
+  [Required] public string MenteeEnrollmentId { get; set; } = string.Empty;
 }
 
 public class AdminUpdateMentorshipResponse
 {
-  public string MentorshipId { get; set; } = string.Empty;
-  public string MentorEnrollmentId { get; set; } = string.Empty;
-  public string MenteeEnrollmentId { get; set; } = string.Empty;
+  [Required] public string MentorshipId { get; set; } = string.Empty;
+  [Required] public string MentorEnrollmentId { get; set; } = string.Empty;
+  [Required] public string MenteeEnrollmentId { get; set; } = string.Empty;
 }

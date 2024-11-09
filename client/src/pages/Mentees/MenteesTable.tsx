@@ -8,7 +8,11 @@ import {
 } from 'mantine-react-table';
 import { ActionIcon, Flex, Text, Tooltip } from '@mantine/core';
 import { modals } from '@mantine/modals';
-import { Mentorship, useGetCurrentUserMenteesList, useKickStudent } from '@/generated/api/client';
+import {
+  MenteeResponseDto,
+  useGetCurrentUserMenteesList,
+  useKickStudent,
+} from '@/generated/api/client';
 import { useSeasonSlug } from '@/shared/hooks/useSeasonSlug';
 import classes from './MenteesTable.module.css';
 
@@ -23,7 +27,7 @@ export const MenteesTable = () => {
   } = useGetCurrentUserMenteesList(seasonSlug);
   const { mutateAsync: kickStudent, status: isKickingStudentStatus } = useKickStudent();
 
-  const openKickMenteeConfirmModal = (row: MRT_Row<Mentorship>) => {
+  const openKickMenteeConfirmModal = (row: MRT_Row<MenteeResponseDto>) => {
     modals.openConfirmModal({
       title: 'Delete Mentee',
       children: (
@@ -37,7 +41,7 @@ export const MenteesTable = () => {
         await kickStudent({
           data: {
             seasonSlug,
-            studentEnrollmentId: row.original.menteeEnrollmentId,
+            menteeEnrollmentId: row.original.menteeEnrollmentId,
           },
         });
         await refetchMentees();
@@ -46,15 +50,11 @@ export const MenteesTable = () => {
     });
   };
 
-  const columns = useMemo<MRT_ColumnDef<Mentorship>[]>(
+  const columns = useMemo<MRT_ColumnDef<MenteeResponseDto>[]>(
     () => [
       {
-        accessorKey: 'menteeEnrollment.user.name',
+        accessorKey: 'menteeName',
         header: 'Name',
-      },
-      {
-        accessorKey: 'menteeEnrollment.user.email',
-        header: 'Email',
       },
     ],
     []
@@ -71,7 +71,7 @@ export const MenteesTable = () => {
       density: 'xs',
       sorting: [
         {
-          id: 'menteeEnrollment.user.name',
+          id: 'menteeName',
           desc: true,
         },
       ],

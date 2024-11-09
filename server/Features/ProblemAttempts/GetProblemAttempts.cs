@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Net;
 using Carter;
 using FluentValidation;
@@ -75,8 +76,6 @@ public static class GetProblemAttempts
                   .Include(p => p.LeetcodeProblem)
                   .ThenInclude(l => l.LeetcodeProblemCategories)
                   .Include(p => p.LeetcodeProblem)
-                  .ThenInclude(l => l.LeetcodeProblemDifficulty)
-                  .Include(p => p.LeetcodeProblem)
                   .ThenInclude(l => l.Problem);
         }
 
@@ -140,15 +139,7 @@ public class GetProblemAttemptsEndpoint : ICarterModule
   }
 }
 
-public record GetProblemAttemptsRequest
-{
-  public string Email { get; set; } = string.Empty;
-  public string? EnrollmentId { get; set; }
-  public bool IncludeLeetcode { get; set; } = false;
-  public bool IncludeCustom { get; set; } = false;
-}
-
 public class GetProblemAttemptsResponse
 {
-  public IList<ProblemAttemptEntity> ProblemAttempts { get; set; } = new List<ProblemAttemptEntity>();
+  [Required] public IList<ProblemAttemptEntity> ProblemAttempts { get; set; } = new List<ProblemAttemptEntity>();
 }

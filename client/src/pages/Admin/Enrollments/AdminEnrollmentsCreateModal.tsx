@@ -9,15 +9,15 @@ import {
   AdminCreateEnrollmentResponseApiResult,
   AdminListEnrollmentResponseApiResult,
   EnrollmentResponse,
-  Role,
-  Season,
-  User,
+  SeasonEntity,
+  SeasonRole,
+  UserEntity,
 } from '@/generated/api/client';
 
 const schema = z.object({
-  seasonId: z.string().uuid().min(1),
-  userId: z.string().uuid().min(1),
-  roleId: z.string().uuid().min(1),
+  seasonId: z.string(),
+  userId: z.string(),
+  role: z.string(),
 });
 
 export const AdminEnrollmentsCreateModal = ({
@@ -25,7 +25,6 @@ export const AdminEnrollmentsCreateModal = ({
   createEnrollment,
   refetchEnrollments,
   seasons,
-  roles,
   users,
 }: AdminEnrollmentsCreateModalProps) => {
   const form = useForm({
@@ -33,14 +32,17 @@ export const AdminEnrollmentsCreateModal = ({
     initialValues: {
       seasonId: '',
       userId: '',
-      roleId: '',
+      role: '',
     },
     validate: zodResolver(schema),
   });
 
-  const handleSubmit = async (values: { seasonId: string; userId: string; roleId: string }) => {
+  const handleSubmit = async (values: { seasonId: string; userId: string; role: string }) => {
     try {
-      const requestData: AdminCreateEnrollmentRequest = values;
+      const requestData: AdminCreateEnrollmentRequest = {
+        ...values,
+        role: SeasonRole[values.role as keyof typeof SeasonRole],
+      };
       await createEnrollment({ data: requestData });
       await refetchEnrollments();
       table.setCreatingRow(null);
@@ -52,19 +54,18 @@ export const AdminEnrollmentsCreateModal = ({
 
   const seasonOptions =
     seasons?.map((season) => ({
-      value: season.seasonId || '',
+      value: season.seasonId,
       label: season.name,
     })) || [];
 
-  const roleOptions =
-    roles?.map((role) => ({
-      value: role.roleId || '',
-      label: role.name,
-    })) || [];
+  const roleOptions = Object.entries(SeasonRole).map(([key, _]) => ({
+    value: key,
+    label: key,
+  }));
 
   const userOptions =
     users?.map((user) => ({
-      value: user.userId || '',
+      value: user.userId,
       label: user.name,
     })) || [];
 
@@ -90,7 +91,7 @@ export const AdminEnrollmentsCreateModal = ({
           searchable
         />
         <Select
-          {...form.getInputProps('roleId')}
+          {...form.getInputProps('role')}
           label="Select Role"
           placeholder="Pick a role"
           data={roleOptions}
@@ -123,7 +124,6 @@ type AdminEnrollmentsCreateModalProps = {
   ) => Promise<
     QueryObserverResult<AdminListEnrollmentResponseApiResult, AdminListEnrollmentResponseApiResult>
   >;
-  seasons: Season[] | null | undefined;
-  roles: Role[] | null | undefined;
-  users: User[] | null | undefined;
+  seasons: SeasonEntity[] | null | undefined;
+  users: UserEntity[] | null | undefined;
 };

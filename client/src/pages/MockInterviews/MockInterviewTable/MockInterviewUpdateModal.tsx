@@ -7,12 +7,12 @@ import { DateTimePicker } from '@mantine/dates';
 import { useForm } from '@mantine/form';
 import {
   GetMockInterviewsResponseApiResult,
-  LeetcodeProblem,
-  MockInterview,
+  LeetcodeProblemDto,
+  MockInterviewEntity,
   MockInterviewRoundDto,
   UpdateMockInterviewRequest,
   UpdateMockInterviewResponseApiResult,
-  User,
+  UserEntity,
 } from '@/generated/api/client';
 
 const scoreSchema = z
@@ -158,8 +158,8 @@ export const MockInterviewUpdateModal = ({
 
   const leetcodeProblemOptions =
     leetcodeProblems?.map((leetcodeProblem) => ({
-      value: leetcodeProblem.leetcodeProblemId || '',
-      label: leetcodeProblem.problem.title,
+      value: leetcodeProblem.leetcodeProblemId,
+      label: leetcodeProblem.title,
     })) || [];
 
   const usersOptions =
@@ -338,7 +338,7 @@ export const MockInterviewUpdateModal = ({
 };
 
 type MockInterviewUpdateModalProps = {
-  table: MRT_TableInstance<MockInterview>;
+  table: MRT_TableInstance<MockInterviewEntity>;
   updateMockInterview: UseMutateAsyncFunction<
     UpdateMockInterviewResponseApiResult,
     UpdateMockInterviewResponseApiResult,
@@ -352,8 +352,8 @@ type MockInterviewUpdateModalProps = {
   ) => Promise<
     QueryObserverResult<GetMockInterviewsResponseApiResult, GetMockInterviewsResponseApiResult>
   >;
-  row: MRT_Row<MockInterview>;
-  leetcodeProblems: LeetcodeProblem[] | null | undefined;
-  users: User[] | null | undefined;
+  row: MRT_Row<MockInterviewEntity>;
+  leetcodeProblems: LeetcodeProblemDto[] | null | undefined;
+  users: UserEntity[] | null | undefined;
   enrollmentId: string;
 };

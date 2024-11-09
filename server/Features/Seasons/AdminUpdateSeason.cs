@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Net;
 using Carter;
 using FluentValidation;
@@ -143,22 +144,22 @@ public class AdminUpdateSeasonEndpoint : ICarterModule
 
 public record AdminUpdateSeasonRequest
 {
-  public string SeasonId { get; set; } = string.Empty;
-  public string Name { get; set; } = string.Empty;
-  public string Slug { get; set; } = string.Empty;
-  public DateTime StartDateInclusiveUtc { get; set; }
-  public DateTime EndDateInclusiveUtc { get; set; }
-  public string Location { get; set; } = string.Empty;
-  public string ImageUrl { get; set; } = string.Empty;
+  [Required] public string SeasonId { get; set; } = string.Empty;
+  [Required] public string Name { get; set; } = string.Empty;
+  [Required] public string Slug { get; set; } = string.Empty;
+  [Required] public DateTime StartDateInclusiveUtc { get; set; }
+  [Required] public DateTime EndDateInclusiveUtc { get; set; }
+  [Required] public string Location { get; set; } = string.Empty;
+  [Required] public string ImageUrl { get; set; } = string.Empty;
 }
 
 public class AdminUpdateSeasonResponse
 {
-  public string SeasonId { get; set; } = string.Empty;
-  public string Name { get; set; } = string.Empty;
-  public string Slug { get; set; } = string.Empty;
-  public DateTime StartDateInclusiveUtc { get; set; }
-  public DateTime EndDateInclusiveUtc { get; set; }
-  public string Location { get; set; } = string.Empty;
-  public string ImageUrl { get; set; } = string.Empty;
+  [Required] public string SeasonId { get; set; } = string.Empty;
+  [Required] public string Name { get; set; } = string.Empty;
+  [Required] public string Slug { get; set; } = string.Empty;
+  [Required] public DateTime StartDateInclusiveUtc { get; set; }
+  [Required] public DateTime EndDateInclusiveUtc { get; set; }
+  [Required] public string Location { get; set; } = string.Empty;
+  [Required] public string ImageUrl { get; set; } = string.Empty;
 }

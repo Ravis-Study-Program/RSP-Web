@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using System.Text.Json.Serialization;
 using Carter;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -24,6 +25,7 @@ var builder = WebApplication.CreateBuilder(args);
          .AddEndpointsApiExplorer()
          .AddSwaggerGen(options =>
          {
+           options.SchemaFilter<EnumSchemaFilter>();
            options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
            {
              In = ParameterLocation.Header,
@@ -88,9 +90,8 @@ var builder = WebApplication.CreateBuilder(args);
          .AddJsonOptions(options =>
          {
            options.JsonSerializerOptions.ReferenceHandler =
-             System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+             ReferenceHandler.IgnoreCycles;
          });
-
 }
 
 var app = builder.Build();

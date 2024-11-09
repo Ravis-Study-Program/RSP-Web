@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Net;
 using Carter;
 using FluentValidation;
@@ -112,9 +113,9 @@ public class CreateUserIfNotExistsEndpoint : ICarterModule
 
 public record CreateUserIfNotExistsRequest
 {
-  public string DiscordId { get; set; } = string.Empty;
-  public string Name { get; set; } = string.Empty;
-  public string ProfileImage { get; set; } = string.Empty;
+  [Required] public string DiscordId { get; set; } = string.Empty;
+  [Required] public string Name { get; set; } = string.Empty;
+  [Required] public string ProfileImage { get; set; } = string.Empty;
 }
 
 public record CreateUserIfNotExistsResponse

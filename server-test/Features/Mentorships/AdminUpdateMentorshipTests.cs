@@ -36,6 +36,7 @@ public class AdminUpdateMentorshipTests : TestsHelper
     var mentorEnrollment = new EnrollmentEntity
     {
       EnrollmentId = DummyId1,
+      Role = SeasonRole.Mentor,
       Season = new SeasonEntity
       {
         SeasonId = DummyId1
@@ -44,6 +45,7 @@ public class AdminUpdateMentorshipTests : TestsHelper
     var menteeEnrollment = new EnrollmentEntity
     {
       EnrollmentId = DummyId2,
+      Role = SeasonRole.Student,
       Season = new SeasonEntity
       {
         SeasonId = DummyId2
@@ -77,6 +79,7 @@ public class AdminUpdateMentorshipTests : TestsHelper
     var mentorEnrollment = new EnrollmentEntity
     {
       EnrollmentId = DummyId1,
+      Role = SeasonRole.Mentor,
       Season = new SeasonEntity
       {
         SeasonId = DummyId1
@@ -85,6 +88,7 @@ public class AdminUpdateMentorshipTests : TestsHelper
     var menteeEnrollment = new EnrollmentEntity
     {
       EnrollmentId = DummyId2,
+      Role = SeasonRole.Student,
       Season = new SeasonEntity
       {
         SeasonId = DummyId1
@@ -123,6 +127,7 @@ public class AdminUpdateMentorshipTests : TestsHelper
     var mentorEnrollment = new EnrollmentEntity
     {
       EnrollmentId = DummyId1,
+      Role = SeasonRole.Mentor,
       Season = new SeasonEntity
       {
         SeasonId = DummyId1
@@ -131,6 +136,7 @@ public class AdminUpdateMentorshipTests : TestsHelper
     var menteeEnrollment = new EnrollmentEntity
     {
       EnrollmentId = DummyId2,
+      Role = SeasonRole.Student,
       Season = new SeasonEntity
       {
         SeasonId = DummyId1
@@ -184,6 +190,7 @@ public class AdminUpdateMentorshipTests : TestsHelper
     var targetEnrollment = new EnrollmentEntity
     {
       EnrollmentId = DummyId3,
+      Role = SeasonRole.Student,
       Season = new SeasonEntity
       {
         SeasonId = DummyId1
@@ -192,6 +199,7 @@ public class AdminUpdateMentorshipTests : TestsHelper
     var mentorEnrollment = new EnrollmentEntity
     {
       EnrollmentId = DummyId1,
+      Role = SeasonRole.Mentor,
       Season = new SeasonEntity
       {
         SeasonId = DummyId1
@@ -200,6 +208,7 @@ public class AdminUpdateMentorshipTests : TestsHelper
     var menteeEnrollment = new EnrollmentEntity
     {
       EnrollmentId = DummyId2,
+      Role = SeasonRole.Student,
       Season = new SeasonEntity
       {
         SeasonId = DummyId1

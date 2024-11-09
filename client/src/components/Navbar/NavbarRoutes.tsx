@@ -15,6 +15,7 @@ import {
   IconUsersGroup,
   TablerIcon,
 } from '@tabler/icons-react';
+import { SeasonRole } from '@/generated/api/client';
 
 export interface TabItem {
   label: string;
@@ -152,7 +153,6 @@ const getAdminTabs = (seasonSlug: string | null): Tabs => ({
   general: [
     { label: 'Seasons', icon: IconCalendarMonth, link: '/admin/seasons', hidden: false },
     { label: 'Users', icon: IconUsersGroup, link: '/admin/users', hidden: false },
-    { label: 'Roles', icon: IconBadge, link: '/admin/roles', hidden: false },
     { label: 'Enrollments', icon: IconSchool, link: '/admin/enrollments', hidden: false },
     { label: 'Mentorships', icon: IconChessKnight, link: '/admin/mentorships', hidden: false },
   ],
@@ -176,23 +176,26 @@ const getAdminTabs = (seasonSlug: string | null): Tabs => ({
     : [],
 });
 
-export const getTabs = (seasonSlug: string | null, isAdmin: boolean, roleName: string) => {
-  let tabs: Tabs | null = null;
+export const getTabs = (seasonSlug: string | null, isAdmin: boolean, role: SeasonRole | null) => {
+  let tabs: Tabs = noSeasonSelectedTabs;
+
+  if (role == null) {
+    return tabs;
+  }
+
   if (isAdmin) {
     tabs = seasonSlug === null ? adminNoSeasonSelectedTabs : getAdminTabs(seasonSlug);
   } else {
-    switch (roleName) {
-      case 'Student':
+    switch (role) {
+      case SeasonRole.Student:
         tabs = getStudentTabs(seasonSlug);
         break;
-      case 'Mentor':
+      case SeasonRole.Mentor:
         tabs = getMentorTabs(seasonSlug);
         break;
-      case 'Coordinator':
+      case SeasonRole.Coordinator:
         tabs = getCoordinatorTabs(seasonSlug);
         break;
-      default:
-        tabs = noSeasonSelectedTabs;
     }
   }
 
@@ -203,9 +206,9 @@ export const lookupTabByLink = (
   link: string,
   seasonSlug: string | null,
   isAdmin: boolean,
-  roleName: string
+  role: SeasonRole | null
 ): TabItem | undefined => {
-  const tabs = getTabs(seasonSlug, isAdmin, roleName);
-  const tabsLink = [...tabs.general, ...(tabs?.season || [])];
+  const tabs = getTabs(seasonSlug, isAdmin, role);
+  const tabsLink = [...tabs.general, ...(tabs.season || [])];
   return tabsLink.find((tab) => tab.link === link);
 };

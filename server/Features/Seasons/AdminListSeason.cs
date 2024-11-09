@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Net;
 using Carter;
 using MediatR;
@@ -88,5 +89,5 @@ public class AdminListSeasonEndpoint : ICarterModule
 
 public class AdminListSeasonResponse
 {
-  public ICollection<SeasonEntity> Seasons { get; set; } = new List<SeasonEntity>();
+  [Required] public ICollection<SeasonEntity> Seasons { get; set; } = new List<SeasonEntity>();
 }

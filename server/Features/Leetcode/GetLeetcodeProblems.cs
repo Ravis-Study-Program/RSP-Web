@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Net;
 using Carter;
 using FluentValidation;
@@ -41,9 +42,22 @@ public static class GetLeetcodeProblems
       {
         var leetcodeProblems = await _dbContext
                                      .LeetcodeProblems
-                                     .Include(l => l.LeetcodeProblemCategories)
-                                     .Include(l => l.LeetcodeProblemDifficulty)
-                                     .Include(l => l.Problem)
+                                     .Select(l => new LeetcodeProblemDto
+                                     {
+                                       LeetcodeProblemId = l.LeetcodeProblemId,
+                                       IsPremium = l.IsPremium,
+                                       Link = l.Problem.Link ?? "",
+                                       Title = l.Problem.Title,
+                                       Difficulty = l.LeetcodeProblemDifficulty,
+                                       LeetcodeProblemCategories =
+                                         l.LeetcodeProblemCategories
+                                          .Select(c => new LeetcodeProblemCategoryDto
+                                          {
+                                            Name = c.Name
+                                          })
+                                          .ToList()
+                                     })
+                                     .AsNoTracking()
                                      .ToListAsync(cancellationToken);
 
         return new ApiResult<GetLeetcodeProblemsResponse>
@@ -92,7 +106,22 @@ public record GetLeetcodeProblemsRequest
 {
 }
 
+public record LeetcodeProblemDto
+{
+  [Required] public List<LeetcodeProblemCategoryDto> LeetcodeProblemCategories = new();
+  [Required] public string LeetcodeProblemId { get; set; } = string.Empty;
+  [Required] public LeetcodeProblemDifficulty Difficulty { get; set; }
+  [Required] public bool IsPremium { get; set; }
+  [Required] public string Title { get; set; } = string.Empty;
+  [Required] public string Link { get; set; } = string.Empty;
+}
+
+public record LeetcodeProblemCategoryDto
+{
+  [Required] public string Name { get; set; } = string.Empty;
+}
+
 public class GetLeetcodeProblemsResponse
 {
-  public IList<LeetcodeProblemEntity> LeetcodeProblems { get; set; } = new List<LeetcodeProblemEntity>();
+  [Required] public IList<LeetcodeProblemDto> LeetcodeProblems { get; set; } = new List<LeetcodeProblemDto>();
 }

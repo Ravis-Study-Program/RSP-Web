@@ -1,7 +1,8 @@
 import { Link } from 'react-router-dom';
 import { Badge, Button, Card, Grid, Group, Image, Skeleton, Text } from '@mantine/core';
 import { Layout } from '@/components/Layout/Layout';
-import { Enrollment, useGetCurrentUserEnrollments } from '@/generated/api/client';
+import { EnrollmentResponseDto, useGetCurrentUserEnrollments } from '@/generated/api/client';
+import { SeasonRoleReverseIndex } from '@/shared/entities/reverseIndex';
 import classes from './Seasons.module.css';
 
 export function SeasonsPage() {
@@ -54,16 +55,16 @@ const SeasonsGridCards = ({ enrollments }: SeasonsListProps) => {
           <Card withBorder shadow="sm" radius="md" className={classes.card}>
             <Card.Section className={classes.imageSection}>
               <Image
-                src={enrollment.season.imageUrl}
+                src={enrollment.seasonImageUrl}
                 alt="Tesla Model S"
                 className={classes.image}
               />
             </Card.Section>
 
             <Group justify="space-between" mt="md" mb="xs">
-              <Text fw={500}>{enrollment.season.name}</Text>
+              <Text fw={500}>{enrollment.seasonName}</Text>
               <Badge color="yellow.6" autoContrast>
-                {enrollment.role.name}
+                {SeasonRoleReverseIndex[enrollment.role]}
               </Badge>
             </Group>
 
@@ -73,7 +74,7 @@ const SeasonsGridCards = ({ enrollments }: SeasonsListProps) => {
               mt="md"
               radius="md"
               component={Link}
-              to={`/seasons/${enrollment.season.slug}`}
+              to={`/seasons/${enrollment.seasonSlug}`}
             >
               Select
             </Button>
@@ -85,5 +86,5 @@ const SeasonsGridCards = ({ enrollments }: SeasonsListProps) => {
 };
 
 type SeasonsListProps = {
-  enrollments: Enrollment[] | null | undefined;
+  enrollments: EnrollmentResponseDto[] | null | undefined;
 };

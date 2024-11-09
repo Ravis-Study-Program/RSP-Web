@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Net;
 using Carter;
 using FluentValidation;
@@ -123,16 +124,16 @@ public class AdminUpdateEnrollmentEndpoint : ICarterModule
 
 public record AdminUpdateEnrollmentRequest
 {
-  public string EnrollmentId { get; set; } = string.Empty;
-  public string SeasonId { get; set; } = string.Empty;
-  public string UserId { get; set; } = string.Empty;
-  public SeasonRole Role { get; set; }
+  [Required] public string EnrollmentId { get; set; } = string.Empty;
+  [Required] public string SeasonId { get; set; } = string.Empty;
+  [Required] public string UserId { get; set; } = string.Empty;
+  [Required] public SeasonRole Role { get; set; }
 }
 
 public class AdminUpdateEnrollmentResponse
 {
-  public string EnrollmentId { get; set; } = string.Empty;
-  public string SeasonId { get; set; } = string.Empty;
-  public string UserId { get; set; } = string.Empty;
-  public SeasonRole Role { get; set; }
+  [Required] public string EnrollmentId { get; set; } = string.Empty;
+  [Required]  public string SeasonId { get; set; } = string.Empty;
+  [Required] public string UserId { get; set; } = string.Empty;
+  [Required] public SeasonRole Role { get; set; }
 }

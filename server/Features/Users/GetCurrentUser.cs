@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Net;
 using Carter;
 using FluentValidation;
@@ -103,5 +104,5 @@ public class GetCurrentUserEndpoint : ICarterModule
 
 public record GetCurrentUserResponse
 {
-  public UserEntity User { get; set; }
+  [Required] public UserEntity User { get; set; }
 }

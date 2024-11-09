@@ -1,6 +1,6 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import { useGetIsUserEnrolled } from '@/generated/api/client';
+import { SeasonRole, useGetIsUserEnrolled } from '@/generated/api/client';
 import { NotFoundPage } from '@/pages/NotFound/NotFound.page';
 
 const SeasonRoleViewRouter = ({
@@ -29,12 +29,12 @@ const SeasonRoleViewRouter = ({
     return <NotFoundPage />;
   }
 
-  switch (userResponse?.responseBody?.role?.name) {
-    case 'Student':
+  switch (userResponse?.responseBody?.role) {
+    case SeasonRole.Student:
       return studentView ? <>{studentView}</> : <NotFoundPage />;
-    case 'Mentor':
+    case SeasonRole.Mentor:
       return mentorView ? <>{mentorView}</> : <NotFoundPage />;
-    case 'Coordinator':
+    case SeasonRole.Coordinator:
       return coordinatorView ? <>{coordinatorView}</> : <NotFoundPage />;
     default:
       break;

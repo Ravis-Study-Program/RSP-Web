@@ -12,6 +12,7 @@ import {
   useComputedColorScheme,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
+import { SeasonRoleReverseIndex } from '@/shared/entities/reverseIndex';
 import { useSeasonSlug } from '@/shared/hooks/useSeasonSlug';
 import { useUserAndEnrollment } from '@/shared/hooks/useUserAndEnrollment';
 import { Navbar } from '../Navbar/Navbar';
@@ -26,7 +27,7 @@ export function Layout({ children }: LayoutProps) {
   const [opened, { toggle }] = useDisclosure();
   const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
   const { seasonSlug, pathSegments } = useSeasonSlug();
-  const { user, isAdmin, roleName, isLoading } = useUserAndEnrollment(seasonSlug);
+  const { user, isAdmin, role, isLoading } = useUserAndEnrollment(seasonSlug);
 
   const getBreadcrumbLinks = () => {
     if (isLoading) {
@@ -37,7 +38,7 @@ export function Layout({ children }: LayoutProps) {
     let currentPath = '';
     for (let i = 0; i < pathSegments.length; i++) {
       currentPath += `/${pathSegments[i]}`;
-      const tab = lookupTabByLink(currentPath, seasonSlug, isAdmin, roleName);
+      const tab = lookupTabByLink(currentPath, seasonSlug, isAdmin, role);
       if (tab) {
         breadcrumbs.push(tab);
       }
@@ -47,9 +48,9 @@ export function Layout({ children }: LayoutProps) {
       <Anchor underline="never" href={item.link} key={index} className={classes.breadcrumb_links}>
         <Flex justify="center" align="center" gap={8}>
           {item.label}
-          {item.link === `/seasons/${seasonSlug}` ? (
+          {item.link === `/seasons/${seasonSlug}` && role ? (
             <Badge autoContrast color="yellow.5" className={classes.roleBadge}>
-              {roleName}
+              {SeasonRoleReverseIndex[role]}
             </Badge>
           ) : null}
         </Flex>
@@ -89,7 +90,12 @@ export function Layout({ children }: LayoutProps) {
             </Title>
           </Anchor>
         </Group>
-        <Navbar isLoading={isLoading} user={user} tabs={getTabs(seasonSlug, isAdmin, roleName)} />
+        <Navbar
+          isLoading={isLoading}
+          user={user}
+          tabs={getTabs(seasonSlug, isAdmin, role)}
+          isSeasonUrl={seasonSlug !== ''}
+        />
       </AppShell.Navbar>
       <AppShell.Main className={classes.main}>{children}</AppShell.Main>
     </AppShell>

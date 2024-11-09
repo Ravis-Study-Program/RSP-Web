@@ -9,10 +9,10 @@ import {
   CreateMockInterviewRequest,
   CreateMockInterviewResponseApiResult,
   GetMockInterviewsResponseApiResult,
-  LeetcodeProblem,
-  MockInterview,
+  LeetcodeProblemDto,
+  MockInterviewEntity,
   MockInterviewRoundDto,
-  User,
+  UserEntity,
 } from '@/generated/api/client';
 
 const scoreSchema = z
@@ -143,8 +143,8 @@ export const MockInterviewCreateModal = ({
 
   const leetcodeProblemOptions =
     leetcodeProblems?.map((leetcodeProblem) => ({
-      value: leetcodeProblem.leetcodeProblemId || '',
-      label: leetcodeProblem.problem.title,
+      value: leetcodeProblem.leetcodeProblemId,
+      label: leetcodeProblem.title,
     })) || [];
 
   const usersOptions =
@@ -202,7 +202,7 @@ export const MockInterviewCreateModal = ({
           label="Behavioural Score"
           placeholder="Enter behavioural score"
           withAsterisk
-          error={form.errors.behavioralScore}
+          error={form.errors.behaviouralScore}
         />
         <Fieldset legend="Leetcode Problem 1" mt="sm">
           <Select
@@ -323,7 +323,7 @@ export const MockInterviewCreateModal = ({
 };
 
 type MockInterviewCreateModalProps = {
-  table: MRT_TableInstance<MockInterview>;
+  table: MRT_TableInstance<MockInterviewEntity>;
   createMockInterview: UseMutateAsyncFunction<
     CreateMockInterviewResponseApiResult,
     CreateMockInterviewResponseApiResult,
@@ -337,7 +337,7 @@ type MockInterviewCreateModalProps = {
   ) => Promise<
     QueryObserverResult<GetMockInterviewsResponseApiResult, GetMockInterviewsResponseApiResult>
   >;
-  leetcodeProblems: LeetcodeProblem[] | null | undefined;
-  users: User[] | null | undefined;
+  leetcodeProblems: LeetcodeProblemDto[] | null | undefined;
+  users: UserEntity[] | null | undefined;
   enrollmentId: string;
 };
