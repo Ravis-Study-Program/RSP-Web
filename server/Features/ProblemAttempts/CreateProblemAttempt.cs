@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Net;
 using Carter;
 using FluentValidation;
@@ -15,7 +16,7 @@ public static class CreateProblemAttempt
 {
   public class Command : AuthRequest<ApiResult<CreateProblemAttemptResponse>>
   {
-    public DateTime AttemptStartDate { get; set; }
+    public DateTime AttemptStartDateUtc { get; set; }
     public int TimeTakenInMinutes { get; set; }
     public string Notes { get; set; } = string.Empty;
     public string? LeetcodeProblemId { get; set; }
@@ -28,7 +29,7 @@ public static class CreateProblemAttempt
   {
     public Validator()
     {
-      RuleFor(c => c.AttemptStartDate).NotEmpty();
+      RuleFor(c => c.AttemptStartDateUtc).NotEmpty();
       RuleFor(c => c.TimeTakenInMinutes).NotEmpty().GreaterThanOrEqualTo(1);
       RuleFor(c => c.Email).NotEmpty().EmailAddress();
     }
@@ -97,7 +98,7 @@ public static class CreateProblemAttempt
         var problemAttempt = new ProblemAttemptEntity
         {
           ProblemAttemptId = Database.Constants.GeneratePrimaryKeyId(),
-          AttemptStartDateUtc = request.AttemptStartDate,
+          AttemptStartDateUtc = request.AttemptStartDateUtc,
           TimeTakenInMinutes = request.TimeTakenInMinutes,
           LeetcodeProblemId = request.LeetcodeProblemId,
           CustomProblemId = request.CustomProblemId,
@@ -141,7 +142,7 @@ public class CreateProblemAttemptEndpoint : ICarterModule
 
            var command = new CreateProblemAttempt.Command
            {
-             AttemptStartDate = request.AttemptStartDate,
+             AttemptStartDateUtc = request.AttemptStartDateUtc,
              TimeTakenInMinutes = request.TimeTakenInMinutes,
              Notes = request.Notes,
              Email = email,
@@ -160,9 +161,9 @@ public class CreateProblemAttemptEndpoint : ICarterModule
 
 public record CreateProblemAttemptRequest
 {
-  public DateTime AttemptStartDate { get; set; }
-  public int TimeTakenInMinutes { get; set; }
-  public string Notes { get; set; } = string.Empty;
+  [Required] public DateTime AttemptStartDateUtc { get; set; }
+  [Required] public int TimeTakenInMinutes { get; set; }
+  [Required] public string Notes { get; set; } = string.Empty;
   public string LeetcodeProblemId { get; set; } = string.Empty;
   public string CustomProblemId { get; set; } = string.Empty;
   public string? EnrollmentId { get; set; }

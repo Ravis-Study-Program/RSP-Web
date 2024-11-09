@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Net;
 using Carter;
 using FluentValidation;
@@ -46,33 +47,26 @@ public static class GetIsUserEnrolled
     {
       try
       {
-        var enrollments = await _dbContext
-                                .Enrollments
-                                .Where(e => e.User.Email == request.Email && e.Season.Slug == request.SeasonSlug)
-                                .ToListAsync(cancellationToken);
-
-        if (enrollments.Count == 0)
-        {
-          return new ApiResult<GetIsUserEnrolledResponse>
-          {
-            StatusCode = HttpStatusCode.OK,
-            ResponseBody = new GetIsUserEnrolledResponse
-            {
-              IsEnrolled = false,
-              Role = null,
-              EnrollmentId = null
-            }
-          };
-        }
+        var enrollment = await _dbContext.Enrollments
+                                         .Where(e => e.User.Email == request.Email &&
+                                                     e.Season.Slug == request.SeasonSlug)
+                                         .Select(e => new GetIsUserEnrolledResponse
+                                         {
+                                           IsEnrolled = true,
+                                           Role = e.Role,
+                                           EnrollmentId = e.EnrollmentId
+                                         })
+                                         .AsNoTracking()
+                                         .FirstOrDefaultAsync(cancellationToken);
 
         return new ApiResult<GetIsUserEnrolledResponse>
         {
           StatusCode = HttpStatusCode.OK,
-          ResponseBody = new GetIsUserEnrolledResponse
+          ResponseBody = enrollment ?? new GetIsUserEnrolledResponse
           {
-            IsEnrolled = true,
-            Role = enrollments[0].Role,
-            EnrollmentId = enrollments[0].EnrollmentId
+            IsEnrolled = false,
+            Role = null,
+            EnrollmentId = null
           }
         };
       }
@@ -116,7 +110,7 @@ public class GetIsUserEnrolledEndpoint : ICarterModule
 
 public record GetIsUserEnrolledResponse
 {
-  public bool IsEnrolled { get; set; }
-  public SeasonRole? Role { get; set; }
-  public string? EnrollmentId { get; set; }
+  [Required] public bool IsEnrolled { get; set; }
+  [Required] public SeasonRole? Role { get; set; }
+  [Required] public string? EnrollmentId { get; set; }
 }

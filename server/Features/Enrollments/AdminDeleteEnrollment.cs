@@ -42,8 +42,9 @@ public static class AdminDeleteEnrollment
     )
     {
       var existingEnrollment = await _dbContext
-                                     .Enrollments.FirstOrDefaultAsync(
-                                       u => u.EnrollmentId == request.EnrollmentId, cancellationToken);
+                                     .Enrollments
+                                     .FirstOrDefaultAsync(u => u.EnrollmentId == request.EnrollmentId,
+                                                          cancellationToken);
       if (existingEnrollment == null)
       {
         return new ApiResult<AdminDeleteEnrollmentResponse>

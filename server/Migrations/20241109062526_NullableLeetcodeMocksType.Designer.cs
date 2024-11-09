@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using RSPWebAPI.Database;
@@ -11,9 +12,11 @@ using RSPWebAPI.Database;
 namespace RSPWebAPI.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241109062526_NullableLeetcodeMocksType")]
+    partial class NullableLeetcodeMocksType
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -47,7 +50,22 @@ namespace RSPWebAPI.Migrations
                         .HasColumnType("int")
                         .HasColumnName("BehavioralScore");
 
+                    b.Property<string>("MockInterviewId")
+                        .IsRequired()
+                        .HasColumnType("varchar(16)")
+                        .HasColumnName("MockInterviewId");
+
+                    b.Property<string>("MockInterviewRoundId")
+                        .IsRequired()
+                        .HasColumnType("varchar(16)")
+                        .HasColumnName("MockInterviewRoundId");
+
                     b.HasKey("BehaviouralMockInterviewRoundId");
+
+                    b.HasIndex("MockInterviewId");
+
+                    b.HasIndex("MockInterviewRoundId")
+                        .IsUnique();
 
                     b.ToTable("BehaviouralMockInterviewRound", (string)null);
                 });
@@ -68,11 +86,26 @@ namespace RSPWebAPI.Migrations
                         .HasColumnType("varchar(255)")
                         .HasColumnName("Link");
 
+                    b.Property<string>("MockInterviewId")
+                        .IsRequired()
+                        .HasColumnType("varchar(16)")
+                        .HasColumnName("MockInterviewId");
+
+                    b.Property<string>("MockInterviewRoundId")
+                        .IsRequired()
+                        .HasColumnType("varchar(16)")
+                        .HasColumnName("MockInterviewRoundId");
+
                     b.Property<int>("Score")
                         .HasColumnType("int")
                         .HasColumnName("Score");
 
                     b.HasKey("CustomMockInterviewRoundId");
+
+                    b.HasIndex("MockInterviewId");
+
+                    b.HasIndex("MockInterviewRoundId")
+                        .IsUnique();
 
                     b.ToTable("CustomMockInterviewRound", (string)null);
                 });
@@ -165,6 +198,16 @@ namespace RSPWebAPI.Migrations
                         .HasColumnType("varchar(16)")
                         .HasColumnName("LeetcodeProblemId");
 
+                    b.Property<string>("MockInterviewId")
+                        .IsRequired()
+                        .HasColumnType("varchar(16)")
+                        .HasColumnName("MockInterviewId");
+
+                    b.Property<string>("MockInterviewRoundId")
+                        .IsRequired()
+                        .HasColumnType("varchar(16)")
+                        .HasColumnName("MockInterviewRoundId");
+
                     b.Property<int>("TestingScore")
                         .HasColumnType("int")
                         .HasColumnName("TestingScore");
@@ -172,6 +215,11 @@ namespace RSPWebAPI.Migrations
                     b.HasKey("LeetcodeMockInterviewRoundId");
 
                     b.HasIndex("LeetcodeProblemId");
+
+                    b.HasIndex("MockInterviewId");
+
+                    b.HasIndex("MockInterviewRoundId")
+                        .IsUnique();
 
                     b.ToTable("LeetcodeMockInterviewRound", (string)null);
                 });
@@ -510,6 +558,44 @@ namespace RSPWebAPI.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("RSPWebAPI.Entities.BehaviouralMockInterviewRoundEntity", b =>
+                {
+                    b.HasOne("RSPWebAPI.Entities.MockInterviewEntity", "MockInterview")
+                        .WithMany()
+                        .HasForeignKey("MockInterviewId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("RSPWebAPI.Entities.MockInterviewRoundEntity", "MockInterviewRound")
+                        .WithOne()
+                        .HasForeignKey("RSPWebAPI.Entities.BehaviouralMockInterviewRoundEntity", "MockInterviewRoundId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("MockInterview");
+
+                    b.Navigation("MockInterviewRound");
+                });
+
+            modelBuilder.Entity("RSPWebAPI.Entities.CustomMockInterviewRoundEntity", b =>
+                {
+                    b.HasOne("RSPWebAPI.Entities.MockInterviewEntity", "MockInterview")
+                        .WithMany()
+                        .HasForeignKey("MockInterviewId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("RSPWebAPI.Entities.MockInterviewRoundEntity", "MockInterviewRound")
+                        .WithOne()
+                        .HasForeignKey("RSPWebAPI.Entities.CustomMockInterviewRoundEntity", "MockInterviewRoundId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("MockInterview");
+
+                    b.Navigation("MockInterviewRound");
+                });
+
             modelBuilder.Entity("RSPWebAPI.Entities.CustomProblemEntity", b =>
                 {
                     b.HasOne("RSPWebAPI.Entities.ProblemEntity", "Problem")
@@ -548,7 +634,23 @@ namespace RSPWebAPI.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("RSPWebAPI.Entities.MockInterviewEntity", "MockInterview")
+                        .WithMany()
+                        .HasForeignKey("MockInterviewId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("RSPWebAPI.Entities.MockInterviewRoundEntity", "MockInterviewRound")
+                        .WithOne()
+                        .HasForeignKey("RSPWebAPI.Entities.LeetcodeMockInterviewRoundEntity", "MockInterviewRoundId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("LeetcodeProblem");
+
+                    b.Navigation("MockInterview");
+
+                    b.Navigation("MockInterviewRound");
                 });
 
             modelBuilder.Entity("RSPWebAPI.Entities.LeetcodeProblemEntity", b =>

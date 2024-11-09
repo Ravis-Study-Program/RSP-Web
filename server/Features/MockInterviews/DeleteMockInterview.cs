@@ -42,8 +42,9 @@ public static class DeleteMockInterview
     )
     {
       var existingMockInterview = await _dbContext
-                                        .MockInterviews.FirstOrDefaultAsync(
-                                          u => u.MockInterviewId == request.MockInterviewId, cancellationToken);
+                                        .MockInterviews
+                                        .Where(u => u.MockInterviewId == request.MockInterviewId)
+                                        .FirstOrDefaultAsync(cancellationToken);
       if (existingMockInterview == null)
       {
         return new ApiResult<DeleteMockInterviewResponse>

@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -5,13 +6,13 @@ namespace RSPWebAPI.Entities;
 
 public class CustomProblemEntity
 {
-  public string? CustomProblemId { get; set; } = string.Empty;
-  public string? ProblemId { get; set; } = string.Empty;
-  public string Difficulty { get; set; } = string.Empty;
-  public string Question { get; set; } = string.Empty;
+  [Required] public string? CustomProblemId { get; set; } = string.Empty;
+  [Required] public string? ProblemId { get; set; } = string.Empty;
+  [Required] public string Difficulty { get; set; } = string.Empty;
+  [Required] public string Question { get; set; } = string.Empty;
 
   // Navigation
-  public virtual ProblemEntity? Problem { get; set; }
+  public ProblemEntity Problem { get; set; } = null!;
 }
 
 public class CustomProblemEntityConfiguration : IEntityTypeConfiguration<CustomProblemEntity>

@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Net;
 using Carter;
 using FluentValidation;
@@ -151,5 +152,5 @@ public class GetMockInterviewsEndpoint : ICarterModule
 
 public class GetMockInterviewsResponse
 {
-  public IList<MockInterviewEntity> MockInterviews { get; set; } = new List<MockInterviewEntity>();
+  [Required] public IList<MockInterviewEntity> MockInterviews { get; set; } = new List<MockInterviewEntity>();
 }

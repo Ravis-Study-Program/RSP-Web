@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Net;
 using Carter;
 using FluentValidation;
@@ -45,17 +46,21 @@ public static class AdminCreateMentorship
     )
     {
       // Reject if any of the provided mentor or mentee doesn't exist
-      var mentor = await _dbContext
-                         .Enrollments
-                         .Include(e => e.Season)
-                         .FirstOrDefaultAsync(e => e.EnrollmentId == request.MentorEnrollmentId, cancellationToken);
+      var mentorSeasonId = await _dbContext
+                                 .Enrollments
+                                 .Where(e => e.EnrollmentId == request.MentorEnrollmentId &&
+                                             e.Role == SeasonRole.Mentor)
+                                 .Select(e => e.Season.SeasonId)
+                                 .FirstOrDefaultAsync(cancellationToken);
 
-      var mentee = await _dbContext
-                         .Enrollments
-                         .Include(e => e.Season)
-                         .FirstOrDefaultAsync(e => e.EnrollmentId == request.MenteeEnrollmentId, cancellationToken);
+      var menteeSeasonId = await _dbContext
+                                 .Enrollments
+                                 .Where(e => e.EnrollmentId == request.MenteeEnrollmentId &&
+                                             e.Role == SeasonRole.Student)
+                                 .Select(e => e.Season.SeasonId)
+                                 .FirstOrDefaultAsync(cancellationToken);
 
-      if (mentor == null || mentee == null)
+      if (mentorSeasonId == null || menteeSeasonId == null)
       {
         return new ApiResult<AdminCreateMentorshipResponse>
         {
@@ -65,7 +70,7 @@ public static class AdminCreateMentorship
       }
 
       // Reject if provided mentor and mentee doesn't belong to the same season
-      if (mentor.Season.SeasonId != mentee.Season.SeasonId)
+      if (mentorSeasonId != menteeSeasonId)
       {
         return new ApiResult<AdminCreateMentorshipResponse>
         {
@@ -152,13 +157,13 @@ public class AdminCreateMentorshipEndpoint : ICarterModule
 
 public record AdminCreateMentorshipRequest
 {
-  public string MentorEnrollmentId { get; set; } = string.Empty;
-  public string MenteeEnrollmentId { get; set; } = string.Empty;
+  [Required] public string MentorEnrollmentId { get; set; } = string.Empty;
+  [Required] public string MenteeEnrollmentId { get; set; } = string.Empty;
 }
 
 public class AdminCreateMentorshipResponse
 {
-  public string MentorshipId { get; set; } = string.Empty;
-  public string MentorEnrollmentId { get; set; } = string.Empty;
-  public string MenteeEnrollmentId { get; set; } = string.Empty;
+  [Required] public string MentorshipId { get; set; } = string.Empty;
+  [Required] public string MentorEnrollmentId { get; set; } = string.Empty;
+  [Required] public string MenteeEnrollmentId { get; set; } = string.Empty;
 }

@@ -28,8 +28,9 @@ export function LoginPage() {
         if (user && !isUserCreated) {
           try {
             const request: CreateUserIfNotExistsRequest = {
-              profileImage: user.picture,
-              name: user.given_name,
+              profileImage: user.picture || '',
+              name: user.given_name || '',
+              discordId: '',
             };
             await createUser({ data: request });
             setIsUserCreated(true);

@@ -26,14 +26,14 @@ import {
   useComputedColorScheme,
   useMantineColorScheme,
 } from '@mantine/core';
-import { User } from '@/generated/api/client';
+import { UserEntity } from '@/generated/api/client';
 import { LinksGroup } from '../NavbarLinksGroup/NavbarLinksGroup';
 import { Tabs } from './NavbarRoutes';
 import classes from './Navbar.module.css';
 
-export function Navbar({ isLoading, user, tabs }: NavbarProps) {
+export function Navbar({ isLoading, user, tabs, isSeasonUrl }: NavbarProps) {
   const { setColorScheme } = useMantineColorScheme();
-  const [section, setSection] = useState<'general' | 'season'>('general');
+  const [section, setSection] = useState<'general' | 'season'>(isSeasonUrl ? 'season' : 'general');
   const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
   const { logout } = useAuth0();
 
@@ -151,8 +151,9 @@ export function Navbar({ isLoading, user, tabs }: NavbarProps) {
 
 type NavbarProps = {
   isLoading: boolean;
-  user: User | undefined;
+  user: UserEntity | undefined;
   tabs: Tabs | null;
+  isSeasonUrl: boolean;
 };
 
 const NavbarSkeleton = () => {

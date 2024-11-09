@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -5,13 +6,13 @@ namespace RSPWebAPI.Entities;
 
 public class MentorshipEntity
 {
-  public string MentorshipId { get; set; } = string.Empty;
-  public string MentorEnrollmentId { get; set; } = string.Empty;
-  public string MenteeEnrollmentId { get; set; } = string.Empty;
+  [Required] public string MentorshipId { get; set; } = string.Empty;
+  [Required] public string MentorEnrollmentId { get; set; } = string.Empty;
+  [Required] public string MenteeEnrollmentId { get; set; } = string.Empty;
 
   // Navigation
-  public virtual EnrollmentEntity MentorEnrollment { get; set; } = null!;
-  public virtual EnrollmentEntity MenteeEnrollment { get; set; } = null!;
+  public EnrollmentEntity MentorEnrollment { get; set; } = null!;
+  public EnrollmentEntity MenteeEnrollment { get; set; } = null!;
 }
 
 public class MentorshipEntityConfiguration : IEntityTypeConfiguration<MentorshipEntity>

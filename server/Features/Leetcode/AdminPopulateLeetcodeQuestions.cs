@@ -48,7 +48,6 @@ public static class AdminPopulateLeetcodeQuestions
       CancellationToken cancellationToken
     )
     {
-      // TODO: Implement a more optimal solution in querying. I tried skip parameter but GraphQL doesn't sort it for some reason.
       var skipNumber = 0;
 
       // Hit Leetcode endpoint to get data
@@ -74,7 +73,6 @@ public static class AdminPopulateLeetcodeQuestions
         };
       }
 
-      // Process obtained data and save into database
       await using (var transaction = await _dbContext.Database.BeginTransactionAsync(cancellationToken))
       {
         try
@@ -89,25 +87,39 @@ public static class AdminPopulateLeetcodeQuestions
             }
           }
 
-          // Add to database if it doesn't exist
+          // Retrieve existing categories without tracking to avoid duplicate tracking errors
+          var existingCategories = _dbContext.LeetcodeProblemCategories
+                                             .AsNoTracking()
+                                             .ToDictionary(c => c.Name, c => c);
+
           foreach (var category in categorySet)
           {
-            if (!_dbContext.LeetcodeProblemCategories.Any(c => c.Name == category))
+            if (!existingCategories.ContainsKey(category))
             {
-              var newCategory = new LeetcodeProblemCategoryEntity { Name = category };
+              var newCategory = new LeetcodeProblemCategoryEntity
+              {
+                LeetcodeProblemCategoryId = Database.Constants.GeneratePrimaryKeyId(),
+                Name = category
+              };
               _dbContext.LeetcodeProblemCategories.Add(newCategory);
+              existingCategories[category] = newCategory; // Track the new category in-memory
+            }
+            else
+            {
+              // Attach existing category to ensure it's linked to the context without adding duplicates
+              _dbContext.LeetcodeProblemCategories.Attach(existingCategories[category]);
             }
           }
 
           await _dbContext.SaveChangesAsync(cancellationToken);
 
-          // Add leetcode problem
+          // Add leetcode problems
           foreach (var question in jsonData.Data.ProblemsetQuestionList.Questions)
           {
             var title = $"{question.QuestionId}. {question.Title}";
-            // Check if the leetcode problem exists (there's probably a better way in doing this for sure)
             var existingLeetcode = await _dbContext
                                          .Problems
+                                         .AsNoTracking() // Avoid tracking errors
                                          .FirstOrDefaultAsync(p => p.Title == title, cancellationToken);
             if (existingLeetcode != null)
             {
@@ -116,8 +128,10 @@ public static class AdminPopulateLeetcodeQuestions
 
             var newLeetcodeProblem = new LeetcodeProblemEntity
             {
+              LeetcodeProblemId = Database.Constants.GeneratePrimaryKeyId(),
               Problem = new ProblemEntity
               {
+                ProblemId = Database.Constants.GeneratePrimaryKeyId(),
                 Title = title,
                 Link = $"https://leetcode.com/problems/{question.TitleSlug}"
               },
@@ -125,7 +139,6 @@ public static class AdminPopulateLeetcodeQuestions
               LeetcodeProblemCategories = new List<LeetcodeProblemCategoryEntity>()
             };
 
-            // Add difficulty
             switch (question.Difficulty)
             {
               case "Easy":
@@ -139,13 +152,12 @@ public static class AdminPopulateLeetcodeQuestions
                 break;
             }
 
-            // Add categories
             foreach (var category in question.TopicTags)
             {
-              var existingCategory =
-                _dbContext.LeetcodeProblemCategories.FirstOrDefault(c => c.Name == category.Name);
-              if (existingCategory != null)
+              if (existingCategories.TryGetValue(category.Name, out var existingCategory))
               {
+                // Attach each category to avoid duplicate tracking
+                _dbContext.LeetcodeProblemCategories.Attach(existingCategory);
                 newLeetcodeProblem.LeetcodeProblemCategories.Add(existingCategory);
               }
             }
@@ -158,8 +170,13 @@ public static class AdminPopulateLeetcodeQuestions
         }
         catch (Exception ex)
         {
-          Console.WriteLine(ex.Message);
+          _logger.LogError(ex, "Error occurred during transaction.");
           await transaction.RollbackAsync(cancellationToken);
+          return new ApiResult<AdminPopulateLeetcodeQuestionsResponse>
+          {
+            StatusCode = HttpStatusCode.InternalServerError,
+            Error = new ApiError("An error occurred while populating questions.")
+          };
         }
       }
 

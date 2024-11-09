@@ -63,7 +63,7 @@ public class AdminListEnrollmentTests : TestsHelper
     var enrollments = result.ResponseBody.Enrollments.ToList();
     var enrollment = enrollments[0];
     Assert.Equal(DummyId1, enrollment.EnrollmentId);
-    Assert.Equal("User Name", enrollment.User);
-    Assert.Equal("Season Name", enrollment.Season);
+    Assert.Equal("User Name", enrollment.UserName);
+    Assert.Equal("Season Name", enrollment.SeasonName);
   }
 }

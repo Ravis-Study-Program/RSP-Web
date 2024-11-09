@@ -1,6 +1,6 @@
 import { LineChart } from '@mantine/charts';
-import { Container } from '@mantine/core';
-import { ProblemAttempt } from '@/generated/api/client';
+import { Container, useComputedColorScheme } from '@mantine/core';
+import { LeetcodeProblemDifficulty, ProblemAttemptEntity } from '@/generated/api/client';
 import classes from './ProblemAttemptsGraph.module.css';
 
 function formatDate(date: Date): string {
@@ -8,13 +8,16 @@ function formatDate(date: Date): string {
 }
 
 export const ProblemAttemptsGraph = ({ problemAttempts }: ProblemAttemptsGraphProps) => {
-  const transform = (problemAttempts: ProblemAttempt[]) => {
+  const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
+  const bgColor = computedColorScheme === 'light' ? 'white' : 'dark';
+
+  const transform = (problemAttempts: ProblemAttemptEntity[]) => {
     const result: Record<string, { date: string; Easy: number; Medium: number; Hard: number }> = {};
 
     const sortedProblemAttempts = problemAttempts
       .map((attempt) => ({
         ...attempt,
-        attemptStartDate: new Date(attempt.attemptStartDate),
+        attemptStartDate: new Date(attempt.attemptStartDateUtc),
       }))
       .sort((a, b) => a.attemptStartDate.getTime() - b.attemptStartDate.getTime());
 
@@ -24,14 +27,14 @@ export const ProblemAttemptsGraph = ({ problemAttempts }: ProblemAttemptsGraphPr
         result[date] = { date, Easy: 0, Medium: 0, Hard: 0 };
       }
 
-      switch (problemAttempt.leetcodeProblem?.leetcodeProblemDifficulty.name) {
-        case 'Easy':
+      switch (problemAttempt.leetcodeProblem?.leetcodeProblemDifficulty) {
+        case LeetcodeProblemDifficulty.Easy:
           result[date].Easy += 1;
           break;
-        case 'Medium':
+        case LeetcodeProblemDifficulty.Medium:
           result[date].Medium += 1;
           break;
-        case 'Hard':
+        case LeetcodeProblemDifficulty.Hard:
           result[date].Hard += 1;
           break;
       }
@@ -40,31 +43,33 @@ export const ProblemAttemptsGraph = ({ problemAttempts }: ProblemAttemptsGraphPr
     return Object.values(result);
   };
 
-  return (
-    <Container bg="white" fluid className={classes.graphContainer}>
-      <LineChart
-        h={300}
-        bg="white"
-        data={transform(problemAttempts || [])}
-        dataKey="date"
-        xAxisLabel="Date"
-        yAxisLabel="Count"
-        series={[
-          { name: 'Easy', color: 'green.6' },
-          { name: 'Medium', color: 'yellow.6' },
-          { name: 'Hard', color: 'red.6' },
-        ]}
-        curveType="linear"
-        tickLine="xy"
-        gridAxis="xy"
-        yAxisProps={{ domain: [0, 'auto'], interval: 1, minTickGap: 1 }}
-        withLegend
-        legendProps={{ verticalAlign: 'top', height: 50 }}
-      />
-    </Container>
-  );
+  if (problemAttempts != null && problemAttempts.length > 0) {
+    return (
+      <Container bg={bgColor} fluid className={classes.graphContainer}>
+        <LineChart
+          h={300}
+          bg={bgColor}
+          data={transform(problemAttempts || [])}
+          dataKey="date"
+          xAxisLabel="Date"
+          yAxisLabel="Count"
+          series={[
+            { name: 'Easy', color: 'green.6' },
+            { name: 'Medium', color: 'yellow.6' },
+            { name: 'Hard', color: 'red.6' },
+          ]}
+          curveType="linear"
+          tickLine="xy"
+          gridAxis="xy"
+          yAxisProps={{ domain: [0, 'auto'], interval: 1, minTickGap: 1 }}
+          withLegend
+          legendProps={{ verticalAlign: 'top', height: 50 }}
+        />
+      </Container>
+    );
+  }
 };
 
 type ProblemAttemptsGraphProps = {
-  problemAttempts: ProblemAttempt[] | null | undefined;
+  problemAttempts: ProblemAttemptEntity[] | null | undefined;
 };

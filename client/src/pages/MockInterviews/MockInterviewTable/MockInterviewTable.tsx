@@ -12,8 +12,8 @@ import { ActionIcon, Anchor, Box, Button, Flex, Table, Text, Tooltip } from '@ma
 import { modals } from '@mantine/modals';
 import {
   GetMockInterviewsResponseApiResult,
-  MockInterview,
-  MockInterviewRound,
+  MockInterviewEntity,
+  MockInterviewRoundEntity,
   useCreateMockInterview,
   useDeleteMockInterview,
   useGetLeetcodeProblems,
@@ -50,7 +50,7 @@ export const MockInterviewTable = ({
   const { mutateAsync: deleteMockInterview, status: isDeletingMockInterviewStatus } =
     useDeleteMockInterview();
 
-  const openDeleteConfirmModal = (row: MRT_Row<MockInterview>) => {
+  const openDeleteConfirmModal = (row: MRT_Row<MockInterviewEntity>) => {
     modals.openConfirmModal({
       title: 'Delete Problem Attempt',
       children: (
@@ -67,13 +67,14 @@ export const MockInterviewTable = ({
       },
     });
   };
-  const columns = useMemo<MRT_ColumnDef<MockInterview>[]>(
+  const columns = useMemo<MRT_ColumnDef<MockInterviewEntity>[]>(
     () => [
       {
         header: 'Date',
         id: 'startDate',
-        accessorFn: (row) => {
-          const startFormatted = dayjs(row.startDate).format('D MMM YYYY HH:mm');
+        accessorFn: (row) => dayjs(row.startDate).format('D MMM YYYY HH:mm'),
+        Cell: ({ row }) => {
+          const startFormatted = dayjs(row.original.startDate).format('D MMM YYYY HH:mm');
           return <Text size="sm">{startFormatted}</Text>;
         },
       },
@@ -87,10 +88,11 @@ export const MockInterviewTable = ({
       },
       {
         header: 'Result',
-        accessorFn: (row) => {
+        accessorFn: (row) => (row.isPass ? 'Pass' : 'Fail'),
+        Cell: ({ row }) => {
           return (
-            <Text size="sm" fw={500} c={row.isPass ? 'green.8' : 'red.8'}>
-              {row.isPass ? 'Pass' : 'Fail'}
+            <Text size="sm" fw={500} c={row.original.isPass ? 'green.8' : 'red.8'}>
+              {row.original.isPass ? 'Pass' : 'Fail'}
             </Text>
           );
         },
@@ -99,6 +101,11 @@ export const MockInterviewTable = ({
         header: 'Behavioural',
         accessorFn: (row) => {
           const rounds = row.mockInterviewRounds || [];
+          const behaviouralRound = rounds.filter((r) => r.behaviouralMockInterviewRound != null)[0];
+          return behaviouralRound?.behaviouralMockInterviewRound?.behavioralScore || 0;
+        },
+        Cell: ({ row }) => {
+          const rounds = row.original.mockInterviewRounds || [];
           const behaviouralRound = rounds.filter((r) => r.behaviouralMockInterviewRound != null)[0];
           const score = behaviouralRound?.behaviouralMockInterviewRound?.behavioralScore || 0;
           return <ScoreText score={score} />;
@@ -221,7 +228,7 @@ type MockInterviewTableProps = {
   ) => Promise<
     QueryObserverResult<GetMockInterviewsResponseApiResult, GetMockInterviewsResponseApiResult>
   >;
-  mockInterviews: MockInterview[] | null | undefined;
+  mockInterviews: MockInterviewEntity[] | null | undefined;
   enrollmentId: string;
 };
 
@@ -316,7 +323,7 @@ const CustomMockInterviewRoundsInnerTable = ({ rounds }: InnerMockInterviewTable
 };
 
 type InnerMockInterviewTableProps = {
-  rounds: MockInterviewRound[];
+  rounds: MockInterviewRoundEntity[];
 };
 
 const ScoreText = ({ score }: ScoreTextProps) => {

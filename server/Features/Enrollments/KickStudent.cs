@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Net;
 using Carter;
 using FluentValidation;
@@ -13,7 +14,7 @@ namespace RSPWebAPI.Features.Enrollments;
 
 public static class KickStudent
 {
-  public class Command : AdminAuthRequest<ApiResult<KickStudentResponse>>
+  public class Command : AuthRequest<ApiResult<KickStudentResponse>>
   {
     public string MenteeEnrollmentId { get; set; } = string.Empty;
     public string SeasonSlug { get; set; } = string.Empty;
@@ -113,7 +114,7 @@ public class KickStudentEndpoint : ICarterModule
 
            var command = new KickStudent.Command
            {
-             MenteeEnrollmentId = request.StudentEnrollmentId,
+             MenteeEnrollmentId = request.MenteeEnrollmentId,
              SeasonSlug = request.SeasonSlug,
              Email = email
            };
@@ -128,8 +129,8 @@ public class KickStudentEndpoint : ICarterModule
 
 public class KickStudentRequest
 {
-  public string StudentEnrollmentId { get; set; } = string.Empty;
-  public string SeasonSlug { get; set; } = string.Empty;
+  [Required] public string MenteeEnrollmentId { get; set; } = string.Empty;
+  [Required] public string SeasonSlug { get; set; } = string.Empty;
 }
 
 public class KickStudentResponse

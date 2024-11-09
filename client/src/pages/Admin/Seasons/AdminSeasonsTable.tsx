@@ -10,7 +10,7 @@ import {
 import { ActionIcon, Button, Flex, Text, Tooltip } from '@mantine/core';
 import { modals } from '@mantine/modals';
 import {
-  Season,
+  SeasonEntity,
   useAdminCreateSeason,
   useAdminDeleteSeason,
   useAdminListSeason,
@@ -32,7 +32,7 @@ export const AdminSeasonsTable = () => {
   const { mutateAsync: updateSeason, status: isUpdatingSeasonStatus } = useAdminUpdateSeason();
   const { mutateAsync: deleteSeason, status: isDeletingSeasonStatus } = useAdminDeleteSeason();
 
-  const openDeleteConfirmModal = (row: MRT_Row<Season>) => {
+  const openDeleteConfirmModal = (row: MRT_Row<SeasonEntity>) => {
     modals.openConfirmModal({
       title: 'Delete Season',
       children: (
@@ -48,7 +48,7 @@ export const AdminSeasonsTable = () => {
     });
   };
 
-  const columns = useMemo<MRT_ColumnDef<Season>[]>(
+  const columns = useMemo<MRT_ColumnDef<SeasonEntity>[]>(
     () => [
       {
         accessorKey: 'name',
@@ -59,18 +59,20 @@ export const AdminSeasonsTable = () => {
         header: 'Slug',
       },
       {
-        accessorKey: 'startDate',
+        accessorKey: 'startDateInclusiveUtc',
+        accessorFn: (row) => dayjs(row.endDateInclusiveUtc).format('D MMM YYYY'),
         header: 'Start Date',
         Cell: ({ row }) => {
-          const startFormatted = dayjs(row.original.startDate).format('D MMM YYYY');
-          return <Text size="sm">{startFormatted}</Text>;
+          const startFormatted = dayjs(row.original.startDateInclusiveUtc).format('D MMM YYYY');
+          return startFormatted;
         },
       },
       {
-        accessorKey: 'endDate',
+        accessorKey: 'endDateInclusiveUtc',
+        accessorFn: (row) => dayjs(row.endDateInclusiveUtc).format('D MMM YYYY'),
         header: 'End Date',
         Cell: ({ row }) => {
-          const endFormatted = dayjs(row.original.endDate).format('D MMM YYYY');
+          const endFormatted = dayjs(row.original.endDateInclusiveUtc).format('D MMM YYYY');
           return <Text size="sm">{endFormatted}</Text>;
         },
       },
@@ -113,7 +115,7 @@ export const AdminSeasonsTable = () => {
       density: 'xs',
       sorting: [
         {
-          id: 'startDate',
+          id: 'startDateInclusiveUtc',
           desc: true,
         },
       ],

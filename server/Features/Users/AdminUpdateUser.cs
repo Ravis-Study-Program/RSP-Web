@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Net;
 using Carter;
 using FluentValidation;
@@ -122,19 +123,19 @@ public class AdminUpdateUserEndpoint : ICarterModule
 
 public record AdminUpdateUserRequest
 {
-  public string DiscordId { get; set; } = string.Empty;
-  public string Email { get; set; } = string.Empty;
-  public string Name { get; set; } = string.Empty;
-  public string ProfileImage { get; set; } = string.Empty;
-  public bool IsAdmin { get; set; } = false;
+  [Required] public string DiscordId { get; set; } = string.Empty;
+  [Required] public string Email { get; set; } = string.Empty;
+  [Required] public string Name { get; set; } = string.Empty;
+  [Required] public string ProfileImage { get; set; } = string.Empty;
+  [Required] public bool IsAdmin { get; set; } = false;
 }
 
 public class AdminUpdateUserResponse
 {
-  public string UserId { get; set; } = string.Empty;
-  public string DiscordId { get; set; } = string.Empty;
-  public string Email { get; set; } = string.Empty;
-  public string Name { get; set; } = string.Empty;
-  public string ProfileImage { get; set; } = string.Empty;
-  public bool IsAdmin { get; set; }
+  [Required] public string UserId { get; set; } = string.Empty;
+  [Required] public string DiscordId { get; set; } = string.Empty;
+  [Required] public string Email { get; set; } = string.Empty;
+  [Required] public string Name { get; set; } = string.Empty;
+  [Required] public string ProfileImage { get; set; } = string.Empty;
+  [Required] public bool IsAdmin { get; set; }
 }

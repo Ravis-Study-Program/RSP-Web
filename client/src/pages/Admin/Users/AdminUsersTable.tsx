@@ -13,7 +13,7 @@ import {
   useAdminDeleteUser,
   useAdminListUser,
   useAdminUpdateUser,
-  User,
+  UserEntity,
 } from '@/generated/api/client';
 import { AdminUsersCreateModal } from './AdminUsersCreateModal';
 import { AdminUsersUpdateModal } from './AdminUsersUpdateModal';
@@ -31,7 +31,7 @@ export const AdminUsersTable = () => {
   const { mutateAsync: updateUser, status: isUpdatingUserStatus } = useAdminUpdateUser();
   const { mutateAsync: deleteUser, status: isDeletingUserStatus } = useAdminDeleteUser();
 
-  const openDeleteConfirmModal = (row: MRT_Row<User>) => {
+  const openDeleteConfirmModal = (row: MRT_Row<UserEntity>) => {
     modals.openConfirmModal({
       title: 'Delete User',
       children: (
@@ -47,7 +47,7 @@ export const AdminUsersTable = () => {
     });
   };
 
-  const columns = useMemo<MRT_ColumnDef<User>[]>(
+  const columns = useMemo<MRT_ColumnDef<UserEntity>[]>(
     () => [
       {
         accessorKey: 'name',
@@ -60,9 +60,8 @@ export const AdminUsersTable = () => {
       {
         accessorKey: 'isAdmin',
         header: 'Is Admin',
-        Cell: ({ row }) => {
-          return <Text size="sm">{row.original.isAdmin ? 'Yes' : 'No'}</Text>;
-        },
+        accessorFn: (row) => (row.isAdmin ? 'Yes' : 'No'),
+        Cell: ({ row }) => (row.original.isAdmin ? 'Yes' : 'No'),
       },
       {
         accessorKey: 'discordId',

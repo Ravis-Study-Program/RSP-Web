@@ -49,10 +49,6 @@ export type DeleteProblemAttemptParams = {
   problemAttemptId: string;
 };
 
-export type AdminDeleteRoleParams = {
-  roleId: string;
-};
-
 export type AdminDeleteSeasonParams = {
   seasonId: string;
 };
@@ -70,7 +66,7 @@ export interface ValidationError {
   validationErrors?: ValidationError[] | null;
 }
 
-export interface User {
+export interface UserEntity {
   /** @minLength 1 */
   discordId: string;
   /** @minLength 1 */
@@ -80,7 +76,8 @@ export interface User {
   name: string;
   /** @minLength 1 */
   profileImage: string;
-  userId?: string;
+  /** @minLength 1 */
+  userId: string;
 }
 
 export interface UpdateProblemAttemptResponse {
@@ -97,69 +94,88 @@ export interface UpdateProblemAttemptResponseApiResult {
 }
 
 export interface UpdateProblemAttemptRequest {
-  attemptStartDate?: string;
-  customProblemId?: string;
+  attemptStartDateUtc: string;
+  /** @nullable */
+  customProblemId?: string | null;
   /** @nullable */
   enrollmentId?: string | null;
-  leetcodeProblemId?: string;
   /** @nullable */
-  notes?: string | null;
-  problemAttemptId?: string;
-  timeTakenInMinutes?: number;
+  leetcodeProblemId?: string | null;
+  /** @minLength 1 */
+  notes: string;
+  /** @minLength 1 */
+  problemAttemptId: string;
+  timeTakenInMinutes: number;
 }
 
 export interface UpdateMockInterviewResponse {
   [key: string]: unknown;
 }
 
-export interface UpdateMockInterviewResponseApiResult {
-  error?: ApiError;
-  readonly isSuccess?: boolean;
-  responseBody?: UpdateMockInterviewResponse;
-  statusCode?: HttpStatusCode;
-  /** @nullable */
-  successMessage?: string | null;
-}
-
 export interface UpdateMockInterviewRequest {
   /** @nullable */
   enrollmentId?: string | null;
-  interviewerUserId?: string;
-  mockInterviewId?: string;
-  /** @nullable */
-  mockInterviewRoundDtos?: MockInterviewRoundDto[] | null;
-  startDate?: string;
-  timeTakenInMinutes?: number;
+  /** @minLength 1 */
+  interviewerUserId: string;
+  /** @minLength 1 */
+  mockInterviewId: string;
+  mockInterviewRoundDtos: MockInterviewRoundDto[];
+  startDate: string;
+  timeTakenInMinutes: number;
 }
 
-export interface Season {
-  endDate: string;
+export type SeasonRole = (typeof SeasonRole)[keyof typeof SeasonRole];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const SeasonRole = {
+  Student: 0,
+  Mentor: 1,
+  Coordinator: 2,
+} as const;
+
+export interface SeasonEntity {
+  endDateInclusiveUtc: string;
   /** @minLength 1 */
   imageUrl: string;
   /** @minLength 1 */
   location: string;
   /** @minLength 1 */
   name: string;
-  seasonId?: string;
+  /** @minLength 1 */
+  seasonId: string;
   /** @minLength 1 */
   slug: string;
-  startDate: string;
+  startDateInclusiveUtc: string;
 }
 
-export interface Role {
-  /** @minLength 1 */
-  name: string;
-  roleId: string;
-}
-
-export interface Problem {
-  /** @nullable */
-  leetcodeProblemCategories?: LeetcodeProblemCategory[] | null;
+export interface ProblemEntity {
   /** @minLength 1 */
   link: string;
+  /** @minLength 1 */
   problemId: string;
   /** @minLength 1 */
   title: string;
+}
+
+export interface ProblemAttemptEntity {
+  attemptStartDateUtc: string;
+  customProblem?: CustomProblemEntity;
+  /** @nullable */
+  customProblemId?: string | null;
+  enrollment?: EnrollmentEntity;
+  /** @nullable */
+  enrollmentId?: string | null;
+  leetcodeProblem?: LeetcodeProblemEntity;
+  /** @nullable */
+  leetcodeProblemId?: string | null;
+  /** @minLength 1 */
+  notes: string;
+  /** @minLength 1 */
+  problemAttemptId: string;
+  timeTakenInMinutes: number;
+  user?: UserEntity;
+  /** @minLength 1 */
+  userId: string;
 }
 
 export interface MockInterviewRoundDto {
@@ -170,37 +186,43 @@ export interface MockInterviewRoundDto {
   mockInterviewRoundId?: string | null;
 }
 
-export interface MockInterviewRound {
-  behaviouralMockInterviewRound?: BehaviouralMockInterviewRound;
-  /** @nullable */
-  behaviouralMockInterviewRoundId?: string | null;
-  customMockInterviewRound?: CustomMockInterviewRound;
-  /** @nullable */
-  customMockInterviewRoundId?: string | null;
-  /** @nullable */
-  intervieweeComment?: string | null;
-  isReviewedByInterviewee?: boolean;
-  leetcodeMockInterviewRound?: LeetcodeMockInterviewRound;
-  /** @nullable */
-  leetcodeMockInterviewRoundId?: string | null;
-  mockInterviewId: string;
-  mockInterviewRoundId: string;
-}
-
-export interface MockInterview {
-  enrollment?: Enrollment;
+export interface MockInterviewEntity {
+  enrollment?: EnrollmentEntity;
   /** @nullable */
   enrollmentId?: string | null;
-  interviewee: User;
+  interviewee?: UserEntity;
+  /** @minLength 1 */
   intervieweeUserId: string;
-  interviewer: User;
+  interviewer?: UserEntity;
+  /** @minLength 1 */
   interviewerUserId: string;
   isPass: boolean;
+  /** @minLength 1 */
   mockInterviewId: string;
   /** @nullable */
-  mockInterviewRounds?: MockInterviewRound[] | null;
+  mockInterviewRounds?: MockInterviewRoundEntity[] | null;
   startDate: string;
   timeTakenInMinutes: number;
+}
+
+export interface MockInterviewRoundEntity {
+  behaviouralMockInterviewRound?: BehaviouralMockInterviewRoundEntity;
+  /** @nullable */
+  behaviouralMockInterviewRoundId?: string | null;
+  customMockInterviewRound?: CustomMockInterviewRoundEntity;
+  /** @nullable */
+  customMockInterviewRoundId?: string | null;
+  /** @minLength 1 */
+  intervieweeComment: string;
+  isReviewedByInterviewee: boolean;
+  leetcodeMockInterviewRound?: LeetcodeMockInterviewRoundEntity;
+  /** @nullable */
+  leetcodeMockInterviewRoundId?: string | null;
+  mockInterview?: MockInterviewEntity;
+  /** @minLength 1 */
+  mockInterviewId: string;
+  /** @minLength 1 */
+  mockInterviewRoundId: string;
 }
 
 export interface MockCreateMockInterviewResponse {
@@ -217,79 +239,97 @@ export interface MockCreateMockInterviewResponseApiResult {
 }
 
 export interface MentorshipResponse {
-  mentee: Enrollment;
-  mentor: Enrollment;
-  mentorshipId: string;
-  season: Season;
-}
-
-export interface Mentorship {
-  menteeEnrollment: Enrollment;
-  menteeEnrollmentId: string;
-  mentorEnrollment: Enrollment;
-  mentorEnrollmentId: string;
-  mentorshipId: string;
-}
-
-export interface LeetcodeProblemDifficulty {
-  leetcodeProblemDifficultyId: string;
   /** @minLength 1 */
-  name: string;
+  menteeEnrollmentId: string;
+  /** @minLength 1 */
+  menteeName: string;
+  /** @minLength 1 */
+  mentorEnrollmentId: string;
+  /** @minLength 1 */
+  mentorName: string;
+  /** @minLength 1 */
+  mentorshipId: string;
+  /** @minLength 1 */
+  seasonId: string;
+  /** @minLength 1 */
+  seasonName: string;
+  /** @minLength 1 */
+  seasonSlug: string;
 }
 
-export interface LeetcodeProblemCategory {
+export interface MenteeResponseDto {
+  /** @minLength 1 */
+  menteeEnrollmentId: string;
+  /** @minLength 1 */
+  menteeName: string;
+}
+
+export type LeetcodeProblemDifficulty =
+  (typeof LeetcodeProblemDifficulty)[keyof typeof LeetcodeProblemDifficulty];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const LeetcodeProblemDifficulty = {
+  Easy: 0,
+  Medium: 1,
+  Hard: 2,
+} as const;
+
+export interface LeetcodeProblemEntity {
+  isPremium: boolean;
+  /** @nullable */
+  leetcodeProblemCategories?: LeetcodeProblemCategoryEntity[] | null;
+  leetcodeProblemDifficulty: LeetcodeProblemDifficulty;
+  /** @minLength 1 */
+  leetcodeProblemId: string;
+  problem?: ProblemEntity;
+  /** @minLength 1 */
+  problemId: string;
+}
+
+export interface LeetcodeProblemDto {
+  difficulty: LeetcodeProblemDifficulty;
+  isPremium: boolean;
+  /** @minLength 1 */
+  leetcodeProblemId: string;
+  /** @minLength 1 */
+  link: string;
+  /** @minLength 1 */
+  title: string;
+}
+
+export interface LeetcodeProblemCategoryEntity {
+  /** @minLength 1 */
   leetcodeProblemCategoryId: string;
   /** @minLength 1 */
   name: string;
 }
 
-export interface LeetcodeProblem {
-  isPremium: boolean;
-  /** @nullable */
-  leetcodeProblemCategories?: LeetcodeProblemCategory[] | null;
-  leetcodeProblemDifficulty: LeetcodeProblemDifficulty;
-  leetcodeProblemId: string;
-  problem: Problem;
-  problemId: string;
-}
-
-export interface ProblemAttempt {
-  attemptStartDate: string;
-  customProblem?: CustomProblem;
-  /** @nullable */
-  customProblemId?: string | null;
-  enrollment?: Enrollment;
-  /** @nullable */
-  enrollmentId?: string | null;
-  leetcodeProblem?: LeetcodeProblem;
-  /** @nullable */
-  leetcodeProblemId?: string | null;
-  /** @minLength 1 */
-  notes: string;
-  problemAttemptId: string;
-  timeTakenInMinutes: number;
-  user: User;
-  userId: string;
-}
-
-export interface LeetcodeMockInterviewRoundDto {
-  algorithmDesignScore?: number;
-  codingScore?: number;
-  complexityAnalysisScore?: number;
-  confirmQuestionScore?: number;
-  leetcodeProblemId?: string;
-  testingScore?: number;
-}
-
-export interface LeetcodeMockInterviewRound {
+export interface LeetcodeMockInterviewRoundEntity {
   algorithmDesignScore: number;
   codingScore: number;
   complexityAnalysisScore: number;
   confirmQuestionScore: number;
+  /** @minLength 1 */
   leetcodeMockInterviewRoundId: string;
-  leetcodeProblem: LeetcodeProblem;
+  leetcodeProblem?: LeetcodeProblemEntity;
+  /** @minLength 1 */
   leetcodeProblemId: string;
+  mockInterview?: MockInterviewEntity;
+  /** @minLength 1 */
   mockInterviewId: string;
+  mockInterviewRound?: MockInterviewRoundEntity;
+  /** @minLength 1 */
+  mockInterviewRoundId: string;
+  testingScore: number;
+}
+
+export interface LeetcodeMockInterviewRoundDto {
+  algorithmDesignScore: number;
+  codingScore: number;
+  complexityAnalysisScore: number;
+  confirmQuestionScore: number;
+  /** @minLength 1 */
+  leetcodeProblemId: string;
   testingScore: number;
 }
 
@@ -307,81 +347,90 @@ export interface KickStudentResponseApiResult {
 }
 
 export interface KickStudentRequest {
-  /** @nullable */
-  seasonSlug?: string | null;
-  studentEnrollmentId?: string;
+  /** @minLength 1 */
+  menteeEnrollmentId: string;
+  /** @minLength 1 */
+  seasonSlug: string;
 }
 
 export type HttpStatusCode = (typeof HttpStatusCode)[keyof typeof HttpStatusCode];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const HttpStatusCode = {
-  NUMBER_100: 100,
-  NUMBER_101: 101,
-  NUMBER_102: 102,
-  NUMBER_103: 103,
-  NUMBER_200: 200,
-  NUMBER_201: 201,
-  NUMBER_202: 202,
-  NUMBER_203: 203,
-  NUMBER_204: 204,
-  NUMBER_205: 205,
-  NUMBER_206: 206,
-  NUMBER_207: 207,
-  NUMBER_208: 208,
-  NUMBER_226: 226,
-  NUMBER_300: 300,
-  NUMBER_301: 301,
-  NUMBER_302: 302,
-  NUMBER_303: 303,
-  NUMBER_304: 304,
-  NUMBER_305: 305,
-  NUMBER_306: 306,
-  NUMBER_307: 307,
-  NUMBER_308: 308,
-  NUMBER_400: 400,
-  NUMBER_401: 401,
-  NUMBER_402: 402,
-  NUMBER_403: 403,
-  NUMBER_404: 404,
-  NUMBER_405: 405,
-  NUMBER_406: 406,
-  NUMBER_407: 407,
-  NUMBER_408: 408,
-  NUMBER_409: 409,
-  NUMBER_410: 410,
-  NUMBER_411: 411,
-  NUMBER_412: 412,
-  NUMBER_413: 413,
-  NUMBER_414: 414,
-  NUMBER_415: 415,
-  NUMBER_416: 416,
-  NUMBER_417: 417,
-  NUMBER_421: 421,
-  NUMBER_422: 422,
-  NUMBER_423: 423,
-  NUMBER_424: 424,
-  NUMBER_426: 426,
-  NUMBER_428: 428,
-  NUMBER_429: 429,
-  NUMBER_431: 431,
-  NUMBER_451: 451,
-  NUMBER_500: 500,
-  NUMBER_501: 501,
-  NUMBER_502: 502,
-  NUMBER_503: 503,
-  NUMBER_504: 504,
-  NUMBER_505: 505,
-  NUMBER_506: 506,
-  NUMBER_507: 507,
-  NUMBER_508: 508,
-  NUMBER_510: 510,
-  NUMBER_511: 511,
+  Continue: 100,
+  SwitchingProtocols: 101,
+  Processing: 102,
+  EarlyHints: 103,
+  OK: 200,
+  Created: 201,
+  Accepted: 202,
+  NonAuthoritativeInformation: 203,
+  NoContent: 204,
+  ResetContent: 205,
+  PartialContent: 206,
+  MultiStatus: 207,
+  AlreadyReported: 208,
+  IMUsed: 226,
+  MultipleChoices: 300,
+  MovedPermanently: 301,
+  Found: 302,
+  SeeOther: 303,
+  NotModified: 304,
+  UseProxy: 305,
+  Unused: 306,
+  RedirectKeepVerb: 307,
+  PermanentRedirect: 308,
+  BadRequest: 400,
+  Unauthorized: 401,
+  PaymentRequired: 402,
+  Forbidden: 403,
+  NotFound: 404,
+  MethodNotAllowed: 405,
+  NotAcceptable: 406,
+  ProxyAuthenticationRequired: 407,
+  RequestTimeout: 408,
+  Conflict: 409,
+  Gone: 410,
+  LengthRequired: 411,
+  PreconditionFailed: 412,
+  RequestEntityTooLarge: 413,
+  RequestUriTooLong: 414,
+  UnsupportedMediaType: 415,
+  RequestedRangeNotSatisfiable: 416,
+  ExpectationFailed: 417,
+  MisdirectedRequest: 421,
+  UnprocessableEntity: 422,
+  Locked: 423,
+  FailedDependency: 424,
+  UpgradeRequired: 426,
+  PreconditionRequired: 428,
+  TooManyRequests: 429,
+  RequestHeaderFieldsTooLarge: 431,
+  UnavailableForLegalReasons: 451,
+  InternalServerError: 500,
+  NotImplemented: 501,
+  BadGateway: 502,
+  ServiceUnavailable: 503,
+  GatewayTimeout: 504,
+  HttpVersionNotSupported: 505,
+  VariantAlsoNegotiates: 506,
+  InsufficientStorage: 507,
+  LoopDetected: 508,
+  NotExtended: 510,
+  NetworkAuthenticationRequired: 511,
 } as const;
 
-export interface GetUserListResponse {
+export interface UpdateMockInterviewResponseApiResult {
+  error?: ApiError;
+  readonly isSuccess?: boolean;
+  responseBody?: UpdateMockInterviewResponse;
+  statusCode?: HttpStatusCode;
   /** @nullable */
-  users?: User[] | null;
+  successMessage?: string | null;
+}
+
+export interface GetUserListResponse {
+  users: UserEntity[];
 }
 
 export interface GetUserListResponseApiResult {
@@ -394,8 +443,7 @@ export interface GetUserListResponseApiResult {
 }
 
 export interface GetProblemAttemptsResponse {
-  /** @nullable */
-  problemAttempts?: ProblemAttempt[] | null;
+  problemAttempts: ProblemAttemptEntity[];
 }
 
 export interface GetProblemAttemptsResponseApiResult {
@@ -408,8 +456,7 @@ export interface GetProblemAttemptsResponseApiResult {
 }
 
 export interface GetMockInterviewsResponse {
-  /** @nullable */
-  mockInterviews?: MockInterview[] | null;
+  mockInterviews: MockInterviewEntity[];
 }
 
 export interface GetMockInterviewsResponseApiResult {
@@ -422,8 +469,7 @@ export interface GetMockInterviewsResponseApiResult {
 }
 
 export interface GetLeetcodeProblemsResponse {
-  /** @nullable */
-  leetcodeProblems?: LeetcodeProblem[] | null;
+  leetcodeProblems: LeetcodeProblemDto[];
 }
 
 export interface GetLeetcodeProblemsResponseApiResult {
@@ -436,10 +482,10 @@ export interface GetLeetcodeProblemsResponseApiResult {
 }
 
 export interface GetIsUserEnrolledResponse {
-  /** @nullable */
-  enrollmentId?: string | null;
-  isEnrolled?: boolean;
-  role?: Role;
+  /** @minLength 1 */
+  enrollmentId: string;
+  isEnrolled: boolean;
+  role: SeasonRole;
 }
 
 export interface GetIsUserEnrolledResponseApiResult {
@@ -452,7 +498,7 @@ export interface GetIsUserEnrolledResponseApiResult {
 }
 
 export interface GetCurrentUserResponse {
-  user?: User;
+  user: UserEntity;
 }
 
 export interface GetCurrentUserResponseApiResult {
@@ -465,8 +511,7 @@ export interface GetCurrentUserResponseApiResult {
 }
 
 export interface GetCurrentUserMenteesListResponse {
-  /** @nullable */
-  mentees?: Mentorship[] | null;
+  mentees: MenteeResponseDto[];
 }
 
 export interface GetCurrentUserMenteesListResponseApiResult {
@@ -478,32 +523,18 @@ export interface GetCurrentUserMenteesListResponseApiResult {
   successMessage?: string | null;
 }
 
-export interface EnrollmentResponse {
-  enrollmentId: string;
+export interface EnrollmentResponseDto {
+  role: SeasonRole;
   /** @minLength 1 */
-  role: string;
-  roleId: string;
+  seasonImageUrl: string;
   /** @minLength 1 */
-  season: string;
-  seasonId: string;
+  seasonName: string;
   /** @minLength 1 */
-  user: string;
-  userId: string;
-}
-
-export interface Enrollment {
-  enrollmentId: string;
-  role: Role;
-  roleId: string;
-  season: Season;
-  seasonId: string;
-  user: User;
-  userId: string;
+  seasonSlug: string;
 }
 
 export interface GetCurrentUserEnrollmentsResponse {
-  /** @nullable */
-  enrollments?: Enrollment[] | null;
+  enrollments: EnrollmentResponseDto[];
 }
 
 export interface GetCurrentUserEnrollmentsResponseApiResult {
@@ -513,6 +544,32 @@ export interface GetCurrentUserEnrollmentsResponseApiResult {
   statusCode?: HttpStatusCode;
   /** @nullable */
   successMessage?: string | null;
+}
+
+export interface EnrollmentResponse {
+  /** @minLength 1 */
+  enrollmentId: string;
+  role: SeasonRole;
+  /** @minLength 1 */
+  seasonId: string;
+  /** @minLength 1 */
+  seasonName: string;
+  /** @minLength 1 */
+  userId: string;
+  /** @minLength 1 */
+  userName: string;
+}
+
+export interface EnrollmentEntity {
+  /** @minLength 1 */
+  enrollmentId: string;
+  role: SeasonRole;
+  season?: SeasonEntity;
+  /** @minLength 1 */
+  seasonId: string;
+  user?: UserEntity;
+  /** @minLength 1 */
+  userId: string;
 }
 
 export interface DeleteProblemAttemptResponse {
@@ -541,31 +598,39 @@ export interface DeleteMockInterviewResponseApiResult {
   successMessage?: string | null;
 }
 
-export interface CustomProblem {
+export interface CustomProblemEntity {
+  /** @minLength 1 */
   customProblemId: string;
   /** @minLength 1 */
   difficulty: string;
-  problem: Problem;
+  problem?: ProblemEntity;
+  /** @minLength 1 */
   problemId: string;
   /** @minLength 1 */
   question: string;
 }
 
-export interface CustomMockInterviewRoundDto {
-  /** @nullable */
-  content?: string | null;
-  /** @nullable */
-  link?: string | null;
-  score?: number;
-}
-
-export interface CustomMockInterviewRound {
+export interface CustomMockInterviewRoundEntity {
   /** @minLength 1 */
   content: string;
+  /** @minLength 1 */
   customMockInterviewRoundId: string;
   /** @minLength 1 */
   link: string;
+  mockInterview?: MockInterviewEntity;
+  /** @minLength 1 */
   mockInterviewId: string;
+  mockInterviewRound?: MockInterviewRoundEntity;
+  /** @minLength 1 */
+  mockInterviewRoundId: string;
+  score: number;
+}
+
+export interface CustomMockInterviewRoundDto {
+  /** @minLength 1 */
+  content: string;
+  /** @minLength 1 */
+  link: string;
   score: number;
 }
 
@@ -583,27 +648,38 @@ export interface CreateUserIfNotExistsResponseApiResult {
 }
 
 export interface CreateUserIfNotExistsRequest {
-  /** @nullable */
-  discordId?: string | null;
-  /** @nullable */
-  name?: string | null;
-  /** @nullable */
-  profileImage?: string | null;
+  /** @minLength 1 */
+  discordId: string;
+  /** @minLength 1 */
+  name: string;
+  /** @minLength 1 */
+  profileImage: string;
 }
 
 export interface CreateProblemAttemptResponse {
   [key: string]: unknown;
 }
 
+export interface CreateProblemAttemptResponseApiResult {
+  error?: ApiError;
+  readonly isSuccess?: boolean;
+  responseBody?: CreateProblemAttemptResponse;
+  statusCode?: HttpStatusCode;
+  /** @nullable */
+  successMessage?: string | null;
+}
+
 export interface CreateProblemAttemptRequest {
-  attemptStartDate?: string;
-  customProblemId?: string;
+  attemptStartDateUtc: string;
+  /** @nullable */
+  customProblemId?: string | null;
   /** @nullable */
   enrollmentId?: string | null;
-  leetcodeProblemId?: string;
   /** @nullable */
-  notes?: string | null;
-  timeTakenInMinutes?: number;
+  leetcodeProblemId?: string | null;
+  /** @minLength 1 */
+  notes: string;
+  timeTakenInMinutes: number;
 }
 
 export interface CreateMockInterviewResponse {
@@ -622,21 +698,27 @@ export interface CreateMockInterviewResponseApiResult {
 export interface CreateMockInterviewRequest {
   /** @nullable */
   enrollmentId?: string | null;
-  interviewerUserId?: string;
-  /** @nullable */
-  mockInterviewRoundDtos?: MockInterviewRoundDto[] | null;
-  startDate?: string;
-  timeTakenInMinutes?: number;
+  /** @minLength 1 */
+  interviewerUserId: string;
+  mockInterviewRoundDtos: MockInterviewRoundDto[];
+  startDate: string;
+  timeTakenInMinutes: number;
+}
+
+export interface BehaviouralMockInterviewRoundEntity {
+  behavioralScore: number;
+  /** @minLength 1 */
+  behaviouralMockInterviewRoundId: string;
+  mockInterview?: MockInterviewEntity;
+  /** @minLength 1 */
+  mockInterviewId: string;
+  mockInterviewRound?: MockInterviewRoundEntity;
+  /** @minLength 1 */
+  mockInterviewRoundId: string;
 }
 
 export interface BehaviouralMockInterviewRoundDto {
-  behavioralScore?: number;
-}
-
-export interface BehaviouralMockInterviewRound {
   behavioralScore: number;
-  behaviouralMockInterviewRoundId: string;
-  mockInterviewId: string;
 }
 
 export interface ApiError {
@@ -646,26 +728,18 @@ export interface ApiError {
   validationErrors?: ValidationError[] | null;
 }
 
-export interface CreateProblemAttemptResponseApiResult {
-  error?: ApiError;
-  readonly isSuccess?: boolean;
-  responseBody?: CreateProblemAttemptResponse;
-  statusCode?: HttpStatusCode;
-  /** @nullable */
-  successMessage?: string | null;
-}
-
 export interface AdminUpdateUserResponse {
-  /** @nullable */
-  discordId?: string | null;
-  /** @nullable */
-  email?: string | null;
-  isAdmin?: boolean;
-  /** @nullable */
-  name?: string | null;
-  /** @nullable */
-  profileImage?: string | null;
-  userId?: string;
+  /** @minLength 1 */
+  discordId: string;
+  /** @minLength 1 */
+  email: string;
+  isAdmin: boolean;
+  /** @minLength 1 */
+  name: string;
+  /** @minLength 1 */
+  profileImage: string;
+  /** @minLength 1 */
+  userId: string;
 }
 
 export interface AdminUpdateUserResponseApiResult {
@@ -678,29 +752,30 @@ export interface AdminUpdateUserResponseApiResult {
 }
 
 export interface AdminUpdateUserRequest {
-  /** @nullable */
-  discordId?: string | null;
-  /** @nullable */
-  email?: string | null;
-  isAdmin?: boolean;
-  /** @nullable */
-  name?: string | null;
-  /** @nullable */
-  profileImage?: string | null;
+  /** @minLength 1 */
+  discordId: string;
+  /** @minLength 1 */
+  email: string;
+  isAdmin: boolean;
+  /** @minLength 1 */
+  name: string;
+  /** @minLength 1 */
+  profileImage: string;
 }
 
 export interface AdminUpdateSeasonResponse {
-  endDate?: string;
-  /** @nullable */
-  imageUrl?: string | null;
-  /** @nullable */
-  location?: string | null;
-  /** @nullable */
-  name?: string | null;
-  seasonId?: string;
-  /** @nullable */
-  slug?: string | null;
-  startDate?: string;
+  endDateInclusiveUtc: string;
+  /** @minLength 1 */
+  imageUrl: string;
+  /** @minLength 1 */
+  location: string;
+  /** @minLength 1 */
+  name: string;
+  /** @minLength 1 */
+  seasonId: string;
+  /** @minLength 1 */
+  slug: string;
+  startDateInclusiveUtc: string;
 }
 
 export interface AdminUpdateSeasonResponseApiResult {
@@ -713,44 +788,27 @@ export interface AdminUpdateSeasonResponseApiResult {
 }
 
 export interface AdminUpdateSeasonRequest {
-  endDate?: string;
-  /** @nullable */
-  imageUrl?: string | null;
-  /** @nullable */
-  location?: string | null;
-  /** @nullable */
-  name?: string | null;
-  seasonId?: string;
-  /** @nullable */
-  slug?: string | null;
-  startDate?: string;
-}
-
-export interface AdminUpdateRoleResponse {
-  /** @nullable */
-  name?: string | null;
-  roleId?: string;
-}
-
-export interface AdminUpdateRoleResponseApiResult {
-  error?: ApiError;
-  readonly isSuccess?: boolean;
-  responseBody?: AdminUpdateRoleResponse;
-  statusCode?: HttpStatusCode;
-  /** @nullable */
-  successMessage?: string | null;
-}
-
-export interface AdminUpdateRoleRequest {
-  /** @nullable */
-  name?: string | null;
-  roleId?: string;
+  endDateInclusiveUtc: string;
+  /** @minLength 1 */
+  imageUrl: string;
+  /** @minLength 1 */
+  location: string;
+  /** @minLength 1 */
+  name: string;
+  /** @minLength 1 */
+  seasonId: string;
+  /** @minLength 1 */
+  slug: string;
+  startDateInclusiveUtc: string;
 }
 
 export interface AdminUpdateMentorshipResponse {
-  menteeEnrollmentId?: string;
-  mentorEnrollmentId?: string;
-  mentorshipId?: string;
+  /** @minLength 1 */
+  menteeEnrollmentId: string;
+  /** @minLength 1 */
+  mentorEnrollmentId: string;
+  /** @minLength 1 */
+  mentorshipId: string;
 }
 
 export interface AdminUpdateMentorshipResponseApiResult {
@@ -763,16 +821,22 @@ export interface AdminUpdateMentorshipResponseApiResult {
 }
 
 export interface AdminUpdateMentorshipRequest {
-  menteeEnrollmentId?: string;
-  mentorEnrollmentId?: string;
-  mentorshipId?: string;
+  /** @minLength 1 */
+  menteeEnrollmentId: string;
+  /** @minLength 1 */
+  mentorEnrollmentId: string;
+  /** @minLength 1 */
+  mentorshipId: string;
 }
 
 export interface AdminUpdateEnrollmentResponse {
-  enrollmentId?: string;
-  roleId?: string;
-  seasonId?: string;
-  userId?: string;
+  /** @minLength 1 */
+  enrollmentId: string;
+  role: SeasonRole;
+  /** @minLength 1 */
+  seasonId: string;
+  /** @minLength 1 */
+  userId: string;
 }
 
 export interface AdminUpdateEnrollmentResponseApiResult {
@@ -785,10 +849,13 @@ export interface AdminUpdateEnrollmentResponseApiResult {
 }
 
 export interface AdminUpdateEnrollmentRequest {
-  enrollmentId?: string;
-  roleId?: string;
-  seasonId?: string;
-  userId?: string;
+  /** @minLength 1 */
+  enrollmentId: string;
+  role: SeasonRole;
+  /** @minLength 1 */
+  seasonId: string;
+  /** @minLength 1 */
+  userId: string;
 }
 
 export interface AdminPopulateLeetcodeQuestionsResponse {
@@ -805,8 +872,7 @@ export interface AdminPopulateLeetcodeQuestionsResponseApiResult {
 }
 
 export interface AdminListUserResponse {
-  /** @nullable */
-  users?: User[] | null;
+  users: UserEntity[];
 }
 
 export interface AdminListUserResponseApiResult {
@@ -819,8 +885,7 @@ export interface AdminListUserResponseApiResult {
 }
 
 export interface AdminListSeasonResponse {
-  /** @nullable */
-  seasons?: Season[] | null;
+  seasons: SeasonEntity[];
 }
 
 export interface AdminListSeasonResponseApiResult {
@@ -832,23 +897,8 @@ export interface AdminListSeasonResponseApiResult {
   successMessage?: string | null;
 }
 
-export interface AdminListRoleResponse {
-  /** @nullable */
-  roles?: Role[] | null;
-}
-
-export interface AdminListRoleResponseApiResult {
-  error?: ApiError;
-  readonly isSuccess?: boolean;
-  responseBody?: AdminListRoleResponse;
-  statusCode?: HttpStatusCode;
-  /** @nullable */
-  successMessage?: string | null;
-}
-
 export interface AdminListMentorshipResponse {
-  /** @nullable */
-  mentorships?: MentorshipResponse[] | null;
+  mentorships: MentorshipResponse[];
 }
 
 export interface AdminListMentorshipResponseApiResult {
@@ -861,8 +911,7 @@ export interface AdminListMentorshipResponseApiResult {
 }
 
 export interface AdminListEnrollmentResponse {
-  /** @nullable */
-  enrollments?: EnrollmentResponse[] | null;
+  enrollments: EnrollmentResponse[];
 }
 
 export interface AdminListEnrollmentResponseApiResult {
@@ -900,19 +949,6 @@ export interface AdminDeleteSeasonResponseApiResult {
   successMessage?: string | null;
 }
 
-export interface AdminDeleteRoleResponse {
-  [key: string]: unknown;
-}
-
-export interface AdminDeleteRoleResponseApiResult {
-  error?: ApiError;
-  readonly isSuccess?: boolean;
-  responseBody?: AdminDeleteRoleResponse;
-  statusCode?: HttpStatusCode;
-  /** @nullable */
-  successMessage?: string | null;
-}
-
 export interface AdminDeleteMentorshipResponse {
   [key: string]: unknown;
 }
@@ -940,16 +976,17 @@ export interface AdminDeleteEnrollmentResponseApiResult {
 }
 
 export interface AdminCreateUserResponse {
-  /** @nullable */
-  discordId?: string | null;
-  /** @nullable */
-  email?: string | null;
-  isAdmin?: boolean;
-  /** @nullable */
-  name?: string | null;
-  /** @nullable */
-  profileImage?: string | null;
-  userId?: string;
+  /** @minLength 1 */
+  discordId: string;
+  /** @minLength 1 */
+  email: string;
+  isAdmin: boolean;
+  /** @minLength 1 */
+  name: string;
+  /** @minLength 1 */
+  profileImage: string;
+  /** @minLength 1 */
+  userId: string;
 }
 
 export interface AdminCreateUserResponseApiResult {
@@ -962,29 +999,30 @@ export interface AdminCreateUserResponseApiResult {
 }
 
 export interface AdminCreateUserRequest {
-  /** @nullable */
-  discordId?: string | null;
-  /** @nullable */
-  email?: string | null;
-  isAdmin?: boolean;
-  /** @nullable */
-  name?: string | null;
-  /** @nullable */
-  profileImage?: string | null;
+  /** @minLength 1 */
+  discordId: string;
+  /** @minLength 1 */
+  email: string;
+  isAdmin: boolean;
+  /** @minLength 1 */
+  name: string;
+  /** @minLength 1 */
+  profileImage: string;
 }
 
 export interface AdminCreateSeasonResponse {
-  endDate?: string;
-  /** @nullable */
-  imageUrl?: string | null;
-  /** @nullable */
-  location?: string | null;
-  /** @nullable */
-  name?: string | null;
-  seasonId?: string;
-  /** @nullable */
-  slug?: string | null;
-  startDate?: string;
+  endDateInclusiveUtc: string;
+  /** @minLength 1 */
+  imageUrl: string;
+  /** @minLength 1 */
+  location: string;
+  /** @minLength 1 */
+  name: string;
+  /** @minLength 1 */
+  seasonId: string;
+  /** @minLength 1 */
+  slug: string;
+  startDateInclusiveUtc: string;
 }
 
 export interface AdminCreateSeasonResponseApiResult {
@@ -997,42 +1035,25 @@ export interface AdminCreateSeasonResponseApiResult {
 }
 
 export interface AdminCreateSeasonRequest {
-  endDate?: string;
-  /** @nullable */
-  imageUrl?: string | null;
-  /** @nullable */
-  location?: string | null;
-  /** @nullable */
-  name?: string | null;
-  /** @nullable */
-  slug?: string | null;
-  startDate?: string;
-}
-
-export interface AdminCreateRoleResponse {
-  /** @nullable */
-  name?: string | null;
-  roleId?: string;
-}
-
-export interface AdminCreateRoleResponseApiResult {
-  error?: ApiError;
-  readonly isSuccess?: boolean;
-  responseBody?: AdminCreateRoleResponse;
-  statusCode?: HttpStatusCode;
-  /** @nullable */
-  successMessage?: string | null;
-}
-
-export interface AdminCreateRoleRequest {
-  /** @nullable */
-  name?: string | null;
+  endDateInclusiveUtc: string;
+  /** @minLength 1 */
+  imageUrl: string;
+  /** @minLength 1 */
+  location: string;
+  /** @minLength 1 */
+  name: string;
+  /** @minLength 1 */
+  slug: string;
+  startDateInclusiveUtc: string;
 }
 
 export interface AdminCreateMentorshipResponse {
-  menteeEnrollmentId?: string;
-  mentorEnrollmentId?: string;
-  mentorshipId?: string;
+  /** @minLength 1 */
+  menteeEnrollmentId: string;
+  /** @minLength 1 */
+  mentorEnrollmentId: string;
+  /** @minLength 1 */
+  mentorshipId: string;
 }
 
 export interface AdminCreateMentorshipResponseApiResult {
@@ -1045,15 +1066,20 @@ export interface AdminCreateMentorshipResponseApiResult {
 }
 
 export interface AdminCreateMentorshipRequest {
-  menteeEnrollmentId?: string;
-  mentorEnrollmentId?: string;
+  /** @minLength 1 */
+  menteeEnrollmentId: string;
+  /** @minLength 1 */
+  mentorEnrollmentId: string;
 }
 
 export interface AdminCreateEnrollmentResponse {
-  enrollmentId?: string;
-  roleId?: string;
-  seasonId?: string;
-  userId?: string;
+  /** @minLength 1 */
+  enrollmentId: string;
+  role: SeasonRole;
+  /** @minLength 1 */
+  seasonId: string;
+  /** @minLength 1 */
+  userId: string;
 }
 
 export interface AdminCreateEnrollmentResponseApiResult {
@@ -1066,9 +1092,11 @@ export interface AdminCreateEnrollmentResponseApiResult {
 }
 
 export interface AdminCreateEnrollmentRequest {
-  roleId?: string;
-  seasonId?: string;
-  userId?: string;
+  role: SeasonRole;
+  /** @minLength 1 */
+  seasonId: string;
+  /** @minLength 1 */
+  userId: string;
 }
 
 type SecondParameter<T extends (...args: any) => any> = Parameters<T>[1];
@@ -1913,307 +1941,6 @@ export const useAdminUpdateSeason = <
   TContext
 > => {
   const mutationOptions = getAdminUpdateSeasonMutationOptions(options);
-
-  return useMutation(mutationOptions);
-};
-
-export const adminCreateRole = (
-  adminCreateRoleRequest: AdminCreateRoleRequest,
-  options?: SecondParameter<typeof CustomAxiosInstance>
-) => {
-  return CustomAxiosInstance<AdminCreateRoleResponseApiResult>(
-    {
-      url: `http://localhost:4000/api/admin/roles`,
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      data: adminCreateRoleRequest,
-    },
-    options
-  );
-};
-
-export const getAdminCreateRoleMutationOptions = <
-  TError = AdminCreateRoleResponseApiResult,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof adminCreateRole>>,
-    TError,
-    { data: AdminCreateRoleRequest },
-    TContext
-  >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof adminCreateRole>>,
-  TError,
-  { data: AdminCreateRoleRequest },
-  TContext
-> => {
-  const { mutation: mutationOptions, request: requestOptions } = options ?? {};
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof adminCreateRole>>,
-    { data: AdminCreateRoleRequest }
-  > = (props) => {
-    const { data } = props ?? {};
-
-    return adminCreateRole(data, requestOptions);
-  };
-
-  return { mutationFn, ...mutationOptions };
-};
-
-export type AdminCreateRoleMutationResult = NonNullable<
-  Awaited<ReturnType<typeof adminCreateRole>>
->;
-export type AdminCreateRoleMutationBody = AdminCreateRoleRequest;
-export type AdminCreateRoleMutationError = AdminCreateRoleResponseApiResult;
-
-export const useAdminCreateRole = <
-  TError = AdminCreateRoleResponseApiResult,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof adminCreateRole>>,
-    TError,
-    { data: AdminCreateRoleRequest },
-    TContext
-  >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseMutationResult<
-  Awaited<ReturnType<typeof adminCreateRole>>,
-  TError,
-  { data: AdminCreateRoleRequest },
-  TContext
-> => {
-  const mutationOptions = getAdminCreateRoleMutationOptions(options);
-
-  return useMutation(mutationOptions);
-};
-
-export const adminDeleteRole = (
-  params: AdminDeleteRoleParams,
-  options?: SecondParameter<typeof CustomAxiosInstance>
-) => {
-  return CustomAxiosInstance<AdminDeleteRoleResponseApiResult>(
-    { url: `http://localhost:4000/api/admin/roles`, method: 'DELETE', params },
-    options
-  );
-};
-
-export const getAdminDeleteRoleMutationOptions = <
-  TError = AdminDeleteRoleResponseApiResult,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof adminDeleteRole>>,
-    TError,
-    { params: AdminDeleteRoleParams },
-    TContext
-  >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof adminDeleteRole>>,
-  TError,
-  { params: AdminDeleteRoleParams },
-  TContext
-> => {
-  const { mutation: mutationOptions, request: requestOptions } = options ?? {};
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof adminDeleteRole>>,
-    { params: AdminDeleteRoleParams }
-  > = (props) => {
-    const { params } = props ?? {};
-
-    return adminDeleteRole(params, requestOptions);
-  };
-
-  return { mutationFn, ...mutationOptions };
-};
-
-export type AdminDeleteRoleMutationResult = NonNullable<
-  Awaited<ReturnType<typeof adminDeleteRole>>
->;
-
-export type AdminDeleteRoleMutationError = AdminDeleteRoleResponseApiResult;
-
-export const useAdminDeleteRole = <
-  TError = AdminDeleteRoleResponseApiResult,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof adminDeleteRole>>,
-    TError,
-    { params: AdminDeleteRoleParams },
-    TContext
-  >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseMutationResult<
-  Awaited<ReturnType<typeof adminDeleteRole>>,
-  TError,
-  { params: AdminDeleteRoleParams },
-  TContext
-> => {
-  const mutationOptions = getAdminDeleteRoleMutationOptions(options);
-
-  return useMutation(mutationOptions);
-};
-
-export const adminListRole = (
-  options?: SecondParameter<typeof CustomAxiosInstance>,
-  signal?: AbortSignal
-) => {
-  return CustomAxiosInstance<AdminListRoleResponseApiResult>(
-    { url: `http://localhost:4000/api/admin/roles`, method: 'GET', signal },
-    options
-  );
-};
-
-export const getAdminListRoleQueryKey = () => {
-  return [`http://localhost:4000/api/admin/roles`] as const;
-};
-
-export const getAdminListRoleQueryOptions = <
-  TData = Awaited<ReturnType<typeof adminListRole>>,
-  TError = AdminListRoleResponseApiResult,
->(options?: {
-  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof adminListRole>>, TError, TData>>;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {};
-
-  const queryKey = queryOptions?.queryKey ?? getAdminListRoleQueryKey();
-
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof adminListRole>>> = ({ signal }) =>
-    adminListRole(requestOptions, signal);
-
-  return { queryKey, queryFn, staleTime: 8000, ...queryOptions } as UseQueryOptions<
-    Awaited<ReturnType<typeof adminListRole>>,
-    TError,
-    TData
-  > & { queryKey: QueryKey };
-};
-
-export type AdminListRoleQueryResult = NonNullable<Awaited<ReturnType<typeof adminListRole>>>;
-export type AdminListRoleQueryError = AdminListRoleResponseApiResult;
-
-export function useAdminListRole<
-  TData = Awaited<ReturnType<typeof adminListRole>>,
-  TError = AdminListRoleResponseApiResult,
->(options: {
-  query: Partial<UseQueryOptions<Awaited<ReturnType<typeof adminListRole>>, TError, TData>> &
-    Pick<
-      DefinedInitialDataOptions<Awaited<ReturnType<typeof adminListRole>>, TError, TData>,
-      'initialData'
-    >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): DefinedUseQueryResult<TData, TError> & { queryKey: QueryKey };
-export function useAdminListRole<
-  TData = Awaited<ReturnType<typeof adminListRole>>,
-  TError = AdminListRoleResponseApiResult,
->(options?: {
-  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof adminListRole>>, TError, TData>> &
-    Pick<
-      UndefinedInitialDataOptions<Awaited<ReturnType<typeof adminListRole>>, TError, TData>,
-      'initialData'
-    >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseQueryResult<TData, TError> & { queryKey: QueryKey };
-export function useAdminListRole<
-  TData = Awaited<ReturnType<typeof adminListRole>>,
-  TError = AdminListRoleResponseApiResult,
->(options?: {
-  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof adminListRole>>, TError, TData>>;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseQueryResult<TData, TError> & { queryKey: QueryKey };
-
-export function useAdminListRole<
-  TData = Awaited<ReturnType<typeof adminListRole>>,
-  TError = AdminListRoleResponseApiResult,
->(options?: {
-  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof adminListRole>>, TError, TData>>;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
-  const queryOptions = getAdminListRoleQueryOptions(options);
-
-  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & { queryKey: QueryKey };
-
-  query.queryKey = queryOptions.queryKey;
-
-  return query;
-}
-
-export const adminUpdateRole = (
-  adminUpdateRoleRequest: AdminUpdateRoleRequest,
-  options?: SecondParameter<typeof CustomAxiosInstance>
-) => {
-  return CustomAxiosInstance<AdminUpdateRoleResponseApiResult>(
-    {
-      url: `http://localhost:4000/api/admin/roles`,
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      data: adminUpdateRoleRequest,
-    },
-    options
-  );
-};
-
-export const getAdminUpdateRoleMutationOptions = <
-  TError = AdminUpdateRoleResponseApiResult,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof adminUpdateRole>>,
-    TError,
-    { data: AdminUpdateRoleRequest },
-    TContext
-  >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof adminUpdateRole>>,
-  TError,
-  { data: AdminUpdateRoleRequest },
-  TContext
-> => {
-  const { mutation: mutationOptions, request: requestOptions } = options ?? {};
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof adminUpdateRole>>,
-    { data: AdminUpdateRoleRequest }
-  > = (props) => {
-    const { data } = props ?? {};
-
-    return adminUpdateRole(data, requestOptions);
-  };
-
-  return { mutationFn, ...mutationOptions };
-};
-
-export type AdminUpdateRoleMutationResult = NonNullable<
-  Awaited<ReturnType<typeof adminUpdateRole>>
->;
-export type AdminUpdateRoleMutationBody = AdminUpdateRoleRequest;
-export type AdminUpdateRoleMutationError = AdminUpdateRoleResponseApiResult;
-
-export const useAdminUpdateRole = <
-  TError = AdminUpdateRoleResponseApiResult,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof adminUpdateRole>>,
-    TError,
-    { data: AdminUpdateRoleRequest },
-    TContext
-  >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseMutationResult<
-  Awaited<ReturnType<typeof adminUpdateRole>>,
-  TError,
-  { data: AdminUpdateRoleRequest },
-  TContext
-> => {
-  const mutationOptions = getAdminUpdateRoleMutationOptions(options);
 
   return useMutation(mutationOptions);
 };

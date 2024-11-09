@@ -21,12 +21,14 @@ import {
 import { modals } from '@mantine/modals';
 import {
   GetProblemAttemptsResponseApiResult,
-  ProblemAttempt,
+  LeetcodeProblemDifficulty,
+  ProblemAttemptEntity,
   useCreateProblemAttempt,
   useDeleteProblemAttempt,
   useGetLeetcodeProblems,
   useUpdateProblemAttempt,
 } from '@/generated/api/client';
+import { LeetcodeProblemDifficultyReverseIndex } from '@/shared/entities/reverseIndex';
 import { LeetcodeProblemAttemptCreateModal } from './LeetcodeProblemAttemptCreateModal';
 import { LeetcodeProblemAttemptUpdateModal } from './LeetcodeProblemAttemptUpdateModal';
 import classes from './LeetcodeTable.module.css';
@@ -52,7 +54,7 @@ export const LeetcodeTable = ({
   const { mutateAsync: deleteProblemAttempt, status: isDeletingProblemAttemptStatus } =
     useDeleteProblemAttempt();
 
-  const openDeleteConfirmModal = (row: MRT_Row<ProblemAttempt>) => {
+  const openDeleteConfirmModal = (row: MRT_Row<ProblemAttemptEntity>) => {
     modals.openConfirmModal({
       title: 'Delete Problem Attempt',
       children: (
@@ -70,14 +72,15 @@ export const LeetcodeTable = ({
     });
   };
 
-  const columns = useMemo<MRT_ColumnDef<ProblemAttempt>[]>(
+  const columns = useMemo<MRT_ColumnDef<ProblemAttemptEntity>[]>(
     () => [
       {
         header: 'Attempt Date',
         id: 'attemptStartDate',
-        accessorFn: (row) => {
-          const startFormatted = dayjs(row.attemptStartDate).format('D MMM YYYY HH:mm');
-          return <Text size="sm">{startFormatted}</Text>;
+        accessorFn: (row) => dayjs(row.attemptStartDateUtc).format('D MMM YYYY HH:mm'),
+        Cell: ({ row }) => {
+          const startFormatted = dayjs(row.original.attemptStartDateUtc).format('D MMM YYYY HH:mm');
+          return startFormatted;
         },
       },
       {
@@ -86,32 +89,37 @@ export const LeetcodeTable = ({
       },
       {
         header: 'Title',
-        accessorFn: (row) => (
+        accessorFn: (row) => row.leetcodeProblem?.problem?.title,
+        Cell: ({ row }) => (
           <Anchor
-            href={row.leetcodeProblem?.problem.link}
+            href={row.original.leetcodeProblem?.problem?.link}
             target="_blank"
             inherit
             c={computedColorScheme === 'light' ? 'dark' : 'white'}
             underline="always"
           >
-            {row.leetcodeProblem?.problem.title}
+            {row.original.leetcodeProblem?.problem?.title}
           </Anchor>
         ),
       },
       {
         header: 'Difficulty',
         accessorFn: (row) => {
-          const difficulty = row.leetcodeProblem?.leetcodeProblemDifficulty.name;
+          const difficulty = row.leetcodeProblem?.leetcodeProblemDifficulty;
+          return difficulty != null ? LeetcodeProblemDifficultyReverseIndex[difficulty] : '';
+        },
+        Cell: ({ row }) => {
+          const difficulty = row.original.leetcodeProblem?.leetcodeProblemDifficulty;
 
           let textClass = '';
           switch (difficulty) {
-            case 'Easy':
+            case LeetcodeProblemDifficulty.Easy:
               textClass = classes.textGreen;
               break;
-            case 'Medium':
+            case LeetcodeProblemDifficulty.Medium:
               textClass = classes.textYellow;
               break;
-            case 'Hard':
+            case LeetcodeProblemDifficulty.Hard:
               textClass = classes.textRed;
               break;
             default:
@@ -119,17 +127,21 @@ export const LeetcodeTable = ({
 
           return (
             <Text size="sm" className={textClass}>
-              {difficulty}
+              {difficulty != null && LeetcodeProblemDifficultyReverseIndex[difficulty]}
             </Text>
           );
         },
       },
       {
         header: 'Category',
-        accessorFn: (row) => {
+        accessorFn: (row) =>
+          row.leetcodeProblem?.leetcodeProblemCategories
+            ?.map((category) => category.name)
+            .join(' ') || '',
+        Cell: ({ row }) => {
           return (
             <Flex className={classes.categoryContainer}>
-              {row.leetcodeProblem?.leetcodeProblemCategories?.map((category, index) => (
+              {row.original.leetcodeProblem?.leetcodeProblemCategories?.map((category, index) => (
                 <Pill size="sm" key={index} className={classes.category}>
                   {category.name}
                 </Pill>
@@ -240,6 +252,6 @@ type LeetcodeTableProps = {
   ) => Promise<
     QueryObserverResult<GetProblemAttemptsResponseApiResult, GetProblemAttemptsResponseApiResult>
   >;
-  problemAttempts: ProblemAttempt[] | null | undefined;
+  problemAttempts: ProblemAttemptEntity[] | null | undefined;
   enrollmentId: string;
 };

@@ -8,7 +8,7 @@ import {
   AdminListUserResponseApiResult,
   AdminUpdateUserRequest,
   AdminUpdateUserResponseApiResult,
-  User,
+  UserEntity,
 } from '@/generated/api/client';
 
 const schema = z.object({
@@ -102,7 +102,7 @@ export const AdminUsersUpdateModal = ({
 };
 
 type AdminUsersUpdateModalProps = {
-  table: MRT_TableInstance<User>;
+  table: MRT_TableInstance<UserEntity>;
   updateUser: UseMutateAsyncFunction<
     AdminUpdateUserResponseApiResult,
     AdminUpdateUserResponseApiResult,
@@ -111,7 +111,7 @@ type AdminUsersUpdateModalProps = {
     },
     unknown
   >;
-  row: MRT_Row<User>;
+  row: MRT_Row<UserEntity>;
   refetchUsers: (
     options?: RefetchOptions
   ) => Promise<QueryObserverResult<AdminListUserResponseApiResult, AdminListUserResponseApiResult>>;

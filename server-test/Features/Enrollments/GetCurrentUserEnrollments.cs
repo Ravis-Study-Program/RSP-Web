@@ -33,6 +33,7 @@ public class GetCurrentUserEnrollmentsTests : TestsHelper
     var dummyEnrollment = new EnrollmentEntity
     {
       EnrollmentId = DummyId1,
+      Role = SeasonRole.Mentor,
       Season = new SeasonEntity
       {
         SeasonId = DummyId1,
@@ -56,7 +57,7 @@ public class GetCurrentUserEnrollmentsTests : TestsHelper
     var enrollments = result.ResponseBody?.Enrollments.ToList();
     var enrollment = enrollments?[0];
     Assert.Equal(HttpStatusCode.OK, result.StatusCode);
-    Assert.Equal(DummyId1, enrollment?.EnrollmentId);
-    Assert.Equal("Season Name", enrollment?.Season.Name);
+    Assert.Equal(SeasonRole.Mentor, enrollment?.Role);
+    Assert.Equal("Season Name", enrollment?.SeasonName);
   }
 }

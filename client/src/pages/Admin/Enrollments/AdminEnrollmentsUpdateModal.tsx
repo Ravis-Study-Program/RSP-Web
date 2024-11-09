@@ -9,15 +9,15 @@ import {
   AdminUpdateEnrollmentRequest,
   AdminUpdateEnrollmentResponseApiResult,
   EnrollmentResponse,
-  Role,
-  Season,
-  User,
+  SeasonEntity,
+  SeasonRole,
+  UserEntity,
 } from '@/generated/api/client';
 
 const schema = z.object({
-  seasonId: z.string().uuid().min(1),
-  userId: z.string().uuid().min(1),
-  roleId: z.string().uuid().min(1),
+  seasonId: z.string(),
+  userId: z.string(),
+  role: z.number(),
 });
 
 export const AdminEnrollmentsUpdateModal = ({
@@ -26,7 +26,6 @@ export const AdminEnrollmentsUpdateModal = ({
   updateEnrollment,
   refetchEnrollments,
   seasons,
-  roles,
   users,
 }: AdminEnrollmentsUpdateModalProps) => {
   const form = useForm({
@@ -34,12 +33,12 @@ export const AdminEnrollmentsUpdateModal = ({
     initialValues: {
       seasonId: enrollment.seasonId,
       userId: enrollment.userId,
-      roleId: enrollment.roleId,
+      role: enrollment.role,
     },
     validate: zodResolver(schema),
   });
 
-  const handleSubmit = async (values: { seasonId: string; userId: string; roleId: string }) => {
+  const handleSubmit = async (values: { seasonId: string; userId: string; role: SeasonRole }) => {
     try {
       const requestData: AdminUpdateEnrollmentRequest = {
         ...values,
@@ -56,19 +55,19 @@ export const AdminEnrollmentsUpdateModal = ({
 
   const seasonOptions =
     seasons?.map((season) => ({
-      value: season.seasonId || '',
+      value: season.seasonId,
       label: season.name,
     })) || [];
 
   const roleOptions =
-    roles?.map((role) => ({
-      value: role.roleId || '',
-      label: role.name,
+    Object.values(SeasonRole)?.map((role, index) => ({
+      value: index.toString(),
+      label: role.toString(),
     })) || [];
 
   const userOptions =
     users?.map((user) => ({
-      value: user.userId || '',
+      value: user.userId,
       label: user.name,
     })) || [];
 
@@ -94,7 +93,7 @@ export const AdminEnrollmentsUpdateModal = ({
           searchable
         />
         <Select
-          {...form.getInputProps('roleId')}
+          {...form.getInputProps('role')}
           label="Select Role"
           placeholder="Pick a role"
           data={roleOptions}
@@ -128,7 +127,6 @@ type AdminEnrollmentsUpdateModalProps = {
   ) => Promise<
     QueryObserverResult<AdminListEnrollmentResponseApiResult, AdminListEnrollmentResponseApiResult>
   >;
-  seasons: Season[] | null | undefined;
-  roles: Role[] | null | undefined;
-  users: User[] | null | undefined;
+  seasons: SeasonEntity[] | null | undefined;
+  users: UserEntity[] | null | undefined;
 };

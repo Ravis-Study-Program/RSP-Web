@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Net;
 using Carter;
 using MediatR;
@@ -80,5 +81,5 @@ public class GetUserListEndpoint : ICarterModule
 
 public class GetUserListResponse
 {
-  public ICollection<UserEntity> Users { get; set; } = new List<UserEntity>();
+  [Required] public ICollection<UserEntity> Users { get; set; } = new List<UserEntity>();
 }

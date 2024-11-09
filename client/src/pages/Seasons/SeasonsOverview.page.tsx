@@ -8,8 +8,8 @@ import classes from './SeasonsOverview.module.css';
 export function SeasonsOverviewPage() {
   const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
   const { seasonSlug } = useSeasonSlug();
-  const { isAdmin, roleName, isLoading } = useUserAndEnrollment(seasonSlug);
-  const tabs = getTabs(seasonSlug, isAdmin, roleName);
+  const { isAdmin, role, isLoading } = useUserAndEnrollment(seasonSlug);
+  const tabs = getTabs(seasonSlug, isAdmin, role);
   const tabItems = tabs.season?.filter((item) => !item.hidden) || [];
 
   if (isLoading) {

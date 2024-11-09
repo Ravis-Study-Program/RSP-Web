@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -5,12 +6,12 @@ namespace RSPWebAPI.Entities;
 
 public class UserEntity
 {
-  public string UserId { get; set; } = string.Empty;
-  public string DiscordId { get; set; } = string.Empty;
-  public string Email { get; set; } = string.Empty;
-  public bool IsAdmin { get; set; }
-  public string Name { get; set; } = string.Empty;
-  public string ProfileImage { get; set; } = string.Empty;
+  [Required] public string UserId { get; set; } = string.Empty;
+  [Required] public string DiscordId { get; set; } = string.Empty;
+  [Required] public string Email { get; set; } = string.Empty;
+  [Required] public bool IsAdmin { get; set; }
+  [Required] public string Name { get; set; } = string.Empty;
+  [Required] public string ProfileImage { get; set; } = string.Empty;
 }
 
 public class UserEntityConfiguration : IEntityTypeConfiguration<UserEntity>

@@ -1,9 +1,9 @@
+using System.ComponentModel.DataAnnotations;
 using System.Net;
 using Carter;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using RSPWebAPI.Database;
-using RSPWebAPI.Entities;
 using RSPWebAPI.Features.Constants;
 using RSPWebAPI.Shared;
 using RSPWebAPI.Shared.Behaviours;
@@ -35,18 +35,16 @@ public static class AdminListMentorship
       try
       {
         var mentorships = await _dbContext.Mentorships
-                                          .Include(m => m.MentorEnrollment)
-                                          .ThenInclude(m => m.User)
-                                          .Include(m => m.MentorEnrollment)
-                                          .ThenInclude(m => m.Season)
-                                          .Include(m => m.MenteeEnrollment)
-                                          .ThenInclude(m => m.User)
                                           .Select(m => new MentorshipResponse
                                           {
                                             MentorshipId = m.MentorshipId,
-                                            Mentor = m.MentorEnrollment,
-                                            Mentee = m.MenteeEnrollment,
-                                            Season = m.MentorEnrollment.Season
+                                            SeasonId = m.MentorEnrollment.SeasonId,
+                                            SeasonName = m.MentorEnrollment.Season.Name,
+                                            SeasonSlug = m.MenteeEnrollment.Season.Slug,
+                                            MentorEnrollmentId = m.MentorEnrollment.EnrollmentId,
+                                            MentorName = m.MentorEnrollment.User.Name,
+                                            MenteeEnrollmentId = m.MenteeEnrollment.EnrollmentId,
+                                            MenteeName = m.MenteeEnrollment.User.Name
                                           })
                                           .ToListAsync(cancellationToken);
 
@@ -94,13 +92,17 @@ public class AdminListMentorshipEndpoint : ICarterModule
 
 public record MentorshipResponse
 {
-  public string MentorshipId { get; set; } = string.Empty;
-  public SeasonEntity? Season { get; set; }
-  public EnrollmentEntity? Mentor { get; set; }
-  public EnrollmentEntity? Mentee { get; set; }
+  [Required] public string SeasonId { get; set; } = string.Empty;
+  [Required] public string MentorshipId { get; set; } = string.Empty;
+  [Required] public string SeasonName { get; set; } = string.Empty;
+  [Required] public string SeasonSlug { get; set; } = string.Empty;
+  [Required] public string MentorEnrollmentId { get; set; } = string.Empty;
+  [Required] public string MentorName { get; set; } = string.Empty;
+  [Required] public string MenteeEnrollmentId { get; set; } = string.Empty;
+  [Required] public string MenteeName { get; set; } = string.Empty;
 }
 
 public class AdminListMentorshipResponse
 {
-  public ICollection<MentorshipResponse> Mentorships { get; set; } = new List<MentorshipResponse>();
+  [Required] public ICollection<MentorshipResponse> Mentorships { get; set; } = new List<MentorshipResponse>();
 }

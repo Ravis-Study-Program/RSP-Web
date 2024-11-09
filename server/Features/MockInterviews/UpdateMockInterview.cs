@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Net;
 using Carter;
 using FluentValidation;
@@ -21,7 +22,7 @@ public static class UpdateMockInterview
     public string? EnrollmentId { get; set; }
     public DateTime StartDate { get; set; }
     public int TimeTakenInMinutes { get; set; }
-    public List<MockInterviewRoundDto> MockInterviewRoundDtos { get; set; }
+    public List<MockInterviewRoundDto> MockInterviewRoundDtos { get; set; } = new();
   }
 
   public class Validator : AbstractValidator<Command>
@@ -68,7 +69,7 @@ public static class UpdateMockInterview
                                           .FirstOrDefaultAsync(e => e.MockInterviewId == request.MockInterviewId,
                                                                cancellationToken);
         if (existingMockInterview == null || (request.EnrollmentId != null &&
-                                              existingMockInterview.Enrollment?.EnrollmentId != request.EnrollmentId))
+                                              existingMockInterview.Enrollment.EnrollmentId != request.EnrollmentId))
         {
           return new ApiResult<UpdateMockInterviewResponse>
           {
@@ -123,13 +124,13 @@ public static class UpdateMockInterview
             continue;
           }
 
-          if (round.BehaviouralMockInterviewRound != null && updatedRoundDto.BehaviouralMockInterviewRound != null)
+          if (updatedRoundDto.BehaviouralMockInterviewRound != null)
           {
             round.BehaviouralMockInterviewRound.BehavioralScore =
               updatedRoundDto.BehaviouralMockInterviewRound.BehavioralScore;
           }
 
-          if (round.LeetcodeMockInterviewRound != null && updatedRoundDto.LeetcodeMockInterviewRound != null)
+          if (updatedRoundDto.LeetcodeMockInterviewRound != null)
           {
             round.LeetcodeMockInterviewRound.ConfirmQuestionScore =
               updatedRoundDto.LeetcodeMockInterviewRound.ConfirmQuestionScore;
@@ -141,7 +142,7 @@ public static class UpdateMockInterview
             round.LeetcodeMockInterviewRound.TestingScore = updatedRoundDto.LeetcodeMockInterviewRound.TestingScore;
           }
 
-          if (round.CustomMockInterviewRound != null && updatedRoundDto.CustomMockInterviewRound != null)
+          if (updatedRoundDto.CustomMockInterviewRound != null)
           {
             round.CustomMockInterviewRound.Score = updatedRoundDto.CustomMockInterviewRound.Score;
             round.CustomMockInterviewRound.Link = updatedRoundDto.CustomMockInterviewRound.Link;
@@ -255,12 +256,12 @@ public class UpdateMockInterviewEndpoint : ICarterModule
 
 public record UpdateMockInterviewRequest
 {
-  public string MockInterviewId { get; set; } = string.Empty;
-  public string InterviewerUserId { get; set; } = string.Empty;
+  [Required] public string MockInterviewId { get; set; } = string.Empty;
+  [Required] public string InterviewerUserId { get; set; } = string.Empty;
   public string? EnrollmentId { get; set; }
-  public DateTime StartDate { get; set; }
-  public int TimeTakenInMinutes { get; set; }
-  public List<MockInterviewRoundDto> MockInterviewRoundDtos { get; set; }
+  [Required] public DateTime StartDate { get; set; }
+  [Required] public int TimeTakenInMinutes { get; set; }
+  [Required] public List<MockInterviewRoundDto> MockInterviewRoundDtos { get; set; } = new();
 }
 
 public class UpdateMockInterviewResponse

@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Net;
 using Carter;
 using FluentValidation;
@@ -15,7 +16,7 @@ public static class UpdateProblemAttempt
   public class Command : AuthRequest<ApiResult<UpdateProblemAttemptResponse>>
   {
     public string ProblemAttemptId { get; set; } = string.Empty;
-    public DateTime AttemptStartDate { get; set; }
+    public DateTime AttemptStartDateUtc { get; set; }
     public int TimeTakenInMinutes { get; set; }
     public string Notes { get; set; } = string.Empty;
     public string? LeetcodeProblemId { get; set; }
@@ -29,7 +30,7 @@ public static class UpdateProblemAttempt
     public Validator()
     {
       RuleFor(c => c.ProblemAttemptId).NotEmpty();
-      RuleFor(c => c.AttemptStartDate).NotEmpty();
+      RuleFor(c => c.AttemptStartDateUtc).NotEmpty();
       RuleFor(c => c.TimeTakenInMinutes).NotEmpty().GreaterThanOrEqualTo(1);
       RuleFor(c => c.Email).NotEmpty().EmailAddress();
     }
@@ -75,7 +76,7 @@ public static class UpdateProblemAttempt
           request.CustomProblemId = null;
         }
 
-        existingProblemAttempt.AttemptStartDateUtc = request.AttemptStartDate;
+        existingProblemAttempt.AttemptStartDateUtc = request.AttemptStartDateUtc;
         existingProblemAttempt.TimeTakenInMinutes = request.TimeTakenInMinutes;
         existingProblemAttempt.LeetcodeProblemId = request.LeetcodeProblemId;
         existingProblemAttempt.CustomProblemId = request.CustomProblemId;
@@ -117,7 +118,7 @@ public class UpdateProblemAttemptEndpoint : ICarterModule
            var command = new UpdateProblemAttempt.Command
            {
              ProblemAttemptId = request.ProblemAttemptId,
-             AttemptStartDate = request.AttemptStartDate,
+             AttemptStartDateUtc = request.AttemptStartDateUtc,
              TimeTakenInMinutes = request.TimeTakenInMinutes,
              Notes = request.Notes,
              Email = email,
@@ -136,10 +137,10 @@ public class UpdateProblemAttemptEndpoint : ICarterModule
 
 public record UpdateProblemAttemptRequest
 {
-  public string ProblemAttemptId { get; set; } = string.Empty;
-  public DateTime AttemptStartDate { get; set; }
-  public int TimeTakenInMinutes { get; set; }
-  public string Notes { get; set; } = string.Empty;
+  [Required] public string ProblemAttemptId { get; set; } = string.Empty;
+  [Required] public DateTime AttemptStartDateUtc { get; set; }
+  [Required] public int TimeTakenInMinutes { get; set; }
+  [Required] public string Notes { get; set; } = string.Empty;
   public string LeetcodeProblemId { get; set; } = string.Empty;
   public string CustomProblemId { get; set; } = string.Empty;
   public string? EnrollmentId { get; set; }
