@@ -7,11 +7,11 @@ import React from 'react';
 import { Auth0Provider } from '@auth0/auth0-react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import ReactDOM from 'react-dom/client';
+import { BrowserRouter } from 'react-router-dom';
 import { MantineProvider } from '@mantine/core';
 import { ModalsProvider } from '@mantine/modals';
 import AppRoutes from './Router';
 import { theme } from './theme';
-import { BrowserRouter } from 'react-router-dom';
 
 const queryClient = new QueryClient();
 

@@ -1,4 +1,4 @@
-import React, { Suspense, lazy } from 'react';
+import React, { lazy, Suspense } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import { Text } from '@mantine/core';
 import { Layout } from './components/Layout/Layout';
@@ -70,10 +70,6 @@ const routes = (
   </Routes>
 );
 
-const AppRoutes = () => (
-  <Suspense fallback={<Text>Loading...</Text>}>
-    {routes}
-  </Suspense>
-);
+const AppRoutes = () => <Suspense fallback={<Text>Loading...</Text>}>{routes}</Suspense>;
 
 export default AppRoutes;

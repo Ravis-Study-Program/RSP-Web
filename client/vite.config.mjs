@@ -13,5 +13,11 @@ export default defineConfig({
     port: 3000,
     host: '0.0.0.0',
     strictPort: true
-  }
+  },
+  resolve: {
+    alias: {
+      // /esm/icons/index.mjs only exports the icons statically, so no separate chunks are created
+      '@tabler/icons-react': '@tabler/icons-react/dist/esm/icons/index.mjs',
+    },
+  },
 });
