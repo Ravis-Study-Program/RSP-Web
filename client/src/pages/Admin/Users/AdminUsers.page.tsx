@@ -1,7 +1,7 @@
 import { Layout } from '@/components/Layout/Layout';
 import { AdminUsersTable } from './AdminUsersTable';
 
-export function AdminUsersPage() {
+export default function AdminUsersPage() {
   return (
     <Layout>
       <AdminUsersTable />

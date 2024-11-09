@@ -5,7 +5,7 @@ import { Button, Container, Text, Title } from '@mantine/core';
 import { CreateUserIfNotExistsRequest, useCreateUserIfNotExists } from '@/generated/api/client';
 import classes from './Login.module.css';
 
-export function LoginPage() {
+export default function LoginPage() {
   const { loginWithRedirect, isLoading: isAuthLoading, isAuthenticated, user } = useAuth0();
   const [shouldRedirect, setShouldRedirect] = useState(false);
   const [isUserCreated, setIsUserCreated] = useState(false);

@@ -1,36 +1,38 @@
-import { createRoutesFromElements, Route } from 'react-router-dom';
+import React, { Suspense, lazy } from 'react';
+import { Route, Routes } from 'react-router-dom';
 import { Text } from '@mantine/core';
 import { Layout } from './components/Layout/Layout';
-import { AdminEnrollmentsPage } from './pages/Admin/Enrollments/AdminEnrollments.page';
-import { AdminMentorshipsPage } from './pages/Admin/Mentorships/AdminMentorships.page';
-import { AdminSeasonsPage } from './pages/Admin/Seasons/AdminSeasons.page';
-import { AdminUsersPage } from './pages/Admin/Users/AdminUsers.page';
-import { GraduatesPage } from './pages/Graduates/Graduates.page';
-import { LeetcodePage } from './pages/Leetcode/Leetcode.page';
-import { LoginPage } from './pages/Login/Login.page';
-import { MenteesPage } from './pages/Mentees/Mentees.page';
-import { MockInterviewPage } from './pages/MockInterviews/MockInterview.page';
-import { NotFoundPage } from './pages/NotFound/NotFound.page';
-import { SeasonsPage } from './pages/Seasons/Seasons.page';
-import { SeasonsOverviewPage } from './pages/Seasons/SeasonsOverview.page';
-import { SettingsPage } from './pages/Settings/Settings.page';
 import AdminRouteGuard from './shared/auth/AdminRouteGuard';
 import AuthRouteGuard from './shared/auth/AuthRouteGuard';
 import SeasonRouteGuard from './shared/auth/SeasonRouteGuard';
 import SeasonRoleViewRouter from './shared/auth/SeasonViewRouter';
 
-const placeholderPage = (title: string) => {
-  return (
-    <Layout>
-      <Text size="lg" c="dimmed">
-        {title}
-      </Text>
-    </Layout>
-  );
-};
+// Lazy load the page components
+const AdminEnrollmentsPage = lazy(() => import('./pages/Admin/Enrollments/AdminEnrollments.page'));
+const AdminMentorshipsPage = lazy(() => import('./pages/Admin/Mentorships/AdminMentorships.page'));
+const AdminSeasonsPage = lazy(() => import('./pages/Admin/Seasons/AdminSeasons.page'));
+const AdminUsersPage = lazy(() => import('./pages/Admin/Users/AdminUsers.page'));
+const GraduatesPage = lazy(() => import('./pages/Graduates/Graduates.page'));
+const LeetcodePage = lazy(() => import('./pages/Leetcode/Leetcode.page'));
+const LoginPage = lazy(() => import('./pages/Login/Login.page'));
+const MenteesPage = lazy(() => import('./pages/Mentees/Mentees.page'));
+const MockInterviewPage = lazy(() => import('./pages/MockInterviews/MockInterview.page'));
+const NotFoundPage = lazy(() => import('./pages/NotFound/NotFound.page'));
+const SeasonsPage = lazy(() => import('./pages/Seasons/Seasons.page'));
+const SeasonsOverviewPage = lazy(() => import('./pages/Seasons/SeasonsOverview.page'));
+const SettingsPage = lazy(() => import('./pages/Settings/Settings.page'));
 
-const routes = createRoutesFromElements(
-  <>
+// Placeholder for simple pages
+const placeholderPage = (title: string) => (
+  <Layout>
+    <Text size="lg" color="dimmed">
+      {title}
+    </Text>
+  </Layout>
+);
+
+const routes = (
+  <Routes>
     {/* Authenticated Routes */}
     <Route element={<AuthRouteGuard />}>
       {/* Admin Routes */}
@@ -65,7 +67,13 @@ const routes = createRoutesFromElements(
     {/* Unprotected Routes */}
     <Route path="/" element={<LoginPage />} />
     <Route path="*" element={<NotFoundPage />} />
-  </>
+  </Routes>
 );
 
-export default routes;
+const AppRoutes = () => (
+  <Suspense fallback={<Text>Loading...</Text>}>
+    {routes}
+  </Suspense>
+);
+
+export default AppRoutes;

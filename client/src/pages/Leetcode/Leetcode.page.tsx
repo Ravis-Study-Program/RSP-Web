@@ -5,7 +5,7 @@ import { useSeasonSlug } from '@/shared/hooks/useSeasonSlug';
 import { LeetcodeTable } from './LeetcodeTable/LeetcodeTable';
 import { ProblemAttemptsGraph } from './ProblemAttemptsGraph/ProblemAttemptsGraph';
 
-export function LeetcodePage() {
+export default function LeetcodePage() {
   const [isLeetcode, _] = useState(true);
   const { seasonSlug } = useSeasonSlug();
 

@@ -39,7 +39,7 @@ export function NotificationSettings() {
   );
 }
 
-export function SettingsPage() {
+export default function SettingsPage() {
   return (
     <Layout>
       <Grid gutter={{ base: 5, xs: 'md', md: 'xl' }}>
