@@ -1,4 +1,4 @@
-import { CreateUserIfNotExistsRequest, useCreateUserIfNotExists, useGetCurrentUser } from '@/generated/api/client';
+import { CreateUserIfNotExistsRequest, useCreateUserIfNotExists } from '@/generated/api/client';
 import { useAuth0 } from '@auth0/auth0-react';
 import { Button, Container, Text, Title } from '@mantine/core';
 import { useEffect, useMemo, useState } from 'react';
@@ -10,10 +10,6 @@ export default function LoginPage() {
   const [isUserCreated, setIsUserCreated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const { mutateAsync: createUser } = useCreateUserIfNotExists();
-  const { data: userResponse,
-    isFetching: isFetchingUser,
-    isLoading: isLoadingUser,
-  } = useGetCurrentUser();
 
   useEffect(() => {
     const initializeUser = async () => {
@@ -38,18 +34,17 @@ export default function LoginPage() {
   }, [isAuth0Authenticated, Auth0User, isUserCreated, createUser]);
 
   const shouldRedirect = useMemo(() => {
-    if (isAuth0Authenticated && userResponse) {
+    if (isAuth0Authenticated) {
       return true;
     }
     return false;
-  }, [isAuth0Authenticated, userResponse]);
+  }, [isAuth0Authenticated]);
 
   if (shouldRedirect) {
-    const user = userResponse?.responseBody?.user;
-    return <Navigate to={user?.isAdmin ? "/admin/seasons" : "/seasons"} />;
+    return <Navigate to="/seasons" />;
   }
 
-  if (isAuth0Loading || isLoading || isFetchingUser || isLoadingUser) {
+  if (isAuth0Loading || isLoading) {
     return null;
   }
 
