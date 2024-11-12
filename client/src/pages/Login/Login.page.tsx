@@ -1,58 +1,50 @@
-import { useEffect, useState } from 'react';
-import { useAuth0 } from '@auth0/auth0-react';
-import { Navigate } from 'react-router-dom';
-import { Button, Container, Text, Title } from '@mantine/core';
 import { CreateUserIfNotExistsRequest, useCreateUserIfNotExists } from '@/generated/api/client';
+import { useAuth0 } from '@auth0/auth0-react';
+import { Button, Container, Text, Title } from '@mantine/core';
+import { useEffect, useMemo, useState } from 'react';
+import { Navigate } from 'react-router-dom';
 import classes from './Login.module.css';
 
 export default function LoginPage() {
-  const { loginWithRedirect, isLoading: isAuthLoading, isAuthenticated, user } = useAuth0();
-  const [shouldRedirect, setShouldRedirect] = useState(false);
+  const { loginWithRedirect, isLoading: isAuth0Loading, isAuthenticated: isAuth0Authenticated, user: Auth0User } = useAuth0();
   const [isUserCreated, setIsUserCreated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const { mutateAsync: createUser } = useCreateUserIfNotExists();
 
-  const handleLogin = () => {
-    loginWithRedirect()
-      .then(() => {
-        // TODO: Log Success
-      })
-      .catch(() => {
-        // TODO: Log Failure
-      });
-  };
-
   useEffect(() => {
-    const createUserIfNotExists = async () => {
-      if (isAuthenticated) {
-        if (user && !isUserCreated) {
-          try {
-            const request: CreateUserIfNotExistsRequest = {
-              profileImage: user.picture || '',
-              name: user.given_name || '',
-              discordId: '',
-            };
-            await createUser({ data: request });
-            setIsUserCreated(true);
-            setIsLoading(false);
-          } catch (err) {
-            // eslint-disable-next-line no-console
-            console.error(err);
-          }
+    const initializeUser = async () => {
+      if (isAuth0Authenticated && Auth0User && !isUserCreated) {
+        try {
+          const request: CreateUserIfNotExistsRequest = {
+            profileImage: Auth0User.picture || '',
+            name: Auth0User.given_name || '',
+            discordId: '',
+          };
+          await createUser({ data: request });
+          setIsUserCreated(true);
+        } catch (err) {
+          // eslint-disable-next-line no-console
+          console.error('User creation error:', err);
         }
-        setShouldRedirect(true);
-      } else {
-        setIsLoading(false);
       }
+      setIsLoading(false);
     };
-    createUserIfNotExists();
-  }, [isAuthenticated, user, isUserCreated, createUser]);
+
+    initializeUser();
+  }, [isAuth0Authenticated, Auth0User, isUserCreated, createUser]);
+
+  const shouldRedirect = useMemo(() => {
+    if (isAuth0Authenticated) {
+      return true;
+    }
+    return false;
+  }, [isAuth0Authenticated]);
 
   if (shouldRedirect) {
     return <Navigate to="/seasons" />;
   }
 
-  if (isAuthLoading || isLoading) {
+  if (isAuth0Loading || isLoading) {
     return null;
   }
 
@@ -84,7 +76,7 @@ export default function LoginPage() {
         </Container>
 
         <div className={classes.controls}>
-          <Button className={classes.control} size="lg" onClick={handleLogin}>
+          <Button className={classes.control} size="lg" onClick={() => loginWithRedirect()}>
             Login
           </Button>
         </div>
