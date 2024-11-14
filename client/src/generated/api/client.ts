@@ -112,6 +112,15 @@ export interface UpdateMockInterviewResponse {
   [key: string]: unknown;
 }
 
+export interface UpdateMockInterviewResponseApiResult {
+  error?: ApiError;
+  readonly isSuccess?: boolean;
+  responseBody?: UpdateMockInterviewResponse;
+  statusCode?: HttpStatusCode;
+  /** @nullable */
+  successMessage?: string | null;
+}
+
 export interface UpdateMockInterviewRequest {
   /** @nullable */
   enrollmentId?: string | null;
@@ -157,25 +166,23 @@ export interface ProblemEntity {
   title: string;
 }
 
-export interface ProblemAttemptEntity {
-  attemptStartDateUtc: string;
-  customProblem?: CustomProblemEntity;
+export interface MockInterviewRoundEntity {
+  behaviouralMockInterviewRound?: BehaviouralMockInterviewRoundEntity;
   /** @nullable */
-  customProblemId?: string | null;
-  enrollment?: EnrollmentEntity;
+  behaviouralMockInterviewRoundId?: string | null;
+  customMockInterviewRound?: CustomMockInterviewRoundEntity;
   /** @nullable */
-  enrollmentId?: string | null;
-  leetcodeProblem?: LeetcodeProblemEntity;
+  customMockInterviewRoundId?: string | null;
+  /** @minLength 1 */
+  intervieweeComment: string;
+  isReviewedByInterviewee: boolean;
+  leetcodeMockInterviewRound?: LeetcodeMockInterviewRoundEntity;
   /** @nullable */
-  leetcodeProblemId?: string | null;
+  leetcodeMockInterviewRoundId?: string | null;
   /** @minLength 1 */
-  notes: string;
+  mockInterviewId: string;
   /** @minLength 1 */
-  problemAttemptId: string;
-  timeTakenInMinutes: number;
-  user?: UserEntity;
-  /** @minLength 1 */
-  userId: string;
+  mockInterviewRoundId: string;
 }
 
 export interface MockInterviewRoundDto {
@@ -203,26 +210,6 @@ export interface MockInterviewEntity {
   mockInterviewRounds?: MockInterviewRoundEntity[] | null;
   startDate: string;
   timeTakenInMinutes: number;
-}
-
-export interface MockInterviewRoundEntity {
-  behaviouralMockInterviewRound?: BehaviouralMockInterviewRoundEntity;
-  /** @nullable */
-  behaviouralMockInterviewRoundId?: string | null;
-  customMockInterviewRound?: CustomMockInterviewRoundEntity;
-  /** @nullable */
-  customMockInterviewRoundId?: string | null;
-  /** @minLength 1 */
-  intervieweeComment: string;
-  isReviewedByInterviewee: boolean;
-  leetcodeMockInterviewRound?: LeetcodeMockInterviewRoundEntity;
-  /** @nullable */
-  leetcodeMockInterviewRoundId?: string | null;
-  mockInterview?: MockInterviewEntity;
-  /** @minLength 1 */
-  mockInterviewId: string;
-  /** @minLength 1 */
-  mockInterviewRoundId: string;
 }
 
 export interface MockCreateMockInterviewResponse {
@@ -274,18 +261,6 @@ export const LeetcodeProblemDifficulty = {
   Hard: 2,
 } as const;
 
-export interface LeetcodeProblemEntity {
-  isPremium: boolean;
-  /** @nullable */
-  leetcodeProblemCategories?: LeetcodeProblemCategoryEntity[] | null;
-  leetcodeProblemDifficulty: LeetcodeProblemDifficulty;
-  /** @minLength 1 */
-  leetcodeProblemId: string;
-  problem?: ProblemEntity;
-  /** @minLength 1 */
-  problemId: string;
-}
-
 export interface LeetcodeProblemDto {
   difficulty: LeetcodeProblemDifficulty;
   isPremium: boolean;
@@ -304,6 +279,39 @@ export interface LeetcodeProblemCategoryEntity {
   name: string;
 }
 
+export interface LeetcodeProblemEntity {
+  isPremium: boolean;
+  /** @nullable */
+  leetcodeProblemCategories?: LeetcodeProblemCategoryEntity[] | null;
+  leetcodeProblemDifficulty: LeetcodeProblemDifficulty;
+  /** @minLength 1 */
+  leetcodeProblemId: string;
+  problem?: ProblemEntity;
+  /** @minLength 1 */
+  problemId: string;
+}
+
+export interface ProblemAttemptEntity {
+  attemptStartDateUtc: string;
+  customProblem?: CustomProblemEntity;
+  /** @nullable */
+  customProblemId?: string | null;
+  enrollment?: EnrollmentEntity;
+  /** @nullable */
+  enrollmentId?: string | null;
+  leetcodeProblem?: LeetcodeProblemEntity;
+  /** @nullable */
+  leetcodeProblemId?: string | null;
+  /** @minLength 1 */
+  notes: string;
+  /** @minLength 1 */
+  problemAttemptId: string;
+  timeTakenInMinutes: number;
+  user?: UserEntity;
+  /** @minLength 1 */
+  userId: string;
+}
+
 export interface LeetcodeMockInterviewRoundEntity {
   algorithmDesignScore: number;
   codingScore: number;
@@ -314,12 +322,6 @@ export interface LeetcodeMockInterviewRoundEntity {
   leetcodeProblem?: LeetcodeProblemEntity;
   /** @minLength 1 */
   leetcodeProblemId: string;
-  mockInterview?: MockInterviewEntity;
-  /** @minLength 1 */
-  mockInterviewId: string;
-  mockInterviewRound?: MockInterviewRoundEntity;
-  /** @minLength 1 */
-  mockInterviewRoundId: string;
   testingScore: number;
 }
 
@@ -420,13 +422,13 @@ export const HttpStatusCode = {
   NetworkAuthenticationRequired: 511,
 } as const;
 
-export interface UpdateMockInterviewResponseApiResult {
-  error?: ApiError;
-  readonly isSuccess?: boolean;
-  responseBody?: UpdateMockInterviewResponse;
-  statusCode?: HttpStatusCode;
-  /** @nullable */
-  successMessage?: string | null;
+export interface GraduateDto {
+  /** @minLength 1 */
+  discordId: string;
+  /** @minLength 1 */
+  name: string;
+  /** @minLength 1 */
+  profileImage: string;
 }
 
 export interface GetUserListResponse {
@@ -492,6 +494,19 @@ export interface GetIsUserEnrolledResponseApiResult {
   error?: ApiError;
   readonly isSuccess?: boolean;
   responseBody?: GetIsUserEnrolledResponse;
+  statusCode?: HttpStatusCode;
+  /** @nullable */
+  successMessage?: string | null;
+}
+
+export interface GetGraduatesResponse {
+  graduates: GraduateDto[];
+}
+
+export interface GetGraduatesResponseApiResult {
+  error?: ApiError;
+  readonly isSuccess?: boolean;
+  responseBody?: GetGraduatesResponse;
   statusCode?: HttpStatusCode;
   /** @nullable */
   successMessage?: string | null;
@@ -617,12 +632,6 @@ export interface CustomMockInterviewRoundEntity {
   customMockInterviewRoundId: string;
   /** @minLength 1 */
   link: string;
-  mockInterview?: MockInterviewEntity;
-  /** @minLength 1 */
-  mockInterviewId: string;
-  mockInterviewRound?: MockInterviewRoundEntity;
-  /** @minLength 1 */
-  mockInterviewRoundId: string;
   score: number;
 }
 
@@ -709,12 +718,6 @@ export interface BehaviouralMockInterviewRoundEntity {
   behavioralScore: number;
   /** @minLength 1 */
   behaviouralMockInterviewRoundId: string;
-  mockInterview?: MockInterviewEntity;
-  /** @minLength 1 */
-  mockInterviewId: string;
-  mockInterviewRound?: MockInterviewRoundEntity;
-  /** @minLength 1 */
-  mockInterviewRoundId: string;
 }
 
 export interface BehaviouralMockInterviewRoundDto {
@@ -3267,6 +3270,90 @@ export function useGetLeetcodeProblems<
   request?: SecondParameter<typeof CustomAxiosInstance>;
 }): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
   const queryOptions = getGetLeetcodeProblemsQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+export const getGraduates = (
+  options?: SecondParameter<typeof CustomAxiosInstance>,
+  signal?: AbortSignal
+) => {
+  return CustomAxiosInstance<GetGraduatesResponseApiResult>(
+    { url: `http://localhost:4000/api/graduates`, method: 'GET', signal },
+    options
+  );
+};
+
+export const getGetGraduatesQueryKey = () => {
+  return [`http://localhost:4000/api/graduates`] as const;
+};
+
+export const getGetGraduatesQueryOptions = <
+  TData = Awaited<ReturnType<typeof getGraduates>>,
+  TError = GetGraduatesResponseApiResult,
+>(options?: {
+  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getGraduates>>, TError, TData>>;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetGraduatesQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getGraduates>>> = ({ signal }) =>
+    getGraduates(requestOptions, signal);
+
+  return { queryKey, queryFn, staleTime: 8000, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getGraduates>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetGraduatesQueryResult = NonNullable<Awaited<ReturnType<typeof getGraduates>>>;
+export type GetGraduatesQueryError = GetGraduatesResponseApiResult;
+
+export function useGetGraduates<
+  TData = Awaited<ReturnType<typeof getGraduates>>,
+  TError = GetGraduatesResponseApiResult,
+>(options: {
+  query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getGraduates>>, TError, TData>> &
+    Pick<
+      DefinedInitialDataOptions<Awaited<ReturnType<typeof getGraduates>>, TError, TData>,
+      'initialData'
+    >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): DefinedUseQueryResult<TData, TError> & { queryKey: QueryKey };
+export function useGetGraduates<
+  TData = Awaited<ReturnType<typeof getGraduates>>,
+  TError = GetGraduatesResponseApiResult,
+>(options?: {
+  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getGraduates>>, TError, TData>> &
+    Pick<
+      UndefinedInitialDataOptions<Awaited<ReturnType<typeof getGraduates>>, TError, TData>,
+      'initialData'
+    >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey };
+export function useGetGraduates<
+  TData = Awaited<ReturnType<typeof getGraduates>>,
+  TError = GetGraduatesResponseApiResult,
+>(options?: {
+  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getGraduates>>, TError, TData>>;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+export function useGetGraduates<
+  TData = Awaited<ReturnType<typeof getGraduates>>,
+  TError = GetGraduatesResponseApiResult,
+>(options?: {
+  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getGraduates>>, TError, TData>>;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetGraduatesQueryOptions(options);
 
   const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & { queryKey: QueryKey };
 
