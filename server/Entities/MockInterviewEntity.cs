@@ -1,10 +1,11 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using RSPWebAPI.Entities.Interfaces;
 
 namespace RSPWebAPI.Entities;
 
-public class MockInterviewEntity
+public class MockInterviewEntity : ISoftDelete
 {
   [Required] public string MockInterviewId { get; set; } = string.Empty;
   [Required] public bool IsPass { get; set; }
@@ -22,6 +23,7 @@ public class MockInterviewEntity
   public UserEntity Interviewee { get; set; } = null!;
   public EnrollmentEntity Enrollment { get; set; } = null!;
   public ICollection<MockInterviewRoundEntity> MockInterviewRounds { get; set; } = null!;
+  public DateTime? DeletedAtUtc { get; set; }
 }
 
 public class MockInterviewEntityConfiguration : IEntityTypeConfiguration<MockInterviewEntity>
@@ -43,6 +45,7 @@ public class MockInterviewEntityConfiguration : IEntityTypeConfiguration<MockInt
            .HasMaxLength(32).IsRequired();
     builder.Property(x => x.IntervieweeUserId).HasColumnName("IntervieweeUserId").HasColumnType("varchar(16)")
            .HasMaxLength(32).IsRequired();
+    builder.Property(x => x.DeletedAtUtc).HasColumnName("DeletedAtUtc").HasColumnType("timestamptz");
 
     // Foreign Keys
     builder.HasOne(x => x.Interviewer).WithMany().HasForeignKey(x => x.InterviewerUserId)

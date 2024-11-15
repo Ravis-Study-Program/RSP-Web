@@ -56,6 +56,7 @@ public static class DeleteProblemAttempt
       try
       {
         _dbContext.Remove(existingProblemAttempt);
+        Console.WriteLine(_dbContext.Entry(existingProblemAttempt).State);
         await _dbContext.SaveChangesAsync(cancellationToken);
 
         return new ApiResult<DeleteProblemAttemptResponse>

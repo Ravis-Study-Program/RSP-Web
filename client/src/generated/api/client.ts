@@ -67,6 +67,8 @@ export interface ValidationError {
 }
 
 export interface UserEntity {
+  /** @nullable */
+  deletedAtUtc?: string | null;
   /** @minLength 1 */
   discordId: string;
   /** @minLength 1 */
@@ -112,18 +114,6 @@ export interface UpdateMockInterviewResponse {
   [key: string]: unknown;
 }
 
-export interface UpdateMockInterviewRequest {
-  /** @nullable */
-  enrollmentId?: string | null;
-  /** @minLength 1 */
-  interviewerUserId: string;
-  /** @minLength 1 */
-  mockInterviewId: string;
-  mockInterviewRoundDtos: MockInterviewRoundDto[];
-  startDate: string;
-  timeTakenInMinutes: number;
-}
-
 export type SeasonRole = (typeof SeasonRole)[keyof typeof SeasonRole];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
@@ -134,6 +124,8 @@ export const SeasonRole = {
 } as const;
 
 export interface SeasonEntity {
+  /** @nullable */
+  deletedAtUtc?: string | null;
   endDateInclusiveUtc: string;
   /** @minLength 1 */
   imageUrl: string;
@@ -149,6 +141,8 @@ export interface SeasonEntity {
 }
 
 export interface ProblemEntity {
+  /** @nullable */
+  deletedAtUtc?: string | null;
   /** @minLength 1 */
   link: string;
   /** @minLength 1 */
@@ -162,6 +156,8 @@ export interface ProblemAttemptEntity {
   customProblem?: CustomProblemEntity;
   /** @nullable */
   customProblemId?: string | null;
+  /** @nullable */
+  deletedAtUtc?: string | null;
   enrollment?: EnrollmentEntity;
   /** @nullable */
   enrollmentId?: string | null;
@@ -178,6 +174,27 @@ export interface ProblemAttemptEntity {
   userId: string;
 }
 
+export interface MockInterviewRoundEntity {
+  behaviouralMockInterviewRound?: BehaviouralMockInterviewRoundEntity;
+  /** @nullable */
+  behaviouralMockInterviewRoundId?: string | null;
+  customMockInterviewRound?: CustomMockInterviewRoundEntity;
+  /** @nullable */
+  customMockInterviewRoundId?: string | null;
+  /** @nullable */
+  deletedAtUtc?: string | null;
+  /** @minLength 1 */
+  intervieweeComment: string;
+  isReviewedByInterviewee: boolean;
+  leetcodeMockInterviewRound?: LeetcodeMockInterviewRoundEntity;
+  /** @nullable */
+  leetcodeMockInterviewRoundId?: string | null;
+  /** @minLength 1 */
+  mockInterviewId: string;
+  /** @minLength 1 */
+  mockInterviewRoundId: string;
+}
+
 export interface MockInterviewRoundDto {
   behaviouralMockInterviewRound?: BehaviouralMockInterviewRoundDto;
   customMockInterviewRound?: CustomMockInterviewRoundDto;
@@ -186,7 +203,21 @@ export interface MockInterviewRoundDto {
   mockInterviewRoundId?: string | null;
 }
 
+export interface UpdateMockInterviewRequest {
+  /** @nullable */
+  enrollmentId?: string | null;
+  /** @minLength 1 */
+  interviewerUserId: string;
+  /** @minLength 1 */
+  mockInterviewId: string;
+  mockInterviewRoundDtos: MockInterviewRoundDto[];
+  startDate: string;
+  timeTakenInMinutes: number;
+}
+
 export interface MockInterviewEntity {
+  /** @nullable */
+  deletedAtUtc?: string | null;
   enrollment?: EnrollmentEntity;
   /** @nullable */
   enrollmentId?: string | null;
@@ -203,26 +234,6 @@ export interface MockInterviewEntity {
   mockInterviewRounds?: MockInterviewRoundEntity[] | null;
   startDate: string;
   timeTakenInMinutes: number;
-}
-
-export interface MockInterviewRoundEntity {
-  behaviouralMockInterviewRound?: BehaviouralMockInterviewRoundEntity;
-  /** @nullable */
-  behaviouralMockInterviewRoundId?: string | null;
-  customMockInterviewRound?: CustomMockInterviewRoundEntity;
-  /** @nullable */
-  customMockInterviewRoundId?: string | null;
-  /** @minLength 1 */
-  intervieweeComment: string;
-  isReviewedByInterviewee: boolean;
-  leetcodeMockInterviewRound?: LeetcodeMockInterviewRoundEntity;
-  /** @nullable */
-  leetcodeMockInterviewRoundId?: string | null;
-  mockInterview?: MockInterviewEntity;
-  /** @minLength 1 */
-  mockInterviewId: string;
-  /** @minLength 1 */
-  mockInterviewRoundId: string;
 }
 
 export interface MockCreateMockInterviewResponse {
@@ -275,6 +286,8 @@ export const LeetcodeProblemDifficulty = {
 } as const;
 
 export interface LeetcodeProblemEntity {
+  /** @nullable */
+  deletedAtUtc?: string | null;
   isPremium: boolean;
   /** @nullable */
   leetcodeProblemCategories?: LeetcodeProblemCategoryEntity[] | null;
@@ -298,6 +311,8 @@ export interface LeetcodeProblemDto {
 }
 
 export interface LeetcodeProblemCategoryEntity {
+  /** @nullable */
+  deletedAtUtc?: string | null;
   /** @minLength 1 */
   leetcodeProblemCategoryId: string;
   /** @minLength 1 */
@@ -309,17 +324,13 @@ export interface LeetcodeMockInterviewRoundEntity {
   codingScore: number;
   complexityAnalysisScore: number;
   confirmQuestionScore: number;
+  /** @nullable */
+  deletedAtUtc?: string | null;
   /** @minLength 1 */
   leetcodeMockInterviewRoundId: string;
   leetcodeProblem?: LeetcodeProblemEntity;
   /** @minLength 1 */
   leetcodeProblemId: string;
-  mockInterview?: MockInterviewEntity;
-  /** @minLength 1 */
-  mockInterviewId: string;
-  mockInterviewRound?: MockInterviewRoundEntity;
-  /** @minLength 1 */
-  mockInterviewRoundId: string;
   testingScore: number;
 }
 
@@ -561,6 +572,8 @@ export interface EnrollmentResponse {
 }
 
 export interface EnrollmentEntity {
+  /** @nullable */
+  deletedAtUtc?: string | null;
   /** @minLength 1 */
   enrollmentId: string;
   role: SeasonRole;
@@ -601,6 +614,8 @@ export interface DeleteMockInterviewResponseApiResult {
 export interface CustomProblemEntity {
   /** @minLength 1 */
   customProblemId: string;
+  /** @nullable */
+  deletedAtUtc?: string | null;
   /** @minLength 1 */
   difficulty: string;
   problem?: ProblemEntity;
@@ -615,14 +630,10 @@ export interface CustomMockInterviewRoundEntity {
   content: string;
   /** @minLength 1 */
   customMockInterviewRoundId: string;
+  /** @nullable */
+  deletedAtUtc?: string | null;
   /** @minLength 1 */
   link: string;
-  mockInterview?: MockInterviewEntity;
-  /** @minLength 1 */
-  mockInterviewId: string;
-  mockInterviewRound?: MockInterviewRoundEntity;
-  /** @minLength 1 */
-  mockInterviewRoundId: string;
   score: number;
 }
 
@@ -709,12 +720,8 @@ export interface BehaviouralMockInterviewRoundEntity {
   behavioralScore: number;
   /** @minLength 1 */
   behaviouralMockInterviewRoundId: string;
-  mockInterview?: MockInterviewEntity;
-  /** @minLength 1 */
-  mockInterviewId: string;
-  mockInterviewRound?: MockInterviewRoundEntity;
-  /** @minLength 1 */
-  mockInterviewRoundId: string;
+  /** @nullable */
+  deletedAtUtc?: string | null;
 }
 
 export interface BehaviouralMockInterviewRoundDto {

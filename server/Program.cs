@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using RSPWebAPI.Database;
+using RSPWebAPI.Database.Interceptors;
 using RSPWebAPI.Shared;
 using RSPWebAPI.Shared.Behaviours;
 
@@ -58,7 +59,8 @@ var builder = WebApplication.CreateBuilder(args);
          })
          .AddHttpContextAccessor()
          .AddDbContext<ApplicationDbContext>(options =>
-                                               options.UseNpgsql(connectionString))
+                                               options.UseNpgsql(connectionString)
+                                                      .AddInterceptors(new SoftDeleteInterceptor()))
          .AddMediatR(config =>
          {
            config.RegisterServicesFromAssembly(assembly);

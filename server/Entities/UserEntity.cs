@@ -1,10 +1,11 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using RSPWebAPI.Entities.Interfaces;
 
 namespace RSPWebAPI.Entities;
 
-public class UserEntity
+public class UserEntity : ISoftDelete
 {
   [Required] public string UserId { get; set; } = string.Empty;
   [Required] public string DiscordId { get; set; } = string.Empty;
@@ -12,6 +13,7 @@ public class UserEntity
   [Required] public bool IsAdmin { get; set; }
   [Required] public string Name { get; set; } = string.Empty;
   [Required] public string ProfileImage { get; set; } = string.Empty;
+  public DateTime? DeletedAtUtc { get; set; }
 }
 
 public class UserEntityConfiguration : IEntityTypeConfiguration<UserEntity>
@@ -34,5 +36,6 @@ public class UserEntityConfiguration : IEntityTypeConfiguration<UserEntity>
     builder.Property(x => x.Name).HasColumnName("Name").HasColumnType("varchar(100)").IsRequired();
     builder.Property(x => x.ProfileImage).HasColumnName("ProfileImage").HasColumnType("varchar(255)")
            .IsRequired();
+    builder.Property(x => x.DeletedAtUtc).HasColumnName("DeletedAtUtc").HasColumnType("timestamptz");
   }
 }

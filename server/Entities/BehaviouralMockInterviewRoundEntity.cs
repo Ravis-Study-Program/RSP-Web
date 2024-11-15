@@ -1,13 +1,15 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using RSPWebAPI.Entities.Interfaces;
 
 namespace RSPWebAPI.Entities;
 
-public class BehaviouralMockInterviewRoundEntity
+public class BehaviouralMockInterviewRoundEntity : ISoftDelete
 {
   [Required] public string BehaviouralMockInterviewRoundId { get; set; } = string.Empty;
   [Required] public int BehavioralScore { get; set; }
+  public DateTime? DeletedAtUtc { get; set; }
 }
 
 public class
@@ -22,5 +24,6 @@ public class
     builder.Property(x => x.BehaviouralMockInterviewRoundId).HasColumnName("BehaviouralMockInterviewRoundId")
            .HasColumnType("varchar(32)").ValueGeneratedNever().IsRequired();
     builder.Property(x => x.BehavioralScore).HasColumnName("BehavioralScore").HasColumnType("int").IsRequired();
+    builder.Property(x => x.DeletedAtUtc).HasColumnName("DeletedAtUtc").HasColumnType("timestamptz");
   }
 }

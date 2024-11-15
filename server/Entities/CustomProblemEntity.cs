@@ -1,10 +1,11 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using RSPWebAPI.Entities.Interfaces;
 
 namespace RSPWebAPI.Entities;
 
-public class CustomProblemEntity
+public class CustomProblemEntity : ISoftDelete
 {
   [Required] public string? CustomProblemId { get; set; } = string.Empty;
   [Required] public string? ProblemId { get; set; } = string.Empty;
@@ -13,6 +14,7 @@ public class CustomProblemEntity
 
   // Navigation
   public ProblemEntity Problem { get; set; } = null!;
+  public DateTime? DeletedAtUtc { get; set; }
 }
 
 public class CustomProblemEntityConfiguration : IEntityTypeConfiguration<CustomProblemEntity>
@@ -31,6 +33,7 @@ public class CustomProblemEntityConfiguration : IEntityTypeConfiguration<CustomP
            .IsRequired();
     builder.Property(x => x.Question).HasColumnName("Question").HasColumnType("varchar(255)")
            .IsRequired();
+    builder.Property(x => x.DeletedAtUtc).HasColumnName("DeletedAtUtc").HasColumnType("timestamptz");
 
     // Foreign Keys
     builder.HasOne(x => x.Problem)

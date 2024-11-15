@@ -1,10 +1,11 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using RSPWebAPI.Entities.Interfaces;
 
 namespace RSPWebAPI.Entities;
 
-public class ProblemAttemptEntity
+public class ProblemAttemptEntity : ISoftDelete
 {
   [Required] public string ProblemAttemptId { get; set; } = string.Empty;
   [Required] public DateTime AttemptStartDateUtc { get; set; }
@@ -24,6 +25,7 @@ public class ProblemAttemptEntity
   public LeetcodeProblemEntity LeetcodeProblem { get; set; } = null!;
   public CustomProblemEntity CustomProblem { get; set; } = null!;
   public EnrollmentEntity Enrollment { get; set; } = null!;
+  public DateTime? DeletedAtUtc { get; set; }
 }
 
 public class ProblemAttemptEntityConfiguration : IEntityTypeConfiguration<ProblemAttemptEntity>
@@ -48,6 +50,7 @@ public class ProblemAttemptEntityConfiguration : IEntityTypeConfiguration<Proble
            .HasMaxLength(32);
     builder.Property(x => x.EnrollmentId).HasColumnName("EnrollmentId").HasColumnType("varchar(16)")
            .HasMaxLength(32);
+    builder.Property(x => x.DeletedAtUtc).HasColumnName("DeletedAtUtc").HasColumnType("timestamptz");
 
     // Foreign Keys
     builder.HasOne(x => x.User)

@@ -1,10 +1,11 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using RSPWebAPI.Entities.Interfaces;
 
 namespace RSPWebAPI.Entities;
 
-public class LeetcodeMockInterviewRoundEntity
+public class LeetcodeMockInterviewRoundEntity : ISoftDelete
 {
   [Required] public string LeetcodeMockInterviewRoundId { get; set; } = string.Empty;
   [Required] public string LeetcodeProblemId { get; set; } = string.Empty;
@@ -17,6 +18,7 @@ public class LeetcodeMockInterviewRoundEntity
 
   // Navigation
   public LeetcodeProblemEntity LeetcodeProblem { get; set; } = null!;
+  public DateTime? DeletedAtUtc { get; set; }
 }
 
 public class LeetcodeMockInterviewRoundEntityConfiguration : IEntityTypeConfiguration<LeetcodeMockInterviewRoundEntity>
@@ -39,6 +41,7 @@ public class LeetcodeMockInterviewRoundEntityConfiguration : IEntityTypeConfigur
            .IsRequired();
     builder.Property(x => x.CodingScore).HasColumnName("CodingScore").HasColumnType("int").IsRequired();
     builder.Property(x => x.TestingScore).HasColumnName("TestingScore").HasColumnType("int").IsRequired();
+    builder.Property(x => x.DeletedAtUtc).HasColumnName("DeletedAtUtc").HasColumnType("timestamptz");
 
     // Foreign Keys
     builder.HasOne(x => x.LeetcodeProblem).WithMany().HasForeignKey(x => x.LeetcodeProblemId)
