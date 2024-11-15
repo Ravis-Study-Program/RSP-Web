@@ -23,7 +23,7 @@ public class CustomMockInterviewRoundConfiguration : IEntityTypeConfiguration<Cu
 
     // Fields
     builder.Property(x => x.CustomMockInterviewRoundId).HasColumnName("CustomMockInterviewRoundId")
-           .HasColumnType("varchar(32)").ValueGeneratedNever().IsRequired();
+           .HasColumnType("varchar(16)").ValueGeneratedNever().IsRequired();
     builder.Property(x => x.Content).HasColumnName("Content").HasColumnType("varchar(10000)").IsRequired();
     builder.Property(x => x.Link).HasColumnName("Link").HasColumnType("varchar(255)");
     builder.Property(x => x.Score).HasColumnName("Score").HasColumnType("int").IsRequired();

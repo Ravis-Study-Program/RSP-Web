@@ -25,14 +25,14 @@ public class SeasonEntityConfiguration : IEntityTypeConfiguration<SeasonEntity>
     builder.HasKey(x => x.SeasonId);
 
     // Indexes
-    builder.HasIndex(x => x.Slug).IsUnique();
+    builder.HasIndex(x => x.Slug);
 
     // Fields
     builder.Property(x => x.SeasonId).HasColumnName("SeasonId").HasColumnType("varchar(16)")
            .ValueGeneratedNever().IsRequired();
     builder.Property(x => x.Name).HasColumnName("Name").HasColumnType("varchar(100)")
            .IsRequired();
-    builder.Property(x => x.Slug).HasColumnName("Slug").HasColumnType("varchar(32)")
+    builder.Property(x => x.Slug).HasColumnName("Slug").HasColumnType("varchar(16)")
            .IsRequired();
     builder.Property(x => x.StartDateInclusiveUtc).HasColumnName("StartDateInclusiveUTC")
            .HasColumnType("timestamptz").IsRequired();

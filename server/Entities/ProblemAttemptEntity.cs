@@ -37,19 +37,16 @@ public class ProblemAttemptEntityConfiguration : IEntityTypeConfiguration<Proble
 
     // Fields
     builder.Property(x => x.ProblemAttemptId).HasColumnName("ProblemAttemptId").HasColumnType("varchar(16)")
-           .HasMaxLength(32).ValueGeneratedNever().IsRequired();
+           .ValueGeneratedNever().IsRequired();
     builder.Property(x => x.AttemptStartDateUtc).HasColumnName("AttemptStartDateUtc")
            .HasColumnType("timestamptz").IsRequired();
     builder.Property(x => x.TimeTakenInMinutes).HasColumnName("TimeTakenInMinutes").HasColumnType("int")
            .IsRequired();
-    builder.Property(x => x.Notes).HasColumnName("Notes").HasColumnType("varchar(16)").HasMaxLength(10000).IsRequired();
-    builder.Property(x => x.UserId).HasColumnName("UserId").HasColumnType("varchar(16)").HasMaxLength(32).IsRequired();
-    builder.Property(x => x.LeetcodeProblemId).HasColumnName("LeetcodeProblemId").HasColumnType("varchar(16)")
-           .HasMaxLength(32);
-    builder.Property(x => x.CustomProblemId).HasColumnName("CustomProblemId").HasColumnType("varchar(16)")
-           .HasMaxLength(32);
-    builder.Property(x => x.EnrollmentId).HasColumnName("EnrollmentId").HasColumnType("varchar(16)")
-           .HasMaxLength(32);
+    builder.Property(x => x.Notes).HasColumnName("Notes").HasColumnType("varchar(10000)").IsRequired();
+    builder.Property(x => x.UserId).HasColumnName("UserId").HasColumnType("varchar(16)").IsRequired();
+    builder.Property(x => x.LeetcodeProblemId).HasColumnName("LeetcodeProblemId").HasColumnType("varchar(16)");
+    builder.Property(x => x.CustomProblemId).HasColumnName("CustomProblemId").HasColumnType("varchar(16)");
+    builder.Property(x => x.EnrollmentId).HasColumnName("EnrollmentId").HasColumnType("varchar(16)");
     builder.Property(x => x.DeletedAtUtc).HasColumnName("DeletedAtUtc").HasColumnType("timestamptz");
 
     // Foreign Keys

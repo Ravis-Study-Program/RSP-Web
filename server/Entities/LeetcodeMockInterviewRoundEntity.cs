@@ -30,7 +30,7 @@ public class LeetcodeMockInterviewRoundEntityConfiguration : IEntityTypeConfigur
 
     // Fields
     builder.Property(x => x.LeetcodeMockInterviewRoundId).HasColumnName("LeetcodeMockInterviewRoundId")
-           .HasColumnType("varchar(32)").ValueGeneratedNever().IsRequired();
+           .HasColumnType("varchar(16)").ValueGeneratedNever().IsRequired();
     builder.Property(x => x.LeetcodeProblemId).HasColumnName("LeetcodeProblemId").HasColumnType("varchar(16)")
            .IsRequired();
     builder.Property(x => x.ConfirmQuestionScore).HasColumnName("ConfirmQuestionScore").HasColumnType("int")

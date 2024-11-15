@@ -28,7 +28,7 @@ public class EnrollmentEntityConfiguration : IEntityTypeConfiguration<Enrollment
     // Indexes
     builder.HasIndex(x => x.SeasonId);
     builder.HasIndex(x => x.UserId);
-    builder.HasIndex(x => new { x.SeasonId, x.UserId }).IsUnique();
+    builder.HasIndex(x => new { x.SeasonId, x.UserId });
 
     // Fields
     builder.Property(x => x.EnrollmentId).HasColumnName("EnrollmentId").HasColumnType("varchar(16)")

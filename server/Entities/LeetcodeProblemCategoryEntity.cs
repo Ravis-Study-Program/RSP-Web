@@ -21,7 +21,7 @@ public class LeetcodeProblemCategoryEntityConfiguration : IEntityTypeConfigurati
 
     // Fields
     builder.Property(x => x.LeetcodeProblemCategoryId).HasColumnName("LeetcodeProblemCategoryId")
-           .HasColumnType("varchar(32)").ValueGeneratedNever().IsRequired();
+           .HasColumnType("varchar(16)").ValueGeneratedNever().IsRequired();
     builder.Property(x => x.Name).HasColumnName("Name").HasColumnType("varchar(100)").IsRequired();
     builder.Property(x => x.DeletedAtUtc).HasColumnName("DeletedAtUtc").HasColumnType("timestamptz");
   }

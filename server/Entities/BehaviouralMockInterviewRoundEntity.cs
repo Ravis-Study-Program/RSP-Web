@@ -22,7 +22,7 @@ public class
 
     // Fields
     builder.Property(x => x.BehaviouralMockInterviewRoundId).HasColumnName("BehaviouralMockInterviewRoundId")
-           .HasColumnType("varchar(32)").ValueGeneratedNever().IsRequired();
+           .HasColumnType("varchar(16)").ValueGeneratedNever().IsRequired();
     builder.Property(x => x.BehavioralScore).HasColumnName("BehavioralScore").HasColumnType("int").IsRequired();
     builder.Property(x => x.DeletedAtUtc).HasColumnName("DeletedAtUtc").HasColumnType("timestamptz");
   }

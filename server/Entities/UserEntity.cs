@@ -24,7 +24,7 @@ public class UserEntityConfiguration : IEntityTypeConfiguration<UserEntity>
     builder.HasKey(x => x.UserId);
 
     // Indexes
-    builder.HasIndex(x => x.Email).IsUnique();
+    builder.HasIndex(x => x.Email);
 
     // Fields
     builder.Property(x => x.UserId).HasColumnName("UserId").HasColumnType("varchar(16)")
