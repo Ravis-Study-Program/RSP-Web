@@ -1,6 +1,6 @@
-import { Outlet, useParams } from 'react-router-dom';
-import { useGetIsUserEnrolled } from '@/generated/api/client';
 import NotFoundPage from '@/pages/NotFound/NotFound.page';
+import { Outlet, useParams } from 'react-router-dom';
+import { useUserAndEnrollment } from '../hooks/useUserAndEnrollment';
 
 const SeasonRouteGuard = () => {
   const { seasonSlug } = useParams<{ seasonSlug: string }>();
@@ -9,18 +9,19 @@ const SeasonRouteGuard = () => {
     return <NotFoundPage />;
   }
 
-  const {
-    data: userResponse,
-    isError: isLoadingUserError,
-    isFetching: isFetchingUser,
-    isLoading: isLoadingUser,
-  } = useGetIsUserEnrolled(seasonSlug);
+  const { user, isAdmin, role, isLoading } = useUserAndEnrollment(seasonSlug);
 
-  if (isLoadingUser || isFetchingUser || isLoadingUserError) {
+  if (isLoading) {
     return null;
   }
 
-  if (!userResponse?.responseBody?.isEnrolled) {
+  // Admin can bypass all seasons without a role
+  if (isAdmin) {
+    return <Outlet />;
+  }
+
+  // Non-admin must have a role in the season
+  if (user === null || role === null) {
     return <NotFoundPage />;
   }
 
