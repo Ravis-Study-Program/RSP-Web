@@ -3,6 +3,7 @@ using System.Net;
 using Carter;
 using FluentValidation;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using RSPWebAPI.Database;
 using RSPWebAPI.Entities;
 using RSPWebAPI.Features.Constants;
@@ -63,6 +64,19 @@ public static class AdminCreateSeason
       CancellationToken cancellationToken
     )
     {
+      var existingSeason = await _dbContext
+                                     .Seasons
+                                     .FirstOrDefaultAsync(s => s.Slug == request.Slug,
+                                                          cancellationToken);
+      if (existingSeason != null)
+      {
+        return new ApiResult<AdminCreateSeasonResponse>
+        {
+          StatusCode = HttpStatusCode.BadRequest,
+          Error = new ApiError(Message.SeasonExists)
+        };
+      }
+      
       var season = new SeasonEntity
       {
         SeasonId = Database.Constants.GeneratePrimaryKeyId(),

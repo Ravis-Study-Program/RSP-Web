@@ -24,7 +24,7 @@ public class ProblemEntityConfiguration : IEntityTypeConfiguration<ProblemEntity
     builder.Property(x => x.ProblemId).HasColumnName("ProblemId").HasColumnType("varchar(16)").ValueGeneratedNever()
            .IsRequired();
     builder.Property(x => x.Title).HasColumnName("Title").HasColumnType("varchar(100)").IsRequired();
-    builder.Property(x => x.Link).HasColumnName("Link").HasColumnType("varchar(510)").HasMaxLength(510);
+    builder.Property(x => x.Link).HasColumnName("Link").HasColumnType("varchar(510)");
     builder.Property(x => x.DeletedAtUtc).HasColumnName("DeletedAtUtc").HasColumnType("timestamptz");
   }
 }

@@ -35,16 +35,15 @@ public class MockInterviewEntityConfiguration : IEntityTypeConfiguration<MockInt
 
     // Fields  
     builder.Property(x => x.MockInterviewId).HasColumnName("MockInterviewId").HasColumnType("varchar(16)")
-           .HasMaxLength(32)
            .ValueGeneratedNever().IsRequired();
     builder.Property(x => x.IsPass).HasColumnName("IsPass").IsRequired();
     builder.Property(x => x.StartDate).HasColumnName("StartDate").HasColumnType("timestamptz").IsRequired();
     builder.Property(x => x.TimeTakenInMinutes).HasColumnName("TimeTakenInMinutes").HasColumnType("int").IsRequired();
-    builder.Property(x => x.EnrollmentId).HasColumnName("EnrollmentId").HasColumnType("varchar(16)").HasMaxLength(32);
+    builder.Property(x => x.EnrollmentId).HasColumnName("EnrollmentId").HasColumnType("varchar(16)");
     builder.Property(x => x.InterviewerUserId).HasColumnName("InterviewerUserId").HasColumnType("varchar(16)")
-           .HasMaxLength(32).IsRequired();
+           .IsRequired();
     builder.Property(x => x.IntervieweeUserId).HasColumnName("IntervieweeUserId").HasColumnType("varchar(16)")
-           .HasMaxLength(32).IsRequired();
+           .IsRequired();
     builder.Property(x => x.DeletedAtUtc).HasColumnName("DeletedAtUtc").HasColumnType("timestamptz");
 
     // Foreign Keys

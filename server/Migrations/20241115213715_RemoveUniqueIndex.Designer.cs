@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using RSPWebAPI.Database;
@@ -11,9 +12,11 @@ using RSPWebAPI.Database;
 namespace RSPWebAPI.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241115213715_RemoveUniqueIndex")]
+    partial class RemoveUniqueIndex
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -25,7 +28,7 @@ namespace RSPWebAPI.Migrations
             modelBuilder.Entity("LeetcodeProblemCategoryEntityLeetcodeProblemEntity", b =>
                 {
                     b.Property<string>("LeetcodeProblemCategoriesLeetcodeProblemCategoryId")
-                        .HasColumnType("varchar(16)");
+                        .HasColumnType("varchar(32)");
 
                     b.Property<string>("LeetcodeProblemEntityLeetcodeProblemId")
                         .HasColumnType("varchar(16)");
@@ -40,7 +43,7 @@ namespace RSPWebAPI.Migrations
             modelBuilder.Entity("RSPWebAPI.Entities.BehaviouralMockInterviewRoundEntity", b =>
                 {
                     b.Property<string>("BehaviouralMockInterviewRoundId")
-                        .HasColumnType("varchar(16)")
+                        .HasColumnType("varchar(32)")
                         .HasColumnName("BehaviouralMockInterviewRoundId");
 
                     b.Property<int>("BehavioralScore")
@@ -59,7 +62,7 @@ namespace RSPWebAPI.Migrations
             modelBuilder.Entity("RSPWebAPI.Entities.CustomMockInterviewRoundEntity", b =>
                 {
                     b.Property<string>("CustomMockInterviewRoundId")
-                        .HasColumnType("varchar(16)")
+                        .HasColumnType("varchar(32)")
                         .HasColumnName("CustomMockInterviewRoundId");
 
                     b.Property<string>("Content")
@@ -156,7 +159,7 @@ namespace RSPWebAPI.Migrations
             modelBuilder.Entity("RSPWebAPI.Entities.LeetcodeMockInterviewRoundEntity", b =>
                 {
                     b.Property<string>("LeetcodeMockInterviewRoundId")
-                        .HasColumnType("varchar(16)")
+                        .HasColumnType("varchar(32)")
                         .HasColumnName("LeetcodeMockInterviewRoundId");
 
                     b.Property<int>("AlgorithmDesignScore")
@@ -198,7 +201,7 @@ namespace RSPWebAPI.Migrations
             modelBuilder.Entity("RSPWebAPI.Entities.LeetcodeProblemCategoryEntity", b =>
                 {
                     b.Property<string>("LeetcodeProblemCategoryId")
-                        .HasColumnType("varchar(16)")
+                        .HasColumnType("varchar(32)")
                         .HasColumnName("LeetcodeProblemCategoryId");
 
                     b.Property<DateTime?>("DeletedAtUtc")
@@ -277,6 +280,7 @@ namespace RSPWebAPI.Migrations
             modelBuilder.Entity("RSPWebAPI.Entities.MockInterviewEntity", b =>
                 {
                     b.Property<string>("MockInterviewId")
+                        .HasMaxLength(32)
                         .HasColumnType("varchar(16)")
                         .HasColumnName("MockInterviewId");
 
@@ -285,16 +289,19 @@ namespace RSPWebAPI.Migrations
                         .HasColumnName("DeletedAtUtc");
 
                     b.Property<string>("EnrollmentId")
+                        .HasMaxLength(32)
                         .HasColumnType("varchar(16)")
                         .HasColumnName("EnrollmentId");
 
                     b.Property<string>("IntervieweeUserId")
                         .IsRequired()
+                        .HasMaxLength(32)
                         .HasColumnType("varchar(16)")
                         .HasColumnName("IntervieweeUserId");
 
                     b.Property<string>("InterviewerUserId")
                         .IsRequired()
+                        .HasMaxLength(32)
                         .HasColumnType("varchar(16)")
                         .HasColumnName("InterviewerUserId");
 
@@ -328,11 +335,11 @@ namespace RSPWebAPI.Migrations
                         .HasColumnName("MockInterviewRoundId");
 
                     b.Property<string>("BehaviouralMockInterviewRoundId")
-                        .HasColumnType("varchar(16)")
+                        .HasColumnType("varchar(32)")
                         .HasColumnName("BehaviouralMockInterviewRoundId");
 
                     b.Property<string>("CustomMockInterviewRoundId")
-                        .HasColumnType("varchar(16)")
+                        .HasColumnType("varchar(32)")
                         .HasColumnName("CustomMockInterviewRoundId");
 
                     b.Property<DateTime?>("DeletedAtUtc")
@@ -349,7 +356,7 @@ namespace RSPWebAPI.Migrations
                         .HasColumnName("IsReviewedByInterviewee");
 
                     b.Property<string>("LeetcodeMockInterviewRoundId")
-                        .HasColumnType("varchar(16)")
+                        .HasColumnType("varchar(32)")
                         .HasColumnName("LeetcodeMockInterviewRoundId");
 
                     b.Property<string>("MockInterviewId")
@@ -376,6 +383,7 @@ namespace RSPWebAPI.Migrations
             modelBuilder.Entity("RSPWebAPI.Entities.ProblemAttemptEntity", b =>
                 {
                     b.Property<string>("ProblemAttemptId")
+                        .HasMaxLength(32)
                         .HasColumnType("varchar(16)")
                         .HasColumnName("ProblemAttemptId");
 
@@ -384,6 +392,7 @@ namespace RSPWebAPI.Migrations
                         .HasColumnName("AttemptStartDateUtc");
 
                     b.Property<string>("CustomProblemId")
+                        .HasMaxLength(32)
                         .HasColumnType("varchar(16)")
                         .HasColumnName("CustomProblemId");
 
@@ -392,16 +401,19 @@ namespace RSPWebAPI.Migrations
                         .HasColumnName("DeletedAtUtc");
 
                     b.Property<string>("EnrollmentId")
+                        .HasMaxLength(32)
                         .HasColumnType("varchar(16)")
                         .HasColumnName("EnrollmentId");
 
                     b.Property<string>("LeetcodeProblemId")
+                        .HasMaxLength(32)
                         .HasColumnType("varchar(16)")
                         .HasColumnName("LeetcodeProblemId");
 
                     b.Property<string>("Notes")
                         .IsRequired()
-                        .HasColumnType("varchar(10000)")
+                        .HasMaxLength(10000)
+                        .HasColumnType("varchar(16)")
                         .HasColumnName("Notes");
 
                     b.Property<int>("TimeTakenInMinutes")
@@ -410,6 +422,7 @@ namespace RSPWebAPI.Migrations
 
                     b.Property<string>("UserId")
                         .IsRequired()
+                        .HasMaxLength(32)
                         .HasColumnType("varchar(16)")
                         .HasColumnName("UserId");
 
@@ -438,6 +451,7 @@ namespace RSPWebAPI.Migrations
 
                     b.Property<string>("Link")
                         .IsRequired()
+                        .HasMaxLength(510)
                         .HasColumnType("varchar(510)")
                         .HasColumnName("Link");
 
@@ -482,7 +496,7 @@ namespace RSPWebAPI.Migrations
 
                     b.Property<string>("Slug")
                         .IsRequired()
-                        .HasColumnType("varchar(16)")
+                        .HasColumnType("varchar(32)")
                         .HasColumnName("Slug");
 
                     b.Property<DateTime>("StartDateInclusiveUtc")

@@ -42,11 +42,11 @@ public class MockInterviewRoundEntityConfiguration : IEntityTypeConfiguration<Mo
     builder.Property(x => x.IntervieweeComment).HasColumnName("IntervieweeComment").HasColumnType("varchar(1000)")
            .IsRequired();
     builder.Property(x => x.BehaviouralMockInterviewRoundId).HasColumnName("BehaviouralMockInterviewRoundId")
-           .HasColumnType("varchar(32)");
+           .HasColumnType("varchar(16)");
     builder.Property(x => x.LeetcodeMockInterviewRoundId).HasColumnName("LeetcodeMockInterviewRoundId")
-           .HasColumnType("varchar(32)");
+           .HasColumnType("varchar(16)");
     builder.Property(x => x.CustomMockInterviewRoundId).HasColumnName("CustomMockInterviewRoundId")
-           .HasColumnType("varchar(32)");
+           .HasColumnType("varchar(16)");
     builder.Property(x => x.DeletedAtUtc).HasColumnName("DeletedAtUtc").HasColumnType("timestamptz");
 
     // Foreign Keys
