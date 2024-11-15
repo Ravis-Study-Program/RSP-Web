@@ -7,7 +7,7 @@ import {
   MRT_Row,
   useMantineReactTable,
 } from 'mantine-react-table';
-import { ActionIcon, Button, Flex, Text, Tooltip } from '@mantine/core';
+import { ActionIcon, Anchor, Button, Flex, Text, Tooltip } from '@mantine/core';
 import { modals } from '@mantine/modals';
 import {
   SeasonEntity,
@@ -52,7 +52,11 @@ export const AdminSeasonsTable = () => {
     () => [
       {
         accessorKey: 'name',
+        accessorFn: (row) => row.name,
         header: 'Name',
+        Cell: ({ row }) => {
+          return <Anchor href={`/seasons/${row.original.slug}`}>{row.original.name}</Anchor>;
+        },
       },
       {
         accessorKey: 'slug',

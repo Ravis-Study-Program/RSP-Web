@@ -1,5 +1,4 @@
 import {
-  IconBadge,
   IconCalendarMonth,
   IconChalkboard,
   IconChessKnight,
@@ -44,7 +43,6 @@ const adminNoSeasonSelectedTabs: Tabs = {
   general: [
     { label: 'Seasons', icon: IconCalendarMonth, link: '/admin/seasons', hidden: false },
     { label: 'Users', icon: IconUsersGroup, link: '/admin/users', hidden: false },
-    { label: 'Roles', icon: IconBadge, link: '/admin/roles', hidden: false },
     { label: 'Enrollments', icon: IconSchool, link: '/admin/enrollments', hidden: false },
     { label: 'Mentorships', icon: IconChessKnight, link: '/admin/mentorships', hidden: false },
     { label: 'Settings', icon: IconSettings, link: '/settings', hidden: true },
@@ -178,25 +176,26 @@ const getAdminTabs = (seasonSlug: string | null): Tabs => ({
 
 export const getTabs = (seasonSlug: string | null, isAdmin: boolean, role: SeasonRole | null) => {
   let tabs: Tabs = noSeasonSelectedTabs;
-
+  
+  if (isAdmin) {    
+    tabs = (seasonSlug === null || seasonSlug === '') ? adminNoSeasonSelectedTabs : getAdminTabs(seasonSlug);    
+    return tabs;
+  } 
+  
   if (role == null) {
     return tabs;
   }
 
-  if (isAdmin) {
-    tabs = seasonSlug === null ? adminNoSeasonSelectedTabs : getAdminTabs(seasonSlug);
-  } else {
-    switch (role) {
-      case SeasonRole.Student:
-        tabs = getStudentTabs(seasonSlug);
-        break;
-      case SeasonRole.Mentor:
-        tabs = getMentorTabs(seasonSlug);
-        break;
-      case SeasonRole.Coordinator:
-        tabs = getCoordinatorTabs(seasonSlug);
-        break;
-    }
+  switch (role) {
+    case SeasonRole.Student:
+      tabs = getStudentTabs(seasonSlug);
+      break;
+    case SeasonRole.Mentor:
+      tabs = getMentorTabs(seasonSlug);
+      break;
+    case SeasonRole.Coordinator:
+      tabs = getCoordinatorTabs(seasonSlug);
+      break;
   }
 
   return tabs;
