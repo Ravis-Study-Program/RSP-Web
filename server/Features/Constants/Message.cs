@@ -24,18 +24,10 @@ public static class Message
   public const string SeasonUpdatedSuccessfully = "Season updated successfully.";
   public const string SeasonDeletedSuccessfully = "Season deleted successfully.";
   public const string SeasonListSuccessfully = "List of Season retrieved successfully.";
-
-  public const string RoleExists = "A role with this RoleId already exists.";
-  public const string RoleDoesNotExists = "No role found using the RoleId provided.";
-  public const string RoleCreatedSuccessfully = "Role created successfully.";
-  public const string RoleCreationUnexpectedError = "An unexpected error has occurred during role creation.";
-  public const string RoleUpdateUnexpectedError = "An unexpected error has occurred during role update.";
-  public const string RoleDeletionUnexpectedError = "An unexpected error has occurred during role deletion.";
-  public const string RoleUpdatedSuccessfully = "Role updated successfully.";
-  public const string RoleDeletedSuccessfully = "Role deleted successfully.";
-  public const string RoleListSuccessfully = "List of Role retrieved successfully.";
-  public const string RoleListUnexpectedError = "An unexpected error has occurred during role list.";
-
+  
+  public const string GraduatesListSuccessfully = "List of Graduates retrieved successfully.";
+  public const string GraduatesListUnexpectedError = "An unexpected error has occurred during graduates list.";
+  
   public const string EnrollmentExists = "A enrollment with this EnrollmentId already exists.";
   public const string EnrollmentDoesNotExists = "No enrollment found using the EnrollmentId provided.";
   public const string EnrollmentCreatedSuccessfully = "Enrollment created successfully.";

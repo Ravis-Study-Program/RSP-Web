@@ -1,90 +1,93 @@
-import { IconBrandGithub, IconBrandInstagram, IconBrandLinkedin } from '@tabler/icons-react';
+import { Layout } from '@/components/Layout/Layout';
+import { GraduateDto, useGetGraduates } from '@/generated/api/client';
 import {
   ActionIcon,
+  Anchor,
   Avatar,
-  Badge,
   Card,
   Grid,
   Group,
   rem,
-  Text,
-  useMantineTheme,
+  Skeleton,
+  Text
 } from '@mantine/core';
-import { Layout } from '@/components/Layout/Layout';
+import { IconBrandDiscordFilled } from '@tabler/icons-react';
 import classes from './Graduates.module.css';
 
-const graduates: GraduateCardProps[] = [
-  {
-    image:
-      'https://images.pexels.com/photos/1490908/pexels-photo-1490908.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-    name: 'John Doe',
-    season: 'New York 2023',
-    company: 'Google',
-  },
-];
-
 export default function GraduatesPage() {
+  const {
+    data: graduatesResponse,
+    isError: isLoadingGraduatesError,
+    isFetching: isFetchingGraduates,
+    isLoading: isLoadingGraduates,
+  } = useGetGraduates();
+
   return (
     <Layout>
       <Grid gutter={{ base: 'md', xs: 'md', md: 'xl', xl: 50 }}>
-        {Array(30)
-          .fill(null)
-          .map((_) => (
-            <Grid.Col span={{ base: 12, xs: 6, sm: 6, md: 4, lg: 3, xl: 2 }}>
-              <GraduateCard graduate={graduates[0]} />
-            </Grid.Col>
-          ))}
+        {!isLoadingGraduates && !isFetchingGraduates && !isLoadingGraduatesError ? (
+          <GraduateCards graduates={graduatesResponse?.responseBody?.graduates} />
+        ) : (
+          <GraduateSkeletonCards />
+        )}
       </Grid>
     </Layout>
   );
 }
 
-interface GraduateCardProps {
-  image: string;
-  name: string;
-  season: string;
-  company: string;
-}
-
-export function GraduateCard({ graduate }: { graduate: GraduateCardProps }) {
-  const theme = useMantineTheme();
+const GraduateSkeletonCards = () => {
+  const numCards = 8;
 
   return (
-    <Card withBorder shadow="sm" radius="md" className={classes.card}>
-      <Avatar src={graduate.image} size={120} radius={120} mx="auto" />
-      <Text ta="center" fz="lg" fw={600} mt="md">
-        {graduate.name}
-      </Text>
-      <Text ta="center" c="dimmed" fz="sm">
-        {graduate.company}
-      </Text>
-      <Badge color="lime.8" mt="sm">
-        {graduate.season}
-      </Badge>
+    <>
+      {Array.from({ length: numCards }).map((_, index) => (
+        <Grid.Col key={index} span={{ base: 12, sm: 6, md: 6, lg: 2 }}>
+          <Card withBorder shadow="xs" radius="md">
+            <Skeleton height={80} mb="xl" />
+            <Skeleton height={10} radius="xl" />
+            <Skeleton height={8} mt={8} radius="xl" />
+            <Skeleton height={8} mt={8} radius="xl" />
+            <Skeleton height={8} mt={8} width="70%" radius="xl" />
+            <Skeleton height={40} mt={50} radius="xl" />
+          </Card>
+        </Grid.Col>
+      ))}
+    </>
+  );
+};
 
-      <Group gap={0} mt="md">
-        <ActionIcon variant="subtle" color="gray">
-          <IconBrandLinkedin
-            style={{ width: rem(20), height: rem(20) }}
-            color={theme.colors.blue[6]}
-            stroke={1.5}
-          />
-        </ActionIcon>
-        <ActionIcon variant="subtle" color="gray">
-          <IconBrandGithub
-            style={{ width: rem(20), height: rem(20) }}
-            color={theme.colors.gray[6]}
-            stroke={1.5}
-          />
-        </ActionIcon>
-        <ActionIcon variant="subtle" color="gray">
-          <IconBrandInstagram
-            style={{ width: rem(20), height: rem(20) }}
-            color={theme.colors.pink[6]}
-            stroke={1.5}
-          />
-        </ActionIcon>
-      </Group>
-    </Card>
+
+type GraduateCardsProps = {
+  graduates: GraduateDto[] | undefined
+}
+
+export function GraduateCards({ graduates }: GraduateCardsProps) {
+  return (
+    <>
+      {
+        graduates?.map((graduate, key) => (
+          <Grid.Col key={key} span={{ base: 12, sm: 6, md: 6, lg: 2 }}>
+          <Card key={key} withBorder shadow="sm" radius="md" className={classes.card}>
+            <Avatar src={graduate.profileImage} size={70} radius={70} mx="auto" />
+            <Text ta="center" fz="lg" fw={600} mt="md">
+              {graduate.name}
+            </Text>
+
+            <Group gap={0} mt="md">
+                <Anchor c="gray" target='_blank' href='https://www.discord.com'>
+                  <ActionIcon variant="subtle" color="gray">
+                    <IconBrandDiscordFilled
+                      style={{ width: rem(20), height: rem(20) }}
+                      color="gray"
+                      stroke={1.5}
+                    />
+                  </ActionIcon>
+                </Anchor>
+              </Group>
+          </Card>
+          </Grid.Col>
+        ))
+      }
+    </>
   );
 }
