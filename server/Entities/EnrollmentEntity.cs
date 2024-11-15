@@ -1,10 +1,11 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using RSPWebAPI.Entities.Interfaces;
 
 namespace RSPWebAPI.Entities;
 
-public class EnrollmentEntity
+public class EnrollmentEntity : ISoftDelete
 {
   [Required] public string EnrollmentId { get; set; } = string.Empty;
   [Required] public string SeasonId { get; set; } = string.Empty;
@@ -14,6 +15,7 @@ public class EnrollmentEntity
   // Navigation
   public SeasonEntity Season { get; set; } = null!;
   public UserEntity User { get; set; } = null!;
+  public DateTime? DeletedAtUtc { get; set; }
 }
 
 public class EnrollmentEntityConfiguration : IEntityTypeConfiguration<EnrollmentEntity>
@@ -34,6 +36,7 @@ public class EnrollmentEntityConfiguration : IEntityTypeConfiguration<Enrollment
     builder.Property(x => x.SeasonId).HasColumnName("SeasonId").HasColumnType("varchar(16)").IsRequired();
     builder.Property(x => x.UserId).HasColumnName("UserId").HasColumnType("varchar(16)").IsRequired();
     builder.Property(x => x.Role).HasColumnName("Role").IsRequired();
+    builder.Property(x => x.DeletedAtUtc).HasColumnName("DeletedAtUtc").HasColumnType("timestamptz");
 
     // Foreign Keys
     builder.HasOne(x => x.Season).WithMany().HasForeignKey(x => x.SeasonId).OnDelete(DeleteBehavior.Restrict)

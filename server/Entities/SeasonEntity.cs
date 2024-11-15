@@ -1,10 +1,11 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using RSPWebAPI.Entities.Interfaces;
 
 namespace RSPWebAPI.Entities;
 
-public class SeasonEntity
+public class SeasonEntity : ISoftDelete
 {
   [Required] public string SeasonId { get; set; } = string.Empty;
   [Required] public string Name { get; set; } = string.Empty;
@@ -13,6 +14,7 @@ public class SeasonEntity
   [Required] public DateTime EndDateInclusiveUtc { get; set; }
   [Required] public string Location { get; set; } = string.Empty;
   [Required] public string ImageUrl { get; set; } = string.Empty;
+  public DateTime? DeletedAtUtc { get; set; }
 }
 
 public class SeasonEntityConfiguration : IEntityTypeConfiguration<SeasonEntity>
@@ -38,5 +40,6 @@ public class SeasonEntityConfiguration : IEntityTypeConfiguration<SeasonEntity>
            .HasColumnType("timestamptz").IsRequired();
     builder.Property(x => x.Location).HasColumnName("Location").HasColumnType("varchar(100)").IsRequired();
     builder.Property(x => x.ImageUrl).HasColumnName("ImageUrl").HasColumnType("varchar(255)").IsRequired();
+    builder.Property(x => x.DeletedAtUtc).HasColumnName("DeletedAtUtc").HasColumnType("timestamptz");
   }
 }

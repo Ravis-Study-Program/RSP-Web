@@ -2,10 +2,11 @@ using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using RSPWebAPI.Entities.Interfaces;
 
 namespace RSPWebAPI.Entities;
 
-public class MockInterviewRoundEntity
+public class MockInterviewRoundEntity : ISoftDelete
 {
   [Required] public string MockInterviewRoundId { get; set; } = string.Empty;
   [Required] public string MockInterviewId { get; set; } = string.Empty;
@@ -22,6 +23,7 @@ public class MockInterviewRoundEntity
   public BehaviouralMockInterviewRoundEntity BehaviouralMockInterviewRound { get; set; } = null!;
   public LeetcodeMockInterviewRoundEntity LeetcodeMockInterviewRound { get; set; } = null!;
   public CustomMockInterviewRoundEntity CustomMockInterviewRound { get; set; } = null!;
+  public DateTime? DeletedAtUtc { get; set; }
 }
 
 public class MockInterviewRoundEntityConfiguration : IEntityTypeConfiguration<MockInterviewRoundEntity>
@@ -45,6 +47,7 @@ public class MockInterviewRoundEntityConfiguration : IEntityTypeConfiguration<Mo
            .HasColumnType("varchar(32)");
     builder.Property(x => x.CustomMockInterviewRoundId).HasColumnName("CustomMockInterviewRoundId")
            .HasColumnType("varchar(32)");
+    builder.Property(x => x.DeletedAtUtc).HasColumnName("DeletedAtUtc").HasColumnType("timestamptz");
 
     // Foreign Keys
     builder.HasOne(x => x.MockInterview)

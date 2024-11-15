@@ -67,6 +67,8 @@ export interface ValidationError {
 }
 
 export interface UserEntity {
+  /** @nullable */
+  deletedAtUtc?: string | null;
   /** @minLength 1 */
   discordId: string;
   /** @minLength 1 */
@@ -143,6 +145,8 @@ export const SeasonRole = {
 } as const;
 
 export interface SeasonEntity {
+  /** @nullable */
+  deletedAtUtc?: string | null;
   endDateInclusiveUtc: string;
   /** @minLength 1 */
   imageUrl: string;
@@ -158,6 +162,8 @@ export interface SeasonEntity {
 }
 
 export interface ProblemEntity {
+  /** @nullable */
+  deletedAtUtc?: string | null;
   /** @minLength 1 */
   link: string;
   /** @minLength 1 */
@@ -173,6 +179,8 @@ export interface MockInterviewRoundEntity {
   customMockInterviewRound?: CustomMockInterviewRoundEntity;
   /** @nullable */
   customMockInterviewRoundId?: string | null;
+  /** @nullable */
+  deletedAtUtc?: string | null;
   /** @minLength 1 */
   intervieweeComment: string;
   isReviewedByInterviewee: boolean;
@@ -194,6 +202,8 @@ export interface MockInterviewRoundDto {
 }
 
 export interface MockInterviewEntity {
+  /** @nullable */
+  deletedAtUtc?: string | null;
   enrollment?: EnrollmentEntity;
   /** @nullable */
   enrollmentId?: string | null;
@@ -273,6 +283,8 @@ export interface LeetcodeProblemDto {
 }
 
 export interface LeetcodeProblemCategoryEntity {
+  /** @nullable */
+  deletedAtUtc?: string | null;
   /** @minLength 1 */
   leetcodeProblemCategoryId: string;
   /** @minLength 1 */
@@ -280,6 +292,8 @@ export interface LeetcodeProblemCategoryEntity {
 }
 
 export interface LeetcodeProblemEntity {
+  /** @nullable */
+  deletedAtUtc?: string | null;
   isPremium: boolean;
   /** @nullable */
   leetcodeProblemCategories?: LeetcodeProblemCategoryEntity[] | null;
@@ -296,6 +310,8 @@ export interface ProblemAttemptEntity {
   customProblem?: CustomProblemEntity;
   /** @nullable */
   customProblemId?: string | null;
+  /** @nullable */
+  deletedAtUtc?: string | null;
   enrollment?: EnrollmentEntity;
   /** @nullable */
   enrollmentId?: string | null;
@@ -317,6 +333,8 @@ export interface LeetcodeMockInterviewRoundEntity {
   codingScore: number;
   complexityAnalysisScore: number;
   confirmQuestionScore: number;
+  /** @nullable */
+  deletedAtUtc?: string | null;
   /** @minLength 1 */
   leetcodeMockInterviewRoundId: string;
   leetcodeProblem?: LeetcodeProblemEntity;
@@ -576,6 +594,8 @@ export interface EnrollmentResponse {
 }
 
 export interface EnrollmentEntity {
+  /** @nullable */
+  deletedAtUtc?: string | null;
   /** @minLength 1 */
   enrollmentId: string;
   role: SeasonRole;
@@ -616,6 +636,8 @@ export interface DeleteMockInterviewResponseApiResult {
 export interface CustomProblemEntity {
   /** @minLength 1 */
   customProblemId: string;
+  /** @nullable */
+  deletedAtUtc?: string | null;
   /** @minLength 1 */
   difficulty: string;
   problem?: ProblemEntity;
@@ -630,6 +652,8 @@ export interface CustomMockInterviewRoundEntity {
   content: string;
   /** @minLength 1 */
   customMockInterviewRoundId: string;
+  /** @nullable */
+  deletedAtUtc?: string | null;
   /** @minLength 1 */
   link: string;
   score: number;
@@ -718,6 +742,8 @@ export interface BehaviouralMockInterviewRoundEntity {
   behavioralScore: number;
   /** @minLength 1 */
   behaviouralMockInterviewRoundId: string;
+  /** @nullable */
+  deletedAtUtc?: string | null;
 }
 
 export interface BehaviouralMockInterviewRoundDto {
