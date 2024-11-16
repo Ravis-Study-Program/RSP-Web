@@ -49,7 +49,7 @@ public static class GetMockInterviews
     {
       try
       {
-        var query = _dbContext.MockInterviews.AsQueryable();
+        var query = _dbContext.MockInterviews.Include(e => e.Enrollment.Season).AsQueryable();
 
         // Check if the enrollment exists
         if (request.EnrollmentId != null)
