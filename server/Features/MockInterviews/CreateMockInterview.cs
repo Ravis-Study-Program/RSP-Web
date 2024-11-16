@@ -58,46 +58,43 @@ public static class CreateMockInterview
         if (request.EnrollmentId != null)
         {
           var existingEnrollmentUserEmail = await _dbContext
-                                                  .Enrollments
-                                                  .Where(e => e.EnrollmentId == request.EnrollmentId)
-                                                  .Select(e => e.User.Email)
-                                                  .FirstOrDefaultAsync(cancellationToken);
+            .Enrollments.Where(e => e.EnrollmentId == request.EnrollmentId)
+            .Select(e => e.User.Email)
+            .FirstOrDefaultAsync(cancellationToken);
           if (existingEnrollmentUserEmail != request.IntervieweeEmail)
           {
             return new ApiResult<CreateMockInterviewResponse>
             {
               StatusCode = HttpStatusCode.BadRequest,
-              Error = new ApiError(Message.EnrollmentDoesNotExists)
+              Error = new ApiError(Message.EnrollmentDoesNotExists),
             };
           }
         }
 
         // Get user for interviewee and interviewer
         var intervieweeUserId = await _dbContext
-                                      .Users
-                                      .Where(u => u.Email == request.IntervieweeEmail)
-                                      .Select(u => u.UserId)
-                                      .FirstOrDefaultAsync(cancellationToken);
+          .Users.Where(u => u.Email == request.IntervieweeEmail)
+          .Select(u => u.UserId)
+          .FirstOrDefaultAsync(cancellationToken);
         if (intervieweeUserId == null)
         {
           return new ApiResult<CreateMockInterviewResponse>
           {
             StatusCode = HttpStatusCode.BadRequest,
-            Error = new ApiError(Message.UserEmailDoesNotExists)
+            Error = new ApiError(Message.UserEmailDoesNotExists),
           };
         }
 
         var interviewerUserId = await _dbContext
-                                      .Users
-                                      .Where(u => u.UserId == request.InterviewerUserId)
-                                      .Select(u => u.UserId)
-                                      .FirstOrDefaultAsync(cancellationToken);
+          .Users.Where(u => u.UserId == request.InterviewerUserId)
+          .Select(u => u.UserId)
+          .FirstOrDefaultAsync(cancellationToken);
         if (interviewerUserId == null)
         {
           return new ApiResult<CreateMockInterviewResponse>
           {
             StatusCode = HttpStatusCode.BadRequest,
-            Error = new ApiError(Message.UserEmailDoesNotExists)
+            Error = new ApiError(Message.UserEmailDoesNotExists),
           };
         }
 
@@ -113,17 +110,18 @@ public static class CreateMockInterview
             MockInterviewRoundId = mockInterviewRoundId,
             MockInterviewId = mockInterviewId,
             IsReviewedByInterviewee = false,
-            IntervieweeComment = ""
+            IntervieweeComment = "",
           };
 
           // Add BehaviouralMockInterviewRound if present, and avoid other types in this round
           if (m.BehaviouralMockInterviewRound != null)
           {
-            mockInterviewRound.BehaviouralMockInterviewRound = new BehaviouralMockInterviewRoundEntity
-            {
-              BehaviouralMockInterviewRoundId = Database.Constants.GeneratePrimaryKeyId(),
-              BehavioralScore = m.BehaviouralMockInterviewRound.BehavioralScore
-            };
+            mockInterviewRound.BehaviouralMockInterviewRound =
+              new BehaviouralMockInterviewRoundEntity
+              {
+                BehaviouralMockInterviewRoundId = Database.Constants.GeneratePrimaryKeyId(),
+                BehavioralScore = m.BehaviouralMockInterviewRound.BehavioralScore,
+              };
           }
 
           // Add LeetcodeMockInterviewRound if present
@@ -137,7 +135,7 @@ public static class CreateMockInterview
               ComplexityAnalysisScore = m.LeetcodeMockInterviewRound.ComplexityAnalysisScore,
               CodingScore = m.LeetcodeMockInterviewRound.CodingScore,
               TestingScore = m.LeetcodeMockInterviewRound.TestingScore,
-              LeetcodeProblemId = m.LeetcodeMockInterviewRound.LeetcodeProblemId
+              LeetcodeProblemId = m.LeetcodeMockInterviewRound.LeetcodeProblemId,
             };
           }
 
@@ -149,7 +147,7 @@ public static class CreateMockInterview
               CustomMockInterviewRoundId = Database.Constants.GeneratePrimaryKeyId(),
               Content = m.CustomMockInterviewRound.Content,
               Score = m.CustomMockInterviewRound.Score,
-              Link = m.CustomMockInterviewRound.Link
+              Link = m.CustomMockInterviewRound.Link,
             };
           }
 
@@ -167,7 +165,7 @@ public static class CreateMockInterview
           EnrollmentId = request.EnrollmentId,
           MockInterviewRounds = mockInterviewRounds,
           StartDate = request.StartDate,
-          TimeTakenInMinutes = request.TimeTakenInMinutes
+          TimeTakenInMinutes = request.TimeTakenInMinutes,
         };
 
         // Attach mock interview and its rounds to the DbContext to avoid circular dependency issues
@@ -177,7 +175,7 @@ public static class CreateMockInterview
         return new ApiResult<CreateMockInterviewResponse>
         {
           StatusCode = HttpStatusCode.OK,
-          SuccessMessage = Message.MockInterviewCreatedSuccessfully
+          SuccessMessage = Message.MockInterviewCreatedSuccessfully,
         };
       }
       catch (Exception ex)
@@ -187,7 +185,7 @@ public static class CreateMockInterview
         return new ApiResult<CreateMockInterviewResponse>
         {
           StatusCode = HttpStatusCode.InternalServerError,
-          Error = new ApiError(Message.MockInterviewCreationUnexpectedError)
+          Error = new ApiError(Message.MockInterviewCreationUnexpectedError),
         };
       }
     }
@@ -202,14 +200,16 @@ public static class CreateMockInterview
         if (round.LeetcodeMockInterviewRound != null)
         {
           var r = round.LeetcodeMockInterviewRound;
-          numList.AddRange(new List<int>
-          {
-            r.ConfirmQuestionScore,
-            r.AlgorithmDesignScore,
-            r.ComplexityAnalysisScore,
-            r.CodingScore,
-            r.TestingScore
-          });
+          numList.AddRange(
+            new List<int>
+            {
+              r.ConfirmQuestionScore,
+              r.AlgorithmDesignScore,
+              r.ComplexityAnalysisScore,
+              r.CodingScore,
+              r.TestingScore,
+            }
+          );
         }
 
         if (round.BehaviouralMockInterviewRound != null)
@@ -243,36 +243,43 @@ public class CreateMockInterviewEndpoint : ICarterModule
   public void AddRoutes(IEndpointRouteBuilder app)
   {
     app.MapPost(
-         "api/mock-interview",
-         async (CreateMockInterviewRequest request, ISender sender, HttpContext httpContext) =>
-         {
-           var email = httpContext?.User?.Identity?.Name ?? "";
+        "api/mock-interview",
+        async (CreateMockInterviewRequest request, ISender sender, HttpContext httpContext) =>
+        {
+          var email = httpContext?.User?.Identity?.Name ?? "";
 
-           var command = new CreateMockInterview.Command
-           {
-             InterviewerUserId = request.InterviewerUserId,
-             IntervieweeEmail = email,
-             EnrollmentId = request.EnrollmentId,
-             MockInterviewRoundDtos = request.MockInterviewRoundDtos,
-             StartDate = request.StartDate,
-             TimeTakenInMinutes = request.TimeTakenInMinutes
-           };
-           var response = await sender.Send(command);
+          var command = new CreateMockInterview.Command
+          {
+            InterviewerUserId = request.InterviewerUserId,
+            IntervieweeEmail = email,
+            EnrollmentId = request.EnrollmentId,
+            MockInterviewRoundDtos = request.MockInterviewRoundDtos,
+            StartDate = request.StartDate,
+            TimeTakenInMinutes = request.TimeTakenInMinutes,
+          };
+          var response = await sender.Send(command);
 
-           return ApiResultHelper.FormatResponse(response);
-         }
-       )
-       .WithName("CreateMockInterview");
+          return ApiResultHelper.FormatResponse(response);
+        }
+      )
+      .WithName("CreateMockInterview");
   }
 }
 
 public record CreateMockInterviewRequest
 {
-  [Required] public string InterviewerUserId { get; set; } = string.Empty;
+  [Required]
+  public string InterviewerUserId { get; set; } = string.Empty;
   public string? EnrollmentId { get; set; }
-  [Required] public DateTime StartDate { get; set; }
-  [Required] public int TimeTakenInMinutes { get; set; }
-  [Required] public List<MockInterviewRoundDto> MockInterviewRoundDtos { get; set; } = new();
+
+  [Required]
+  public DateTime StartDate { get; set; }
+
+  [Required]
+  public int TimeTakenInMinutes { get; set; }
+
+  [Required]
+  public List<MockInterviewRoundDto> MockInterviewRoundDtos { get; set; } = new();
 }
 
 public record MockInterviewRoundDto
@@ -287,26 +294,41 @@ public record MockInterviewRoundDto
 
 public record LeetcodeMockInterviewRoundDto
 {
-  [Required] public int ConfirmQuestionScore { get; set; }
-  [Required] public int AlgorithmDesignScore { get; set; }
-  [Required] public int ComplexityAnalysisScore { get; set; }
-  [Required] public int CodingScore { get; set; }
-  [Required] public int TestingScore { get; set; }
-  [Required] public string LeetcodeProblemId { get; set; } = string.Empty;
+  [Required]
+  public int ConfirmQuestionScore { get; set; }
+
+  [Required]
+  public int AlgorithmDesignScore { get; set; }
+
+  [Required]
+  public int ComplexityAnalysisScore { get; set; }
+
+  [Required]
+  public int CodingScore { get; set; }
+
+  [Required]
+  public int TestingScore { get; set; }
+
+  [Required]
+  public string LeetcodeProblemId { get; set; } = string.Empty;
 }
 
 public record BehaviouralMockInterviewRoundDto
 {
-  [Required] public int BehavioralScore { get; set; }
+  [Required]
+  public int BehavioralScore { get; set; }
 }
 
 public record CustomMockInterviewRoundDto
 {
-  [Required] public string Content { get; set; } = string.Empty;
-  [Required] public string Link { get; set; } = string.Empty;
-  [Required] public int Score { get; set; }
+  [Required]
+  public string Content { get; set; } = string.Empty;
+
+  [Required]
+  public string Link { get; set; } = string.Empty;
+
+  [Required]
+  public int Score { get; set; }
 }
 
-public class CreateMockInterviewResponse
-{
-}
+public class CreateMockInterviewResponse { }

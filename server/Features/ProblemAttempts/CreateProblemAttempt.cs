@@ -57,16 +57,14 @@ public static class CreateProblemAttempt
         if (request.EnrollmentId != null)
         {
           var existingEnrollment = await _dbContext
-                                         .Enrollments
-                                         .Include(e => e.User)
-                                         .FirstOrDefaultAsync(e => e.EnrollmentId == request.EnrollmentId,
-                                                              cancellationToken);
+            .Enrollments.Include(e => e.User)
+            .FirstOrDefaultAsync(e => e.EnrollmentId == request.EnrollmentId, cancellationToken);
           if (existingEnrollment == null || existingEnrollment.User.Email != request.Email)
           {
             return new ApiResult<CreateProblemAttemptResponse>
             {
               StatusCode = HttpStatusCode.BadRequest,
-              Error = new ApiError(Message.EnrollmentDoesNotExists)
+              Error = new ApiError(Message.EnrollmentDoesNotExists),
             };
           }
         }
@@ -79,19 +77,15 @@ public static class CreateProblemAttempt
 
         // Get user. At this point, it should have exists based on authentication middleware
         var existingUser = await _dbContext
-                                 .Users
-                                 .Where(u => u.Email == request.Email)
-                                 .Select(u => new UserEntity
-                                 {
-                                   UserId = u.UserId
-                                 })
-                                 .FirstOrDefaultAsync(cancellationToken);
+          .Users.Where(u => u.Email == request.Email)
+          .Select(u => new UserEntity { UserId = u.UserId })
+          .FirstOrDefaultAsync(cancellationToken);
         if (existingUser == null)
         {
           return new ApiResult<CreateProblemAttemptResponse>
           {
             StatusCode = HttpStatusCode.BadRequest,
-            Error = new ApiError(Message.UserEmailDoesNotExists)
+            Error = new ApiError(Message.UserEmailDoesNotExists),
           };
         }
 
@@ -104,7 +98,7 @@ public static class CreateProblemAttempt
           CustomProblemId = request.CustomProblemId,
           Notes = request.Notes,
           EnrollmentId = request.EnrollmentId,
-          UserId = existingUser.UserId
+          UserId = existingUser.UserId,
         };
 
         _dbContext.Add(problemAttempt);
@@ -113,7 +107,7 @@ public static class CreateProblemAttempt
         return new ApiResult<CreateProblemAttemptResponse>
         {
           StatusCode = HttpStatusCode.OK,
-          SuccessMessage = Message.ProblemAttemptCreatedSuccessfully
+          SuccessMessage = Message.ProblemAttemptCreatedSuccessfully,
         };
       }
       catch (Exception ex)
@@ -123,7 +117,7 @@ public static class CreateProblemAttempt
         return new ApiResult<CreateProblemAttemptResponse>
         {
           StatusCode = HttpStatusCode.InternalServerError,
-          Error = new ApiError(Message.ProblemAttemptCreationUnexpectedError)
+          Error = new ApiError(Message.ProblemAttemptCreationUnexpectedError),
         };
       }
     }
@@ -135,40 +129,43 @@ public class CreateProblemAttemptEndpoint : ICarterModule
   public void AddRoutes(IEndpointRouteBuilder app)
   {
     app.MapPost(
-         "api/problem-attempts",
-         async (CreateProblemAttemptRequest request, ISender sender, HttpContext httpContext) =>
-         {
-           var email = httpContext?.User?.Identity?.Name ?? "";
+        "api/problem-attempts",
+        async (CreateProblemAttemptRequest request, ISender sender, HttpContext httpContext) =>
+        {
+          var email = httpContext?.User?.Identity?.Name ?? "";
 
-           var command = new CreateProblemAttempt.Command
-           {
-             AttemptStartDateUtc = request.AttemptStartDateUtc,
-             TimeTakenInMinutes = request.TimeTakenInMinutes,
-             Notes = request.Notes,
-             Email = email,
-             LeetcodeProblemId = request.LeetcodeProblemId,
-             CustomProblemId = request.CustomProblemId,
-             EnrollmentId = request.EnrollmentId
-           };
-           var response = await sender.Send(command);
+          var command = new CreateProblemAttempt.Command
+          {
+            AttemptStartDateUtc = request.AttemptStartDateUtc,
+            TimeTakenInMinutes = request.TimeTakenInMinutes,
+            Notes = request.Notes,
+            Email = email,
+            LeetcodeProblemId = request.LeetcodeProblemId,
+            CustomProblemId = request.CustomProblemId,
+            EnrollmentId = request.EnrollmentId,
+          };
+          var response = await sender.Send(command);
 
-           return ApiResultHelper.FormatResponse(response);
-         }
-       )
-       .WithName("CreateProblemAttempt");
+          return ApiResultHelper.FormatResponse(response);
+        }
+      )
+      .WithName("CreateProblemAttempt");
   }
 }
 
 public record CreateProblemAttemptRequest
 {
-  [Required] public DateTime AttemptStartDateUtc { get; set; }
-  [Required] public int TimeTakenInMinutes { get; set; }
-  [Required] public string Notes { get; set; } = string.Empty;
+  [Required]
+  public DateTime AttemptStartDateUtc { get; set; }
+
+  [Required]
+  public int TimeTakenInMinutes { get; set; }
+
+  [Required]
+  public string Notes { get; set; } = string.Empty;
   public string LeetcodeProblemId { get; set; } = string.Empty;
   public string CustomProblemId { get; set; } = string.Empty;
   public string? EnrollmentId { get; set; }
 }
 
-public class CreateProblemAttemptResponse
-{
-}
+public class CreateProblemAttemptResponse { }

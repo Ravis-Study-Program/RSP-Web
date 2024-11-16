@@ -1,12 +1,12 @@
 import React, { lazy, Suspense } from 'react';
 import { Route, Routes } from 'react-router-dom';
+import ProfilePage from './pages/Profile/Profile.page';
+import ResourcesPage from './pages/Resources/Resources.page';
+import SeasonUsersPage from './pages/SeasonUsers/SeasonUsers.page';
 import AdminRouteGuard from './shared/auth/AdminRouteGuard';
 import AuthRouteGuard from './shared/auth/AuthRouteGuard';
 import SeasonRouteGuard from './shared/auth/SeasonRouteGuard';
 import SeasonRoleViewRouter from './shared/auth/SeasonViewRouter';
-import ResourcesPage from './pages/Resources/Resources.page';
-import SeasonUsersPage from './pages/SeasonUsers/SeasonUsers.page';
-import ProfilePage from './pages/Profile/Profile.page';
 
 // Lazy load the page components
 const AdminEnrollmentsPage = lazy(() => import('./pages/Admin/Enrollments/AdminEnrollments.page'));

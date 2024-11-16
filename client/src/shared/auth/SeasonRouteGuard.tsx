@@ -1,5 +1,5 @@
-import NotFoundPage from '@/pages/NotFound/NotFound.page';
 import { Outlet, useParams } from 'react-router-dom';
+import NotFoundPage from '@/pages/NotFound/NotFound.page';
 import { useUserAndEnrollment } from '../hooks/useUserAndEnrollment';
 
 const SeasonRouteGuard = () => {

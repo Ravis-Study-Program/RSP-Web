@@ -13,9 +13,7 @@ namespace RSPWebAPI.Features.Users;
 
 public static class AdminListUser
 {
-  public class Command : AdminAuthRequest<ApiResult<AdminListUserResponse>>
-  {
-  }
+  public class Command : AdminAuthRequest<ApiResult<AdminListUserResponse>> { }
 
   public class Handler : IRequestHandler<Command, ApiResult<AdminListUserResponse>>
   {
@@ -41,10 +39,7 @@ public static class AdminListUser
         {
           StatusCode = HttpStatusCode.OK,
           SuccessMessage = Message.UserListSuccessfully,
-          ResponseBody = new AdminListUserResponse
-          {
-            Users = users
-          }
+          ResponseBody = new AdminListUserResponse { Users = users },
         };
       }
       catch (Exception ex)
@@ -54,7 +49,7 @@ public static class AdminListUser
         return new ApiResult<AdminListUserResponse>
         {
           StatusCode = HttpStatusCode.InternalServerError,
-          Error = new ApiError(Message.UserListUnexpectedError)
+          Error = new ApiError(Message.UserListUnexpectedError),
         };
       }
     }
@@ -66,20 +61,21 @@ public class AdminListUserEndpoint : ICarterModule
   public void AddRoutes(IEndpointRouteBuilder app)
   {
     app.MapGet(
-         "api/admin/users",
-         async (ISender sender) =>
-         {
-           var command = new AdminListUser.Command();
-           var response = await sender.Send(command);
+        "api/admin/users",
+        async (ISender sender) =>
+        {
+          var command = new AdminListUser.Command();
+          var response = await sender.Send(command);
 
-           return ApiResultHelper.FormatResponse(response);
-         }
-       )
-       .WithName("AdminListUser");
+          return ApiResultHelper.FormatResponse(response);
+        }
+      )
+      .WithName("AdminListUser");
   }
 }
 
 public class AdminListUserResponse
 {
-  [Required] public ICollection<UserEntity> Users { get; set; } = new List<UserEntity>();
+  [Required]
+  public ICollection<UserEntity> Users { get; set; } = new List<UserEntity>();
 }

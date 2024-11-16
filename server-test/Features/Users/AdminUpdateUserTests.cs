@@ -27,18 +27,20 @@ public class AdminUpdateUserTests : TestsHelper
       DiscordId = DummyDiscordId,
       Email = DummyEmail,
       ProfileImage = DummyProfileImage,
-      Name = DummyName
+      Name = DummyName,
     };
   }
 
   [Fact]
   public async Task Handle_UserDoesNotExists_BadRequest()
   {
-    _dbContextMock.Setup(x => x.Users)
-                  .ReturnsDbSet(new List<UserEntity>());
+    _dbContextMock.Setup(x => x.Users).ReturnsDbSet(new List<UserEntity>());
 
     var command = UpdateDummyCommand();
-    var handler = new AdminUpdateUser.Handler(_dbContextMock.Object, Mock.Of<ILogger<AdminUpdateUser.Handler>>());
+    var handler = new AdminUpdateUser.Handler(
+      _dbContextMock.Object,
+      Mock.Of<ILogger<AdminUpdateUser.Handler>>()
+    );
 
     var result = await handler.Handle(command, CancellationToken.None);
     Assert.Equal(HttpStatusCode.BadRequest, result.StatusCode);
@@ -49,11 +51,13 @@ public class AdminUpdateUserTests : TestsHelper
   public async Task Handle_Success_OK()
   {
     var existingUser = new UserEntity { Email = DummyEmail };
-    _dbContextMock.Setup(x => x.Users)
-                  .ReturnsDbSet(new List<UserEntity> { existingUser });
+    _dbContextMock.Setup(x => x.Users).ReturnsDbSet(new List<UserEntity> { existingUser });
 
     var command = UpdateDummyCommand();
-    var handler = new AdminUpdateUser.Handler(_dbContextMock.Object, Mock.Of<ILogger<AdminUpdateUser.Handler>>());
+    var handler = new AdminUpdateUser.Handler(
+      _dbContextMock.Object,
+      Mock.Of<ILogger<AdminUpdateUser.Handler>>()
+    );
 
     var result = await handler.Handle(command, CancellationToken.None);
     Assert.Equal(HttpStatusCode.OK, result.StatusCode);

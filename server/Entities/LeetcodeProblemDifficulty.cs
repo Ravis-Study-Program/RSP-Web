@@ -4,5 +4,5 @@ public enum LeetcodeProblemDifficulty
 {
   Easy = 0,
   Medium = 1,
-  Hard = 2
+  Hard = 2,
 }

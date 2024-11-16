@@ -26,7 +26,7 @@ public class AdminUpdateMentorshipTests : TestsHelper
     {
       MentorshipId = DummyId1,
       MentorEnrollmentId = DummyId1,
-      MenteeEnrollmentId = DummyId2
+      MenteeEnrollmentId = DummyId2,
     };
   }
 
@@ -37,19 +37,13 @@ public class AdminUpdateMentorshipTests : TestsHelper
     {
       EnrollmentId = DummyId1,
       Role = SeasonRole.Mentor,
-      Season = new SeasonEntity
-      {
-        SeasonId = DummyId1
-      }
+      Season = new SeasonEntity { SeasonId = DummyId1 },
     };
     var menteeEnrollment = new EnrollmentEntity
     {
       EnrollmentId = DummyId2,
       Role = SeasonRole.Student,
-      Season = new SeasonEntity
-      {
-        SeasonId = DummyId2
-      }
+      Season = new SeasonEntity { SeasonId = DummyId2 },
     };
     var existingMentorship = new MentorshipEntity
     {
@@ -57,16 +51,20 @@ public class AdminUpdateMentorshipTests : TestsHelper
       MentorEnrollmentId = DummyId1,
       MentorEnrollment = mentorEnrollment,
       MenteeEnrollmentId = DummyId2,
-      MenteeEnrollment = menteeEnrollment
+      MenteeEnrollment = menteeEnrollment,
     };
-    _dbContextMock.Setup(x => x.Enrollments)
-                  .ReturnsDbSet(new List<EnrollmentEntity> { menteeEnrollment, mentorEnrollment });
-    _dbContextMock.Setup(x => x.Mentorships)
-                  .ReturnsDbSet(new List<MentorshipEntity> { existingMentorship });
+    _dbContextMock
+      .Setup(x => x.Enrollments)
+      .ReturnsDbSet(new List<EnrollmentEntity> { menteeEnrollment, mentorEnrollment });
+    _dbContextMock
+      .Setup(x => x.Mentorships)
+      .ReturnsDbSet(new List<MentorshipEntity> { existingMentorship });
 
     var command = UpdateDummyCommand();
-    var handler =
-      new AdminUpdateMentorship.Handler(_dbContextMock.Object, Mock.Of<ILogger<AdminUpdateMentorship.Handler>>());
+    var handler = new AdminUpdateMentorship.Handler(
+      _dbContextMock.Object,
+      Mock.Of<ILogger<AdminUpdateMentorship.Handler>>()
+    );
 
     var result = await handler.Handle(command, CancellationToken.None);
     Assert.Equal(HttpStatusCode.BadRequest, result.StatusCode);
@@ -80,19 +78,13 @@ public class AdminUpdateMentorshipTests : TestsHelper
     {
       EnrollmentId = DummyId1,
       Role = SeasonRole.Mentor,
-      Season = new SeasonEntity
-      {
-        SeasonId = DummyId1
-      }
+      Season = new SeasonEntity { SeasonId = DummyId1 },
     };
     var menteeEnrollment = new EnrollmentEntity
     {
       EnrollmentId = DummyId2,
       Role = SeasonRole.Student,
-      Season = new SeasonEntity
-      {
-        SeasonId = DummyId1
-      }
+      Season = new SeasonEntity { SeasonId = DummyId1 },
     };
     var existingMentorship = new MentorshipEntity
     {
@@ -100,21 +92,25 @@ public class AdminUpdateMentorshipTests : TestsHelper
       MentorEnrollmentId = DummyId1,
       MentorEnrollment = mentorEnrollment,
       MenteeEnrollmentId = DummyId2,
-      MenteeEnrollment = menteeEnrollment
+      MenteeEnrollment = menteeEnrollment,
     };
-    _dbContextMock.Setup(x => x.Enrollments)
-                  .ReturnsDbSet(new List<EnrollmentEntity> { menteeEnrollment, mentorEnrollment });
-    _dbContextMock.Setup(x => x.Mentorships)
-                  .ReturnsDbSet(new List<MentorshipEntity> { existingMentorship });
+    _dbContextMock
+      .Setup(x => x.Enrollments)
+      .ReturnsDbSet(new List<EnrollmentEntity> { menteeEnrollment, mentorEnrollment });
+    _dbContextMock
+      .Setup(x => x.Mentorships)
+      .ReturnsDbSet(new List<MentorshipEntity> { existingMentorship });
 
     var command = new AdminUpdateMentorship.Command
     {
       MentorshipId = DummyId1,
       MentorEnrollmentId = DummyId3,
-      MenteeEnrollmentId = DummyId1
+      MenteeEnrollmentId = DummyId1,
     };
-    var handler =
-      new AdminUpdateMentorship.Handler(_dbContextMock.Object, Mock.Of<ILogger<AdminUpdateMentorship.Handler>>());
+    var handler = new AdminUpdateMentorship.Handler(
+      _dbContextMock.Object,
+      Mock.Of<ILogger<AdminUpdateMentorship.Handler>>()
+    );
 
     var result = await handler.Handle(command, CancellationToken.None);
     Assert.Equal(HttpStatusCode.BadRequest, result.StatusCode);
@@ -128,19 +124,13 @@ public class AdminUpdateMentorshipTests : TestsHelper
     {
       EnrollmentId = DummyId1,
       Role = SeasonRole.Mentor,
-      Season = new SeasonEntity
-      {
-        SeasonId = DummyId1
-      }
+      Season = new SeasonEntity { SeasonId = DummyId1 },
     };
     var menteeEnrollment = new EnrollmentEntity
     {
       EnrollmentId = DummyId2,
       Role = SeasonRole.Student,
-      Season = new SeasonEntity
-      {
-        SeasonId = DummyId1
-      }
+      Season = new SeasonEntity { SeasonId = DummyId1 },
     };
     var existingMentorship = new MentorshipEntity
     {
@@ -148,21 +138,25 @@ public class AdminUpdateMentorshipTests : TestsHelper
       MentorEnrollmentId = DummyId1,
       MentorEnrollment = mentorEnrollment,
       MenteeEnrollmentId = DummyId2,
-      MenteeEnrollment = menteeEnrollment
+      MenteeEnrollment = menteeEnrollment,
     };
-    _dbContextMock.Setup(x => x.Enrollments)
-                  .ReturnsDbSet(new List<EnrollmentEntity> { menteeEnrollment, mentorEnrollment });
-    _dbContextMock.Setup(x => x.Mentorships)
-                  .ReturnsDbSet(new List<MentorshipEntity> { existingMentorship });
+    _dbContextMock
+      .Setup(x => x.Enrollments)
+      .ReturnsDbSet(new List<EnrollmentEntity> { menteeEnrollment, mentorEnrollment });
+    _dbContextMock
+      .Setup(x => x.Mentorships)
+      .ReturnsDbSet(new List<MentorshipEntity> { existingMentorship });
 
     var command = new AdminUpdateMentorship.Command
     {
       MentorshipId = DummyId1,
       MentorEnrollmentId = DummyId1,
-      MenteeEnrollmentId = DummyId3
+      MenteeEnrollmentId = DummyId3,
     };
-    var handler =
-      new AdminUpdateMentorship.Handler(_dbContextMock.Object, Mock.Of<ILogger<AdminUpdateMentorship.Handler>>());
+    var handler = new AdminUpdateMentorship.Handler(
+      _dbContextMock.Object,
+      Mock.Of<ILogger<AdminUpdateMentorship.Handler>>()
+    );
 
     var result = await handler.Handle(command, CancellationToken.None);
     Assert.Equal(HttpStatusCode.BadRequest, result.StatusCode);
@@ -172,12 +166,13 @@ public class AdminUpdateMentorshipTests : TestsHelper
   [Fact]
   public async Task Handle_MentorshipDoesNotExists_BadRequest()
   {
-    _dbContextMock.Setup(x => x.Mentorships)
-                  .ReturnsDbSet(new List<MentorshipEntity>());
+    _dbContextMock.Setup(x => x.Mentorships).ReturnsDbSet(new List<MentorshipEntity>());
 
     var command = UpdateDummyCommand();
-    var handler =
-      new AdminUpdateMentorship.Handler(_dbContextMock.Object, Mock.Of<ILogger<AdminUpdateMentorship.Handler>>());
+    var handler = new AdminUpdateMentorship.Handler(
+      _dbContextMock.Object,
+      Mock.Of<ILogger<AdminUpdateMentorship.Handler>>()
+    );
 
     var result = await handler.Handle(command, CancellationToken.None);
     Assert.Equal(HttpStatusCode.BadRequest, result.StatusCode);
@@ -191,28 +186,19 @@ public class AdminUpdateMentorshipTests : TestsHelper
     {
       EnrollmentId = DummyId3,
       Role = SeasonRole.Student,
-      Season = new SeasonEntity
-      {
-        SeasonId = DummyId1
-      }
+      Season = new SeasonEntity { SeasonId = DummyId1 },
     };
     var mentorEnrollment = new EnrollmentEntity
     {
       EnrollmentId = DummyId1,
       Role = SeasonRole.Mentor,
-      Season = new SeasonEntity
-      {
-        SeasonId = DummyId1
-      }
+      Season = new SeasonEntity { SeasonId = DummyId1 },
     };
     var menteeEnrollment = new EnrollmentEntity
     {
       EnrollmentId = DummyId2,
       Role = SeasonRole.Student,
-      Season = new SeasonEntity
-      {
-        SeasonId = DummyId1
-      }
+      Season = new SeasonEntity { SeasonId = DummyId1 },
     };
     var existingMentorship = new MentorshipEntity
     {
@@ -220,21 +206,27 @@ public class AdminUpdateMentorshipTests : TestsHelper
       MentorEnrollmentId = DummyId1,
       MentorEnrollment = mentorEnrollment,
       MenteeEnrollmentId = DummyId2,
-      MenteeEnrollment = menteeEnrollment
+      MenteeEnrollment = menteeEnrollment,
     };
-    _dbContextMock.Setup(x => x.Enrollments)
-                  .ReturnsDbSet(new List<EnrollmentEntity> { menteeEnrollment, mentorEnrollment, targetEnrollment });
-    _dbContextMock.Setup(x => x.Mentorships)
-                  .ReturnsDbSet(new List<MentorshipEntity> { existingMentorship });
+    _dbContextMock
+      .Setup(x => x.Enrollments)
+      .ReturnsDbSet(
+        new List<EnrollmentEntity> { menteeEnrollment, mentorEnrollment, targetEnrollment }
+      );
+    _dbContextMock
+      .Setup(x => x.Mentorships)
+      .ReturnsDbSet(new List<MentorshipEntity> { existingMentorship });
 
     var command = new AdminUpdateMentorship.Command
     {
       MentorshipId = DummyId1,
       MentorEnrollmentId = DummyId1,
-      MenteeEnrollmentId = DummyId3
+      MenteeEnrollmentId = DummyId3,
     };
-    var handler =
-      new AdminUpdateMentorship.Handler(_dbContextMock.Object, Mock.Of<ILogger<AdminUpdateMentorship.Handler>>());
+    var handler = new AdminUpdateMentorship.Handler(
+      _dbContextMock.Object,
+      Mock.Of<ILogger<AdminUpdateMentorship.Handler>>()
+    );
 
     var result = await handler.Handle(command, CancellationToken.None);
     Assert.Equal(HttpStatusCode.OK, result.StatusCode);

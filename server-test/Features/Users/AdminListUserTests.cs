@@ -28,11 +28,13 @@ public class AdminListUserTests : TestsHelper
   [Fact]
   public async Task Handle_Success_OK()
   {
-    _dbContextMock.Setup(x => x.Users)
-                  .ReturnsDbSet(new List<UserEntity>());
+    _dbContextMock.Setup(x => x.Users).ReturnsDbSet(new List<UserEntity>());
 
     var command = ListDummyCommand();
-    var handler = new AdminListUser.Handler(_dbContextMock.Object, Mock.Of<ILogger<AdminListUser.Handler>>());
+    var handler = new AdminListUser.Handler(
+      _dbContextMock.Object,
+      Mock.Of<ILogger<AdminListUser.Handler>>()
+    );
 
     var result = await handler.Handle(command, CancellationToken.None);
     Assert.Equal(HttpStatusCode.OK, result.StatusCode);

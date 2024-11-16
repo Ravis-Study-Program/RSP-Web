@@ -29,18 +29,20 @@ public class AdminCreateSeasonTests : TestsHelper
       StartDateInclusiveUtc = DummyStartDate,
       EndDateInclusiveUtc = DummyEndDate,
       Location = DummyLocation,
-      ImageUrl = DummyImageUrl
+      ImageUrl = DummyImageUrl,
     };
   }
 
   [Fact]
   public async Task Handle_Success_OK()
   {
-    _dbContextMock.Setup(x => x.Seasons)
-                  .ReturnsDbSet(new List<SeasonEntity>());
+    _dbContextMock.Setup(x => x.Seasons).ReturnsDbSet(new List<SeasonEntity>());
 
     var command = CreateDummyCommand();
-    var handler = new AdminCreateSeason.Handler(_dbContextMock.Object, Mock.Of<ILogger<AdminCreateSeason.Handler>>());
+    var handler = new AdminCreateSeason.Handler(
+      _dbContextMock.Object,
+      Mock.Of<ILogger<AdminCreateSeason.Handler>>()
+    );
 
     var result = await handler.Handle(command, CancellationToken.None);
     Assert.Equal(HttpStatusCode.OK, result.StatusCode);

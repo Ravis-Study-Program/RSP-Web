@@ -1,15 +1,15 @@
+import { Button, Card, Grid, Group, Image, Skeleton, Text } from '@mantine/core';
 import { Layout } from '@/components/Layout/Layout';
 import { SeasonRole } from '@/generated/api/client';
 import { useSeasonSlug } from '@/shared/hooks/useSeasonSlug';
 import { useUserAndEnrollment } from '@/shared/hooks/useUserAndEnrollment';
-import { Button, Card, Grid, Group, Image, Skeleton, Text } from '@mantine/core';
 import classes from './Resources.module.css';
 
 type Resource = {
   link: string;
   title: string;
   imageUrl: string;
-}
+};
 
 export default function ResourcesPage() {
   const { seasonSlug } = useSeasonSlug();
@@ -19,23 +19,26 @@ export default function ResourcesPage() {
     {
       link: 'https://google.com',
       title: 'Coordinator Resource',
-      imageUrl: 'https://images.pexels.com/photos/66100/pexels-photo-66100.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'
-    }
+      imageUrl:
+        'https://images.pexels.com/photos/66100/pexels-photo-66100.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    },
   ];
   const mentorResources: Resource[] = [
     {
       link: 'https://google.com',
       title: 'Mentor Resource',
-      imageUrl: 'https://images.pexels.com/photos/1250452/pexels-photo-1250452.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'
-    }
+      imageUrl:
+        'https://images.pexels.com/photos/1250452/pexels-photo-1250452.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    },
   ];
   const studentResources: Resource[] = [
     {
       link: 'https://google.com',
       title: 'Student Resource',
-      imageUrl: 'https://images.pexels.com/photos/1516440/pexels-photo-1516440.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'
-    }
-  ]
+      imageUrl:
+        'https://images.pexels.com/photos/1516440/pexels-photo-1516440.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    },
+  ];
 
   let resources;
 
@@ -50,11 +53,7 @@ export default function ResourcesPage() {
   return (
     <Layout>
       <Grid gutter={{ base: 5, xs: 'md', md: 'xl', xl: 'xl' }}>
-        {!isLoading ? (
-          <ResourcesGridCards resources={resources} />
-        ) : (
-          <ResourcesSkeletonCards />
-        )}
+        {!isLoading ? <ResourcesGridCards resources={resources} /> : <ResourcesSkeletonCards />}
       </Grid>
     </Layout>
   );
@@ -88,11 +87,7 @@ const ResourcesGridCards = ({ resources }: ResourcesListProps) => {
         <Grid.Col key={key} span={{ base: 12, sm: 6, md: 6, lg: 2 }}>
           <Card withBorder shadow="sm" radius="md" className={classes.card}>
             <Card.Section className={classes.imageSection}>
-              <Image
-                src={resource.imageUrl}
-                alt="Resource image"
-                className={classes.image}
-              />
+              <Image src={resource.imageUrl} alt="Resource image" className={classes.image} />
             </Card.Section>
 
             <Group justify="space-between" mt="md" mb="xs">
@@ -105,7 +100,7 @@ const ResourcesGridCards = ({ resources }: ResourcesListProps) => {
               mt="md"
               radius="md"
               component="a"
-              target='_blank'
+              target="_blank"
               href={resource.link}
             >
               View

@@ -21,10 +21,7 @@ public class GetCurrentUserEnrollmentsTests : TestsHelper
 
   private GetCurrentUserEnrollments.Command CreateDummyCommand()
   {
-    return new GetCurrentUserEnrollments.Command
-    {
-      Email = DummyEmail
-    };
+    return new GetCurrentUserEnrollments.Command { Email = DummyEmail };
   }
 
   [Fact]
@@ -34,24 +31,18 @@ public class GetCurrentUserEnrollmentsTests : TestsHelper
     {
       EnrollmentId = DummyId1,
       Role = SeasonRole.Mentor,
-      Season = new SeasonEntity
-      {
-        SeasonId = DummyId1,
-        Name = "Season Name"
-      },
-      User = new UserEntity
-      {
-        UserId = DummyId1,
-        Email = DummyEmail
-      }
+      Season = new SeasonEntity { SeasonId = DummyId1, Name = "Season Name" },
+      User = new UserEntity { UserId = DummyId1, Email = DummyEmail },
     };
-    _dbContextMock.Setup(x => x.Enrollments)
-                  .ReturnsDbSet(new List<EnrollmentEntity> { dummyEnrollment });
+    _dbContextMock
+      .Setup(x => x.Enrollments)
+      .ReturnsDbSet(new List<EnrollmentEntity> { dummyEnrollment });
 
     var command = CreateDummyCommand();
-    var handler =
-      new GetCurrentUserEnrollments.Handler(_dbContextMock.Object,
-                                            Mock.Of<ILogger<GetCurrentUserEnrollments.Handler>>());
+    var handler = new GetCurrentUserEnrollments.Handler(
+      _dbContextMock.Object,
+      Mock.Of<ILogger<GetCurrentUserEnrollments.Handler>>()
+    );
 
     var result = await handler.Handle(command, CancellationToken.None);
     var enrollments = result.ResponseBody?.Enrollments.ToList();

@@ -22,20 +22,19 @@ public class AdminDeleteUserTests : TestsHelper
 
   private AdminDeleteUser.Command DeleteDummyCommand()
   {
-    return new AdminDeleteUser.Command
-    {
-      Email = DummyEmail
-    };
+    return new AdminDeleteUser.Command { Email = DummyEmail };
   }
 
   [Fact]
   public async Task Handle_UserDoesNotExists_BadRequest()
   {
-    _dbContextMock.Setup(x => x.Users)
-                  .ReturnsDbSet(new List<UserEntity>());
+    _dbContextMock.Setup(x => x.Users).ReturnsDbSet(new List<UserEntity>());
 
     var command = DeleteDummyCommand();
-    var handler = new AdminDeleteUser.Handler(_dbContextMock.Object, Mock.Of<ILogger<AdminDeleteUser.Handler>>());
+    var handler = new AdminDeleteUser.Handler(
+      _dbContextMock.Object,
+      Mock.Of<ILogger<AdminDeleteUser.Handler>>()
+    );
 
     var result = await handler.Handle(command, CancellationToken.None);
     Assert.Equal(HttpStatusCode.BadRequest, result.StatusCode);
@@ -46,11 +45,13 @@ public class AdminDeleteUserTests : TestsHelper
   public async Task Handle_Success_OK()
   {
     var existingUser = new UserEntity { Email = DummyEmail };
-    _dbContextMock.Setup(x => x.Users)
-                  .ReturnsDbSet(new List<UserEntity> { existingUser });
+    _dbContextMock.Setup(x => x.Users).ReturnsDbSet(new List<UserEntity> { existingUser });
 
     var command = DeleteDummyCommand();
-    var handler = new AdminDeleteUser.Handler(_dbContextMock.Object, Mock.Of<ILogger<AdminDeleteUser.Handler>>());
+    var handler = new AdminDeleteUser.Handler(
+      _dbContextMock.Object,
+      Mock.Of<ILogger<AdminDeleteUser.Handler>>()
+    );
 
     var result = await handler.Handle(command, CancellationToken.None);
     Assert.Equal(HttpStatusCode.OK, result.StatusCode);

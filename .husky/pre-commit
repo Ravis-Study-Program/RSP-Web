@@ -1,0 +1,8 @@
+# Parallel for faster speed
+(cd client && yarn run format-and-test) & dotnet csharpier . & (cd server-test && dotnet restore --force --no-cache && dotnet build && dotnet test --no-restore --no-build) & wait
+
+# Exit if there are unstaged changes
+if ! git diff --exit-code; then
+  echo "There are unstaged changes. Please stage them before committing."
+  exit 1
+fi

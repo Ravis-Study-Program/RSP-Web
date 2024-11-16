@@ -24,9 +24,9 @@ public class EnumSchemaFilter : ISchemaFilter
       {
         var memberInfo = context.Type.GetMember(enumValue?.ToString() ?? "")[0];
         var enumMemberAttribute = memberInfo
-                                  .GetCustomAttributes(typeof(EnumMemberAttribute), false)
-                                  .Cast<EnumMemberAttribute>()
-                                  .FirstOrDefault();
+          .GetCustomAttributes(typeof(EnumMemberAttribute), false)
+          .Cast<EnumMemberAttribute>()
+          .FirstOrDefault();
 
         var name = enumMemberAttribute?.Value ?? enumValue?.ToString();
         var intValue = enumValue != null ? (int)enumValue : -1;

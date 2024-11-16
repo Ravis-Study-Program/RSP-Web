@@ -5,9 +5,7 @@ namespace RSPWebAPI.Shared;
 
 public abstract class ApiResult
 {
-  protected ApiResult()
-  {
-  }
+  protected ApiResult() { }
 
   protected ApiResult(HttpStatusCode statusCode, ApiError? error = null)
   {
@@ -26,9 +24,7 @@ public abstract class ApiResult
 
 public class ApiResult<TValue> : ApiResult
 {
-  public ApiResult()
-  {
-  }
+  public ApiResult() { }
 
   protected ApiResult(TValue? responseBody, HttpStatusCode statusCode, ApiError? error = null)
     : base(statusCode, error)
@@ -43,14 +39,17 @@ public class ApiResult<TValue> : ApiResult
 
 public static class ApiResultHelper
 {
-  public static Results<Ok<ApiResult<T>>, NotFound<ApiResult<T>>, BadRequest<ApiResult<T>>> FormatResponse<T>(
-    ApiResult<T> response)
+  public static Results<
+    Ok<ApiResult<T>>,
+    NotFound<ApiResult<T>>,
+    BadRequest<ApiResult<T>>
+  > FormatResponse<T>(ApiResult<T> response)
   {
     return response.StatusCode switch
     {
       HttpStatusCode.OK => TypedResults.Ok(response),
       HttpStatusCode.NotFound => TypedResults.NotFound(response),
-      _ => TypedResults.BadRequest(response)
+      _ => TypedResults.BadRequest(response),
     };
   }
 }

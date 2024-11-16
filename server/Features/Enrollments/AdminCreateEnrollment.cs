@@ -47,19 +47,16 @@ public static class AdminCreateEnrollment
       CancellationToken cancellationToken
     )
     {
-      var existingEnrollment = await _dbContext
-                                     .Enrollments
-                                     .FirstOrDefaultAsync(
-                                       e => e.SeasonId == request.SeasonId
-                                            && e.UserId == request.UserId
-                                            && e.Role == request.Role,
-                                       cancellationToken);
+      var existingEnrollment = await _dbContext.Enrollments.FirstOrDefaultAsync(
+        e => e.SeasonId == request.SeasonId && e.UserId == request.UserId && e.Role == request.Role,
+        cancellationToken
+      );
       if (existingEnrollment != null)
       {
         return new ApiResult<AdminCreateEnrollmentResponse>
         {
           StatusCode = HttpStatusCode.BadRequest,
-          Error = new ApiError(Message.EnrollmentExists)
+          Error = new ApiError(Message.EnrollmentExists),
         };
       }
 
@@ -68,7 +65,7 @@ public static class AdminCreateEnrollment
         EnrollmentId = Database.Constants.GeneratePrimaryKeyId(),
         SeasonId = request.SeasonId,
         UserId = request.UserId,
-        Role = request.Role
+        Role = request.Role,
       };
 
       try
@@ -84,9 +81,9 @@ public static class AdminCreateEnrollment
             SeasonId = enrollment.SeasonId,
             UserId = enrollment.UserId,
             EnrollmentId = enrollment.EnrollmentId,
-            Role = enrollment.Role
+            Role = enrollment.Role,
           },
-          SuccessMessage = Message.EnrollmentCreatedSuccessfully
+          SuccessMessage = Message.EnrollmentCreatedSuccessfully,
         };
       }
       catch (Exception ex)
@@ -96,7 +93,7 @@ public static class AdminCreateEnrollment
         return new ApiResult<AdminCreateEnrollmentResponse>
         {
           StatusCode = HttpStatusCode.InternalServerError,
-          Error = new ApiError(Message.EnrollmentCreationUnexpectedError)
+          Error = new ApiError(Message.EnrollmentCreationUnexpectedError),
         };
       }
     }
@@ -108,35 +105,47 @@ public class AdminCreateEnrollmentEndpoint : ICarterModule
   public void AddRoutes(IEndpointRouteBuilder app)
   {
     app.MapPost(
-         "api/admin/enrollments",
-         async (AdminCreateEnrollmentRequest request, ISender sender) =>
-         {
-           var command = new AdminCreateEnrollment.Command
-           {
-             SeasonId = request.SeasonId,
-             UserId = request.UserId,
-             Role = request.Role
-           };
-           var response = await sender.Send(command);
+        "api/admin/enrollments",
+        async (AdminCreateEnrollmentRequest request, ISender sender) =>
+        {
+          var command = new AdminCreateEnrollment.Command
+          {
+            SeasonId = request.SeasonId,
+            UserId = request.UserId,
+            Role = request.Role,
+          };
+          var response = await sender.Send(command);
 
-           return ApiResultHelper.FormatResponse(response);
-         }
-       )
-       .WithName("AdminCreateEnrollment");
+          return ApiResultHelper.FormatResponse(response);
+        }
+      )
+      .WithName("AdminCreateEnrollment");
   }
 }
 
 public record AdminCreateEnrollmentRequest
 {
-  [Required] public string SeasonId { get; set; } = string.Empty;
-  [Required] public string UserId { get; set; } = string.Empty;
-  [Required] public SeasonRole Role { get; set; }
+  [Required]
+  public string SeasonId { get; set; } = string.Empty;
+
+  [Required]
+  public string UserId { get; set; } = string.Empty;
+
+  [Required]
+  public SeasonRole Role { get; set; }
 }
 
 public class AdminCreateEnrollmentResponse
 {
-  [Required] public string EnrollmentId { get; set; } = string.Empty;
-  [Required] public string SeasonId { get; set; } = string.Empty;
-  [Required] public string UserId { get; set; } = string.Empty;
-  [Required] public SeasonRole Role { get; set; }
+  [Required]
+  public string EnrollmentId { get; set; } = string.Empty;
+
+  [Required]
+  public string SeasonId { get; set; } = string.Empty;
+
+  [Required]
+  public string UserId { get; set; } = string.Empty;
+
+  [Required]
+  public SeasonRole Role { get; set; }
 }

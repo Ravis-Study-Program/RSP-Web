@@ -22,22 +22,25 @@ public class GetCurrentUserTests : TestsHelper
 
   private GetCurrentUser.Command CreateDummyCommand()
   {
-    return new GetCurrentUser.Command
-    {
-      Email = DummyEmail
-    };
+    return new GetCurrentUser.Command { Email = DummyEmail };
   }
 
   [Fact]
   public async Task Handle_UserExists_OK()
   {
-    var existingUser = new UserEntity { Email = DummyEmail, ProfileImage = DummyProfileImage, Name = DummyName };
-    _dbContextMock.Setup(x => x.Users)
-                  .ReturnsDbSet(new List<UserEntity> { existingUser });
+    var existingUser = new UserEntity
+    {
+      Email = DummyEmail,
+      ProfileImage = DummyProfileImage,
+      Name = DummyName,
+    };
+    _dbContextMock.Setup(x => x.Users).ReturnsDbSet(new List<UserEntity> { existingUser });
 
     var command = CreateDummyCommand();
-    var handler =
-      new GetCurrentUser.Handler(_dbContextMock.Object, Mock.Of<ILogger<GetCurrentUser.Handler>>());
+    var handler = new GetCurrentUser.Handler(
+      _dbContextMock.Object,
+      Mock.Of<ILogger<GetCurrentUser.Handler>>()
+    );
 
     var result = await handler.Handle(command, CancellationToken.None);
     Assert.Equal(HttpStatusCode.OK, result.StatusCode);
@@ -49,12 +52,13 @@ public class GetCurrentUserTests : TestsHelper
   [Fact]
   public async Task Handle_UserDoesNotExists_OK()
   {
-    _dbContextMock.Setup(x => x.Users)
-                  .ReturnsDbSet(new List<UserEntity>());
+    _dbContextMock.Setup(x => x.Users).ReturnsDbSet(new List<UserEntity>());
 
     var command = CreateDummyCommand();
-    var handler =
-      new GetCurrentUser.Handler(_dbContextMock.Object, Mock.Of<ILogger<GetCurrentUser.Handler>>());
+    var handler = new GetCurrentUser.Handler(
+      _dbContextMock.Object,
+      Mock.Of<ILogger<GetCurrentUser.Handler>>()
+    );
 
     var result = await handler.Handle(command, CancellationToken.None);
     Assert.Equal(HttpStatusCode.BadRequest, result.StatusCode);

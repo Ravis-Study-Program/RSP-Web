@@ -41,14 +41,16 @@ public static class AdminDeleteUser
       CancellationToken cancellationToken
     )
     {
-      var existingUser = await _dbContext
-                               .Users.FirstOrDefaultAsync(u => u.Email == request.Email, cancellationToken);
+      var existingUser = await _dbContext.Users.FirstOrDefaultAsync(
+        u => u.Email == request.Email,
+        cancellationToken
+      );
       if (existingUser == null)
       {
         return new ApiResult<AdminDeleteUserResponse>
         {
           StatusCode = HttpStatusCode.BadRequest,
-          Error = new ApiError(Message.UserEmailDoesNotExists)
+          Error = new ApiError(Message.UserEmailDoesNotExists),
         };
       }
 
@@ -60,7 +62,7 @@ public static class AdminDeleteUser
         return new ApiResult<AdminDeleteUserResponse>
         {
           StatusCode = HttpStatusCode.OK,
-          SuccessMessage = Message.UserDeletedSuccessfully
+          SuccessMessage = Message.UserDeletedSuccessfully,
         };
       }
       catch (Exception ex)
@@ -70,7 +72,7 @@ public static class AdminDeleteUser
         return new ApiResult<AdminDeleteUserResponse>
         {
           StatusCode = HttpStatusCode.InternalServerError,
-          Error = new ApiError(Message.UserDeletionUnexpectedError)
+          Error = new ApiError(Message.UserDeletionUnexpectedError),
         };
       }
     }
@@ -82,22 +84,17 @@ public class AdminDeleteUserEndpoint : ICarterModule
   public void AddRoutes(IEndpointRouteBuilder app)
   {
     app.MapDelete(
-         "api/admin/users",
-         async (string email, ISender sender) =>
-         {
-           var command = new AdminDeleteUser.Command
-           {
-             Email = email,
-           };
-           var response = await sender.Send(command);
+        "api/admin/users",
+        async (string email, ISender sender) =>
+        {
+          var command = new AdminDeleteUser.Command { Email = email };
+          var response = await sender.Send(command);
 
-           return ApiResultHelper.FormatResponse(response);
-         }
-       )
-       .WithName("AdminDeleteUser");
+          return ApiResultHelper.FormatResponse(response);
+        }
+      )
+      .WithName("AdminDeleteUser");
   }
 }
 
-public class AdminDeleteUserResponse
-{
-}
+public class AdminDeleteUserResponse { }

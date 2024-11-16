@@ -21,11 +21,7 @@ public class GetIsUserEnrolledTests : TestsHelper
 
   private GetIsUserEnrolled.Command CreateDummyCommand()
   {
-    return new GetIsUserEnrolled.Command
-    {
-      Email = DummyEmail,
-      SeasonSlug = "Season Slug"
-    };
+    return new GetIsUserEnrolled.Command { Email = DummyEmail, SeasonSlug = "Season Slug" };
   }
 
   [Fact]
@@ -38,20 +34,19 @@ public class GetIsUserEnrolledTests : TestsHelper
       {
         SeasonId = DummyId1,
         Name = "Season Name",
-        Slug = "Season Slug"
+        Slug = "Season Slug",
       },
-      User = new UserEntity
-      {
-        UserId = DummyId1,
-        Email = DummyEmail
-      }
+      User = new UserEntity { UserId = DummyId1, Email = DummyEmail },
     };
-    _dbContextMock.Setup(x => x.Enrollments)
-                  .ReturnsDbSet(new List<EnrollmentEntity> { dummyEnrollment });
+    _dbContextMock
+      .Setup(x => x.Enrollments)
+      .ReturnsDbSet(new List<EnrollmentEntity> { dummyEnrollment });
 
     var command = CreateDummyCommand();
-    var handler =
-      new GetIsUserEnrolled.Handler(_dbContextMock.Object, Mock.Of<ILogger<GetIsUserEnrolled.Handler>>());
+    var handler = new GetIsUserEnrolled.Handler(
+      _dbContextMock.Object,
+      Mock.Of<ILogger<GetIsUserEnrolled.Handler>>()
+    );
 
     var result = await handler.Handle(command, CancellationToken.None);
     var response = result.ResponseBody;
@@ -62,12 +57,13 @@ public class GetIsUserEnrolledTests : TestsHelper
   [Fact]
   public async Task Handle_UserEnrollmentDoesNotExists_OK()
   {
-    _dbContextMock.Setup(x => x.Enrollments)
-                  .ReturnsDbSet(new List<EnrollmentEntity>());
+    _dbContextMock.Setup(x => x.Enrollments).ReturnsDbSet(new List<EnrollmentEntity>());
 
     var command = CreateDummyCommand();
-    var handler =
-      new GetIsUserEnrolled.Handler(_dbContextMock.Object, Mock.Of<ILogger<GetIsUserEnrolled.Handler>>());
+    var handler = new GetIsUserEnrolled.Handler(
+      _dbContextMock.Object,
+      Mock.Of<ILogger<GetIsUserEnrolled.Handler>>()
+    );
 
     var result = await handler.Handle(command, CancellationToken.None);
     var response = result.ResponseBody;

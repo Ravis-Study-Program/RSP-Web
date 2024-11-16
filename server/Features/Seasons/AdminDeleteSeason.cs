@@ -7,14 +7,11 @@ using RSPWebAPI.Database;
 using RSPWebAPI.Features.Constants;
 using RSPWebAPI.Shared;
 using RSPWebAPI.Shared.Behaviours;
-using AdminDeleteSeasonResult =
-  Microsoft.AspNetCore.Http.HttpResults.Results<
-    Microsoft.AspNetCore.Http.HttpResults.Ok<
-      RSPWebAPI.Shared.ApiResult<RSPWebAPI.Features.Seasons.AdminDeleteSeasonResponse>>,
-    Microsoft.AspNetCore.Http.HttpResults.NotFound<
-      RSPWebAPI.Shared.ApiResult<RSPWebAPI.Features.Seasons.AdminDeleteSeasonResponse>>, Microsoft.AspNetCore.Http.
-    HttpResults.BadRequest<RSPWebAPI.Shared.ApiResult<RSPWebAPI.Features.Seasons.AdminDeleteSeasonResponse>>
-  >;
+using AdminDeleteSeasonResult = Microsoft.AspNetCore.Http.HttpResults.Results<
+  Microsoft.AspNetCore.Http.HttpResults.Ok<RSPWebAPI.Shared.ApiResult<RSPWebAPI.Features.Seasons.AdminDeleteSeasonResponse>>,
+  Microsoft.AspNetCore.Http.HttpResults.NotFound<RSPWebAPI.Shared.ApiResult<RSPWebAPI.Features.Seasons.AdminDeleteSeasonResponse>>,
+  Microsoft.AspNetCore.Http.HttpResults.BadRequest<RSPWebAPI.Shared.ApiResult<RSPWebAPI.Features.Seasons.AdminDeleteSeasonResponse>>
+>;
 
 namespace RSPWebAPI.Features.Seasons;
 
@@ -49,14 +46,16 @@ public static class AdminDeleteSeason
       CancellationToken cancellationToken
     )
     {
-      var existingSeason = await _dbContext
-                                 .Seasons.FirstOrDefaultAsync(u => u.SeasonId == request.SeasonId, cancellationToken);
+      var existingSeason = await _dbContext.Seasons.FirstOrDefaultAsync(
+        u => u.SeasonId == request.SeasonId,
+        cancellationToken
+      );
       if (existingSeason == null)
       {
         return new ApiResult<AdminDeleteSeasonResponse>
         {
           StatusCode = HttpStatusCode.BadRequest,
-          Error = new ApiError(Message.SeasonDoesNotExists)
+          Error = new ApiError(Message.SeasonDoesNotExists),
         };
       }
 
@@ -68,7 +67,7 @@ public static class AdminDeleteSeason
         return new ApiResult<AdminDeleteSeasonResponse>
         {
           StatusCode = HttpStatusCode.OK,
-          SuccessMessage = Message.SeasonDeletedSuccessfully
+          SuccessMessage = Message.SeasonDeletedSuccessfully,
         };
       }
       catch (Exception ex)
@@ -78,7 +77,7 @@ public static class AdminDeleteSeason
         return new ApiResult<AdminDeleteSeasonResponse>
         {
           StatusCode = HttpStatusCode.InternalServerError,
-          Error = new ApiError(Message.SeasonDeletionUnexpectedError)
+          Error = new ApiError(Message.SeasonDeletionUnexpectedError),
         };
       }
     }
@@ -90,22 +89,17 @@ public class AdminDeleteSeasonEndpoint : ICarterModule
   public void AddRoutes(IEndpointRouteBuilder app)
   {
     app.MapDelete(
-         "api/admin/seasons",
-         async Task<AdminDeleteSeasonResult> (string seasonId, ISender sender) =>
-         {
-           var command = new AdminDeleteSeason.Command
-           {
-             SeasonId = seasonId
-           };
-           var response = await sender.Send(command);
+        "api/admin/seasons",
+        async Task<AdminDeleteSeasonResult> (string seasonId, ISender sender) =>
+        {
+          var command = new AdminDeleteSeason.Command { SeasonId = seasonId };
+          var response = await sender.Send(command);
 
-           return ApiResultHelper.FormatResponse(response);
-         }
-       )
-       .WithName("AdminDeleteSeason");
+          return ApiResultHelper.FormatResponse(response);
+        }
+      )
+      .WithName("AdminDeleteSeason");
   }
 }
 
-public class AdminDeleteSeasonResponse
-{
-}
+public class AdminDeleteSeasonResponse { }

@@ -48,15 +48,17 @@ public static class AdminCreateUser
       CancellationToken cancellationToken
     )
     {
-      var existingUser = await _dbContext
-                               .Users.FirstOrDefaultAsync(u => u.Email == request.Email, cancellationToken);
+      var existingUser = await _dbContext.Users.FirstOrDefaultAsync(
+        u => u.Email == request.Email,
+        cancellationToken
+      );
 
       if (existingUser != null)
       {
         return new ApiResult<AdminCreateUserResponse>
         {
           StatusCode = HttpStatusCode.BadRequest,
-          Error = new ApiError(Message.UserEmailExists)
+          Error = new ApiError(Message.UserEmailExists),
         };
       }
 
@@ -67,7 +69,7 @@ public static class AdminCreateUser
         Email = request.Email,
         Name = request.Name,
         ProfileImage = request.ProfileImage,
-        IsAdmin = request.IsAdmin
+        IsAdmin = request.IsAdmin,
       };
 
       try
@@ -85,9 +87,9 @@ public static class AdminCreateUser
             Email = user.Email,
             Name = user.Name,
             ProfileImage = user.ProfileImage,
-            IsAdmin = user.IsAdmin
+            IsAdmin = user.IsAdmin,
           },
-          SuccessMessage = Message.UserCreatedSuccessfully
+          SuccessMessage = Message.UserCreatedSuccessfully,
         };
       }
       catch (Exception ex)
@@ -97,7 +99,7 @@ public static class AdminCreateUser
         return new ApiResult<AdminCreateUserResponse>
         {
           StatusCode = HttpStatusCode.InternalServerError,
-          Error = new ApiError(Message.UserCreationUnexpectedError)
+          Error = new ApiError(Message.UserCreationUnexpectedError),
         };
       }
     }
@@ -109,41 +111,61 @@ public class AdminCreateUserEndpoint : ICarterModule
   public void AddRoutes(IEndpointRouteBuilder app)
   {
     app.MapPost(
-         "api/admin/users",
-         async (AdminCreateUserRequest request, ISender sender) =>
-         {
-           var command = new AdminCreateUser.Command
-           {
-             DiscordId = request.DiscordId,
-             Email = request.Email,
-             Name = request.Name,
-             ProfileImage = request.ProfileImage,
-             IsAdmin = request.IsAdmin
-           };
-           var response = await sender.Send(command);
+        "api/admin/users",
+        async (AdminCreateUserRequest request, ISender sender) =>
+        {
+          var command = new AdminCreateUser.Command
+          {
+            DiscordId = request.DiscordId,
+            Email = request.Email,
+            Name = request.Name,
+            ProfileImage = request.ProfileImage,
+            IsAdmin = request.IsAdmin,
+          };
+          var response = await sender.Send(command);
 
-           return ApiResultHelper.FormatResponse(response);
-         }
-       )
-       .WithName("AdminCreateUser");
+          return ApiResultHelper.FormatResponse(response);
+        }
+      )
+      .WithName("AdminCreateUser");
   }
 }
 
 public record AdminCreateUserRequest
 {
-  [Required] public string DiscordId { get; set; } = string.Empty;
-  [Required] public string Email { get; set; } = string.Empty;
-  [Required] public string Name { get; set; } = string.Empty;
-  [Required] public string ProfileImage { get; set; } = string.Empty;
-  [Required] public bool IsAdmin { get; set; } = false;
+  [Required]
+  public string DiscordId { get; set; } = string.Empty;
+
+  [Required]
+  public string Email { get; set; } = string.Empty;
+
+  [Required]
+  public string Name { get; set; } = string.Empty;
+
+  [Required]
+  public string ProfileImage { get; set; } = string.Empty;
+
+  [Required]
+  public bool IsAdmin { get; set; } = false;
 }
 
 public class AdminCreateUserResponse
 {
-  [Required] public string UserId { get; set; } = string.Empty;
-  [Required] public string DiscordId { get; set; } = string.Empty;
-  [Required] public string Email { get; set; } = string.Empty;
-  [Required] public string Name { get; set; } = string.Empty;
-  [Required] public string ProfileImage { get; set; } = string.Empty;
-  [Required] public bool IsAdmin { get; set; }
+  [Required]
+  public string UserId { get; set; } = string.Empty;
+
+  [Required]
+  public string DiscordId { get; set; } = string.Empty;
+
+  [Required]
+  public string Email { get; set; } = string.Empty;
+
+  [Required]
+  public string Name { get; set; } = string.Empty;
+
+  [Required]
+  public string ProfileImage { get; set; } = string.Empty;
+
+  [Required]
+  public bool IsAdmin { get; set; }
 }

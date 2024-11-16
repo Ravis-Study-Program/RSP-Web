@@ -7,9 +7,14 @@ namespace RSPWebAPI.Entities;
 
 public class MentorshipEntity : ISoftDelete
 {
-  [Required] public string MentorshipId { get; set; } = string.Empty;
-  [Required] public string MentorEnrollmentId { get; set; } = string.Empty;
-  [Required] public string MenteeEnrollmentId { get; set; } = string.Empty;
+  [Required]
+  public string MentorshipId { get; set; } = string.Empty;
+
+  [Required]
+  public string MentorEnrollmentId { get; set; } = string.Empty;
+
+  [Required]
+  public string MenteeEnrollmentId { get; set; } = string.Empty;
 
   // Navigation
   public EnrollmentEntity MentorEnrollment { get; set; } = null!;
@@ -29,25 +34,40 @@ public class MentorshipEntityConfiguration : IEntityTypeConfiguration<Mentorship
     builder.HasIndex(x => x.MenteeEnrollmentId);
 
     // Fields
-    builder.Property(x => x.MentorshipId).HasColumnName("MentorshipId").HasColumnType("varchar(16)")
-           .ValueGeneratedNever().IsRequired();
-    builder.Property(x => x.MentorEnrollmentId).HasColumnName("MentorEnrollmentId").HasColumnType("varchar(16)")
-           .IsRequired();
-    builder.Property(x => x.MenteeEnrollmentId).HasColumnName("MenteeEnrollmentId").HasColumnType("varchar(16)")
-           .IsRequired();
-    builder.Property(x => x.DeletedAtUtc).HasColumnName("DeletedAtUtc").HasColumnType("timestamptz");
+    builder
+      .Property(x => x.MentorshipId)
+      .HasColumnName("MentorshipId")
+      .HasColumnType("varchar(16)")
+      .ValueGeneratedNever()
+      .IsRequired();
+    builder
+      .Property(x => x.MentorEnrollmentId)
+      .HasColumnName("MentorEnrollmentId")
+      .HasColumnType("varchar(16)")
+      .IsRequired();
+    builder
+      .Property(x => x.MenteeEnrollmentId)
+      .HasColumnName("MenteeEnrollmentId")
+      .HasColumnType("varchar(16)")
+      .IsRequired();
+    builder
+      .Property(x => x.DeletedAtUtc)
+      .HasColumnName("DeletedAtUtc")
+      .HasColumnType("timestamptz");
 
     // Foreign Keys
-    builder.HasOne(x => x.MentorEnrollment)
-           .WithMany()
-           .HasForeignKey(x => x.MentorEnrollmentId)
-           .OnDelete(DeleteBehavior.Cascade)
-           .IsRequired();
+    builder
+      .HasOne(x => x.MentorEnrollment)
+      .WithMany()
+      .HasForeignKey(x => x.MentorEnrollmentId)
+      .OnDelete(DeleteBehavior.Cascade)
+      .IsRequired();
 
-    builder.HasOne(x => x.MenteeEnrollment)
-           .WithMany()
-           .HasForeignKey(x => x.MenteeEnrollmentId)
-           .OnDelete(DeleteBehavior.Cascade)
-           .IsRequired();
+    builder
+      .HasOne(x => x.MenteeEnrollment)
+      .WithMany()
+      .HasForeignKey(x => x.MenteeEnrollmentId)
+      .OnDelete(DeleteBehavior.Cascade)
+      .IsRequired();
   }
 }

@@ -45,19 +45,15 @@ public static class MockCreateMockInterview
       try
       {
         var interviewee = await _dbContext
-                                .Users
-                                .Where(u => u.Email == request.Email)
-                                .Select(u => new UserEntity
-                                {
-                                  UserId = u.UserId
-                                })
-                                .FirstOrDefaultAsync(cancellationToken);
+          .Users.Where(u => u.Email == request.Email)
+          .Select(u => new UserEntity { UserId = u.UserId })
+          .FirstOrDefaultAsync(cancellationToken);
         if (interviewee == null)
         {
           return new ApiResult<MockCreateMockInterviewResponse>
           {
             StatusCode = HttpStatusCode.BadRequest,
-            Error = new ApiError(Message.UserEmailDoesNotExists)
+            Error = new ApiError(Message.UserEmailDoesNotExists),
           };
         }
 
@@ -68,15 +64,13 @@ public static class MockCreateMockInterview
           var mockInterviewRound = new MockInterviewRoundEntity
           {
             IsReviewedByInterviewee = false,
-            IntervieweeComment = "My own comment"
+            IntervieweeComment = "My own comment",
           };
 
           if (j == 0)
           {
-            mockInterviewRound.BehaviouralMockInterviewRound = new BehaviouralMockInterviewRoundEntity
-            {
-              BehavioralScore = 8
-            };
+            mockInterviewRound.BehaviouralMockInterviewRound =
+              new BehaviouralMockInterviewRoundEntity { BehavioralScore = 8 };
           }
           else if (j % 2 == 0)
           {
@@ -87,7 +81,7 @@ public static class MockCreateMockInterview
               return new ApiResult<MockCreateMockInterviewResponse>
               {
                 StatusCode = HttpStatusCode.BadRequest,
-                Error = new ApiError("Something went wrong")
+                Error = new ApiError("Something went wrong"),
               };
             }
 
@@ -98,7 +92,7 @@ public static class MockCreateMockInterview
               ComplexityAnalysisScore = 5,
               CodingScore = 3,
               TestingScore = 1,
-              LeetcodeProblemId = leetcode[0].LeetcodeProblemId
+              LeetcodeProblemId = leetcode[0].LeetcodeProblemId,
             };
           }
           else if (j == 1)
@@ -106,7 +100,7 @@ public static class MockCreateMockInterview
             mockInterviewRound.CustomMockInterviewRound = new CustomMockInterviewRoundEntity
             {
               Content = "Some random content",
-              Link = "google.com"
+              Link = "google.com",
             };
           }
 
@@ -120,7 +114,7 @@ public static class MockCreateMockInterview
           IntervieweeUserId = interviewee.UserId,
           MockInterviewRounds = mockInterviewRounds,
           StartDate = DateTime.UtcNow,
-          TimeTakenInMinutes = 120
+          TimeTakenInMinutes = 120,
         };
 
         _dbContext.Add(mockInterview);
@@ -129,7 +123,7 @@ public static class MockCreateMockInterview
         return new ApiResult<MockCreateMockInterviewResponse>
         {
           StatusCode = HttpStatusCode.OK,
-          SuccessMessage = Message.MockInterviewCreatedSuccessfully
+          SuccessMessage = Message.MockInterviewCreatedSuccessfully,
         };
       }
       catch (Exception ex)
@@ -139,7 +133,7 @@ public static class MockCreateMockInterview
         return new ApiResult<MockCreateMockInterviewResponse>
         {
           StatusCode = HttpStatusCode.InternalServerError,
-          Error = new ApiError(Message.MockInterviewCreationUnexpectedError)
+          Error = new ApiError(Message.MockInterviewCreationUnexpectedError),
         };
       }
     }
@@ -151,24 +145,19 @@ public class MockCreateMockInterviewEndpoint : ICarterModule
   public void AddRoutes(IEndpointRouteBuilder app)
   {
     app.MapPost(
-         "api/mock-interview/mock-create",
-         async (ISender sender, HttpContext httpContext) =>
-         {
-           var email = httpContext?.User?.Identity?.Name ?? "";
+        "api/mock-interview/mock-create",
+        async (ISender sender, HttpContext httpContext) =>
+        {
+          var email = httpContext?.User?.Identity?.Name ?? "";
 
-           var command = new MockCreateMockInterview.Command
-           {
-             Email = email
-           };
-           var response = await sender.Send(command);
+          var command = new MockCreateMockInterview.Command { Email = email };
+          var response = await sender.Send(command);
 
-           return ApiResultHelper.FormatResponse(response);
-         }
-       )
-       .WithName("MockCreateMockInterview");
+          return ApiResultHelper.FormatResponse(response);
+        }
+      )
+      .WithName("MockCreateMockInterview");
   }
 }
 
-public class MockCreateMockInterviewResponse
-{
-}
+public class MockCreateMockInterviewResponse { }

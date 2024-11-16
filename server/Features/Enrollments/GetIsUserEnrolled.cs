@@ -47,27 +47,30 @@ public static class GetIsUserEnrolled
     {
       try
       {
-        var enrollment = await _dbContext.Enrollments
-                                         .Where(e => e.User.Email == request.Email &&
-                                                     e.Season.Slug == request.SeasonSlug)
-                                         .Select(e => new GetIsUserEnrolledResponse
-                                         {
-                                           IsEnrolled = true,
-                                           Role = e.Role,
-                                           EnrollmentId = e.EnrollmentId
-                                         })
-                                         .AsNoTracking()
-                                         .FirstOrDefaultAsync(cancellationToken);
+        var enrollment = await _dbContext
+          .Enrollments.Where(e =>
+            e.User.Email == request.Email && e.Season.Slug == request.SeasonSlug
+          )
+          .Select(e => new GetIsUserEnrolledResponse
+          {
+            IsEnrolled = true,
+            Role = e.Role,
+            EnrollmentId = e.EnrollmentId,
+          })
+          .AsNoTracking()
+          .FirstOrDefaultAsync(cancellationToken);
 
         return new ApiResult<GetIsUserEnrolledResponse>
         {
           StatusCode = HttpStatusCode.OK,
-          ResponseBody = enrollment ?? new GetIsUserEnrolledResponse
-          {
-            IsEnrolled = false,
-            Role = null,
-            EnrollmentId = null
-          }
+          ResponseBody =
+            enrollment
+            ?? new GetIsUserEnrolledResponse
+            {
+              IsEnrolled = false,
+              Role = null,
+              EnrollmentId = null,
+            },
         };
       }
       catch (Exception ex)
@@ -77,7 +80,7 @@ public static class GetIsUserEnrolled
         return new ApiResult<GetIsUserEnrolledResponse>
         {
           StatusCode = HttpStatusCode.InternalServerError,
-          Error = new ApiError(Message.EnrollmentIsUserEnrolledError)
+          Error = new ApiError(Message.EnrollmentIsUserEnrolledError),
         };
       }
     }
@@ -89,28 +92,29 @@ public class GetIsUserEnrolledEndpoint : ICarterModule
   public void AddRoutes(IEndpointRouteBuilder app)
   {
     app.MapGet(
-         "api/enrollments/get-is-user-enrolled/{seasonSlug}",
-         async (string seasonSlug, ISender sender, HttpContext httpContext) =>
-         {
-           var email = httpContext?.User?.Identity?.Name ?? "";
+        "api/enrollments/get-is-user-enrolled/{seasonSlug}",
+        async (string seasonSlug, ISender sender, HttpContext httpContext) =>
+        {
+          var email = httpContext?.User?.Identity?.Name ?? "";
 
-           var command = new GetIsUserEnrolled.Command
-           {
-             Email = email,
-             SeasonSlug = seasonSlug
-           };
-           var response = await sender.Send(command);
+          var command = new GetIsUserEnrolled.Command { Email = email, SeasonSlug = seasonSlug };
+          var response = await sender.Send(command);
 
-           return ApiResultHelper.FormatResponse(response);
-         }
-       )
-       .WithName("GetIsUserEnrolled");
+          return ApiResultHelper.FormatResponse(response);
+        }
+      )
+      .WithName("GetIsUserEnrolled");
   }
 }
 
 public record GetIsUserEnrolledResponse
 {
-  [Required] public bool IsEnrolled { get; set; }
-  [Required] public SeasonRole? Role { get; set; }
-  [Required] public string? EnrollmentId { get; set; }
+  [Required]
+  public bool IsEnrolled { get; set; }
+
+  [Required]
+  public SeasonRole? Role { get; set; }
+
+  [Required]
+  public string? EnrollmentId { get; set; }
 }

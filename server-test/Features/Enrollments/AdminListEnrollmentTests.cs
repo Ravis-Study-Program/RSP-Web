@@ -28,31 +28,32 @@ public class AdminListEnrollmentTests : TestsHelper
   [Fact]
   public async Task Handle_Success_OK()
   {
-    _dbContextMock.Setup(x => x.Enrollments)
-                  .ReturnsDbSet(new List<EnrollmentEntity>
-                  {
-                    new()
-                    {
-                      EnrollmentId = DummyId1,
-                      SeasonId = DummyId1,
-                      UserId = DummyId1,
-                      Season = new SeasonEntity
-                      {
-                        SeasonId = DummyId1,
-                        Name = "Season Name",
-                        Location = DummyLocation
-                      },
-                      User = new UserEntity
-                      {
-                        Name = "User Name",
-                        Email = DummyEmail
-                      }
-                    }
-                  });
+    _dbContextMock
+      .Setup(x => x.Enrollments)
+      .ReturnsDbSet(
+        new List<EnrollmentEntity>
+        {
+          new()
+          {
+            EnrollmentId = DummyId1,
+            SeasonId = DummyId1,
+            UserId = DummyId1,
+            Season = new SeasonEntity
+            {
+              SeasonId = DummyId1,
+              Name = "Season Name",
+              Location = DummyLocation,
+            },
+            User = new UserEntity { Name = "User Name", Email = DummyEmail },
+          },
+        }
+      );
 
     var command = ListDummyCommand();
-    var handler =
-      new AdminListEnrollment.Handler(_dbContextMock.Object, Mock.Of<ILogger<AdminListEnrollment.Handler>>());
+    var handler = new AdminListEnrollment.Handler(
+      _dbContextMock.Object,
+      Mock.Of<ILogger<AdminListEnrollment.Handler>>()
+    );
 
     var result = await handler.Handle(command, CancellationToken.None);
     Assert.Equal(HttpStatusCode.OK, result.StatusCode);

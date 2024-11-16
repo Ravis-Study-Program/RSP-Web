@@ -13,9 +13,7 @@ namespace RSPWebAPI.Features.Users;
 
 public static class GetUserList
 {
-  public class Command : AuthRequest<ApiResult<GetUserListResponse>>
-  {
-  }
+  public class Command : AuthRequest<ApiResult<GetUserListResponse>> { }
 
   public class Handler : IRequestHandler<Command, ApiResult<GetUserListResponse>>
   {
@@ -41,10 +39,7 @@ public static class GetUserList
         {
           StatusCode = HttpStatusCode.OK,
           SuccessMessage = Message.UserListSuccessfully,
-          ResponseBody = new GetUserListResponse
-          {
-            Users = users
-          }
+          ResponseBody = new GetUserListResponse { Users = users },
         };
       }
       catch (Exception ex)
@@ -54,7 +49,7 @@ public static class GetUserList
         return new ApiResult<GetUserListResponse>
         {
           StatusCode = HttpStatusCode.InternalServerError,
-          Error = new ApiError(Message.UserListUnexpectedError)
+          Error = new ApiError(Message.UserListUnexpectedError),
         };
       }
     }
@@ -66,20 +61,21 @@ public class GetUserListEndpoint : ICarterModule
   public void AddRoutes(IEndpointRouteBuilder app)
   {
     app.MapGet(
-         "api/users-list",
-         async (ISender sender) =>
-         {
-           var command = new GetUserList.Command();
-           var response = await sender.Send(command);
+        "api/users-list",
+        async (ISender sender) =>
+        {
+          var command = new GetUserList.Command();
+          var response = await sender.Send(command);
 
-           return ApiResultHelper.FormatResponse(response);
-         }
-       )
-       .WithName("GetUserList");
+          return ApiResultHelper.FormatResponse(response);
+        }
+      )
+      .WithName("GetUserList");
   }
 }
 
 public class GetUserListResponse
 {
-  [Required] public ICollection<UserEntity> Users { get; set; } = new List<UserEntity>();
+  [Required]
+  public ICollection<UserEntity> Users { get; set; } = new List<UserEntity>();
 }

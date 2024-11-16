@@ -1,14 +1,14 @@
+import { useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { Avatar, Card, Grid, Group, SegmentedControl, Text } from '@mantine/core';
 import { Layout } from '@/components/Layout/Layout';
 import { useGetMockInterviews, useGetProblemAttempts } from '@/generated/api/client';
 import { SeasonRoleReverseIndex } from '@/shared/entities/reverseIndex';
 import { useSeasonSlug } from '@/shared/hooks/useSeasonSlug';
 import { useUserAndEnrollment } from '@/shared/hooks/useUserAndEnrollment';
-import { Avatar, Card, Grid, Group, SegmentedControl, Text } from '@mantine/core';
-import { useMemo, useState } from 'react';
 import { LeetcodeTable } from '../Leetcode/LeetcodeTable/LeetcodeTable';
 import { MockInterviewTable } from '../MockInterviews/MockInterviewTable/MockInterviewTable';
 import classes from './Profile.module.css';
-import { useSearchParams } from 'react-router-dom';
 
 export default function ProfilePage() {
   const [searchParams] = useSearchParams();
@@ -39,7 +39,7 @@ export default function ProfilePage() {
         enrollmentId={enrollmentId || ''}
         enableEditing={false}
       />
-    )
+    );
   }, [refetchMockInterviews, mockInterviewsResponse, enrollmentId]);
 
   const LeetcodeComponent = useMemo(() => {
@@ -50,7 +50,7 @@ export default function ProfilePage() {
         enrollmentId={enrollmentId || ''}
         enableEditing={false}
       />
-    )
+    );
   }, [refetchProblemAttempts, problemAttemptsResponse, enrollmentId]);
 
   const seasonRole = role !== null ? SeasonRoleReverseIndex[role] : '';
@@ -63,27 +63,27 @@ export default function ProfilePage() {
             problemsCount={problemAttemptsResponse?.responseBody?.problemAttempts.length || 0}
             mockInterviewsCount={mockInterviewsResponse?.responseBody?.mockInterviews.length || 0}
             name={user?.name || ''}
-            seasonRole={seasonRole} studentRole={null} />
+            seasonRole={seasonRole}
+            studentRole={null}
+          />
         </Grid.Col>
         <Grid.Col span={{ base: 12, sm: 12, md: 12, lg: 9 }}>
-
           <SegmentedControl
-            onChange={(value: any) => setTimeout(() => {
-              setSection(value)
-            }, 150)}
+            onChange={(value: any) =>
+              setTimeout(() => {
+                setSection(value);
+              }, 150)
+            }
             mb={10}
             className={classes.control}
             size="sm"
             color="blue"
-            data={['Leetcode', 'Mock Interviews']} />
+            data={['Leetcode', 'Mock Interviews']}
+          />
 
-          {
-            section === 'Leetcode' ? LeetcodeComponent : null
-          }
+          {section === 'Leetcode' ? LeetcodeComponent : null}
 
-          {
-            section === 'Mock Interviews' ? MockInterviewComponent : null
-          }
+          {section === 'Mock Interviews' ? MockInterviewComponent : null}
         </Grid.Col>
       </Grid>
     </Layout>
@@ -91,14 +91,19 @@ export default function ProfilePage() {
 }
 
 type ProfileSummaryProps = {
-  problemsCount: number,
-  mockInterviewsCount: number,
-  name: string,
-  seasonRole: string,
-  studentRole: string | null
-}
+  problemsCount: number;
+  mockInterviewsCount: number;
+  name: string;
+  seasonRole: string;
+  studentRole: string | null;
+};
 
-export function ProfileSummary({ problemsCount, mockInterviewsCount, name, seasonRole }: ProfileSummaryProps) {
+export function ProfileSummary({
+  problemsCount,
+  mockInterviewsCount,
+  name,
+  seasonRole,
+}: ProfileSummaryProps) {
   const stats = [
     { value: problemsCount, label: 'Problems' },
     { value: mockInterviewsCount, label: 'Mock Interviews' },
@@ -131,7 +136,7 @@ export function ProfileSummary({ problemsCount, mockInterviewsCount, name, seaso
         mt={-30}
         className={classes.avatar}
         name={name}
-        color='initials'
+        color="initials"
       />
       <Text ta="center" fz="lg" fw={500} mt="sm">
         {name}
@@ -145,4 +150,3 @@ export function ProfileSummary({ problemsCount, mockInterviewsCount, name, seaso
     </Card>
   );
 }
-

@@ -1,5 +1,4 @@
-import { Layout } from '@/components/Layout/Layout';
-import { SeasonUserDto, useGetSeasonUsers } from '@/generated/api/client';
+import { IconBrandDiscordFilled } from '@tabler/icons-react';
 import {
   ActionIcon,
   Anchor,
@@ -11,12 +10,13 @@ import {
   Group,
   rem,
   Skeleton,
-  Text
+  Text,
 } from '@mantine/core';
-import { IconBrandDiscordFilled } from '@tabler/icons-react';
-import classes from './SeasonUsers.module.css';
-import { useSeasonSlug } from '@/shared/hooks/useSeasonSlug';
+import { Layout } from '@/components/Layout/Layout';
+import { SeasonUserDto, useGetSeasonUsers } from '@/generated/api/client';
 import { SeasonRoleReverseIndex } from '@/shared/entities/reverseIndex';
+import { useSeasonSlug } from '@/shared/hooks/useSeasonSlug';
+import classes from './SeasonUsers.module.css';
 
 export default function SeasonUsersPage() {
   const { seasonSlug } = useSeasonSlug();
@@ -31,7 +31,10 @@ export default function SeasonUsersPage() {
     <Layout>
       <Grid gutter={{ base: 'md', xs: 'md', md: 'xl', xl: 50 }}>
         {!isLoadingSeasonUsers && !isFetchingSeasonUsers && !isLoadingSeasonUsersError ? (
-          <SeasonUserCards seasonUsers={seasonUsersResponse?.responseBody?.seasonUsers} seasonSlug={seasonSlug} />
+          <SeasonUserCards
+            seasonUsers={seasonUsersResponse?.responseBody?.seasonUsers}
+            seasonSlug={seasonSlug}
+          />
         ) : (
           <SeasonUserSkeletonCards />
         )}
@@ -61,44 +64,50 @@ const SeasonUserSkeletonCards = () => {
   );
 };
 
-
 type SeasonUserCardsProps = {
-  seasonUsers: SeasonUserDto[] | undefined
-  seasonSlug: string
-}
+  seasonUsers: SeasonUserDto[] | undefined;
+  seasonSlug: string;
+};
 
 export function SeasonUserCards({ seasonUsers, seasonSlug }: SeasonUserCardsProps) {
   return (
     <>
-      {
-        seasonUsers?.map((seasonUser, key) => (
-          <Grid.Col key={key} span={{ base: 12, sm: 6, md: 6, lg: 2 }}>
+      {seasonUsers?.map((seasonUser, key) => (
+        <Grid.Col key={key} span={{ base: 12, sm: 6, md: 6, lg: 2 }}>
           <Card key={key} withBorder shadow="sm" radius="md" className={classes.card}>
             <Avatar src={seasonUser.profileImage} size={70} radius={70} mx="auto" />
             <Text ta="center" fz="lg" fw={600} mt="md">
               {seasonUser.name}
             </Text>
-            <Badge mt={10} autoContrast color="yellow.5">{SeasonRoleReverseIndex[seasonUser.role]}</Badge>
+            <Badge mt={10} autoContrast color="yellow.5">
+              {SeasonRoleReverseIndex[seasonUser.role]}
+            </Badge>
 
-            <Button component="a" href={`/seasons/${seasonSlug}/profile?email=${seasonUser.email}`} radius="md" mt="sm" size="sm" variant="primary">
+            <Button
+              component="a"
+              href={`/seasons/${seasonSlug}/profile?email=${seasonUser.email}`}
+              radius="md"
+              mt="sm"
+              size="sm"
+              variant="primary"
+            >
               View Profile
             </Button>
 
             <Group gap={0} mt="md">
-                <Anchor c="gray" target='_blank' href='https://www.discord.com'>
-                  <ActionIcon variant="subtle" color="gray">
-                    <IconBrandDiscordFilled
-                      style={{ width: rem(20), height: rem(20) }}
-                      color="gray"
-                      stroke={1.5}
-                    />
-                  </ActionIcon>
-                </Anchor>
-              </Group>
+              <Anchor c="gray" target="_blank" href="https://www.discord.com">
+                <ActionIcon variant="subtle" color="gray">
+                  <IconBrandDiscordFilled
+                    style={{ width: rem(20), height: rem(20) }}
+                    color="gray"
+                    stroke={1.5}
+                  />
+                </ActionIcon>
+              </Anchor>
+            </Group>
           </Card>
-          </Grid.Col>
-        ))
-      }
+        </Grid.Col>
+      ))}
     </>
   );
 }

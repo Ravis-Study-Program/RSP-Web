@@ -22,21 +22,19 @@ public class AdminDeleteMentorshipTests : TestsHelper
 
   private AdminDeleteMentorship.Command DeleteDummyCommand()
   {
-    return new AdminDeleteMentorship.Command
-    {
-      MentorshipId = DummyId1
-    };
+    return new AdminDeleteMentorship.Command { MentorshipId = DummyId1 };
   }
 
   [Fact]
   public async Task Handle_MentorshipDoesNotExists_BadRequest()
   {
-    _dbContextMock.Setup(x => x.Mentorships)
-                  .ReturnsDbSet(new List<MentorshipEntity>());
+    _dbContextMock.Setup(x => x.Mentorships).ReturnsDbSet(new List<MentorshipEntity>());
 
     var command = DeleteDummyCommand();
-    var handler =
-      new AdminDeleteMentorship.Handler(_dbContextMock.Object, Mock.Of<ILogger<AdminDeleteMentorship.Handler>>());
+    var handler = new AdminDeleteMentorship.Handler(
+      _dbContextMock.Object,
+      Mock.Of<ILogger<AdminDeleteMentorship.Handler>>()
+    );
 
     var result = await handler.Handle(command, CancellationToken.None);
     Assert.Equal(HttpStatusCode.BadRequest, result.StatusCode);
@@ -50,14 +48,17 @@ public class AdminDeleteMentorshipTests : TestsHelper
     {
       MentorshipId = DummyId1,
       MentorEnrollmentId = DummyId1,
-      MenteeEnrollmentId = DummyId2
+      MenteeEnrollmentId = DummyId2,
     };
-    _dbContextMock.Setup(x => x.Mentorships)
-                  .ReturnsDbSet(new List<MentorshipEntity> { existingMentorship });
+    _dbContextMock
+      .Setup(x => x.Mentorships)
+      .ReturnsDbSet(new List<MentorshipEntity> { existingMentorship });
 
     var command = DeleteDummyCommand();
-    var handler =
-      new AdminDeleteMentorship.Handler(_dbContextMock.Object, Mock.Of<ILogger<AdminDeleteMentorship.Handler>>());
+    var handler = new AdminDeleteMentorship.Handler(
+      _dbContextMock.Object,
+      Mock.Of<ILogger<AdminDeleteMentorship.Handler>>()
+    );
 
     var result = await handler.Handle(command, CancellationToken.None);
     Assert.Equal(HttpStatusCode.OK, result.StatusCode);

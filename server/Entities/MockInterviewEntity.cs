@@ -7,13 +7,23 @@ namespace RSPWebAPI.Entities;
 
 public class MockInterviewEntity : ISoftDelete
 {
-  [Required] public string MockInterviewId { get; set; } = string.Empty;
-  [Required] public bool IsPass { get; set; }
-  [Required] public DateTime StartDate { get; set; }
-  [Required] public int TimeTakenInMinutes { get; set; }
+  [Required]
+  public string MockInterviewId { get; set; } = string.Empty;
 
-  [Required] public string InterviewerUserId { get; set; } = string.Empty;
-  [Required] public string IntervieweeUserId { get; set; } = string.Empty;
+  [Required]
+  public bool IsPass { get; set; }
+
+  [Required]
+  public DateTime StartDate { get; set; }
+
+  [Required]
+  public int TimeTakenInMinutes { get; set; }
+
+  [Required]
+  public string InterviewerUserId { get; set; } = string.Empty;
+
+  [Required]
+  public string IntervieweeUserId { get; set; } = string.Empty;
 
   // A null enrollment would mean the problem attempt is not tied to any season.
   public string? EnrollmentId { get; set; } = string.Empty;
@@ -33,29 +43,68 @@ public class MockInterviewEntityConfiguration : IEntityTypeConfiguration<MockInt
     builder.ToTable("MockInterview");
     builder.HasKey(x => x.MockInterviewId);
 
-    // Fields  
-    builder.Property(x => x.MockInterviewId).HasColumnName("MockInterviewId").HasColumnType("varchar(16)")
-           .ValueGeneratedNever().IsRequired();
+    // Fields
+    builder
+      .Property(x => x.MockInterviewId)
+      .HasColumnName("MockInterviewId")
+      .HasColumnType("varchar(16)")
+      .ValueGeneratedNever()
+      .IsRequired();
     builder.Property(x => x.IsPass).HasColumnName("IsPass").IsRequired();
-    builder.Property(x => x.StartDate).HasColumnName("StartDate").HasColumnType("timestamptz").IsRequired();
-    builder.Property(x => x.TimeTakenInMinutes).HasColumnName("TimeTakenInMinutes").HasColumnType("int").IsRequired();
-    builder.Property(x => x.EnrollmentId).HasColumnName("EnrollmentId").HasColumnType("varchar(16)");
-    builder.Property(x => x.InterviewerUserId).HasColumnName("InterviewerUserId").HasColumnType("varchar(16)")
-           .IsRequired();
-    builder.Property(x => x.IntervieweeUserId).HasColumnName("IntervieweeUserId").HasColumnType("varchar(16)")
-           .IsRequired();
-    builder.Property(x => x.DeletedAtUtc).HasColumnName("DeletedAtUtc").HasColumnType("timestamptz");
+    builder
+      .Property(x => x.StartDate)
+      .HasColumnName("StartDate")
+      .HasColumnType("timestamptz")
+      .IsRequired();
+    builder
+      .Property(x => x.TimeTakenInMinutes)
+      .HasColumnName("TimeTakenInMinutes")
+      .HasColumnType("int")
+      .IsRequired();
+    builder
+      .Property(x => x.EnrollmentId)
+      .HasColumnName("EnrollmentId")
+      .HasColumnType("varchar(16)");
+    builder
+      .Property(x => x.InterviewerUserId)
+      .HasColumnName("InterviewerUserId")
+      .HasColumnType("varchar(16)")
+      .IsRequired();
+    builder
+      .Property(x => x.IntervieweeUserId)
+      .HasColumnName("IntervieweeUserId")
+      .HasColumnType("varchar(16)")
+      .IsRequired();
+    builder
+      .Property(x => x.DeletedAtUtc)
+      .HasColumnName("DeletedAtUtc")
+      .HasColumnType("timestamptz");
 
     // Foreign Keys
-    builder.HasOne(x => x.Interviewer).WithMany().HasForeignKey(x => x.InterviewerUserId)
-           .OnDelete(DeleteBehavior.Restrict).IsRequired();
-    builder.HasOne(x => x.Interviewee).WithMany().HasForeignKey(x => x.IntervieweeUserId)
-           .OnDelete(DeleteBehavior.Restrict).IsRequired();
-    builder.HasOne(x => x.Enrollment).WithMany().HasForeignKey(x => x.EnrollmentId).OnDelete(DeleteBehavior.SetNull)
-           .IsRequired(false);
+    builder
+      .HasOne(x => x.Interviewer)
+      .WithMany()
+      .HasForeignKey(x => x.InterviewerUserId)
+      .OnDelete(DeleteBehavior.Restrict)
+      .IsRequired();
+    builder
+      .HasOne(x => x.Interviewee)
+      .WithMany()
+      .HasForeignKey(x => x.IntervieweeUserId)
+      .OnDelete(DeleteBehavior.Restrict)
+      .IsRequired();
+    builder
+      .HasOne(x => x.Enrollment)
+      .WithMany()
+      .HasForeignKey(x => x.EnrollmentId)
+      .OnDelete(DeleteBehavior.SetNull)
+      .IsRequired(false);
 
     // Collection Relationship
-    builder.HasMany(x => x.MockInterviewRounds).WithOne().HasForeignKey("MockInterviewId")
-           .OnDelete(DeleteBehavior.Cascade);
+    builder
+      .HasMany(x => x.MockInterviewRounds)
+      .WithOne()
+      .HasForeignKey("MockInterviewId")
+      .OnDelete(DeleteBehavior.Cascade);
   }
 }

@@ -8,14 +8,11 @@ using RSPWebAPI.Database;
 using RSPWebAPI.Features.Constants;
 using RSPWebAPI.Shared;
 using RSPWebAPI.Shared.Behaviours;
-using AdminUpdateSeasonResult =
-  Microsoft.AspNetCore.Http.HttpResults.Results<
-    Microsoft.AspNetCore.Http.HttpResults.Ok<
-      RSPWebAPI.Shared.ApiResult<RSPWebAPI.Features.Seasons.AdminUpdateSeasonResponse>>,
-    Microsoft.AspNetCore.Http.HttpResults.NotFound<
-      RSPWebAPI.Shared.ApiResult<RSPWebAPI.Features.Seasons.AdminUpdateSeasonResponse>>, Microsoft.AspNetCore.Http.
-    HttpResults.BadRequest<RSPWebAPI.Shared.ApiResult<RSPWebAPI.Features.Seasons.AdminUpdateSeasonResponse>>
-  >;
+using AdminUpdateSeasonResult = Microsoft.AspNetCore.Http.HttpResults.Results<
+  Microsoft.AspNetCore.Http.HttpResults.Ok<RSPWebAPI.Shared.ApiResult<RSPWebAPI.Features.Seasons.AdminUpdateSeasonResponse>>,
+  Microsoft.AspNetCore.Http.HttpResults.NotFound<RSPWebAPI.Shared.ApiResult<RSPWebAPI.Features.Seasons.AdminUpdateSeasonResponse>>,
+  Microsoft.AspNetCore.Http.HttpResults.BadRequest<RSPWebAPI.Shared.ApiResult<RSPWebAPI.Features.Seasons.AdminUpdateSeasonResponse>>
+>;
 
 namespace RSPWebAPI.Features.Seasons;
 
@@ -62,14 +59,16 @@ public static class AdminUpdateSeason
       CancellationToken cancellationToken
     )
     {
-      var existingSeason = await _dbContext
-                                 .Seasons.FirstOrDefaultAsync(u => u.SeasonId == request.SeasonId, cancellationToken);
+      var existingSeason = await _dbContext.Seasons.FirstOrDefaultAsync(
+        u => u.SeasonId == request.SeasonId,
+        cancellationToken
+      );
       if (existingSeason == null)
       {
         return new ApiResult<AdminUpdateSeasonResponse>
         {
           StatusCode = HttpStatusCode.BadRequest,
-          Error = new ApiError(Message.SeasonDoesNotExists)
+          Error = new ApiError(Message.SeasonDoesNotExists),
         };
       }
 
@@ -96,9 +95,9 @@ public static class AdminUpdateSeason
             StartDateInclusiveUtc = existingSeason.StartDateInclusiveUtc,
             EndDateInclusiveUtc = existingSeason.EndDateInclusiveUtc,
             Location = existingSeason.Location,
-            ImageUrl = existingSeason.ImageUrl
+            ImageUrl = existingSeason.ImageUrl,
           },
-          SuccessMessage = Message.SeasonUpdatedSuccessfully
+          SuccessMessage = Message.SeasonUpdatedSuccessfully,
         };
       }
       catch (Exception ex)
@@ -108,7 +107,7 @@ public static class AdminUpdateSeason
         return new ApiResult<AdminUpdateSeasonResponse>
         {
           StatusCode = HttpStatusCode.InternalServerError,
-          Error = new ApiError(Message.SeasonCreationUnexpectedError)
+          Error = new ApiError(Message.SeasonCreationUnexpectedError),
         };
       }
     }
@@ -120,46 +119,72 @@ public class AdminUpdateSeasonEndpoint : ICarterModule
   public void AddRoutes(IEndpointRouteBuilder app)
   {
     app.MapPut(
-         "api/admin/seasons",
-         async Task<AdminUpdateSeasonResult> (AdminUpdateSeasonRequest request, ISender sender) =>
-         {
-           var command = new AdminUpdateSeason.Command
-           {
-             SeasonId = request.SeasonId,
-             Name = request.Name,
-             Slug = request.Slug,
-             StartDateInclusiveUtc = request.StartDateInclusiveUtc,
-             EndDateInclusiveUtc = request.EndDateInclusiveUtc,
-             Location = request.Location,
-             ImageUrl = request.ImageUrl
-           };
-           var response = await sender.Send(command);
+        "api/admin/seasons",
+        async Task<AdminUpdateSeasonResult> (AdminUpdateSeasonRequest request, ISender sender) =>
+        {
+          var command = new AdminUpdateSeason.Command
+          {
+            SeasonId = request.SeasonId,
+            Name = request.Name,
+            Slug = request.Slug,
+            StartDateInclusiveUtc = request.StartDateInclusiveUtc,
+            EndDateInclusiveUtc = request.EndDateInclusiveUtc,
+            Location = request.Location,
+            ImageUrl = request.ImageUrl,
+          };
+          var response = await sender.Send(command);
 
-           return ApiResultHelper.FormatResponse(response);
-         }
-       )
-       .WithName("AdminUpdateSeason");
+          return ApiResultHelper.FormatResponse(response);
+        }
+      )
+      .WithName("AdminUpdateSeason");
   }
 }
 
 public record AdminUpdateSeasonRequest
 {
-  [Required] public string SeasonId { get; set; } = string.Empty;
-  [Required] public string Name { get; set; } = string.Empty;
-  [Required] public string Slug { get; set; } = string.Empty;
-  [Required] public DateTime StartDateInclusiveUtc { get; set; }
-  [Required] public DateTime EndDateInclusiveUtc { get; set; }
-  [Required] public string Location { get; set; } = string.Empty;
-  [Required] public string ImageUrl { get; set; } = string.Empty;
+  [Required]
+  public string SeasonId { get; set; } = string.Empty;
+
+  [Required]
+  public string Name { get; set; } = string.Empty;
+
+  [Required]
+  public string Slug { get; set; } = string.Empty;
+
+  [Required]
+  public DateTime StartDateInclusiveUtc { get; set; }
+
+  [Required]
+  public DateTime EndDateInclusiveUtc { get; set; }
+
+  [Required]
+  public string Location { get; set; } = string.Empty;
+
+  [Required]
+  public string ImageUrl { get; set; } = string.Empty;
 }
 
 public class AdminUpdateSeasonResponse
 {
-  [Required] public string SeasonId { get; set; } = string.Empty;
-  [Required] public string Name { get; set; } = string.Empty;
-  [Required] public string Slug { get; set; } = string.Empty;
-  [Required] public DateTime StartDateInclusiveUtc { get; set; }
-  [Required] public DateTime EndDateInclusiveUtc { get; set; }
-  [Required] public string Location { get; set; } = string.Empty;
-  [Required] public string ImageUrl { get; set; } = string.Empty;
+  [Required]
+  public string SeasonId { get; set; } = string.Empty;
+
+  [Required]
+  public string Name { get; set; } = string.Empty;
+
+  [Required]
+  public string Slug { get; set; } = string.Empty;
+
+  [Required]
+  public DateTime StartDateInclusiveUtc { get; set; }
+
+  [Required]
+  public DateTime EndDateInclusiveUtc { get; set; }
+
+  [Required]
+  public string Location { get; set; } = string.Empty;
+
+  [Required]
+  public string ImageUrl { get; set; } = string.Empty;
 }

@@ -30,18 +30,20 @@ public class AdminUpdateSeasonTests : TestsHelper
       StartDateInclusiveUtc = DummyStartDate,
       EndDateInclusiveUtc = DummyEndDate,
       Location = DummyLocation,
-      ImageUrl = DummyImageUrl
+      ImageUrl = DummyImageUrl,
     };
   }
 
   [Fact]
   public async Task Handle_SeasonDoesNotExists_BadRequest()
   {
-    _dbContextMock.Setup(x => x.Seasons)
-                  .ReturnsDbSet(new List<SeasonEntity>());
+    _dbContextMock.Setup(x => x.Seasons).ReturnsDbSet(new List<SeasonEntity>());
 
     var command = UpdateDummyCommand();
-    var handler = new AdminUpdateSeason.Handler(_dbContextMock.Object, Mock.Of<ILogger<AdminUpdateSeason.Handler>>());
+    var handler = new AdminUpdateSeason.Handler(
+      _dbContextMock.Object,
+      Mock.Of<ILogger<AdminUpdateSeason.Handler>>()
+    );
 
     var result = await handler.Handle(command, CancellationToken.None);
     Assert.Equal(HttpStatusCode.BadRequest, result.StatusCode);
@@ -52,11 +54,13 @@ public class AdminUpdateSeasonTests : TestsHelper
   public async Task Handle_Success_OK()
   {
     var existingSeason = new SeasonEntity { SeasonId = DummyId1 };
-    _dbContextMock.Setup(x => x.Seasons)
-                  .ReturnsDbSet(new List<SeasonEntity> { existingSeason });
+    _dbContextMock.Setup(x => x.Seasons).ReturnsDbSet(new List<SeasonEntity> { existingSeason });
 
     var command = UpdateDummyCommand();
-    var handler = new AdminUpdateSeason.Handler(_dbContextMock.Object, Mock.Of<ILogger<AdminUpdateSeason.Handler>>());
+    var handler = new AdminUpdateSeason.Handler(
+      _dbContextMock.Object,
+      Mock.Of<ILogger<AdminUpdateSeason.Handler>>()
+    );
 
     var result = await handler.Handle(command, CancellationToken.None);
     Assert.Equal(HttpStatusCode.OK, result.StatusCode);

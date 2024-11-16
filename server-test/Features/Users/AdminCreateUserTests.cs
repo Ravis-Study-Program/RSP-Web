@@ -27,7 +27,7 @@ public class AdminCreateUserTests : TestsHelper
       DiscordId = DummyDiscordId,
       Email = DummyEmail,
       ProfileImage = DummyProfileImage,
-      Name = DummyName
+      Name = DummyName,
     };
   }
 
@@ -35,11 +35,13 @@ public class AdminCreateUserTests : TestsHelper
   public async Task Handle_UserAlreadyExists_BadRequest()
   {
     var existingUser = new UserEntity { Email = DummyEmail };
-    _dbContextMock.Setup(x => x.Users)
-                  .ReturnsDbSet(new List<UserEntity> { existingUser });
+    _dbContextMock.Setup(x => x.Users).ReturnsDbSet(new List<UserEntity> { existingUser });
 
     var command = CreateDummyCommand();
-    var handler = new AdminCreateUser.Handler(_dbContextMock.Object, Mock.Of<ILogger<AdminCreateUser.Handler>>());
+    var handler = new AdminCreateUser.Handler(
+      _dbContextMock.Object,
+      Mock.Of<ILogger<AdminCreateUser.Handler>>()
+    );
 
     var result = await handler.Handle(command, CancellationToken.None);
     Assert.Equal(HttpStatusCode.BadRequest, result.StatusCode);
@@ -49,11 +51,13 @@ public class AdminCreateUserTests : TestsHelper
   [Fact]
   public async Task Handle_Success_OK()
   {
-    _dbContextMock.Setup(x => x.Users)
-                  .ReturnsDbSet(new List<UserEntity>());
+    _dbContextMock.Setup(x => x.Users).ReturnsDbSet(new List<UserEntity>());
 
     var command = CreateDummyCommand();
-    var handler = new AdminCreateUser.Handler(_dbContextMock.Object, Mock.Of<ILogger<AdminCreateUser.Handler>>());
+    var handler = new AdminCreateUser.Handler(
+      _dbContextMock.Object,
+      Mock.Of<ILogger<AdminCreateUser.Handler>>()
+    );
 
     var result = await handler.Handle(command, CancellationToken.None);
     Assert.Equal(HttpStatusCode.OK, result.StatusCode);

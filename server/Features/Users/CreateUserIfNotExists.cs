@@ -46,8 +46,10 @@ public static class CreateUserIfNotExists
       CancellationToken cancellationToken
     )
     {
-      var existingUser = await _dbContext
-                               .Users.FirstOrDefaultAsync(u => u.Email == request.Email, cancellationToken);
+      var existingUser = await _dbContext.Users.FirstOrDefaultAsync(
+        u => u.Email == request.Email,
+        cancellationToken
+      );
       if (existingUser == null)
       {
         var user = new UserEntity
@@ -56,7 +58,7 @@ public static class CreateUserIfNotExists
           DiscordId = request.DiscordId,
           Email = request.Email,
           Name = request.Name,
-          ProfileImage = request.ProfileImage
+          ProfileImage = request.ProfileImage,
         };
 
         try
@@ -71,7 +73,7 @@ public static class CreateUserIfNotExists
           return new ApiResult<CreateUserIfNotExistsResponse>
           {
             StatusCode = HttpStatusCode.InternalServerError,
-            Error = new ApiError(Message.UserCreationUnexpectedError)
+            Error = new ApiError(Message.UserCreationUnexpectedError),
           };
         }
       }
@@ -79,7 +81,7 @@ public static class CreateUserIfNotExists
       return new ApiResult<CreateUserIfNotExistsResponse>
       {
         StatusCode = HttpStatusCode.OK,
-        ResponseBody = null
+        ResponseBody = null,
       };
     }
   }
@@ -90,34 +92,37 @@ public class CreateUserIfNotExistsEndpoint : ICarterModule
   public void AddRoutes(IEndpointRouteBuilder app)
   {
     app.MapPost(
-         "api/users/create-if-not-exists",
-         async (CreateUserIfNotExistsRequest request, ISender sender, HttpContext httpContext) =>
-         {
-           var email = httpContext?.User?.Identity?.Name ?? "";
+        "api/users/create-if-not-exists",
+        async (CreateUserIfNotExistsRequest request, ISender sender, HttpContext httpContext) =>
+        {
+          var email = httpContext?.User?.Identity?.Name ?? "";
 
-           var command = new CreateUserIfNotExists.Command
-           {
-             DiscordId = request.DiscordId,
-             Email = email,
-             Name = request.Name,
-             ProfileImage = request.ProfileImage
-           };
-           var response = await sender.Send(command);
+          var command = new CreateUserIfNotExists.Command
+          {
+            DiscordId = request.DiscordId,
+            Email = email,
+            Name = request.Name,
+            ProfileImage = request.ProfileImage,
+          };
+          var response = await sender.Send(command);
 
-           return ApiResultHelper.FormatResponse(response);
-         }
-       )
-       .WithName("CreateUserIfNotExists");
+          return ApiResultHelper.FormatResponse(response);
+        }
+      )
+      .WithName("CreateUserIfNotExists");
   }
 }
 
 public record CreateUserIfNotExistsRequest
 {
-  [Required] public string DiscordId { get; set; } = string.Empty;
-  [Required] public string Name { get; set; } = string.Empty;
-  [Required] public string ProfileImage { get; set; } = string.Empty;
+  [Required]
+  public string DiscordId { get; set; } = string.Empty;
+
+  [Required]
+  public string Name { get; set; } = string.Empty;
+
+  [Required]
+  public string ProfileImage { get; set; } = string.Empty;
 }
 
-public record CreateUserIfNotExistsResponse
-{
-}
+public record CreateUserIfNotExistsResponse { }
