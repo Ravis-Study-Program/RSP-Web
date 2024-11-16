@@ -7,6 +7,7 @@ import AuthRouteGuard from './shared/auth/AuthRouteGuard';
 import SeasonRouteGuard from './shared/auth/SeasonRouteGuard';
 import SeasonRoleViewRouter from './shared/auth/SeasonViewRouter';
 import ResourcesPage from './pages/Resources/Resources.page';
+import SeasonUsersPage from './pages/SeasonUsers/SeasonUsers.page';
 
 // Lazy load the page components
 const AdminEnrollmentsPage = lazy(() => import('./pages/Admin/Enrollments/AdminEnrollments.page'));
@@ -54,9 +55,8 @@ const routes = (
       {/* Season Routes */}
       <Route path="seasons/:seasonSlug" element={<SeasonRouteGuard />}>
         <Route index element={<SeasonsOverviewPage />} />
-        <Route path="students" element={placeholderPage('StudentList Page')} />
+        <Route path="users" element={<SeasonUsersPage />} />
         <Route path="mentees" element={<SeasonRoleViewRouter mentorView={<MenteesPage />} />} />
-        <Route path="mentors" element={placeholderPage('MentorsList Page')} />
         <Route path="leetcode" element={placeholderPage('Leetcode Page')} />
         <Route path="mock-interviews" element={placeholderPage('Mock Interviews Page')} />
         <Route path="resources" element={<ResourcesPage />} />
