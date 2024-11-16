@@ -73,9 +73,9 @@ const getStudentTabs = (seasonSlug: string | null): Tabs => ({
           hidden: false,
         },
         {
-          label: 'Students',
+          label: 'Season Users',
           icon: IconSeeding,
-          link: `/seasons/${seasonSlug}/students`,
+          link: `/seasons/${seasonSlug}/users`,
           hidden: false,
         },
         {
@@ -99,9 +99,9 @@ const getMentorTabs = (seasonSlug: string | null): Tabs => ({
     ? [
         { label: seasonSlug, icon: IconLink, link: `/seasons/${seasonSlug}`, hidden: true },
         {
-          label: 'Students',
+          label: 'Season Users',
           icon: IconSeeding,
-          link: `/seasons/${seasonSlug}/students`,
+          link: `/seasons/${seasonSlug}/users`,
           hidden: false,
         },
         {
@@ -131,9 +131,9 @@ const getCoordinatorTabs = (seasonSlug: string | null): Tabs => ({
     ? [
         { label: seasonSlug, icon: IconLink, link: `/seasons/${seasonSlug}`, hidden: true },
         {
-          label: 'Students',
+          label: 'Season Users',
           icon: IconSeeding,
-          link: `/seasons/${seasonSlug}/students`,
+          link: `/seasons/${seasonSlug}/users`,
           hidden: false,
         },
         { label: 'Mentors', icon: IconCode, link: `/seasons/${seasonSlug}/mentors`, hidden: false },
@@ -158,9 +158,9 @@ const getAdminTabs = (seasonSlug: string | null): Tabs => ({
     ? [
         { label: seasonSlug, icon: IconLink, link: `/seasons/${seasonSlug}`, hidden: true },
         {
-          label: 'Students',
+          label: 'Season Users',
           icon: IconSeeding,
-          link: `/seasons/${seasonSlug}/students`,
+          link: `/seasons/${seasonSlug}/users`,
           hidden: false,
         },
         { label: 'Mentors', icon: IconStar, link: `/seasons/${seasonSlug}/mentors`, hidden: false },

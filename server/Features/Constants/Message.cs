@@ -28,6 +28,9 @@ public static class Message
   public const string GraduatesListSuccessfully = "List of Graduates retrieved successfully.";
   public const string GraduatesListUnexpectedError = "An unexpected error has occurred during graduates list.";
   
+  public const string SeasonUsersListSuccessfully = "List of SeasonUsers retrieved successfully.";
+  public const string SeasonUsersListUnexpectedError = "An unexpected error has occurred during season users list.";
+  
   public const string EnrollmentExists = "A enrollment with this EnrollmentId already exists.";
   public const string EnrollmentDoesNotExists = "No enrollment found using the EnrollmentId provided.";
   public const string EnrollmentCreatedSuccessfully = "Enrollment created successfully.";

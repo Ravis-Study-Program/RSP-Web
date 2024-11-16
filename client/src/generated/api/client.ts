@@ -86,15 +86,6 @@ export interface UpdateProblemAttemptResponse {
   [key: string]: unknown;
 }
 
-export interface UpdateProblemAttemptResponseApiResult {
-  error?: ApiError;
-  readonly isSuccess?: boolean;
-  responseBody?: UpdateProblemAttemptResponse;
-  statusCode?: HttpStatusCode;
-  /** @nullable */
-  successMessage?: string | null;
-}
-
 export interface UpdateProblemAttemptRequest {
   attemptStartDateUtc: string;
   /** @nullable */
@@ -114,27 +105,6 @@ export interface UpdateMockInterviewResponse {
   [key: string]: unknown;
 }
 
-export interface UpdateMockInterviewResponseApiResult {
-  error?: ApiError;
-  readonly isSuccess?: boolean;
-  responseBody?: UpdateMockInterviewResponse;
-  statusCode?: HttpStatusCode;
-  /** @nullable */
-  successMessage?: string | null;
-}
-
-export interface UpdateMockInterviewRequest {
-  /** @nullable */
-  enrollmentId?: string | null;
-  /** @minLength 1 */
-  interviewerUserId: string;
-  /** @minLength 1 */
-  mockInterviewId: string;
-  mockInterviewRoundDtos: MockInterviewRoundDto[];
-  startDate: string;
-  timeTakenInMinutes: number;
-}
-
 export type SeasonRole = (typeof SeasonRole)[keyof typeof SeasonRole];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
@@ -143,6 +113,16 @@ export const SeasonRole = {
   Mentor: 1,
   Coordinator: 2,
 } as const;
+
+export interface SeasonUserDto {
+  /** @minLength 1 */
+  discordId: string;
+  /** @minLength 1 */
+  name: string;
+  /** @minLength 1 */
+  profileImage: string;
+  role: SeasonRole;
+}
 
 export interface SeasonEntity {
   /** @nullable */
@@ -199,6 +179,18 @@ export interface MockInterviewRoundDto {
   leetcodeMockInterviewRound?: LeetcodeMockInterviewRoundDto;
   /** @nullable */
   mockInterviewRoundId?: string | null;
+}
+
+export interface UpdateMockInterviewRequest {
+  /** @nullable */
+  enrollmentId?: string | null;
+  /** @minLength 1 */
+  interviewerUserId: string;
+  /** @minLength 1 */
+  mockInterviewId: string;
+  mockInterviewRoundDtos: MockInterviewRoundDto[];
+  startDate: string;
+  timeTakenInMinutes: number;
 }
 
 export interface MockInterviewEntity {
@@ -440,6 +432,24 @@ export const HttpStatusCode = {
   NetworkAuthenticationRequired: 511,
 } as const;
 
+export interface UpdateProblemAttemptResponseApiResult {
+  error?: ApiError;
+  readonly isSuccess?: boolean;
+  responseBody?: UpdateProblemAttemptResponse;
+  statusCode?: HttpStatusCode;
+  /** @nullable */
+  successMessage?: string | null;
+}
+
+export interface UpdateMockInterviewResponseApiResult {
+  error?: ApiError;
+  readonly isSuccess?: boolean;
+  responseBody?: UpdateMockInterviewResponse;
+  statusCode?: HttpStatusCode;
+  /** @nullable */
+  successMessage?: string | null;
+}
+
 export interface GraduateDto {
   /** @minLength 1 */
   discordId: string;
@@ -457,6 +467,19 @@ export interface GetUserListResponseApiResult {
   error?: ApiError;
   readonly isSuccess?: boolean;
   responseBody?: GetUserListResponse;
+  statusCode?: HttpStatusCode;
+  /** @nullable */
+  successMessage?: string | null;
+}
+
+export interface GetSeasonUsersResponse {
+  seasonUsers: SeasonUserDto[];
+}
+
+export interface GetSeasonUsersResponseApiResult {
+  error?: ApiError;
+  readonly isSuccess?: boolean;
+  responseBody?: GetSeasonUsersResponse;
   statusCode?: HttpStatusCode;
   /** @nullable */
   successMessage?: string | null;
@@ -1665,6 +1688,110 @@ export function useGetUserList<
   request?: SecondParameter<typeof CustomAxiosInstance>;
 }): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
   const queryOptions = getGetUserListQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+export const getSeasonUsers = (
+  seasonSlug: string,
+  options?: SecondParameter<typeof CustomAxiosInstance>,
+  signal?: AbortSignal
+) => {
+  return CustomAxiosInstance<GetSeasonUsersResponseApiResult>(
+    { url: `http://localhost:4000/api/season-users/${seasonSlug}`, method: 'GET', signal },
+    options
+  );
+};
+
+export const getGetSeasonUsersQueryKey = (seasonSlug: string) => {
+  return [`http://localhost:4000/api/season-users/${seasonSlug}`] as const;
+};
+
+export const getGetSeasonUsersQueryOptions = <
+  TData = Awaited<ReturnType<typeof getSeasonUsers>>,
+  TError = GetSeasonUsersResponseApiResult,
+>(
+  seasonSlug: string,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getSeasonUsers>>, TError, TData>>;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetSeasonUsersQueryKey(seasonSlug);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getSeasonUsers>>> = ({ signal }) =>
+    getSeasonUsers(seasonSlug, requestOptions, signal);
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!seasonSlug,
+    staleTime: 8000,
+    ...queryOptions,
+  } as UseQueryOptions<Awaited<ReturnType<typeof getSeasonUsers>>, TError, TData> & {
+    queryKey: QueryKey;
+  };
+};
+
+export type GetSeasonUsersQueryResult = NonNullable<Awaited<ReturnType<typeof getSeasonUsers>>>;
+export type GetSeasonUsersQueryError = GetSeasonUsersResponseApiResult;
+
+export function useGetSeasonUsers<
+  TData = Awaited<ReturnType<typeof getSeasonUsers>>,
+  TError = GetSeasonUsersResponseApiResult,
+>(
+  seasonSlug: string,
+  options: {
+    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getSeasonUsers>>, TError, TData>> &
+      Pick<
+        DefinedInitialDataOptions<Awaited<ReturnType<typeof getSeasonUsers>>, TError, TData>,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): DefinedUseQueryResult<TData, TError> & { queryKey: QueryKey };
+export function useGetSeasonUsers<
+  TData = Awaited<ReturnType<typeof getSeasonUsers>>,
+  TError = GetSeasonUsersResponseApiResult,
+>(
+  seasonSlug: string,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getSeasonUsers>>, TError, TData>> &
+      Pick<
+        UndefinedInitialDataOptions<Awaited<ReturnType<typeof getSeasonUsers>>, TError, TData>,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): UseQueryResult<TData, TError> & { queryKey: QueryKey };
+export function useGetSeasonUsers<
+  TData = Awaited<ReturnType<typeof getSeasonUsers>>,
+  TError = GetSeasonUsersResponseApiResult,
+>(
+  seasonSlug: string,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getSeasonUsers>>, TError, TData>>;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+export function useGetSeasonUsers<
+  TData = Awaited<ReturnType<typeof getSeasonUsers>>,
+  TError = GetSeasonUsersResponseApiResult,
+>(
+  seasonSlug: string,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getSeasonUsers>>, TError, TData>>;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetSeasonUsersQueryOptions(seasonSlug, options);
 
   const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & { queryKey: QueryKey };
 
