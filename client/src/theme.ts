@@ -17,6 +17,11 @@ export const theme = createTheme({
           top: 'var(--mantine-spacing-md)',
           right: 'var(--mantine-spacing-md)',
         },
+        header: {
+          position: 'absolute',
+          width: '100%',
+          background: 'none',
+        },
       },
     },
   },

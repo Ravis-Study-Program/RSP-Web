@@ -7,7 +7,7 @@ import {
   MRT_Row,
   useMantineReactTable,
 } from 'mantine-react-table';
-import { ActionIcon, Anchor, Button, Flex, Text, Tooltip } from '@mantine/core';
+import { ActionIcon, Anchor, Button, Flex, Text, Title, Tooltip } from '@mantine/core';
 import { modals } from '@mantine/modals';
 import {
   SeasonEntity,
@@ -34,9 +34,13 @@ export const AdminSeasonsTable = () => {
 
   const openDeleteConfirmModal = (row: MRT_Row<SeasonEntity>) => {
     modals.openConfirmModal({
-      title: 'Delete Season',
       children: (
-        <Text>Are you sure you want to delete this season? This action cannot be undone.</Text>
+        <>
+          <Title order={3} mt={15} mb={10}>
+            Delete Season
+          </Title>
+          <Text>Are you sure you want to delete this season? This action cannot be undone.</Text>
+        </>
       ),
       labels: { confirm: 'Delete', cancel: 'Cancel' },
       confirmProps: { color: 'red' },

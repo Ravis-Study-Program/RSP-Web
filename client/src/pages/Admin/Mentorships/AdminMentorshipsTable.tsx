@@ -6,7 +6,7 @@ import {
   MRT_Row,
   useMantineReactTable,
 } from 'mantine-react-table';
-import { ActionIcon, Button, Flex, Text, Tooltip } from '@mantine/core';
+import { ActionIcon, Button, Flex, Text, Title, Tooltip } from '@mantine/core';
 import { modals } from '@mantine/modals';
 import {
   MentorshipResponse,
@@ -50,9 +50,15 @@ export const AdminMentorshipsTable = () => {
 
   const openDeleteConfirmModal = (row: MRT_Row<MentorshipResponse>) => {
     modals.openConfirmModal({
-      title: 'Delete Mentorship',
       children: (
-        <Text>Are you sure you want to delete this mentorship? This action cannot be undone.</Text>
+        <>
+          <Title order={3} mt={15} mb={10}>
+            Delete Mentorship
+          </Title>
+          <Text>
+            Are you sure you want to delete this mentorship? This action cannot be undone.
+          </Text>
+        </>
       ),
       labels: { confirm: 'Delete', cancel: 'Cancel' },
       confirmProps: { color: 'red' },

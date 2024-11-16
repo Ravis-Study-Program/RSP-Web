@@ -6,7 +6,7 @@ import {
   MRT_Row,
   useMantineReactTable,
 } from 'mantine-react-table';
-import { ActionIcon, Flex, Text, Tooltip } from '@mantine/core';
+import { ActionIcon, Flex, Text, Title, Tooltip } from '@mantine/core';
 import { modals } from '@mantine/modals';
 import {
   MenteeResponseDto,
@@ -29,11 +29,15 @@ export const MenteesTable = () => {
 
   const openKickMenteeConfirmModal = (row: MRT_Row<MenteeResponseDto>) => {
     modals.openConfirmModal({
-      title: 'Delete Mentee',
       children: (
-        <Text>
-          Are you sure you want to kick this mentee out of RSP? This action cannot be undone.
-        </Text>
+        <>
+          <Title order={3} mt={15} mb={10}>
+            Delete Mentee
+          </Title>
+          <Text>
+            Are you sure you want to kick this mentee out of RSP? This action cannot be undone.
+          </Text>
+        </>
       ),
       labels: { confirm: 'Kick Mentee', cancel: 'Cancel' },
       confirmProps: { color: 'red' },

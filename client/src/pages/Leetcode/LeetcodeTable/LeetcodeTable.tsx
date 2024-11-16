@@ -15,6 +15,7 @@ import {
   Flex,
   Pill,
   Text,
+  Title,
   Tooltip,
   useComputedColorScheme,
 } from '@mantine/core';
@@ -57,11 +58,15 @@ export const LeetcodeTable = ({
 
   const openDeleteConfirmModal = (row: MRT_Row<ProblemAttemptEntity>) => {
     modals.openConfirmModal({
-      title: 'Delete Problem Attempt',
       children: (
-        <Text>
-          Are you sure you want to delete this problem attempt? This action cannot be undone.
-        </Text>
+        <>
+          <Title order={3} mt={15} mb={10}>
+            Delete Problem Attempt
+          </Title>
+          <Text>
+            Are you sure you want to delete this problem attempt? This action cannot be undone.
+          </Text>
+        </>
       ),
       labels: { confirm: 'Delete', cancel: 'Cancel' },
       confirmProps: { color: 'red' },

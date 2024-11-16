@@ -4,6 +4,7 @@ import { MRT_TableInstance } from 'mantine-react-table';
 import { z } from 'zod';
 import { Button, Checkbox, Flex, Stack, TextInput, Title } from '@mantine/core';
 import { useForm } from '@mantine/form';
+import { notifications } from '@mantine/notifications';
 import {
   AdminCreateUserRequest,
   AdminCreateUserResponseApiResult,
@@ -48,15 +49,27 @@ export const AdminUsersCreateModal = ({
       await createUser({ data: requestData });
       await refetchUsers();
       table.setCreatingRow(null);
-    } catch (err: unknown) {
-      // eslint-disable-next-line no-console
-      console.log(err);
+      notifications.show({
+        color: 'green',
+        title: 'Success',
+        message: 'User created successfully.',
+      });
+    } catch (err) {
+      const response = (err as any)?.response.data as AdminCreateUserResponseApiResult;
+      notifications.show({
+        color: 'red',
+        title: 'Error',
+        autoClose: false,
+        message: response.error?.message,
+      });
     }
   };
 
   return (
     <Stack>
-      <Title order={3}>Create User</Title>
+      <Title order={3} mt={15}>
+        Create User
+      </Title>
       <form onSubmit={form.onSubmit(handleSubmit)}>
         <TextInput
           {...form.getInputProps('name')}

@@ -8,7 +8,7 @@ import {
   MRT_Row,
   useMantineReactTable,
 } from 'mantine-react-table';
-import { ActionIcon, Anchor, Box, Button, Flex, Table, Text, Tooltip } from '@mantine/core';
+import { ActionIcon, Anchor, Box, Button, Flex, Table, Text, Title, Tooltip } from '@mantine/core';
 import { modals } from '@mantine/modals';
 import {
   GetMockInterviewsResponseApiResult,
@@ -53,11 +53,16 @@ export const MockInterviewTable = ({
 
   const openDeleteConfirmModal = (row: MRT_Row<MockInterviewEntity>) => {
     modals.openConfirmModal({
-      title: 'Delete Problem Attempt',
       children: (
-        <Text>
-          Are you sure you want to delete this mock interview? This action cannot be undone.
-        </Text>
+        <>
+          <Title order={3} mt={15} mb={10}>
+            Delete Mock Interview
+          </Title>
+          <Text>
+            Are you sure you want to kick this mock interview out of RSP? This action cannot be
+            undone.
+          </Text>
+        </>
       ),
       labels: { confirm: 'Delete', cancel: 'Cancel' },
       confirmProps: { color: 'red' },

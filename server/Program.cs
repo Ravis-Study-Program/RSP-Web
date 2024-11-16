@@ -14,6 +14,7 @@ using RSPWebAPI.Shared.Behaviours;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
 {
   var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
   var assembly = typeof(Program).Assembly;
@@ -109,6 +110,7 @@ var builder = WebApplication.CreateBuilder(args);
 }
 
 var app = builder.Build();
+
 
 {
   app.UseCors("CorsPolicy");
