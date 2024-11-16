@@ -1,0 +1,73 @@
+name: Pull Request CI
+
+on:
+  # Trigger on pull requests targeting main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-test:
+    name: Build and Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Cache Node.js modules
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
+      - name: Install client dependencies
+        run: |
+          cd client
+          yarn install
+
+      - name: Format and test client
+        run: |
+          cd client
+          yarn run format-and-test
+
+      - name: Cache .NET packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-dotnet-${{ hashFiles('**/*.csproj') }}
+          restore-keys: |
+            ${{ runner.os }}-dotnet-
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 8.0
+
+      - name: Run C# formatter
+        run: dotnet csharpier .
+
+      - name: Restore and build server-test
+        run: |
+          cd server-test
+          dotnet restore --force --no-cache
+          dotnet build
+
+      - name: Run server tests
+        run: |
+          cd server-test
+          dotnet test --no-restore --no-build
+
+      - name: Check for unstaged changes
+        run: |
+          if ! git diff --exit-code; then
+            echo "There are unstaged changes. Please stage them before committing."
+            exit 1
+          fi
