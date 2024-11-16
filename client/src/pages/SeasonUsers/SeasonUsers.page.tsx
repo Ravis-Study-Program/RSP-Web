@@ -5,6 +5,7 @@ import {
   Anchor,
   Avatar,
   Badge,
+  Button,
   Card,
   Grid,
   Group,
@@ -30,7 +31,7 @@ export default function SeasonUsersPage() {
     <Layout>
       <Grid gutter={{ base: 'md', xs: 'md', md: 'xl', xl: 50 }}>
         {!isLoadingSeasonUsers && !isFetchingSeasonUsers && !isLoadingSeasonUsersError ? (
-          <SeasonUserCards seasonUsers={seasonUsersResponse?.responseBody?.seasonUsers} />
+          <SeasonUserCards seasonUsers={seasonUsersResponse?.responseBody?.seasonUsers} seasonSlug={seasonSlug} />
         ) : (
           <SeasonUserSkeletonCards />
         )}
@@ -63,9 +64,10 @@ const SeasonUserSkeletonCards = () => {
 
 type SeasonUserCardsProps = {
   seasonUsers: SeasonUserDto[] | undefined
+  seasonSlug: string
 }
 
-export function SeasonUserCards({ seasonUsers }: SeasonUserCardsProps) {
+export function SeasonUserCards({ seasonUsers, seasonSlug }: SeasonUserCardsProps) {
   return (
     <>
       {
@@ -77,6 +79,10 @@ export function SeasonUserCards({ seasonUsers }: SeasonUserCardsProps) {
               {seasonUser.name}
             </Text>
             <Badge mt={10} autoContrast color="yellow.5">{SeasonRoleReverseIndex[seasonUser.role]}</Badge>
+
+            <Button component="a" href={`/seasons/${seasonSlug}/profile?email=${seasonUser.email}`} radius="md" mt="sm" size="sm" variant="primary">
+              View Profile
+            </Button>
 
             <Group gap={0} mt="md">
                 <Anchor c="gray" target='_blank' href='https://www.discord.com'>

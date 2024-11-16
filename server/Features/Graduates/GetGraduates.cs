@@ -45,7 +45,8 @@ public static class GetGraduates
                               {
                                 Name = u.Name,
                                 DiscordId = u.DiscordId,
-                                ProfileImage = u.ProfileImage
+                                ProfileImage = u.ProfileImage,
+                                Email = u.Email
                               })
                               .AsNoTracking()
                               .ToListAsync(cancellationToken);
@@ -100,6 +101,7 @@ public record GraduateDto
 {
   [Required] public string DiscordId { get; set; } = string.Empty;
   [Required] public string Name { get; set; } = string.Empty;
+  [Required] public string Email { get; set; } = string.Empty;
   [Required] public string ProfileImage { get; set; } = string.Empty;
 }
 

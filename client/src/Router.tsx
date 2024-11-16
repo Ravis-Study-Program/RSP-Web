@@ -50,6 +50,7 @@ const routes = (
         <Route path="leetcode" element={<LeetcodePage />} />
         <Route path="mock-interviews" element={<MockInterviewPage />} />
         <Route path="resources" element={<ResourcesPage />} />
+        <Route path="profile" element={<ProfilePage />} />
       </Route>
 
       <Route path="*" element={<NotFoundPage />} />

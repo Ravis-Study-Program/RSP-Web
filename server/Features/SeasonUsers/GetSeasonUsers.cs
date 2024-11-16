@@ -53,7 +53,8 @@ public static class GetSeasonUsers
                                 Name = e.User.Name,
                                 Role = e.Role,
                                 DiscordId = e.User.DiscordId,
-                                ProfileImage = e.User.ProfileImage
+                                ProfileImage = e.User.ProfileImage,
+                                Email = e.User.Email
                               })
                               .AsNoTracking()
                               .ToListAsync(cancellationToken);
@@ -111,6 +112,7 @@ public record SeasonUserDto
 {
   [Required] public string DiscordId { get; set; } = string.Empty;
   [Required] public string Name { get; set; } = string.Empty;
+  [Required] public string Email { get; set; } = string.Empty;
   [Required] public SeasonRole Role { get; set; }
   [Required] public string ProfileImage { get; set; } = string.Empty;
 }

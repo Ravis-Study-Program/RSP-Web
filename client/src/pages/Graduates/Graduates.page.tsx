@@ -4,6 +4,7 @@ import {
   ActionIcon,
   Anchor,
   Avatar,
+  Button,
   Card,
   Grid,
   Group,
@@ -72,6 +73,10 @@ export function GraduateCards({ graduates }: GraduateCardsProps) {
             <Text ta="center" fz="lg" fw={600} mt="md">
               {graduate.name}
             </Text>
+
+            <Button component="a" href={`/profile?email=${graduate.email}`} radius="md" mt="sm" size="sm" variant="primary">
+              View Profile
+            </Button>
 
             <Group gap={0} mt="md">
                 <Anchor c="gray" target='_blank' href='https://www.discord.com'>

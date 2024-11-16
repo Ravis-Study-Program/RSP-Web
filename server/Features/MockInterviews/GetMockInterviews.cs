@@ -128,15 +128,15 @@ public class GetMockInterviewsEndpoint : ICarterModule
   {
     app.MapGet(
          "api/mock-interviews",
-         async (string? enrollmentId, bool includeLeetcode, bool includeCustom, bool includeBehavioural, ISender sender,
+         async (string? enrollmentId, string? email, bool includeLeetcode, bool includeCustom, bool includeBehavioural, ISender sender,
            HttpContext httpContext) =>
          {
-           var email = httpContext?.User?.Identity?.Name ?? "";
+           var currentUserEmail = httpContext?.User?.Identity?.Name ?? "";
 
            var command = new GetMockInterviews.Command
            {
              EnrollmentId = enrollmentId,
-             Email = email,
+             Email = email ?? currentUserEmail,
              IncludeLeetcode = includeLeetcode,
              IncludeCustom = includeCustom,
              IncludeBehavioural = includeBehavioural

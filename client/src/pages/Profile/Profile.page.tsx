@@ -8,10 +8,14 @@ import { useMemo, useState } from 'react';
 import { LeetcodeTable } from '../Leetcode/LeetcodeTable/LeetcodeTable';
 import { MockInterviewTable } from '../MockInterviews/MockInterviewTable/MockInterviewTable';
 import classes from './Profile.module.css';
+import { useSearchParams } from 'react-router-dom';
 
 export default function ProfilePage() {
+  const [searchParams] = useSearchParams();
+  const email = searchParams.get('email');
+
   const { seasonSlug } = useSeasonSlug();
-  const { enrollmentId, user, role } = useUserAndEnrollment(seasonSlug);
+  const { enrollmentId, user, role } = useUserAndEnrollment(seasonSlug, email);
   const [section, setSection] = useState<'Leetcode' | 'Mock Interviews'>('Leetcode');
 
   const { data: problemAttemptsResponse, refetch: refetchProblemAttempts } = useGetProblemAttempts({
