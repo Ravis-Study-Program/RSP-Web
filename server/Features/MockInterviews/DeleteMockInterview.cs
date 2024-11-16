@@ -42,15 +42,14 @@ public static class DeleteMockInterview
     )
     {
       var existingMockInterview = await _dbContext
-                                        .MockInterviews
-                                        .Where(u => u.MockInterviewId == request.MockInterviewId)
-                                        .FirstOrDefaultAsync(cancellationToken);
+        .MockInterviews.Where(u => u.MockInterviewId == request.MockInterviewId)
+        .FirstOrDefaultAsync(cancellationToken);
       if (existingMockInterview == null)
       {
         return new ApiResult<DeleteMockInterviewResponse>
         {
           StatusCode = HttpStatusCode.BadRequest,
-          Error = new ApiError(Message.MockInterviewDoesNotExists)
+          Error = new ApiError(Message.MockInterviewDoesNotExists),
         };
       }
 
@@ -62,7 +61,7 @@ public static class DeleteMockInterview
         return new ApiResult<DeleteMockInterviewResponse>
         {
           StatusCode = HttpStatusCode.OK,
-          SuccessMessage = Message.MockInterviewDeletedSuccessfully
+          SuccessMessage = Message.MockInterviewDeletedSuccessfully,
         };
       }
       catch (Exception ex)
@@ -72,7 +71,7 @@ public static class DeleteMockInterview
         return new ApiResult<DeleteMockInterviewResponse>
         {
           StatusCode = HttpStatusCode.InternalServerError,
-          Error = new ApiError(Message.MockInterviewDeletionUnexpectedError)
+          Error = new ApiError(Message.MockInterviewDeletionUnexpectedError),
         };
       }
     }
@@ -84,22 +83,17 @@ public class DeleteMockInterviewEndpoint : ICarterModule
   public void AddRoutes(IEndpointRouteBuilder app)
   {
     app.MapDelete(
-         "api/mock-interviews",
-         async (string mockInterviewId, ISender sender) =>
-         {
-           var command = new DeleteMockInterview.Command
-           {
-             MockInterviewId = mockInterviewId
-           };
-           var response = await sender.Send(command);
+        "api/mock-interviews",
+        async (string mockInterviewId, ISender sender) =>
+        {
+          var command = new DeleteMockInterview.Command { MockInterviewId = mockInterviewId };
+          var response = await sender.Send(command);
 
-           return ApiResultHelper.FormatResponse(response);
-         }
-       )
-       .WithName("DeleteMockInterview");
+          return ApiResultHelper.FormatResponse(response);
+        }
+      )
+      .WithName("DeleteMockInterview");
   }
 }
 
-public class DeleteMockInterviewResponse
-{
-}
+public class DeleteMockInterviewResponse { }

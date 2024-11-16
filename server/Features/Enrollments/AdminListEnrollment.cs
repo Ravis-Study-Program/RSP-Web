@@ -13,9 +13,7 @@ namespace RSPWebAPI.Features.Enrollments;
 
 public static class AdminListEnrollment
 {
-  public class Command : AdminAuthRequest<ApiResult<AdminListEnrollmentResponse>>
-  {
-  }
+  public class Command : AdminAuthRequest<ApiResult<AdminListEnrollmentResponse>> { }
 
   public class Handler : IRequestHandler<Command, ApiResult<AdminListEnrollmentResponse>>
   {
@@ -35,27 +33,24 @@ public static class AdminListEnrollment
     {
       try
       {
-        var enrollments = await _dbContext.Enrollments
-                                          .Select(e => new EnrollmentResponse
-                                          {
-                                            EnrollmentId = e.EnrollmentId,
-                                            Role = e.Role,
-                                            SeasonId = e.Season.SeasonId,
-                                            SeasonName = e.Season.Name,
-                                            UserId = e.User.UserId,
-                                            UserName = e.User.Name
-                                          })
-                                          .AsNoTracking()
-                                          .ToListAsync(cancellationToken);
+        var enrollments = await _dbContext
+          .Enrollments.Select(e => new EnrollmentResponse
+          {
+            EnrollmentId = e.EnrollmentId,
+            Role = e.Role,
+            SeasonId = e.Season.SeasonId,
+            SeasonName = e.Season.Name,
+            UserId = e.User.UserId,
+            UserName = e.User.Name,
+          })
+          .AsNoTracking()
+          .ToListAsync(cancellationToken);
 
         return new ApiResult<AdminListEnrollmentResponse>
         {
           StatusCode = HttpStatusCode.OK,
           SuccessMessage = Message.EnrollmentListSuccessfully,
-          ResponseBody = new AdminListEnrollmentResponse
-          {
-            Enrollments = enrollments
-          }
+          ResponseBody = new AdminListEnrollmentResponse { Enrollments = enrollments },
         };
       }
       catch (Exception ex)
@@ -65,7 +60,7 @@ public static class AdminListEnrollment
         return new ApiResult<AdminListEnrollmentResponse>
         {
           StatusCode = HttpStatusCode.InternalServerError,
-          Error = new ApiError(Message.EnrollmentListUnexpectedError)
+          Error = new ApiError(Message.EnrollmentListUnexpectedError),
         };
       }
     }
@@ -77,30 +72,42 @@ public class AdminListEnrollmentEndpoint : ICarterModule
   public void AddRoutes(IEndpointRouteBuilder app)
   {
     app.MapGet(
-         "api/admin/enrollments",
-         async (ISender sender) =>
-         {
-           var command = new AdminListEnrollment.Command();
-           var response = await sender.Send(command);
+        "api/admin/enrollments",
+        async (ISender sender) =>
+        {
+          var command = new AdminListEnrollment.Command();
+          var response = await sender.Send(command);
 
-           return ApiResultHelper.FormatResponse(response);
-         }
-       )
-       .WithName("AdminListEnrollment");
+          return ApiResultHelper.FormatResponse(response);
+        }
+      )
+      .WithName("AdminListEnrollment");
   }
 }
 
 public class EnrollmentResponse
 {
-  [Required] public string EnrollmentId { get; set; } = string.Empty;
-  [Required] public SeasonRole Role { get; set; }
-  [Required] public string SeasonId { get; set; } = string.Empty;
-  [Required] public string SeasonName { get; set; } = string.Empty;
-  [Required] public string UserId { get; set; } = string.Empty;
-  [Required] public string UserName { get; set; } = string.Empty;
+  [Required]
+  public string EnrollmentId { get; set; } = string.Empty;
+
+  [Required]
+  public SeasonRole Role { get; set; }
+
+  [Required]
+  public string SeasonId { get; set; } = string.Empty;
+
+  [Required]
+  public string SeasonName { get; set; } = string.Empty;
+
+  [Required]
+  public string UserId { get; set; } = string.Empty;
+
+  [Required]
+  public string UserName { get; set; } = string.Empty;
 }
 
 public class AdminListEnrollmentResponse
 {
-  [Required] public ICollection<EnrollmentResponse> Enrollments { get; set; } = new List<EnrollmentResponse>();
+  [Required]
+  public ICollection<EnrollmentResponse> Enrollments { get; set; } = new List<EnrollmentResponse>();
 }

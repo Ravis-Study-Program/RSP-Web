@@ -48,32 +48,33 @@ public static class KickStudent
     )
     {
       // Ensure that the current user is enrolled in the season and is a mentor or coordinator
-      var existingEnrollment = await _dbContext
-                                     .Enrollments.FirstOrDefaultAsync(
-                                       e => e.Season.Slug == request.SeasonSlug &&
-                                            e.User.Email == request.Email &&
-                                            (e.Role == SeasonRole.Mentor || e.Role == SeasonRole.Coordinator),
-                                       cancellationToken);
+      var existingEnrollment = await _dbContext.Enrollments.FirstOrDefaultAsync(
+        e =>
+          e.Season.Slug == request.SeasonSlug
+          && e.User.Email == request.Email
+          && (e.Role == SeasonRole.Mentor || e.Role == SeasonRole.Coordinator),
+        cancellationToken
+      );
       if (existingEnrollment == null)
       {
         return new ApiResult<KickStudentResponse>
         {
           StatusCode = HttpStatusCode.BadRequest,
-          Error = new ApiError(Message.KickStudentCurrentUserEnrollmentDoesNotExists)
+          Error = new ApiError(Message.KickStudentCurrentUserEnrollmentDoesNotExists),
         };
       }
 
       // Ensure the student we want to kick is an actual student
-      var studentEnrollment = await _dbContext
-                                    .Enrollments.FirstOrDefaultAsync(
-                                      e => e.EnrollmentId == request.MenteeEnrollmentId &&
-                                           e.Role == SeasonRole.Student, cancellationToken);
+      var studentEnrollment = await _dbContext.Enrollments.FirstOrDefaultAsync(
+        e => e.EnrollmentId == request.MenteeEnrollmentId && e.Role == SeasonRole.Student,
+        cancellationToken
+      );
       if (studentEnrollment == null)
       {
         return new ApiResult<KickStudentResponse>
         {
           StatusCode = HttpStatusCode.BadRequest,
-          Error = new ApiError(Message.KickStudentMenteeDoesntExist)
+          Error = new ApiError(Message.KickStudentMenteeDoesntExist),
         };
       }
 
@@ -85,7 +86,7 @@ public static class KickStudent
         return new ApiResult<KickStudentResponse>
         {
           StatusCode = HttpStatusCode.OK,
-          SuccessMessage = Message.KickStudentSuccessfully
+          SuccessMessage = Message.KickStudentSuccessfully,
         };
       }
       catch (Exception ex)
@@ -95,7 +96,7 @@ public static class KickStudent
         return new ApiResult<KickStudentResponse>
         {
           StatusCode = HttpStatusCode.InternalServerError,
-          Error = new ApiError(Message.KickStudentUnexpectedError)
+          Error = new ApiError(Message.KickStudentUnexpectedError),
         };
       }
     }
@@ -107,32 +108,33 @@ public class KickStudentEndpoint : ICarterModule
   public void AddRoutes(IEndpointRouteBuilder app)
   {
     app.MapPost(
-         "enrollments/kick-student",
-         async (KickStudentRequest request, ISender sender, HttpContext httpContext) =>
-         {
-           var email = httpContext?.User?.Identity?.Name ?? "";
+        "enrollments/kick-student",
+        async (KickStudentRequest request, ISender sender, HttpContext httpContext) =>
+        {
+          var email = httpContext?.User?.Identity?.Name ?? "";
 
-           var command = new KickStudent.Command
-           {
-             MenteeEnrollmentId = request.MenteeEnrollmentId,
-             SeasonSlug = request.SeasonSlug,
-             Email = email
-           };
-           var response = await sender.Send(command);
+          var command = new KickStudent.Command
+          {
+            MenteeEnrollmentId = request.MenteeEnrollmentId,
+            SeasonSlug = request.SeasonSlug,
+            Email = email,
+          };
+          var response = await sender.Send(command);
 
-           return ApiResultHelper.FormatResponse(response);
-         }
-       )
-       .WithName("KickStudent");
+          return ApiResultHelper.FormatResponse(response);
+        }
+      )
+      .WithName("KickStudent");
   }
 }
 
 public class KickStudentRequest
 {
-  [Required] public string MenteeEnrollmentId { get; set; } = string.Empty;
-  [Required] public string SeasonSlug { get; set; } = string.Empty;
+  [Required]
+  public string MenteeEnrollmentId { get; set; } = string.Empty;
+
+  [Required]
+  public string SeasonSlug { get; set; } = string.Empty;
 }
 
-public class KickStudentResponse
-{
-}
+public class KickStudentResponse { }

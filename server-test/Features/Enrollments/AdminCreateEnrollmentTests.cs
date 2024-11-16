@@ -22,11 +22,7 @@ public class AdminCreateEnrollmentTests : TestsHelper
 
   private AdminCreateEnrollment.Command CreateDummyCommand()
   {
-    return new AdminCreateEnrollment.Command
-    {
-      SeasonId = DummyId1,
-      UserId = DummyId1
-    };
+    return new AdminCreateEnrollment.Command { SeasonId = DummyId1, UserId = DummyId1 };
   }
 
   [Fact]
@@ -36,14 +32,17 @@ public class AdminCreateEnrollmentTests : TestsHelper
     {
       EnrollmentId = DummyId1,
       SeasonId = DummyId1,
-      UserId = DummyId1
+      UserId = DummyId1,
     };
-    _dbContextMock.Setup(x => x.Enrollments)
-                  .ReturnsDbSet(new List<EnrollmentEntity> { existingEnrollment });
+    _dbContextMock
+      .Setup(x => x.Enrollments)
+      .ReturnsDbSet(new List<EnrollmentEntity> { existingEnrollment });
 
     var command = CreateDummyCommand();
-    var handler =
-      new AdminCreateEnrollment.Handler(_dbContextMock.Object, Mock.Of<ILogger<AdminCreateEnrollment.Handler>>());
+    var handler = new AdminCreateEnrollment.Handler(
+      _dbContextMock.Object,
+      Mock.Of<ILogger<AdminCreateEnrollment.Handler>>()
+    );
 
     var result = await handler.Handle(command, CancellationToken.None);
     Assert.Equal(HttpStatusCode.BadRequest, result.StatusCode);
@@ -53,12 +52,13 @@ public class AdminCreateEnrollmentTests : TestsHelper
   [Fact]
   public async Task Handle_Success_OK()
   {
-    _dbContextMock.Setup(x => x.Enrollments)
-                  .ReturnsDbSet(new List<EnrollmentEntity>());
+    _dbContextMock.Setup(x => x.Enrollments).ReturnsDbSet(new List<EnrollmentEntity>());
 
     var command = CreateDummyCommand();
-    var handler =
-      new AdminCreateEnrollment.Handler(_dbContextMock.Object, Mock.Of<ILogger<AdminCreateEnrollment.Handler>>());
+    var handler = new AdminCreateEnrollment.Handler(
+      _dbContextMock.Object,
+      Mock.Of<ILogger<AdminCreateEnrollment.Handler>>()
+    );
 
     var result = await handler.Handle(command, CancellationToken.None);
     Assert.Equal(HttpStatusCode.OK, result.StatusCode);

@@ -28,7 +28,7 @@ export function Layout({ children }: LayoutProps) {
   const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
   const { seasonSlug, pathSegments } = useSeasonSlug();
   const { user, isAdmin, role, isLoading } = useUserAndEnrollment(seasonSlug);
-  const tabs = getTabs(seasonSlug, isAdmin, role);  
+  const tabs = getTabs(seasonSlug, isAdmin, role);
 
   const getBreadcrumbLinks = () => {
     if (isLoading) {
@@ -91,12 +91,7 @@ export function Layout({ children }: LayoutProps) {
             </Title>
           </Anchor>
         </Group>
-        <Navbar
-          isLoading={isLoading}
-          user={user}
-          tabs={tabs}
-          isSeasonUrl={seasonSlug !== ''}
-        />
+        <Navbar isLoading={isLoading} user={user} tabs={tabs} isSeasonUrl={seasonSlug !== ''} />
       </AppShell.Navbar>
       <AppShell.Main className={classes.main}>{children}</AppShell.Main>
     </AppShell>

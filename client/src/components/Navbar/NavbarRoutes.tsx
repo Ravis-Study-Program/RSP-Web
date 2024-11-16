@@ -176,12 +176,15 @@ const getAdminTabs = (seasonSlug: string | null): Tabs => ({
 
 export const getTabs = (seasonSlug: string | null, isAdmin: boolean, role: SeasonRole | null) => {
   let tabs: Tabs = noSeasonSelectedTabs;
-  
-  if (isAdmin) {    
-    tabs = (seasonSlug === null || seasonSlug === '') ? adminNoSeasonSelectedTabs : getAdminTabs(seasonSlug);    
+
+  if (isAdmin) {
+    tabs =
+      seasonSlug === null || seasonSlug === ''
+        ? adminNoSeasonSelectedTabs
+        : getAdminTabs(seasonSlug);
     return tabs;
-  } 
-  
+  }
+
   if (role == null) {
     return tabs;
   }

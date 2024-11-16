@@ -46,27 +46,23 @@ public static class GetSeasonUsers
       try
       {
         var seasonUsers = await _dbContext
-                              .Enrollments
-                              .Where(e => e.Season.Slug == request.SeasonSlug)
-                              .Select(e => new SeasonUserDto
-                              {
-                                Name = e.User.Name,
-                                Role = e.Role,
-                                DiscordId = e.User.DiscordId,
-                                ProfileImage = e.User.ProfileImage,
-                                Email = e.User.Email
-                              })
-                              .AsNoTracking()
-                              .ToListAsync(cancellationToken);
+          .Enrollments.Where(e => e.Season.Slug == request.SeasonSlug)
+          .Select(e => new SeasonUserDto
+          {
+            Name = e.User.Name,
+            Role = e.Role,
+            DiscordId = e.User.DiscordId,
+            ProfileImage = e.User.ProfileImage,
+            Email = e.User.Email,
+          })
+          .AsNoTracking()
+          .ToListAsync(cancellationToken);
 
         return new ApiResult<GetSeasonUsersResponse>
         {
           StatusCode = HttpStatusCode.OK,
-          ResponseBody = new GetSeasonUsersResponse
-          {
-            SeasonUsers = seasonUsers
-          },
-          SuccessMessage = Message.SeasonUsersListSuccessfully
+          ResponseBody = new GetSeasonUsersResponse { SeasonUsers = seasonUsers },
+          SuccessMessage = Message.SeasonUsersListSuccessfully,
         };
       }
       catch (Exception ex)
@@ -76,7 +72,7 @@ public static class GetSeasonUsers
         return new ApiResult<GetSeasonUsersResponse>
         {
           StatusCode = HttpStatusCode.InternalServerError,
-          Error = new ApiError(Message.SeasonUsersListUnexpectedError)
+          Error = new ApiError(Message.SeasonUsersListUnexpectedError),
         };
       }
     }
@@ -88,36 +84,41 @@ public class GetSeasonUsersEndpoint : ICarterModule
   public void AddRoutes(IEndpointRouteBuilder app)
   {
     app.MapGet(
-         "api/season-users/{seasonSlug}",
-         async (string seasonSlug, ISender sender, HttpContext httpContext) =>
-         {
-           var command = new GetSeasonUsers.Command
-           {
-             SeasonSlug = seasonSlug
-           };
-           var response = await sender.Send(command);
+        "api/season-users/{seasonSlug}",
+        async (string seasonSlug, ISender sender, HttpContext httpContext) =>
+        {
+          var command = new GetSeasonUsers.Command { SeasonSlug = seasonSlug };
+          var response = await sender.Send(command);
 
-           return ApiResultHelper.FormatResponse(response);
-         }
-       )
-       .WithName("GetSeasonUsers");
+          return ApiResultHelper.FormatResponse(response);
+        }
+      )
+      .WithName("GetSeasonUsers");
   }
 }
 
-public record GetSeasonUsersRequest
-{
-}
+public record GetSeasonUsersRequest { }
 
 public record SeasonUserDto
 {
-  [Required] public string DiscordId { get; set; } = string.Empty;
-  [Required] public string Name { get; set; } = string.Empty;
-  [Required] public string Email { get; set; } = string.Empty;
-  [Required] public SeasonRole Role { get; set; }
-  [Required] public string ProfileImage { get; set; } = string.Empty;
+  [Required]
+  public string DiscordId { get; set; } = string.Empty;
+
+  [Required]
+  public string Name { get; set; } = string.Empty;
+
+  [Required]
+  public string Email { get; set; } = string.Empty;
+
+  [Required]
+  public SeasonRole Role { get; set; }
+
+  [Required]
+  public string ProfileImage { get; set; } = string.Empty;
 }
 
 public class GetSeasonUsersResponse
 {
-  [Required] public IList<SeasonUserDto> SeasonUsers { get; set; } = new List<SeasonUserDto>();
+  [Required]
+  public IList<SeasonUserDto> SeasonUsers { get; set; } = new List<SeasonUserDto>();
 }

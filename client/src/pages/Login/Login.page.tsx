@@ -1,12 +1,17 @@
-import { CreateUserIfNotExistsRequest, useCreateUserIfNotExists } from '@/generated/api/client';
-import { useAuth0 } from '@auth0/auth0-react';
-import { Button, Container, Text, Title } from '@mantine/core';
 import { useEffect, useMemo, useState } from 'react';
+import { useAuth0 } from '@auth0/auth0-react';
 import { Navigate } from 'react-router-dom';
+import { Button, Container, Text, Title } from '@mantine/core';
+import { CreateUserIfNotExistsRequest, useCreateUserIfNotExists } from '@/generated/api/client';
 import classes from './Login.module.css';
 
 export default function LoginPage() {
-  const { loginWithRedirect, isLoading: isAuth0Loading, isAuthenticated: isAuth0Authenticated, user: Auth0User } = useAuth0();
+  const {
+    loginWithRedirect,
+    isLoading: isAuth0Loading,
+    isAuthenticated: isAuth0Authenticated,
+    user: Auth0User,
+  } = useAuth0();
   const [isUserCreated, setIsUserCreated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const { mutateAsync: createUser } = useCreateUserIfNotExists();

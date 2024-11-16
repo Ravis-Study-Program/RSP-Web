@@ -1,13 +1,13 @@
+import dayjs from 'dayjs';
+import { useMemo } from 'react';
+import { IconEdit, IconTrash } from '@tabler/icons-react';
+import { QueryObserverResult, RefetchOptions } from '@tanstack/react-query';
 import {
-  GetProblemAttemptsResponseApiResult,
-  LeetcodeProblemDifficulty,
-  ProblemAttemptEntity,
-  useCreateProblemAttempt,
-  useDeleteProblemAttempt,
-  useGetLeetcodeProblems,
-  useUpdateProblemAttempt,
-} from '@/generated/api/client';
-import { LeetcodeProblemDifficultyReverseIndex } from '@/shared/entities/reverseIndex';
+  MantineReactTable,
+  MRT_ColumnDef,
+  MRT_Row,
+  useMantineReactTable,
+} from 'mantine-react-table';
 import {
   ActionIcon,
   Anchor,
@@ -19,16 +19,16 @@ import {
   useComputedColorScheme,
 } from '@mantine/core';
 import { modals } from '@mantine/modals';
-import { IconEdit, IconTrash } from '@tabler/icons-react';
-import { QueryObserverResult, RefetchOptions } from '@tanstack/react-query';
-import dayjs from 'dayjs';
 import {
-  MantineReactTable,
-  MRT_ColumnDef,
-  MRT_Row,
-  useMantineReactTable,
-} from 'mantine-react-table';
-import { useMemo } from 'react';
+  GetProblemAttemptsResponseApiResult,
+  LeetcodeProblemDifficulty,
+  ProblemAttemptEntity,
+  useCreateProblemAttempt,
+  useDeleteProblemAttempt,
+  useGetLeetcodeProblems,
+  useUpdateProblemAttempt,
+} from '@/generated/api/client';
+import { LeetcodeProblemDifficultyReverseIndex } from '@/shared/entities/reverseIndex';
 import { LeetcodeProblemAttemptCreateModal } from './LeetcodeProblemAttemptCreateModal';
 import { LeetcodeProblemAttemptUpdateModal } from './LeetcodeProblemAttemptUpdateModal';
 import classes from './LeetcodeTable.module.css';
@@ -37,7 +37,7 @@ export const LeetcodeTable = ({
   refetchProblemAttempts,
   enrollmentId,
   problemAttempts,
-  enableEditing
+  enableEditing,
 }: LeetcodeTableProps) => {
   const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
 
@@ -73,12 +73,13 @@ export const LeetcodeTable = ({
     });
   };
 
-  const enrollmentColumn: MRT_ColumnDef<ProblemAttemptEntity> | null = (enrollmentId === null || enrollmentId === '') ? 
-  {
-    header: 'Season',
-    accessorFn: (row) => row.enrollment?.season?.slug || 'No Season',
-  }
-  : null;
+  const enrollmentColumn: MRT_ColumnDef<ProblemAttemptEntity> | null =
+    enrollmentId === null || enrollmentId === ''
+      ? {
+          header: 'Season',
+          accessorFn: (row) => row.enrollment?.season?.slug || 'No Season',
+        }
+      : null;
 
   const columns = useMemo<MRT_ColumnDef<ProblemAttemptEntity>[]>(
     () => [

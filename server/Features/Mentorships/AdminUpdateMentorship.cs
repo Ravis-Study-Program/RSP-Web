@@ -47,40 +47,40 @@ public static class AdminUpdateMentorship
       CancellationToken cancellationToken
     )
     {
-      var existingMentorship = await _dbContext
-                                     .Mentorships
-                                     .FirstOrDefaultAsync(u => u.MentorshipId == request.MentorshipId,
-                                                          cancellationToken);
+      var existingMentorship = await _dbContext.Mentorships.FirstOrDefaultAsync(
+        u => u.MentorshipId == request.MentorshipId,
+        cancellationToken
+      );
       if (existingMentorship == null)
       {
         return new ApiResult<AdminUpdateMentorshipResponse>
         {
           StatusCode = HttpStatusCode.BadRequest,
-          Error = new ApiError(Message.MentorshipDoesNotExists)
+          Error = new ApiError(Message.MentorshipDoesNotExists),
         };
       }
 
       // Reject if any of the newly provided mentor or mentee doesn't exist
       var mentorSeasonId = await _dbContext
-                                 .Enrollments
-                                 .Where(e => e.EnrollmentId == request.MentorEnrollmentId &&
-                                             e.Role == SeasonRole.Mentor)
-                                 .Select(e => e.Season.SeasonId)
-                                 .FirstOrDefaultAsync(cancellationToken);
+        .Enrollments.Where(e =>
+          e.EnrollmentId == request.MentorEnrollmentId && e.Role == SeasonRole.Mentor
+        )
+        .Select(e => e.Season.SeasonId)
+        .FirstOrDefaultAsync(cancellationToken);
 
       var menteeSeasonId = await _dbContext
-                                 .Enrollments
-                                 .Where(e => e.EnrollmentId == request.MenteeEnrollmentId &&
-                                             e.Role == SeasonRole.Student)
-                                 .Select(e => e.Season.SeasonId)
-                                 .FirstOrDefaultAsync(cancellationToken);
+        .Enrollments.Where(e =>
+          e.EnrollmentId == request.MenteeEnrollmentId && e.Role == SeasonRole.Student
+        )
+        .Select(e => e.Season.SeasonId)
+        .FirstOrDefaultAsync(cancellationToken);
 
       if (mentorSeasonId == null || menteeSeasonId == null)
       {
         return new ApiResult<AdminUpdateMentorshipResponse>
         {
           StatusCode = HttpStatusCode.BadRequest,
-          Error = new ApiError(Message.MentorshipNotPermittedDueToNullMentorOrMentee)
+          Error = new ApiError(Message.MentorshipNotPermittedDueToNullMentorOrMentee),
         };
       }
 
@@ -90,7 +90,7 @@ public static class AdminUpdateMentorship
         return new ApiResult<AdminUpdateMentorshipResponse>
         {
           StatusCode = HttpStatusCode.BadRequest,
-          Error = new ApiError(Message.MentorshipNotPermittedDueToDifferentSeason)
+          Error = new ApiError(Message.MentorshipNotPermittedDueToDifferentSeason),
         };
       }
 
@@ -109,9 +109,9 @@ public static class AdminUpdateMentorship
           {
             MentorshipId = existingMentorship.MentorshipId,
             MentorEnrollmentId = existingMentorship.MentorEnrollmentId,
-            MenteeEnrollmentId = existingMentorship.MenteeEnrollmentId
+            MenteeEnrollmentId = existingMentorship.MenteeEnrollmentId,
           },
-          SuccessMessage = Message.MentorshipUpdatedSuccessfully
+          SuccessMessage = Message.MentorshipUpdatedSuccessfully,
         };
       }
       catch (Exception ex)
@@ -121,7 +121,7 @@ public static class AdminUpdateMentorship
         return new ApiResult<AdminUpdateMentorshipResponse>
         {
           StatusCode = HttpStatusCode.InternalServerError,
-          Error = new ApiError(Message.MentorshipUpdateUnexpectedError)
+          Error = new ApiError(Message.MentorshipUpdateUnexpectedError),
         };
       }
     }
@@ -133,34 +133,44 @@ public class AdminUpdateMentorshipEndpoint : ICarterModule
   public void AddRoutes(IEndpointRouteBuilder app)
   {
     app.MapPut(
-         "api/admin/mentorships",
-         async (AdminUpdateMentorshipRequest request, ISender sender) =>
-         {
-           var command = new AdminUpdateMentorship.Command
-           {
-             MentorshipId = request.MentorshipId,
-             MentorEnrollmentId = request.MentorEnrollmentId,
-             MenteeEnrollmentId = request.MenteeEnrollmentId
-           };
-           var response = await sender.Send(command);
+        "api/admin/mentorships",
+        async (AdminUpdateMentorshipRequest request, ISender sender) =>
+        {
+          var command = new AdminUpdateMentorship.Command
+          {
+            MentorshipId = request.MentorshipId,
+            MentorEnrollmentId = request.MentorEnrollmentId,
+            MenteeEnrollmentId = request.MenteeEnrollmentId,
+          };
+          var response = await sender.Send(command);
 
-           return ApiResultHelper.FormatResponse(response);
-         }
-       )
-       .WithName("AdminUpdateMentorship");
+          return ApiResultHelper.FormatResponse(response);
+        }
+      )
+      .WithName("AdminUpdateMentorship");
   }
 }
 
 public record AdminUpdateMentorshipRequest
 {
-  [Required] public string MentorshipId { get; set; } = string.Empty;
-  [Required] public string MentorEnrollmentId { get; set; } = string.Empty;
-  [Required] public string MenteeEnrollmentId { get; set; } = string.Empty;
+  [Required]
+  public string MentorshipId { get; set; } = string.Empty;
+
+  [Required]
+  public string MentorEnrollmentId { get; set; } = string.Empty;
+
+  [Required]
+  public string MenteeEnrollmentId { get; set; } = string.Empty;
 }
 
 public class AdminUpdateMentorshipResponse
 {
-  [Required] public string MentorshipId { get; set; } = string.Empty;
-  [Required] public string MentorEnrollmentId { get; set; } = string.Empty;
-  [Required] public string MenteeEnrollmentId { get; set; } = string.Empty;
+  [Required]
+  public string MentorshipId { get; set; } = string.Empty;
+
+  [Required]
+  public string MentorEnrollmentId { get; set; } = string.Empty;
+
+  [Required]
+  public string MenteeEnrollmentId { get; set; } = string.Empty;
 }

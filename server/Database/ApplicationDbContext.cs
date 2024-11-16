@@ -6,14 +6,10 @@ namespace RSPWebAPI.Database;
 
 public class ApplicationDbContext : DbContext
 {
-  public ApplicationDbContext()
-  {
-  }
+  public ApplicationDbContext() { }
 
   public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
-    : base(options)
-  {
-  }
+    : base(options) { }
 
   public virtual DbSet<BehaviouralMockInterviewRoundEntity> BehaviouralMockInterviewRounds { get; set; }
   public virtual DbSet<CustomMockInterviewRoundEntity> CustomMockInterviewRounds { get; set; }
@@ -34,18 +30,36 @@ public class ApplicationDbContext : DbContext
   {
     modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 
-    modelBuilder.Entity<BehaviouralMockInterviewRoundEntity>().HasQueryFilter(x => x.DeletedAtUtc.HasValue == false);
-    modelBuilder.Entity<CustomMockInterviewRoundEntity>().HasQueryFilter(x => x.DeletedAtUtc.HasValue == false);
-    modelBuilder.Entity<CustomProblemEntity>().HasQueryFilter(x => x.DeletedAtUtc.HasValue == false);
+    modelBuilder
+      .Entity<BehaviouralMockInterviewRoundEntity>()
+      .HasQueryFilter(x => x.DeletedAtUtc.HasValue == false);
+    modelBuilder
+      .Entity<CustomMockInterviewRoundEntity>()
+      .HasQueryFilter(x => x.DeletedAtUtc.HasValue == false);
+    modelBuilder
+      .Entity<CustomProblemEntity>()
+      .HasQueryFilter(x => x.DeletedAtUtc.HasValue == false);
     modelBuilder.Entity<EnrollmentEntity>().HasQueryFilter(x => x.DeletedAtUtc.HasValue == false);
-    modelBuilder.Entity<LeetcodeMockInterviewRoundEntity>().HasQueryFilter(x => x.DeletedAtUtc.HasValue == false);
-    modelBuilder.Entity<LeetcodeProblemEntity>().HasQueryFilter(x => x.DeletedAtUtc.HasValue == false);
-    modelBuilder.Entity<LeetcodeProblemCategoryEntity>().HasQueryFilter(x => x.DeletedAtUtc.HasValue == false);
+    modelBuilder
+      .Entity<LeetcodeMockInterviewRoundEntity>()
+      .HasQueryFilter(x => x.DeletedAtUtc.HasValue == false);
+    modelBuilder
+      .Entity<LeetcodeProblemEntity>()
+      .HasQueryFilter(x => x.DeletedAtUtc.HasValue == false);
+    modelBuilder
+      .Entity<LeetcodeProblemCategoryEntity>()
+      .HasQueryFilter(x => x.DeletedAtUtc.HasValue == false);
     modelBuilder.Entity<MentorshipEntity>().HasQueryFilter(x => x.DeletedAtUtc.HasValue == false);
-    modelBuilder.Entity<MockInterviewEntity>().HasQueryFilter(x => x.DeletedAtUtc.HasValue == false);
-    modelBuilder.Entity<MockInterviewRoundEntity>().HasQueryFilter(x => x.DeletedAtUtc.HasValue == false);
+    modelBuilder
+      .Entity<MockInterviewEntity>()
+      .HasQueryFilter(x => x.DeletedAtUtc.HasValue == false);
+    modelBuilder
+      .Entity<MockInterviewRoundEntity>()
+      .HasQueryFilter(x => x.DeletedAtUtc.HasValue == false);
     modelBuilder.Entity<ProblemEntity>().HasQueryFilter(x => x.DeletedAtUtc.HasValue == false);
-    modelBuilder.Entity<ProblemAttemptEntity>().HasQueryFilter(x => x.DeletedAtUtc.HasValue == false);
+    modelBuilder
+      .Entity<ProblemAttemptEntity>()
+      .HasQueryFilter(x => x.DeletedAtUtc.HasValue == false);
     modelBuilder.Entity<SeasonEntity>().HasQueryFilter(x => x.DeletedAtUtc.HasValue == false);
     modelBuilder.Entity<UserEntity>().HasQueryFilter(x => x.DeletedAtUtc.HasValue == false);
 

@@ -41,15 +41,16 @@ public static class DeleteProblemAttempt
       CancellationToken cancellationToken
     )
     {
-      var existingProblemAttempt = await _dbContext
-                                         .ProblemAttempts.FirstOrDefaultAsync(
-                                           u => u.ProblemAttemptId == request.ProblemAttemptId, cancellationToken);
+      var existingProblemAttempt = await _dbContext.ProblemAttempts.FirstOrDefaultAsync(
+        u => u.ProblemAttemptId == request.ProblemAttemptId,
+        cancellationToken
+      );
       if (existingProblemAttempt == null)
       {
         return new ApiResult<DeleteProblemAttemptResponse>
         {
           StatusCode = HttpStatusCode.BadRequest,
-          Error = new ApiError(Message.ProblemAttemptDoesNotExists)
+          Error = new ApiError(Message.ProblemAttemptDoesNotExists),
         };
       }
 
@@ -61,7 +62,7 @@ public static class DeleteProblemAttempt
         return new ApiResult<DeleteProblemAttemptResponse>
         {
           StatusCode = HttpStatusCode.OK,
-          SuccessMessage = Message.ProblemAttemptDeletedSuccessfully
+          SuccessMessage = Message.ProblemAttemptDeletedSuccessfully,
         };
       }
       catch (Exception ex)
@@ -71,7 +72,7 @@ public static class DeleteProblemAttempt
         return new ApiResult<DeleteProblemAttemptResponse>
         {
           StatusCode = HttpStatusCode.InternalServerError,
-          Error = new ApiError(Message.ProblemAttemptDeletionUnexpectedError)
+          Error = new ApiError(Message.ProblemAttemptDeletionUnexpectedError),
         };
       }
     }
@@ -83,22 +84,17 @@ public class DeleteProblemAttemptEndpoint : ICarterModule
   public void AddRoutes(IEndpointRouteBuilder app)
   {
     app.MapDelete(
-         "api/problem-attempts",
-         async (string problemAttemptId, ISender sender) =>
-         {
-           var command = new DeleteProblemAttempt.Command
-           {
-             ProblemAttemptId = problemAttemptId
-           };
-           var response = await sender.Send(command);
+        "api/problem-attempts",
+        async (string problemAttemptId, ISender sender) =>
+        {
+          var command = new DeleteProblemAttempt.Command { ProblemAttemptId = problemAttemptId };
+          var response = await sender.Send(command);
 
-           return ApiResultHelper.FormatResponse(response);
-         }
-       )
-       .WithName("DeleteProblemAttempt");
+          return ApiResultHelper.FormatResponse(response);
+        }
+      )
+      .WithName("DeleteProblemAttempt");
   }
 }
 
-public class DeleteProblemAttemptResponse
-{
-}
+public class DeleteProblemAttemptResponse { }

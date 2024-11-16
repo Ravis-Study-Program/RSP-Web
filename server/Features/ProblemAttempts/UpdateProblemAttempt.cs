@@ -56,17 +56,23 @@ public static class UpdateProblemAttempt
       {
         // Check if the problemAttempt exists and if it matches with the enrollment ID
         var existingProblemAttempt = await _dbContext
-                                           .ProblemAttempts
-                                           .Include(p => p.Enrollment)
-                                           .FirstOrDefaultAsync(e => e.ProblemAttemptId == request.ProblemAttemptId,
-                                                                cancellationToken);
-        if (existingProblemAttempt == null || (request.EnrollmentId != null &&
-                                               existingProblemAttempt.Enrollment?.EnrollmentId != request.EnrollmentId))
+          .ProblemAttempts.Include(p => p.Enrollment)
+          .FirstOrDefaultAsync(
+            e => e.ProblemAttemptId == request.ProblemAttemptId,
+            cancellationToken
+          );
+        if (
+          existingProblemAttempt == null
+          || (
+            request.EnrollmentId != null
+            && existingProblemAttempt.Enrollment?.EnrollmentId != request.EnrollmentId
+          )
+        )
         {
           return new ApiResult<UpdateProblemAttemptResponse>
           {
             StatusCode = HttpStatusCode.BadRequest,
-            Error = new ApiError(Message.ProblemAttemptDoesNotExists)
+            Error = new ApiError(Message.ProblemAttemptDoesNotExists),
           };
         }
 
@@ -88,7 +94,7 @@ public static class UpdateProblemAttempt
         return new ApiResult<UpdateProblemAttemptResponse>
         {
           StatusCode = HttpStatusCode.OK,
-          SuccessMessage = Message.ProblemAttemptUpdatedSuccessfully
+          SuccessMessage = Message.ProblemAttemptUpdatedSuccessfully,
         };
       }
       catch (Exception ex)
@@ -98,7 +104,7 @@ public static class UpdateProblemAttempt
         return new ApiResult<UpdateProblemAttemptResponse>
         {
           StatusCode = HttpStatusCode.InternalServerError,
-          Error = new ApiError(Message.ProblemAttemptCreationUnexpectedError)
+          Error = new ApiError(Message.ProblemAttemptCreationUnexpectedError),
         };
       }
     }
@@ -110,42 +116,47 @@ public class UpdateProblemAttemptEndpoint : ICarterModule
   public void AddRoutes(IEndpointRouteBuilder app)
   {
     app.MapPut(
-         "api/problem-attempts",
-         async (UpdateProblemAttemptRequest request, ISender sender, HttpContext httpContext) =>
-         {
-           var email = httpContext?.User?.Identity?.Name ?? "";
+        "api/problem-attempts",
+        async (UpdateProblemAttemptRequest request, ISender sender, HttpContext httpContext) =>
+        {
+          var email = httpContext?.User?.Identity?.Name ?? "";
 
-           var command = new UpdateProblemAttempt.Command
-           {
-             ProblemAttemptId = request.ProblemAttemptId,
-             AttemptStartDateUtc = request.AttemptStartDateUtc,
-             TimeTakenInMinutes = request.TimeTakenInMinutes,
-             Notes = request.Notes,
-             Email = email,
-             LeetcodeProblemId = request.LeetcodeProblemId,
-             CustomProblemId = request.CustomProblemId,
-             EnrollmentId = request.EnrollmentId
-           };
-           var response = await sender.Send(command);
+          var command = new UpdateProblemAttempt.Command
+          {
+            ProblemAttemptId = request.ProblemAttemptId,
+            AttemptStartDateUtc = request.AttemptStartDateUtc,
+            TimeTakenInMinutes = request.TimeTakenInMinutes,
+            Notes = request.Notes,
+            Email = email,
+            LeetcodeProblemId = request.LeetcodeProblemId,
+            CustomProblemId = request.CustomProblemId,
+            EnrollmentId = request.EnrollmentId,
+          };
+          var response = await sender.Send(command);
 
-           return ApiResultHelper.FormatResponse(response);
-         }
-       )
-       .WithName("UpdateProblemAttempt");
+          return ApiResultHelper.FormatResponse(response);
+        }
+      )
+      .WithName("UpdateProblemAttempt");
   }
 }
 
 public record UpdateProblemAttemptRequest
 {
-  [Required] public string ProblemAttemptId { get; set; } = string.Empty;
-  [Required] public DateTime AttemptStartDateUtc { get; set; }
-  [Required] public int TimeTakenInMinutes { get; set; }
-  [Required] public string Notes { get; set; } = string.Empty;
+  [Required]
+  public string ProblemAttemptId { get; set; } = string.Empty;
+
+  [Required]
+  public DateTime AttemptStartDateUtc { get; set; }
+
+  [Required]
+  public int TimeTakenInMinutes { get; set; }
+
+  [Required]
+  public string Notes { get; set; } = string.Empty;
   public string LeetcodeProblemId { get; set; } = string.Empty;
   public string CustomProblemId { get; set; } = string.Empty;
   public string? EnrollmentId { get; set; }
 }
 
-public class UpdateProblemAttemptResponse
-{
-}
+public class UpdateProblemAttemptResponse { }

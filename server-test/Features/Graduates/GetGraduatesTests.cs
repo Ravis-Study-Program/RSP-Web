@@ -30,30 +30,35 @@ public class GetGraduatesTests : TestsHelper
   {
     const string discordId1 = "Discord ID 123";
     const string discordId2 = "Discord ID 456";
-    _dbContextMock.Setup(x => x.Users)
-                  .ReturnsDbSet(new List<UserEntity>
-                  {
-                    new()
-                    {
-                      UserId = DummyId1,
-                      DiscordId = discordId1,
-                      Email = DummyEmail,
-                      Name = DummyName,
-                      ProfileImage = DummyProfileImage
-                    },
-                    new()
-                    {
-                      UserId = DummyId2,
-                      DiscordId = discordId2,
-                      Email = DummyEmail,
-                      Name = DummyName,
-                      ProfileImage = ""
-                    }
-                  });
+    _dbContextMock
+      .Setup(x => x.Users)
+      .ReturnsDbSet(
+        new List<UserEntity>
+        {
+          new()
+          {
+            UserId = DummyId1,
+            DiscordId = discordId1,
+            Email = DummyEmail,
+            Name = DummyName,
+            ProfileImage = DummyProfileImage,
+          },
+          new()
+          {
+            UserId = DummyId2,
+            DiscordId = discordId2,
+            Email = DummyEmail,
+            Name = DummyName,
+            ProfileImage = "",
+          },
+        }
+      );
 
     var command = ListDummyCommand();
-    var handler =
-      new GetGraduates.Handler(_dbContextMock.Object, Mock.Of<ILogger<GetGraduates.Handler>>());
+    var handler = new GetGraduates.Handler(
+      _dbContextMock.Object,
+      Mock.Of<ILogger<GetGraduates.Handler>>()
+    );
 
     var result = await handler.Handle(command, CancellationToken.None);
     Assert.Equal(HttpStatusCode.OK, result.StatusCode);

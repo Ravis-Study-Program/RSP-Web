@@ -5,7 +5,7 @@ namespace RSPWebAPI.Database;
 public static class Constants
 {
   public const int GenerateIdLength = 10;
-  
+
   private static readonly Random Random = new();
 
   public static string GeneratePrimaryKeyId()

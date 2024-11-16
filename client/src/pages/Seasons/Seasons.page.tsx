@@ -3,8 +3,8 @@ import { Badge, Button, Card, Grid, Group, Image, Skeleton, Text } from '@mantin
 import { Layout } from '@/components/Layout/Layout';
 import { EnrollmentResponseDto, useGetCurrentUserEnrollments } from '@/generated/api/client';
 import { SeasonRoleReverseIndex } from '@/shared/entities/reverseIndex';
-import classes from './Seasons.module.css';
 import { useUserAndEnrollment } from '@/shared/hooks/useUserAndEnrollment';
+import classes from './Seasons.module.css';
 
 export default function SeasonsPage() {
   const { isAdmin, isLoading } = useUserAndEnrollment('');
@@ -15,11 +15,11 @@ export default function SeasonsPage() {
     isLoading: isLoadingEnrollments,
   } = useGetCurrentUserEnrollments();
 
-  if(isLoading) {
+  if (isLoading) {
     return null;
   }
 
-  if(isAdmin) {
+  if (isAdmin) {
     return <Navigate to="/admin/seasons" />;
   }
 

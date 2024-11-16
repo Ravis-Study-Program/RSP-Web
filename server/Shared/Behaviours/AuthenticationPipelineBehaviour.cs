@@ -13,15 +13,20 @@ public class AuthenticationPipelineBehavior<TRequest, TResponse>
   private readonly IHttpContextAccessor _httpContextAccessor;
   private readonly ILogger<AuthenticationPipelineBehavior<TRequest, TResponse>> _logger;
 
-  public AuthenticationPipelineBehavior(IHttpContextAccessor httpContextAccessor,
-    ILogger<AuthenticationPipelineBehavior<TRequest, TResponse>> logger)
+  public AuthenticationPipelineBehavior(
+    IHttpContextAccessor httpContextAccessor,
+    ILogger<AuthenticationPipelineBehavior<TRequest, TResponse>> logger
+  )
   {
     _httpContextAccessor = httpContextAccessor;
     _logger = logger;
   }
 
-  public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next,
-    CancellationToken cancellationToken)
+  public async Task<TResponse> Handle(
+    TRequest request,
+    RequestHandlerDelegate<TResponse> next,
+    CancellationToken cancellationToken
+  )
   {
     var context = _httpContextAccessor.HttpContext;
     if (context?.User?.Identity?.IsAuthenticated != true)
@@ -29,7 +34,7 @@ public class AuthenticationPipelineBehavior<TRequest, TResponse>
       return new TResponse
       {
         StatusCode = HttpStatusCode.Unauthorized,
-        Error = new ApiError("You don't have the required authorization to access the resource.")
+        Error = new ApiError("You don't have the required authorization to access the resource."),
       };
     }
 
@@ -46,29 +51,37 @@ public class AdminAuthenticationPipelineBehaviour<TRequest, TResponse>
   private readonly IHttpContextAccessor _httpContextAccessor;
   private readonly ILogger<AdminAuthenticationPipelineBehaviour<TRequest, TResponse>> _logger;
 
-  public AdminAuthenticationPipelineBehaviour(IHttpContextAccessor httpContextAccessor,
+  public AdminAuthenticationPipelineBehaviour(
+    IHttpContextAccessor httpContextAccessor,
     ILogger<AdminAuthenticationPipelineBehaviour<TRequest, TResponse>> logger,
-    ApplicationDbContext dbContext)
+    ApplicationDbContext dbContext
+  )
   {
     _httpContextAccessor = httpContextAccessor;
     _logger = logger;
     _dbContext = dbContext;
   }
 
-  public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next,
-    CancellationToken cancellationToken)
+  public async Task<TResponse> Handle(
+    TRequest request,
+    RequestHandlerDelegate<TResponse> next,
+    CancellationToken cancellationToken
+  )
   {
     var context = _httpContextAccessor.HttpContext;
     var user = context?.User?.Identity;
     var name = user?.Name;
 
-    var foundUser = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email == name && u.IsAdmin, cancellationToken);
+    var foundUser = await _dbContext.Users.FirstOrDefaultAsync(
+      u => u.Email == name && u.IsAdmin,
+      cancellationToken
+    );
     if (foundUser == null)
     {
       return new TResponse
       {
         StatusCode = HttpStatusCode.Unauthorized,
-        Error = new ApiError("You don't have the required authorization to access the resource.")
+        Error = new ApiError("You don't have the required authorization to access the resource."),
       };
     }
 
@@ -76,10 +89,6 @@ public class AdminAuthenticationPipelineBehaviour<TRequest, TResponse>
   }
 }
 
-public class AuthRequest<TResponse> : IRequest<TResponse>
-{
-}
+public class AuthRequest<TResponse> : IRequest<TResponse> { }
 
-public class AdminAuthRequest<TResponse> : AuthRequest<TResponse>
-{
-}
+public class AdminAuthRequest<TResponse> : AuthRequest<TResponse> { }

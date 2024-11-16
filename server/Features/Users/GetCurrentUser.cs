@@ -45,24 +45,23 @@ public static class GetCurrentUser
     {
       try
       {
-        var existingUser = await _dbContext
-                                 .Users.FirstOrDefaultAsync(u => u.Email == request.Email, cancellationToken);
+        var existingUser = await _dbContext.Users.FirstOrDefaultAsync(
+          u => u.Email == request.Email,
+          cancellationToken
+        );
         if (existingUser == null)
         {
           return new ApiResult<GetCurrentUserResponse>
           {
             StatusCode = HttpStatusCode.BadRequest,
-            Error = new ApiError(Message.UserEmailDoesNotExists)
+            Error = new ApiError(Message.UserEmailDoesNotExists),
           };
         }
 
         return new ApiResult<GetCurrentUserResponse>
         {
           StatusCode = HttpStatusCode.OK,
-          ResponseBody = new GetCurrentUserResponse
-          {
-            User = existingUser
-          }
+          ResponseBody = new GetCurrentUserResponse { User = existingUser },
         };
       }
       catch (Exception ex)
@@ -72,7 +71,7 @@ public static class GetCurrentUser
         return new ApiResult<GetCurrentUserResponse>
         {
           StatusCode = HttpStatusCode.InternalServerError,
-          Error = new ApiError(Message.UserListUnexpectedError)
+          Error = new ApiError(Message.UserListUnexpectedError),
         };
       }
     }
@@ -84,25 +83,23 @@ public class GetCurrentUserEndpoint : ICarterModule
   public void AddRoutes(IEndpointRouteBuilder app)
   {
     app.MapGet(
-         "api/users/get-current-user",
-         async (string? email, ISender sender, HttpContext httpContext) =>
-         {
-           var currentUserEmail = httpContext?.User?.Identity?.Name ?? "";
+        "api/users/get-current-user",
+        async (string? email, ISender sender, HttpContext httpContext) =>
+        {
+          var currentUserEmail = httpContext?.User?.Identity?.Name ?? "";
 
-           var command = new GetCurrentUser.Command
-           {
-             Email = email ?? currentUserEmail
-           };
-           var response = await sender.Send(command);
+          var command = new GetCurrentUser.Command { Email = email ?? currentUserEmail };
+          var response = await sender.Send(command);
 
-           return ApiResultHelper.FormatResponse(response);
-         }
-       )
-       .WithName("GetCurrentUser");
+          return ApiResultHelper.FormatResponse(response);
+        }
+      )
+      .WithName("GetCurrentUser");
   }
 }
 
 public record GetCurrentUserResponse
 {
-  [Required] public UserEntity User { get; set; }
+  [Required]
+  public UserEntity User { get; set; }
 }

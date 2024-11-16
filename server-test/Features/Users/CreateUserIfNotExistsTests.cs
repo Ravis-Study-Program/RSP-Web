@@ -26,7 +26,7 @@ public class CreateUserIfNotExistsTests : TestsHelper
       DiscordId = DummyDiscordId,
       Email = DummyEmail,
       ProfileImage = DummyProfileImage,
-      Name = DummyName
+      Name = DummyName,
     };
   }
 
@@ -34,12 +34,13 @@ public class CreateUserIfNotExistsTests : TestsHelper
   public async Task Handle_UserExists_OK()
   {
     var existingUser = new UserEntity { Email = DummyEmail };
-    _dbContextMock.Setup(x => x.Users)
-                  .ReturnsDbSet(new List<UserEntity> { existingUser });
+    _dbContextMock.Setup(x => x.Users).ReturnsDbSet(new List<UserEntity> { existingUser });
 
     var command = CreateDummyCommand();
-    var handler =
-      new CreateUserIfNotExists.Handler(_dbContextMock.Object, Mock.Of<ILogger<CreateUserIfNotExists.Handler>>());
+    var handler = new CreateUserIfNotExists.Handler(
+      _dbContextMock.Object,
+      Mock.Of<ILogger<CreateUserIfNotExists.Handler>>()
+    );
 
     var result = await handler.Handle(command, CancellationToken.None);
     Assert.Equal(HttpStatusCode.OK, result.StatusCode);
@@ -49,12 +50,13 @@ public class CreateUserIfNotExistsTests : TestsHelper
   [Fact]
   public async Task Handle_UserDoesNotExists_OK()
   {
-    _dbContextMock.Setup(x => x.Users)
-                  .ReturnsDbSet(new List<UserEntity>());
+    _dbContextMock.Setup(x => x.Users).ReturnsDbSet(new List<UserEntity>());
 
     var command = CreateDummyCommand();
-    var handler =
-      new CreateUserIfNotExists.Handler(_dbContextMock.Object, Mock.Of<ILogger<CreateUserIfNotExists.Handler>>());
+    var handler = new CreateUserIfNotExists.Handler(
+      _dbContextMock.Object,
+      Mock.Of<ILogger<CreateUserIfNotExists.Handler>>()
+    );
 
     var result = await handler.Handle(command, CancellationToken.None);
     Assert.Equal(HttpStatusCode.OK, result.StatusCode);

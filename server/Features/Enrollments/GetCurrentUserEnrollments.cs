@@ -46,25 +46,21 @@ public static class GetCurrentUserEnrollments
       try
       {
         var enrollments = await _dbContext
-                                .Enrollments
-                                .Where(e => e.User.Email == request.Email)
-                                .Select(e => new EnrollmentResponseDto
-                                {
-                                  SeasonSlug = e.Season.Slug,
-                                  SeasonName = e.Season.Name,
-                                  SeasonImageUrl = e.Season.ImageUrl,
-                                  Role = e.Role
-                                })
-                                .AsNoTracking()
-                                .ToListAsync(cancellationToken);
+          .Enrollments.Where(e => e.User.Email == request.Email)
+          .Select(e => new EnrollmentResponseDto
+          {
+            SeasonSlug = e.Season.Slug,
+            SeasonName = e.Season.Name,
+            SeasonImageUrl = e.Season.ImageUrl,
+            Role = e.Role,
+          })
+          .AsNoTracking()
+          .ToListAsync(cancellationToken);
 
         return new ApiResult<GetCurrentUserEnrollmentsResponse>
         {
           StatusCode = HttpStatusCode.OK,
-          ResponseBody = new GetCurrentUserEnrollmentsResponse
-          {
-            Enrollments = enrollments
-          }
+          ResponseBody = new GetCurrentUserEnrollmentsResponse { Enrollments = enrollments },
         };
       }
       catch (Exception ex)
@@ -74,7 +70,7 @@ public static class GetCurrentUserEnrollments
         return new ApiResult<GetCurrentUserEnrollmentsResponse>
         {
           StatusCode = HttpStatusCode.InternalServerError,
-          Error = new ApiError(Message.EnrollmentListSuccessfully)
+          Error = new ApiError(Message.EnrollmentListSuccessfully),
         };
       }
     }
@@ -86,33 +82,38 @@ public class GetCurrentUserEnrollmentsEndpoint : ICarterModule
   public void AddRoutes(IEndpointRouteBuilder app)
   {
     app.MapGet(
-         "api/enrollments/get-current-user-enrollments",
-         async (ISender sender, HttpContext httpContext) =>
-         {
-           var email = httpContext?.User?.Identity?.Name ?? "";
+        "api/enrollments/get-current-user-enrollments",
+        async (ISender sender, HttpContext httpContext) =>
+        {
+          var email = httpContext?.User?.Identity?.Name ?? "";
 
-           var command = new GetCurrentUserEnrollments.Command
-           {
-             Email = email
-           };
-           var response = await sender.Send(command);
+          var command = new GetCurrentUserEnrollments.Command { Email = email };
+          var response = await sender.Send(command);
 
-           return ApiResultHelper.FormatResponse(response);
-         }
-       )
-       .WithName("GetCurrentUserEnrollments");
+          return ApiResultHelper.FormatResponse(response);
+        }
+      )
+      .WithName("GetCurrentUserEnrollments");
   }
 }
 
 public record EnrollmentResponseDto
 {
-  [Required] public string SeasonName { get; set; } = string.Empty;
-  [Required] public string SeasonImageUrl { get; set; } = string.Empty;
-  [Required] public string SeasonSlug { get; set; } = string.Empty;
-  [Required] public SeasonRole Role { get; set; }
+  [Required]
+  public string SeasonName { get; set; } = string.Empty;
+
+  [Required]
+  public string SeasonImageUrl { get; set; } = string.Empty;
+
+  [Required]
+  public string SeasonSlug { get; set; } = string.Empty;
+
+  [Required]
+  public SeasonRole Role { get; set; }
 }
 
 public record GetCurrentUserEnrollmentsResponse
 {
-  [Required] public IList<EnrollmentResponseDto> Enrollments { get; set; } = new List<EnrollmentResponseDto>();
+  [Required]
+  public IList<EnrollmentResponseDto> Enrollments { get; set; } = new List<EnrollmentResponseDto>();
 }

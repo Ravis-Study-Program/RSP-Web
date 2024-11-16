@@ -22,21 +22,19 @@ public class AdminDeleteEnrollmentTests : TestsHelper
 
   private AdminDeleteEnrollment.Command DeleteDummyCommand()
   {
-    return new AdminDeleteEnrollment.Command
-    {
-      EnrollmentId = DummyId1
-    };
+    return new AdminDeleteEnrollment.Command { EnrollmentId = DummyId1 };
   }
 
   [Fact]
   public async Task Handle_EnrollmentDoesNotExists_BadRequest()
   {
-    _dbContextMock.Setup(x => x.Enrollments)
-                  .ReturnsDbSet(new List<EnrollmentEntity>());
+    _dbContextMock.Setup(x => x.Enrollments).ReturnsDbSet(new List<EnrollmentEntity>());
 
     var command = DeleteDummyCommand();
-    var handler =
-      new AdminDeleteEnrollment.Handler(_dbContextMock.Object, Mock.Of<ILogger<AdminDeleteEnrollment.Handler>>());
+    var handler = new AdminDeleteEnrollment.Handler(
+      _dbContextMock.Object,
+      Mock.Of<ILogger<AdminDeleteEnrollment.Handler>>()
+    );
 
     var result = await handler.Handle(command, CancellationToken.None);
     Assert.Equal(HttpStatusCode.BadRequest, result.StatusCode);
@@ -47,13 +45,20 @@ public class AdminDeleteEnrollmentTests : TestsHelper
   public async Task Handle_Success_OK()
   {
     var existingEnrollment = new EnrollmentEntity
-      { EnrollmentId = DummyId1, SeasonId = DummyId1, UserId = DummyId1 };
-    _dbContextMock.Setup(x => x.Enrollments)
-                  .ReturnsDbSet(new List<EnrollmentEntity> { existingEnrollment });
+    {
+      EnrollmentId = DummyId1,
+      SeasonId = DummyId1,
+      UserId = DummyId1,
+    };
+    _dbContextMock
+      .Setup(x => x.Enrollments)
+      .ReturnsDbSet(new List<EnrollmentEntity> { existingEnrollment });
 
     var command = DeleteDummyCommand();
-    var handler =
-      new AdminDeleteEnrollment.Handler(_dbContextMock.Object, Mock.Of<ILogger<AdminDeleteEnrollment.Handler>>());
+    var handler = new AdminDeleteEnrollment.Handler(
+      _dbContextMock.Object,
+      Mock.Of<ILogger<AdminDeleteEnrollment.Handler>>()
+    );
 
     var result = await handler.Handle(command, CancellationToken.None);
     Assert.Equal(HttpStatusCode.OK, result.StatusCode);

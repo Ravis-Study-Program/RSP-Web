@@ -55,16 +55,14 @@ public static class GetMockInterviews
         if (request.EnrollmentId != null)
         {
           var existingEnrollment = await _dbContext
-                                         .Enrollments
-                                         .Include(e => e.User)
-                                         .FirstOrDefaultAsync(e => e.EnrollmentId == request.EnrollmentId,
-                                                              cancellationToken);
+            .Enrollments.Include(e => e.User)
+            .FirstOrDefaultAsync(e => e.EnrollmentId == request.EnrollmentId, cancellationToken);
           if (existingEnrollment == null || existingEnrollment.User.Email != request.Email)
           {
             return new ApiResult<GetMockInterviewsResponse>
             {
               StatusCode = HttpStatusCode.BadRequest,
-              Error = new ApiError(Message.EnrollmentDoesNotExists)
+              Error = new ApiError(Message.EnrollmentDoesNotExists),
             };
           }
 
@@ -74,38 +72,33 @@ public static class GetMockInterviews
         if (request.IncludeBehavioural)
         {
           query = query
-                  .Include(m => m.MockInterviewRounds)
-                  .ThenInclude(mr => mr.BehaviouralMockInterviewRound);
+            .Include(m => m.MockInterviewRounds)
+            .ThenInclude(mr => mr.BehaviouralMockInterviewRound);
         }
 
         if (request.IncludeLeetcode)
         {
           query = query
-                  .Include(m => m.MockInterviewRounds)
-                  .ThenInclude(mr => mr.LeetcodeMockInterviewRound)
-                  .ThenInclude(l => l.LeetcodeProblem)
-                  .ThenInclude(l => l.Problem);
+            .Include(m => m.MockInterviewRounds)
+            .ThenInclude(mr => mr.LeetcodeMockInterviewRound)
+            .ThenInclude(l => l.LeetcodeProblem)
+            .ThenInclude(l => l.Problem);
         }
 
         if (request.IncludeCustom)
         {
           query = query
-                  .Include(m => m.MockInterviewRounds)
-                  .ThenInclude(mr => mr.CustomMockInterviewRound);
+            .Include(m => m.MockInterviewRounds)
+            .ThenInclude(mr => mr.CustomMockInterviewRound);
         }
 
-        var result = await query
-                           .Include(m => m.Interviewer)
-                           .ToListAsync(cancellationToken);
+        var result = await query.Include(m => m.Interviewer).ToListAsync(cancellationToken);
 
         return new ApiResult<GetMockInterviewsResponse>
         {
           StatusCode = HttpStatusCode.OK,
-          ResponseBody = new GetMockInterviewsResponse
-          {
-            MockInterviews = result
-          },
-          SuccessMessage = Message.MockInterviewListSuccessfully
+          ResponseBody = new GetMockInterviewsResponse { MockInterviews = result },
+          SuccessMessage = Message.MockInterviewListSuccessfully,
         };
       }
       catch (Exception ex)
@@ -115,7 +108,7 @@ public static class GetMockInterviews
         return new ApiResult<GetMockInterviewsResponse>
         {
           StatusCode = HttpStatusCode.InternalServerError,
-          Error = new ApiError(Message.MockInterviewListUnexpectedError)
+          Error = new ApiError(Message.MockInterviewListUnexpectedError),
         };
       }
     }
@@ -127,30 +120,38 @@ public class GetMockInterviewsEndpoint : ICarterModule
   public void AddRoutes(IEndpointRouteBuilder app)
   {
     app.MapGet(
-         "api/mock-interviews",
-         async (string? enrollmentId, string? email, bool includeLeetcode, bool includeCustom, bool includeBehavioural, ISender sender,
-           HttpContext httpContext) =>
-         {
-           var currentUserEmail = httpContext?.User?.Identity?.Name ?? "";
+        "api/mock-interviews",
+        async (
+          string? enrollmentId,
+          string? email,
+          bool includeLeetcode,
+          bool includeCustom,
+          bool includeBehavioural,
+          ISender sender,
+          HttpContext httpContext
+        ) =>
+        {
+          var currentUserEmail = httpContext?.User?.Identity?.Name ?? "";
 
-           var command = new GetMockInterviews.Command
-           {
-             EnrollmentId = enrollmentId,
-             Email = email ?? currentUserEmail,
-             IncludeLeetcode = includeLeetcode,
-             IncludeCustom = includeCustom,
-             IncludeBehavioural = includeBehavioural
-           };
-           var response = await sender.Send(command);
+          var command = new GetMockInterviews.Command
+          {
+            EnrollmentId = enrollmentId,
+            Email = email ?? currentUserEmail,
+            IncludeLeetcode = includeLeetcode,
+            IncludeCustom = includeCustom,
+            IncludeBehavioural = includeBehavioural,
+          };
+          var response = await sender.Send(command);
 
-           return ApiResultHelper.FormatResponse(response);
-         }
-       )
-       .WithName("GetMockInterviews");
+          return ApiResultHelper.FormatResponse(response);
+        }
+      )
+      .WithName("GetMockInterviews");
   }
 }
 
 public class GetMockInterviewsResponse
 {
-  [Required] public IList<MockInterviewEntity> MockInterviews { get; set; } = new List<MockInterviewEntity>();
+  [Required]
+  public IList<MockInterviewEntity> MockInterviews { get; set; } = new List<MockInterviewEntity>();
 }

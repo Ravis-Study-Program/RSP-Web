@@ -54,16 +54,14 @@ public static class GetProblemAttempts
         if (request.EnrollmentId != null)
         {
           var existingEnrollment = await _dbContext
-                                         .Enrollments
-                                         .Include(e => e.User)
-                                         .FirstOrDefaultAsync(e => e.EnrollmentId == request.EnrollmentId,
-                                                              cancellationToken);
+            .Enrollments.Include(e => e.User)
+            .FirstOrDefaultAsync(e => e.EnrollmentId == request.EnrollmentId, cancellationToken);
           if (existingEnrollment == null || existingEnrollment.User.Email != request.Email)
           {
             return new ApiResult<GetProblemAttemptsResponse>
             {
               StatusCode = HttpStatusCode.BadRequest,
-              Error = new ApiError(Message.EnrollmentDoesNotExists)
+              Error = new ApiError(Message.EnrollmentDoesNotExists),
             };
           }
 
@@ -73,17 +71,15 @@ public static class GetProblemAttempts
         if (request.IncludeLeetcode)
         {
           query = query
-                  .Include(p => p.LeetcodeProblem)
-                  .ThenInclude(l => l.LeetcodeProblemCategories)
-                  .Include(p => p.LeetcodeProblem)
-                  .ThenInclude(l => l.Problem);
+            .Include(p => p.LeetcodeProblem)
+            .ThenInclude(l => l.LeetcodeProblemCategories)
+            .Include(p => p.LeetcodeProblem)
+            .ThenInclude(l => l.Problem);
         }
 
         if (request.IncludeCustom)
         {
-          query = query
-                  .Include(p => p.CustomProblem)
-                  .ThenInclude(c => c.Problem);
+          query = query.Include(p => p.CustomProblem).ThenInclude(c => c.Problem);
         }
 
         var result = await query.ToListAsync(cancellationToken);
@@ -91,11 +87,8 @@ public static class GetProblemAttempts
         return new ApiResult<GetProblemAttemptsResponse>
         {
           StatusCode = HttpStatusCode.OK,
-          ResponseBody = new GetProblemAttemptsResponse
-          {
-            ProblemAttempts = result
-          },
-          SuccessMessage = Message.ProblemAttemptListSuccessfully
+          ResponseBody = new GetProblemAttemptsResponse { ProblemAttempts = result },
+          SuccessMessage = Message.ProblemAttemptListSuccessfully,
         };
       }
       catch (Exception ex)
@@ -105,7 +98,7 @@ public static class GetProblemAttempts
         return new ApiResult<GetProblemAttemptsResponse>
         {
           StatusCode = HttpStatusCode.InternalServerError,
-          Error = new ApiError(Message.ProblemAttemptListUnexpectedError)
+          Error = new ApiError(Message.ProblemAttemptListUnexpectedError),
         };
       }
     }
@@ -117,29 +110,37 @@ public class GetProblemAttemptsEndpoint : ICarterModule
   public void AddRoutes(IEndpointRouteBuilder app)
   {
     app.MapGet(
-         "api/problem-attempts",
-         async (string? enrollmentId, string? email, bool includeLeetcode, bool includeCustom, ISender sender,
-           HttpContext httpContext) =>
-         {
-           var currentUserEmail = httpContext?.User?.Identity?.Name ?? "";
+        "api/problem-attempts",
+        async (
+          string? enrollmentId,
+          string? email,
+          bool includeLeetcode,
+          bool includeCustom,
+          ISender sender,
+          HttpContext httpContext
+        ) =>
+        {
+          var currentUserEmail = httpContext?.User?.Identity?.Name ?? "";
 
-           var command = new GetProblemAttempts.Command
-           {
-             EnrollmentId = enrollmentId,
-             Email = email ?? currentUserEmail,
-             IncludeLeetcode = includeLeetcode,
-             IncludeCustom = includeCustom
-           };
-           var response = await sender.Send(command);
+          var command = new GetProblemAttempts.Command
+          {
+            EnrollmentId = enrollmentId,
+            Email = email ?? currentUserEmail,
+            IncludeLeetcode = includeLeetcode,
+            IncludeCustom = includeCustom,
+          };
+          var response = await sender.Send(command);
 
-           return ApiResultHelper.FormatResponse(response);
-         }
-       )
-       .WithName("GetProblemAttempts");
+          return ApiResultHelper.FormatResponse(response);
+        }
+      )
+      .WithName("GetProblemAttempts");
   }
 }
 
 public class GetProblemAttemptsResponse
 {
-  [Required] public IList<ProblemAttemptEntity> ProblemAttempts { get; set; } = new List<ProblemAttemptEntity>();
+  [Required]
+  public IList<ProblemAttemptEntity> ProblemAttempts { get; set; } =
+    new List<ProblemAttemptEntity>();
 }

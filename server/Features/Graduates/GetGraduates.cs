@@ -13,13 +13,9 @@ namespace RSPWebAPI.Features.Graduates;
 
 public static class GetGraduates
 {
-  public class Command : AuthRequest<ApiResult<GetGraduatesResponse>>
-  {
-  }
+  public class Command : AuthRequest<ApiResult<GetGraduatesResponse>> { }
 
-  public class Validator : AbstractValidator<Command>
-  {
-  }
+  public class Validator : AbstractValidator<Command> { }
 
   public class Handler : IRequestHandler<Command, ApiResult<GetGraduatesResponse>>
   {
@@ -40,25 +36,21 @@ public static class GetGraduates
       try
       {
         var graduates = await _dbContext
-                              .Users
-                              .Select(u => new GraduateDto
-                              {
-                                Name = u.Name,
-                                DiscordId = u.DiscordId,
-                                ProfileImage = u.ProfileImage,
-                                Email = u.Email
-                              })
-                              .AsNoTracking()
-                              .ToListAsync(cancellationToken);
+          .Users.Select(u => new GraduateDto
+          {
+            Name = u.Name,
+            DiscordId = u.DiscordId,
+            ProfileImage = u.ProfileImage,
+            Email = u.Email,
+          })
+          .AsNoTracking()
+          .ToListAsync(cancellationToken);
 
         return new ApiResult<GetGraduatesResponse>
         {
           StatusCode = HttpStatusCode.OK,
-          ResponseBody = new GetGraduatesResponse
-          {
-            Graduates = graduates
-          },
-          SuccessMessage = Message.GraduatesListSuccessfully
+          ResponseBody = new GetGraduatesResponse { Graduates = graduates },
+          SuccessMessage = Message.GraduatesListSuccessfully,
         };
       }
       catch (Exception ex)
@@ -68,7 +60,7 @@ public static class GetGraduates
         return new ApiResult<GetGraduatesResponse>
         {
           StatusCode = HttpStatusCode.InternalServerError,
-          Error = new ApiError(Message.GraduatesListUnexpectedError)
+          Error = new ApiError(Message.GraduatesListUnexpectedError),
         };
       }
     }
@@ -80,32 +72,38 @@ public class GetGraduatesEndpoint : ICarterModule
   public void AddRoutes(IEndpointRouteBuilder app)
   {
     app.MapGet(
-         "api/graduates",
-         async (ISender sender, HttpContext httpContext) =>
-         {
-           var command = new GetGraduates.Command();
-           var response = await sender.Send(command);
+        "api/graduates",
+        async (ISender sender, HttpContext httpContext) =>
+        {
+          var command = new GetGraduates.Command();
+          var response = await sender.Send(command);
 
-           return ApiResultHelper.FormatResponse(response);
-         }
-       )
-       .WithName("GetGraduates");
+          return ApiResultHelper.FormatResponse(response);
+        }
+      )
+      .WithName("GetGraduates");
   }
 }
 
-public record GetGraduatesRequest
-{
-}
+public record GetGraduatesRequest { }
 
 public record GraduateDto
 {
-  [Required] public string DiscordId { get; set; } = string.Empty;
-  [Required] public string Name { get; set; } = string.Empty;
-  [Required] public string Email { get; set; } = string.Empty;
-  [Required] public string ProfileImage { get; set; } = string.Empty;
+  [Required]
+  public string DiscordId { get; set; } = string.Empty;
+
+  [Required]
+  public string Name { get; set; } = string.Empty;
+
+  [Required]
+  public string Email { get; set; } = string.Empty;
+
+  [Required]
+  public string ProfileImage { get; set; } = string.Empty;
 }
 
 public class GetGraduatesResponse
 {
-  [Required] public IList<GraduateDto> Graduates { get; set; } = new List<GraduateDto>();
+  [Required]
+  public IList<GraduateDto> Graduates { get; set; } = new List<GraduateDto>();
 }

@@ -4,16 +4,14 @@ namespace RSPWebAPI.Shared;
 
 public class ApiError
 {
-  protected ApiError()
-  {
-  }
+  protected ApiError() { }
 
   public ApiError(string message)
   {
     Message = message;
   }
 
-    public ApiError(string message, ICollection<ValidationError> validationErrors)
+  public ApiError(string message, ICollection<ValidationError> validationErrors)
   {
     Message = message;
     ValidationErrors = validationErrors;

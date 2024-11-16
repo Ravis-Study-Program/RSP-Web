@@ -41,16 +41,16 @@ public static class AdminDeleteEnrollment
       CancellationToken cancellationToken
     )
     {
-      var existingEnrollment = await _dbContext
-                                     .Enrollments
-                                     .FirstOrDefaultAsync(u => u.EnrollmentId == request.EnrollmentId,
-                                                          cancellationToken);
+      var existingEnrollment = await _dbContext.Enrollments.FirstOrDefaultAsync(
+        u => u.EnrollmentId == request.EnrollmentId,
+        cancellationToken
+      );
       if (existingEnrollment == null)
       {
         return new ApiResult<AdminDeleteEnrollmentResponse>
         {
           StatusCode = HttpStatusCode.BadRequest,
-          Error = new ApiError(Message.EnrollmentDoesNotExists)
+          Error = new ApiError(Message.EnrollmentDoesNotExists),
         };
       }
 
@@ -62,7 +62,7 @@ public static class AdminDeleteEnrollment
         return new ApiResult<AdminDeleteEnrollmentResponse>
         {
           StatusCode = HttpStatusCode.OK,
-          SuccessMessage = Message.EnrollmentDeletedSuccessfully
+          SuccessMessage = Message.EnrollmentDeletedSuccessfully,
         };
       }
       catch (Exception ex)
@@ -72,7 +72,7 @@ public static class AdminDeleteEnrollment
         return new ApiResult<AdminDeleteEnrollmentResponse>
         {
           StatusCode = HttpStatusCode.InternalServerError,
-          Error = new ApiError(Message.EnrollmentDeletionUnexpectedError)
+          Error = new ApiError(Message.EnrollmentDeletionUnexpectedError),
         };
       }
     }
@@ -84,22 +84,17 @@ public class AdminDeleteEnrollmentEndpoint : ICarterModule
   public void AddRoutes(IEndpointRouteBuilder app)
   {
     app.MapDelete(
-         "api/admin/enrollments",
-         async (string enrollmentId, ISender sender) =>
-         {
-           var command = new AdminDeleteEnrollment.Command
-           {
-             EnrollmentId = enrollmentId
-           };
-           var response = await sender.Send(command);
+        "api/admin/enrollments",
+        async (string enrollmentId, ISender sender) =>
+        {
+          var command = new AdminDeleteEnrollment.Command { EnrollmentId = enrollmentId };
+          var response = await sender.Send(command);
 
-           return ApiResultHelper.FormatResponse(response);
-         }
-       )
-       .WithName("AdminDeleteEnrollment");
+          return ApiResultHelper.FormatResponse(response);
+        }
+      )
+      .WithName("AdminDeleteEnrollment");
   }
 }
 
-public class AdminDeleteEnrollmentResponse
-{
-}
+public class AdminDeleteEnrollmentResponse { }

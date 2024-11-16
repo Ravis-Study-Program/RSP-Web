@@ -41,15 +41,16 @@ public static class AdminDeleteMentorship
       CancellationToken cancellationToken
     )
     {
-      var existingMentorship = await _dbContext
-                                     .Mentorships.FirstOrDefaultAsync(
-                                       u => u.MentorshipId == request.MentorshipId, cancellationToken);
+      var existingMentorship = await _dbContext.Mentorships.FirstOrDefaultAsync(
+        u => u.MentorshipId == request.MentorshipId,
+        cancellationToken
+      );
       if (existingMentorship == null)
       {
         return new ApiResult<AdminDeleteMentorshipResponse>
         {
           StatusCode = HttpStatusCode.BadRequest,
-          Error = new ApiError(Message.MentorshipDoesNotExists)
+          Error = new ApiError(Message.MentorshipDoesNotExists),
         };
       }
 
@@ -61,7 +62,7 @@ public static class AdminDeleteMentorship
         return new ApiResult<AdminDeleteMentorshipResponse>
         {
           StatusCode = HttpStatusCode.OK,
-          SuccessMessage = Message.MentorshipDeletedSuccessfully
+          SuccessMessage = Message.MentorshipDeletedSuccessfully,
         };
       }
       catch (Exception ex)
@@ -71,7 +72,7 @@ public static class AdminDeleteMentorship
         return new ApiResult<AdminDeleteMentorshipResponse>
         {
           StatusCode = HttpStatusCode.InternalServerError,
-          Error = new ApiError(Message.MentorshipDeletionUnexpectedError)
+          Error = new ApiError(Message.MentorshipDeletionUnexpectedError),
         };
       }
     }
@@ -83,22 +84,17 @@ public class AdminDeleteMentorshipEndpoint : ICarterModule
   public void AddRoutes(IEndpointRouteBuilder app)
   {
     app.MapDelete(
-         "api/admin/mentorships",
-         async (string mentorshipId, ISender sender) =>
-         {
-           var command = new AdminDeleteMentorship.Command
-           {
-             MentorshipId = mentorshipId
-           };
-           var response = await sender.Send(command);
+        "api/admin/mentorships",
+        async (string mentorshipId, ISender sender) =>
+        {
+          var command = new AdminDeleteMentorship.Command { MentorshipId = mentorshipId };
+          var response = await sender.Send(command);
 
-           return ApiResultHelper.FormatResponse(response);
-         }
-       )
-       .WithName("AdminDeleteMentorship");
+          return ApiResultHelper.FormatResponse(response);
+        }
+      )
+      .WithName("AdminDeleteMentorship");
   }
 }
 
-public class AdminDeleteMentorshipResponse
-{
-}
+public class AdminDeleteMentorshipResponse { }

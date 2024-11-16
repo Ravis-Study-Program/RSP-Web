@@ -1,5 +1,4 @@
-import { Layout } from '@/components/Layout/Layout';
-import { GraduateDto, useGetGraduates } from '@/generated/api/client';
+import { IconBrandDiscordFilled } from '@tabler/icons-react';
 import {
   ActionIcon,
   Anchor,
@@ -10,9 +9,10 @@ import {
   Group,
   rem,
   Skeleton,
-  Text
+  Text,
 } from '@mantine/core';
-import { IconBrandDiscordFilled } from '@tabler/icons-react';
+import { Layout } from '@/components/Layout/Layout';
+import { GraduateDto, useGetGraduates } from '@/generated/api/client';
 import classes from './Graduates.module.css';
 
 export default function GraduatesPage() {
@@ -57,42 +57,46 @@ const GraduateSkeletonCards = () => {
   );
 };
 
-
 type GraduateCardsProps = {
-  graduates: GraduateDto[] | undefined
-}
+  graduates: GraduateDto[] | undefined;
+};
 
 export function GraduateCards({ graduates }: GraduateCardsProps) {
   return (
     <>
-      {
-        graduates?.map((graduate, key) => (
-          <Grid.Col key={key} span={{ base: 12, sm: 6, md: 6, lg: 2 }}>
+      {graduates?.map((graduate, key) => (
+        <Grid.Col key={key} span={{ base: 12, sm: 6, md: 6, lg: 2 }}>
           <Card key={key} withBorder shadow="sm" radius="md" className={classes.card}>
             <Avatar src={graduate.profileImage} size={70} radius={70} mx="auto" />
             <Text ta="center" fz="lg" fw={600} mt="md">
               {graduate.name}
             </Text>
 
-            <Button component="a" href={`/profile?email=${graduate.email}`} radius="md" mt="sm" size="sm" variant="primary">
+            <Button
+              component="a"
+              href={`/profile?email=${graduate.email}`}
+              radius="md"
+              mt="sm"
+              size="sm"
+              variant="primary"
+            >
               View Profile
             </Button>
 
             <Group gap={0} mt="md">
-                <Anchor c="gray" target='_blank' href='https://www.discord.com'>
-                  <ActionIcon variant="subtle" color="gray">
-                    <IconBrandDiscordFilled
-                      style={{ width: rem(20), height: rem(20) }}
-                      color="gray"
-                      stroke={1.5}
-                    />
-                  </ActionIcon>
-                </Anchor>
-              </Group>
+              <Anchor c="gray" target="_blank" href="https://www.discord.com">
+                <ActionIcon variant="subtle" color="gray">
+                  <IconBrandDiscordFilled
+                    style={{ width: rem(20), height: rem(20) }}
+                    color="gray"
+                    stroke={1.5}
+                  />
+                </ActionIcon>
+              </Anchor>
+            </Group>
           </Card>
-          </Grid.Col>
-        ))
-      }
+        </Grid.Col>
+      ))}
     </>
   );
 }

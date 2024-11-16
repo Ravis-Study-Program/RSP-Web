@@ -28,11 +28,13 @@ public class AdminListSeasonTests : TestsHelper
   [Fact]
   public async Task Handle_Success_OK()
   {
-    _dbContextMock.Setup(x => x.Seasons)
-                  .ReturnsDbSet(new List<SeasonEntity>());
+    _dbContextMock.Setup(x => x.Seasons).ReturnsDbSet(new List<SeasonEntity>());
 
     var command = ListDummyCommand();
-    var handler = new AdminListSeason.Handler(_dbContextMock.Object, Mock.Of<ILogger<AdminListSeason.Handler>>());
+    var handler = new AdminListSeason.Handler(
+      _dbContextMock.Object,
+      Mock.Of<ILogger<AdminListSeason.Handler>>()
+    );
 
     var result = await handler.Handle(command, CancellationToken.None);
     Assert.Equal(HttpStatusCode.OK, result.StatusCode);

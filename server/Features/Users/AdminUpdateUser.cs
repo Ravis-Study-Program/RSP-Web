@@ -46,14 +46,16 @@ public static class AdminUpdateUser
       CancellationToken cancellationToken
     )
     {
-      var existingUser = await _dbContext
-                               .Users.FirstOrDefaultAsync(u => u.Email == request.Email, cancellationToken);
+      var existingUser = await _dbContext.Users.FirstOrDefaultAsync(
+        u => u.Email == request.Email,
+        cancellationToken
+      );
       if (existingUser == null)
       {
         return new ApiResult<AdminUpdateUserResponse>
         {
           StatusCode = HttpStatusCode.BadRequest,
-          Error = new ApiError(Message.UserEmailDoesNotExists)
+          Error = new ApiError(Message.UserEmailDoesNotExists),
         };
       }
 
@@ -77,9 +79,9 @@ public static class AdminUpdateUser
             Email = existingUser.Email,
             Name = existingUser.Name,
             ProfileImage = existingUser.ProfileImage,
-            IsAdmin = existingUser.IsAdmin
+            IsAdmin = existingUser.IsAdmin,
           },
-          SuccessMessage = Message.UserUpdatedSuccessfully
+          SuccessMessage = Message.UserUpdatedSuccessfully,
         };
       }
       catch (Exception ex)
@@ -89,7 +91,7 @@ public static class AdminUpdateUser
         return new ApiResult<AdminUpdateUserResponse>
         {
           StatusCode = HttpStatusCode.InternalServerError,
-          Error = new ApiError(Message.UserUpdateUnexpectedError)
+          Error = new ApiError(Message.UserUpdateUnexpectedError),
         };
       }
     }
@@ -101,41 +103,61 @@ public class AdminUpdateUserEndpoint : ICarterModule
   public void AddRoutes(IEndpointRouteBuilder app)
   {
     app.MapPut(
-         "api/admin/users",
-         async (AdminUpdateUserRequest request, ISender sender) =>
-         {
-           var command = new AdminUpdateUser.Command
-           {
-             DiscordId = request.DiscordId,
-             Email = request.Email,
-             Name = request.Name,
-             ProfileImage = request.ProfileImage,
-             IsAdmin = request.IsAdmin
-           };
-           var response = await sender.Send(command);
+        "api/admin/users",
+        async (AdminUpdateUserRequest request, ISender sender) =>
+        {
+          var command = new AdminUpdateUser.Command
+          {
+            DiscordId = request.DiscordId,
+            Email = request.Email,
+            Name = request.Name,
+            ProfileImage = request.ProfileImage,
+            IsAdmin = request.IsAdmin,
+          };
+          var response = await sender.Send(command);
 
-           return ApiResultHelper.FormatResponse(response);
-         }
-       )
-       .WithName("AdminUpdateUser");
+          return ApiResultHelper.FormatResponse(response);
+        }
+      )
+      .WithName("AdminUpdateUser");
   }
 }
 
 public record AdminUpdateUserRequest
 {
-  [Required] public string DiscordId { get; set; } = string.Empty;
-  [Required] public string Email { get; set; } = string.Empty;
-  [Required] public string Name { get; set; } = string.Empty;
-  [Required] public string ProfileImage { get; set; } = string.Empty;
-  [Required] public bool IsAdmin { get; set; } = false;
+  [Required]
+  public string DiscordId { get; set; } = string.Empty;
+
+  [Required]
+  public string Email { get; set; } = string.Empty;
+
+  [Required]
+  public string Name { get; set; } = string.Empty;
+
+  [Required]
+  public string ProfileImage { get; set; } = string.Empty;
+
+  [Required]
+  public bool IsAdmin { get; set; } = false;
 }
 
 public class AdminUpdateUserResponse
 {
-  [Required] public string UserId { get; set; } = string.Empty;
-  [Required] public string DiscordId { get; set; } = string.Empty;
-  [Required] public string Email { get; set; } = string.Empty;
-  [Required] public string Name { get; set; } = string.Empty;
-  [Required] public string ProfileImage { get; set; } = string.Empty;
-  [Required] public bool IsAdmin { get; set; }
+  [Required]
+  public string UserId { get; set; } = string.Empty;
+
+  [Required]
+  public string DiscordId { get; set; } = string.Empty;
+
+  [Required]
+  public string Email { get; set; } = string.Empty;
+
+  [Required]
+  public string Name { get; set; } = string.Empty;
+
+  [Required]
+  public string ProfileImage { get; set; } = string.Empty;
+
+  [Required]
+  public bool IsAdmin { get; set; }
 }
