@@ -118,15 +118,15 @@ public class GetProblemAttemptsEndpoint : ICarterModule
   {
     app.MapGet(
          "api/problem-attempts",
-         async (string? enrollmentId, bool includeLeetcode, bool includeCustom, ISender sender,
+         async (string? enrollmentId, string? email, bool includeLeetcode, bool includeCustom, ISender sender,
            HttpContext httpContext) =>
          {
-           var email = httpContext?.User?.Identity?.Name ?? "";
+           var currentUserEmail = httpContext?.User?.Identity?.Name ?? "";
 
            var command = new GetProblemAttempts.Command
            {
              EnrollmentId = enrollmentId,
-             Email = email,
+             Email = email ?? currentUserEmail,
              IncludeLeetcode = includeLeetcode,
              IncludeCustom = includeCustom
            };

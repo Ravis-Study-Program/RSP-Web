@@ -30,6 +30,7 @@ export type AdminDeleteMentorshipParams = {
 
 export type GetMockInterviewsParams = {
   enrollmentId?: string;
+  email?: string;
   includeLeetcode: boolean;
   includeCustom: boolean;
   includeBehavioural: boolean;
@@ -41,6 +42,7 @@ export type DeleteMockInterviewParams = {
 
 export type GetProblemAttemptsParams = {
   enrollmentId?: string;
+  email?: string;
   includeLeetcode: boolean;
   includeCustom: boolean;
 };
@@ -51,6 +53,10 @@ export type DeleteProblemAttemptParams = {
 
 export type AdminDeleteSeasonParams = {
   seasonId: string;
+};
+
+export type GetCurrentUserParams = {
+  email?: string;
 };
 
 export type AdminDeleteUserParams = {
@@ -117,6 +123,8 @@ export const SeasonRole = {
 export interface SeasonUserDto {
   /** @minLength 1 */
   discordId: string;
+  /** @minLength 1 */
+  email: string;
   /** @minLength 1 */
   name: string;
   /** @minLength 1 */
@@ -453,6 +461,8 @@ export interface UpdateMockInterviewResponseApiResult {
 export interface GraduateDto {
   /** @minLength 1 */
   discordId: string;
+  /** @minLength 1 */
+  email: string;
   /** @minLength 1 */
   name: string;
   /** @minLength 1 */
@@ -1529,32 +1539,36 @@ export const useCreateUserIfNotExists = <
 };
 
 export const getCurrentUser = (
+  params?: GetCurrentUserParams,
   options?: SecondParameter<typeof CustomAxiosInstance>,
   signal?: AbortSignal
 ) => {
   return CustomAxiosInstance<GetCurrentUserResponseApiResult>(
-    { url: `http://localhost:4000/api/users/get-current-user`, method: 'GET', signal },
+    { url: `http://localhost:4000/api/users/get-current-user`, method: 'GET', params, signal },
     options
   );
 };
 
-export const getGetCurrentUserQueryKey = () => {
-  return [`http://localhost:4000/api/users/get-current-user`] as const;
+export const getGetCurrentUserQueryKey = (params?: GetCurrentUserParams) => {
+  return [`http://localhost:4000/api/users/get-current-user`, ...(params ? [params] : [])] as const;
 };
 
 export const getGetCurrentUserQueryOptions = <
   TData = Awaited<ReturnType<typeof getCurrentUser>>,
   TError = GetCurrentUserResponseApiResult,
->(options?: {
-  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getCurrentUser>>, TError, TData>>;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}) => {
+>(
+  params?: GetCurrentUserParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getCurrentUser>>, TError, TData>>;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+) => {
   const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey = queryOptions?.queryKey ?? getGetCurrentUserQueryKey();
+  const queryKey = queryOptions?.queryKey ?? getGetCurrentUserQueryKey(params);
 
   const queryFn: QueryFunction<Awaited<ReturnType<typeof getCurrentUser>>> = ({ signal }) =>
-    getCurrentUser(requestOptions, signal);
+    getCurrentUser(params, requestOptions, signal);
 
   return { queryKey, queryFn, staleTime: 8000, ...queryOptions } as UseQueryOptions<
     Awaited<ReturnType<typeof getCurrentUser>>,
@@ -1569,41 +1583,53 @@ export type GetCurrentUserQueryError = GetCurrentUserResponseApiResult;
 export function useGetCurrentUser<
   TData = Awaited<ReturnType<typeof getCurrentUser>>,
   TError = GetCurrentUserResponseApiResult,
->(options: {
-  query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getCurrentUser>>, TError, TData>> &
-    Pick<
-      DefinedInitialDataOptions<Awaited<ReturnType<typeof getCurrentUser>>, TError, TData>,
-      'initialData'
-    >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): DefinedUseQueryResult<TData, TError> & { queryKey: QueryKey };
+>(
+  params: undefined | GetCurrentUserParams,
+  options: {
+    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getCurrentUser>>, TError, TData>> &
+      Pick<
+        DefinedInitialDataOptions<Awaited<ReturnType<typeof getCurrentUser>>, TError, TData>,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): DefinedUseQueryResult<TData, TError> & { queryKey: QueryKey };
 export function useGetCurrentUser<
   TData = Awaited<ReturnType<typeof getCurrentUser>>,
   TError = GetCurrentUserResponseApiResult,
->(options?: {
-  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getCurrentUser>>, TError, TData>> &
-    Pick<
-      UndefinedInitialDataOptions<Awaited<ReturnType<typeof getCurrentUser>>, TError, TData>,
-      'initialData'
-    >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseQueryResult<TData, TError> & { queryKey: QueryKey };
+>(
+  params?: GetCurrentUserParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getCurrentUser>>, TError, TData>> &
+      Pick<
+        UndefinedInitialDataOptions<Awaited<ReturnType<typeof getCurrentUser>>, TError, TData>,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): UseQueryResult<TData, TError> & { queryKey: QueryKey };
 export function useGetCurrentUser<
   TData = Awaited<ReturnType<typeof getCurrentUser>>,
   TError = GetCurrentUserResponseApiResult,
->(options?: {
-  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getCurrentUser>>, TError, TData>>;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseQueryResult<TData, TError> & { queryKey: QueryKey };
+>(
+  params?: GetCurrentUserParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getCurrentUser>>, TError, TData>>;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): UseQueryResult<TData, TError> & { queryKey: QueryKey };
 
 export function useGetCurrentUser<
   TData = Awaited<ReturnType<typeof getCurrentUser>>,
   TError = GetCurrentUserResponseApiResult,
->(options?: {
-  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getCurrentUser>>, TError, TData>>;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
-  const queryOptions = getGetCurrentUserQueryOptions(options);
+>(
+  params?: GetCurrentUserParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getCurrentUser>>, TError, TData>>;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetCurrentUserQueryOptions(params, options);
 
   const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & { queryKey: QueryKey };
 

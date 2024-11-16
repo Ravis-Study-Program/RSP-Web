@@ -85,13 +85,13 @@ public class GetCurrentUserEndpoint : ICarterModule
   {
     app.MapGet(
          "api/users/get-current-user",
-         async (ISender sender, HttpContext httpContext) =>
+         async (string? email, ISender sender, HttpContext httpContext) =>
          {
-           var email = httpContext?.User?.Identity?.Name ?? "";
+           var currentUserEmail = httpContext?.User?.Identity?.Name ?? "";
 
            var command = new GetCurrentUser.Command
            {
-             Email = email
+             Email = email ?? currentUserEmail
            };
            var response = await sender.Send(command);
 

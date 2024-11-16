@@ -1,12 +1,14 @@
 import { useGetCurrentUser, useGetIsUserEnrolled } from '@/generated/api/client';
 
-export const useUserAndEnrollment = (seasonSlug: string) => {
+export const useUserAndEnrollment = (seasonSlug: string, email: string | null = null) => {
+  const queryOptions = email ? { email } : {};
+
   const {
     data: userResponse,
     isError: isLoadingUserError,
     isFetching: isFetchingUser,
     isLoading: isLoadingUser,
-  } = useGetCurrentUser();
+  } = useGetCurrentUser(queryOptions);
 
   const {
     data: enrollmentsResponse,
