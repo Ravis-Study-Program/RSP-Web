@@ -8,6 +8,12 @@ import { useUserAndEnrollment } from '@/shared/hooks/useUserAndEnrollment';
 
 export default function SeasonsPage() {
   const { isAdmin, isLoading } = useUserAndEnrollment('');
+  const {
+    data: enrollmentsResponse,
+    isError: isLoadingEnrollmentsError,
+    isFetching: isFetchingEnrollments,
+    isLoading: isLoadingEnrollments,
+  } = useGetCurrentUserEnrollments();
 
   if(isLoading) {
     return null;
@@ -16,13 +22,6 @@ export default function SeasonsPage() {
   if(isAdmin) {
     return <Navigate to="/admin/seasons" />;
   }
-
-  const {
-    data: enrollmentsResponse,
-    isError: isLoadingEnrollmentsError,
-    isFetching: isFetchingEnrollments,
-    isLoading: isLoadingEnrollments,
-  } = useGetCurrentUserEnrollments();
 
   return (
     <Layout>

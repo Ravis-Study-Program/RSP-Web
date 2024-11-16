@@ -57,7 +57,7 @@ const routes = (
         <Route index element={<SeasonsOverviewPage />} />
         <Route path="users" element={<SeasonUsersPage />} />
         <Route path="mentees" element={<SeasonRoleViewRouter mentorView={<MenteesPage />} />} />
-        <Route path="leetcode" element={placeholderPage('Leetcode Page')} />
+        <Route path="leetcode" element={<LeetcodePage />} />
         <Route path="mock-interviews" element={placeholderPage('Mock Interviews Page')} />
         <Route path="resources" element={<ResourcesPage />} />
       </Route>

@@ -48,7 +48,7 @@ public static class GetProblemAttempts
     {
       try
       {
-        var query = _dbContext.ProblemAttempts.AsQueryable();
+        var query = _dbContext.ProblemAttempts.Include(e => e.Enrollment.Season).AsQueryable();
 
         // Check if the enrollment exists
         if (request.EnrollmentId != null)
