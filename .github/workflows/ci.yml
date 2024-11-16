@@ -1,16 +1,14 @@
 name: Pull Request CI
 
 on:
-  # Trigger on pull requests targeting main
   pull_request:
     branches:
       - main
 
 jobs:
-  build-and-test:
-    name: Build and Test
+  client:
+    name: Client Build and Test
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -19,7 +17,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          key: ${{ runner.os }}-node-${{ hashFiles('client/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-node-
 
@@ -38,11 +36,18 @@ jobs:
           cd client
           yarn run format-and-test
 
+  server:
+    name: Server Build and Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
       - name: Cache .NET packages
         uses: actions/cache@v3
         with:
           path: ~/.nuget/packages
-          key: ${{ runner.os }}-dotnet-${{ hashFiles('**/*.csproj') }}
+          key: ${{ runner.os }}-dotnet-${{ hashFiles('**/*.csproj', '**/*.sln') }}
           restore-keys: |
             ${{ runner.os }}-dotnet-
 
@@ -51,19 +56,23 @@ jobs:
         with:
           dotnet-version: 8.0
 
-      - name: Run C# formatter
-        run: dotnet csharpier .
-
-      - name: Restore and build server-test
+      - name: Restore, build, and test
         run: |
           cd server-test
           dotnet restore --force --no-cache
           dotnet build
-
-      - name: Run server tests
-        run: |
-          cd server-test
           dotnet test --no-restore --no-build
+
+      - name: Run C# formatter
+        run: dotnet csharpier .
+
+  check-changes:
+    name: Check for Unstaged Changes
+    needs: [client, server]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
 
       - name: Check for unstaged changes
         run: |
