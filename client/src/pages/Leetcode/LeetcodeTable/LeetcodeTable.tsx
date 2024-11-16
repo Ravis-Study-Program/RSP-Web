@@ -15,11 +15,14 @@ import {
   Flex,
   Pill,
   Text,
+  Title,
   Tooltip,
   useComputedColorScheme,
 } from '@mantine/core';
 import { modals } from '@mantine/modals';
+import { notifications } from '@mantine/notifications';
 import {
+  DeleteProblemAttemptResponseApiResult,
   GetProblemAttemptsResponseApiResult,
   LeetcodeProblemDifficulty,
   ProblemAttemptEntity,
@@ -57,18 +60,39 @@ export const LeetcodeTable = ({
 
   const openDeleteConfirmModal = (row: MRT_Row<ProblemAttemptEntity>) => {
     modals.openConfirmModal({
-      title: 'Delete Problem Attempt',
       children: (
-        <Text>
-          Are you sure you want to delete this problem attempt? This action cannot be undone.
-        </Text>
+        <>
+          <Title order={3} mt={15} mb={10}>
+            Delete Problem Attempt
+          </Title>
+          <Text>
+            Are you sure you want to delete this problem attempt? This action cannot be undone.
+          </Text>
+        </>
       ),
       labels: { confirm: 'Delete', cancel: 'Cancel' },
       confirmProps: { color: 'red' },
       onConfirm: async () => {
-        await deleteProblemAttempt({ params: { problemAttemptId: row.original.problemAttemptId } });
-        await refetchProblemAttempts();
-        modals.closeAll();
+        try {
+          await deleteProblemAttempt({
+            params: { problemAttemptId: row.original.problemAttemptId },
+          });
+          await refetchProblemAttempts();
+          modals.closeAll();
+          notifications.show({
+            color: 'green',
+            title: 'Success',
+            message: 'Problem attempt deleted successfully.',
+          });
+        } catch (err) {
+          const response = (err as any)?.response.data as DeleteProblemAttemptResponseApiResult;
+          notifications.show({
+            color: 'red',
+            title: 'Error',
+            autoClose: false,
+            message: response.error?.message,
+          });
+        }
       },
     });
   };

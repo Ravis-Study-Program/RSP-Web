@@ -7,9 +7,11 @@ import {
   MRT_Row,
   useMantineReactTable,
 } from 'mantine-react-table';
-import { ActionIcon, Anchor, Button, Flex, Text, Tooltip } from '@mantine/core';
+import { ActionIcon, Anchor, Button, Flex, Text, Title, Tooltip } from '@mantine/core';
 import { modals } from '@mantine/modals';
+import { notifications } from '@mantine/notifications';
 import {
+  AdminDeleteSeasonResponseApiResult,
   SeasonEntity,
   useAdminCreateSeason,
   useAdminDeleteSeason,
@@ -34,16 +36,35 @@ export const AdminSeasonsTable = () => {
 
   const openDeleteConfirmModal = (row: MRT_Row<SeasonEntity>) => {
     modals.openConfirmModal({
-      title: 'Delete Season',
       children: (
-        <Text>Are you sure you want to delete this season? This action cannot be undone.</Text>
+        <>
+          <Title order={3} mt={15} mb={10}>
+            Delete Season
+          </Title>
+          <Text>Are you sure you want to delete this season? This action cannot be undone.</Text>
+        </>
       ),
       labels: { confirm: 'Delete', cancel: 'Cancel' },
       confirmProps: { color: 'red' },
       onConfirm: async () => {
-        await deleteSeason({ params: { seasonId: row.original.seasonId! } });
-        await refetchSeasons();
-        modals.closeAll();
+        try {
+          await deleteSeason({ params: { seasonId: row.original.seasonId! } });
+          await refetchSeasons();
+          modals.closeAll();
+          notifications.show({
+            color: 'green',
+            title: 'Success',
+            message: 'Season deleted successfully.',
+          });
+        } catch (err) {
+          const response = (err as any)?.response.data as AdminDeleteSeasonResponseApiResult;
+          notifications.show({
+            color: 'red',
+            title: 'Error',
+            autoClose: false,
+            message: response.error?.message,
+          });
+        }
       },
     });
   };

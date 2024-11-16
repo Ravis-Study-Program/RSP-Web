@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { Button, Fieldset, Flex, NumberInput, Select, Stack, Title } from '@mantine/core';
 import { DateTimePicker } from '@mantine/dates';
 import { useForm } from '@mantine/form';
+import { notifications } from '@mantine/notifications';
 import {
   CreateMockInterviewRequest,
   CreateMockInterviewResponseApiResult,
@@ -135,9 +136,19 @@ export const MockInterviewCreateModal = ({
       await createMockInterview({ data: requestData });
       await refetchMockInterviews();
       table.setCreatingRow(null);
-    } catch (err: unknown) {
-      // eslint-disable-next-line no-console
-      console.log(err);
+      notifications.show({
+        color: 'green',
+        title: 'Success',
+        message: 'Mock interview created successfully.',
+      });
+    } catch (err) {
+      const response = (err as any)?.response.data as CreateMockInterviewResponseApiResult;
+      notifications.show({
+        color: 'red',
+        title: 'Error',
+        autoClose: false,
+        message: response.error?.message,
+      });
     }
   };
 
@@ -162,7 +173,9 @@ export const MockInterviewCreateModal = ({
 
   return (
     <Stack>
-      <Title order={3}>Add Mock Interview</Title>
+      <Title order={3} mt={15}>
+        Add Mock Interview
+      </Title>
       <form onSubmit={form.onSubmit(handleSubmit)}>
         <DateTimePicker
           {...form.getInputProps('startDate')}

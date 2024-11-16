@@ -1,6 +1,7 @@
 import '@mantine/core/styles.css';
 import '@mantine/charts/styles.css';
 import '@mantine/dates/styles.css';
+import '@mantine/notifications/styles.css';
 import 'mantine-react-table/styles.css';
 
 import React from 'react';
@@ -10,6 +11,7 @@ import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { MantineProvider } from '@mantine/core';
 import { ModalsProvider } from '@mantine/modals';
+import { Notifications } from '@mantine/notifications';
 import AppRoutes from './Router';
 import { theme } from './theme';
 
@@ -18,6 +20,7 @@ const queryClient = new QueryClient();
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <MantineProvider theme={theme}>
+      <Notifications limit={1} />
       <QueryClientProvider client={queryClient}>
         <ModalsProvider>
           <Auth0Provider

@@ -6,9 +6,11 @@ import {
   MRT_Row,
   useMantineReactTable,
 } from 'mantine-react-table';
-import { ActionIcon, Button, Flex, Text, Tooltip } from '@mantine/core';
+import { ActionIcon, Button, Flex, Text, Title, Tooltip } from '@mantine/core';
 import { modals } from '@mantine/modals';
+import { notifications } from '@mantine/notifications';
 import {
+  AdminDeleteMentorshipResponseApiResult,
   MentorshipResponse,
   useAdminCreateMentorship,
   useAdminDeleteMentorship,
@@ -50,16 +52,37 @@ export const AdminMentorshipsTable = () => {
 
   const openDeleteConfirmModal = (row: MRT_Row<MentorshipResponse>) => {
     modals.openConfirmModal({
-      title: 'Delete Mentorship',
       children: (
-        <Text>Are you sure you want to delete this mentorship? This action cannot be undone.</Text>
+        <>
+          <Title order={3} mt={15} mb={10}>
+            Delete Mentorship
+          </Title>
+          <Text>
+            Are you sure you want to delete this mentorship? This action cannot be undone.
+          </Text>
+        </>
       ),
       labels: { confirm: 'Delete', cancel: 'Cancel' },
       confirmProps: { color: 'red' },
       onConfirm: async () => {
-        await deleteMentorship({ params: { mentorshipId: row.original.mentorshipId! } });
-        await refetchMentorships();
-        modals.closeAll();
+        try {
+          await deleteMentorship({ params: { mentorshipId: row.original.mentorshipId! } });
+          await refetchMentorships();
+          modals.closeAll();
+          notifications.show({
+            color: 'green',
+            title: 'Success',
+            message: 'Mentorship deleted successfully.',
+          });
+        } catch (err) {
+          const response = (err as any)?.response.data as AdminDeleteMentorshipResponseApiResult;
+          notifications.show({
+            color: 'red',
+            title: 'Error',
+            autoClose: false,
+            message: response.error?.message,
+          });
+        }
       },
     });
   };

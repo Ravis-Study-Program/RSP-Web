@@ -6,9 +6,11 @@ import {
   MRT_Row,
   useMantineReactTable,
 } from 'mantine-react-table';
-import { ActionIcon, Flex, Text, Tooltip } from '@mantine/core';
+import { ActionIcon, Flex, Text, Title, Tooltip } from '@mantine/core';
 import { modals } from '@mantine/modals';
+import { notifications } from '@mantine/notifications';
 import {
+  KickStudentResponseApiResult,
   MenteeResponseDto,
   useGetCurrentUserMenteesList,
   useKickStudent,
@@ -29,23 +31,42 @@ export const MenteesTable = () => {
 
   const openKickMenteeConfirmModal = (row: MRT_Row<MenteeResponseDto>) => {
     modals.openConfirmModal({
-      title: 'Delete Mentee',
       children: (
-        <Text>
-          Are you sure you want to kick this mentee out of RSP? This action cannot be undone.
-        </Text>
+        <>
+          <Title order={3} mt={15} mb={10}>
+            Delete Mentee
+          </Title>
+          <Text>
+            Are you sure you want to kick this mentee out of RSP? This action cannot be undone.
+          </Text>
+        </>
       ),
       labels: { confirm: 'Kick Mentee', cancel: 'Cancel' },
       confirmProps: { color: 'red' },
       onConfirm: async () => {
-        await kickStudent({
-          data: {
-            seasonSlug,
-            menteeEnrollmentId: row.original.menteeEnrollmentId,
-          },
-        });
-        await refetchMentees();
-        modals.closeAll();
+        try {
+          await kickStudent({
+            data: {
+              seasonSlug,
+              menteeEnrollmentId: row.original.menteeEnrollmentId,
+            },
+          });
+          await refetchMentees();
+          modals.closeAll();
+          notifications.show({
+            color: 'green',
+            title: 'Success',
+            message: 'Mentee deleted successfully.',
+          });
+        } catch (err) {
+          const response = (err as any)?.response.data as KickStudentResponseApiResult;
+          notifications.show({
+            color: 'red',
+            title: 'Error',
+            autoClose: false,
+            message: response.error?.message,
+          });
+        }
       },
     });
   };

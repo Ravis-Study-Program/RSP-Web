@@ -8,9 +8,11 @@ import {
   MRT_Row,
   useMantineReactTable,
 } from 'mantine-react-table';
-import { ActionIcon, Anchor, Box, Button, Flex, Table, Text, Tooltip } from '@mantine/core';
+import { ActionIcon, Anchor, Box, Button, Flex, Table, Text, Title, Tooltip } from '@mantine/core';
 import { modals } from '@mantine/modals';
+import { notifications } from '@mantine/notifications';
 import {
+  DeleteMockInterviewResponseApiResult,
   GetMockInterviewsResponseApiResult,
   MockInterviewEntity,
   MockInterviewRoundEntity,
@@ -53,18 +55,38 @@ export const MockInterviewTable = ({
 
   const openDeleteConfirmModal = (row: MRT_Row<MockInterviewEntity>) => {
     modals.openConfirmModal({
-      title: 'Delete Problem Attempt',
       children: (
-        <Text>
-          Are you sure you want to delete this mock interview? This action cannot be undone.
-        </Text>
+        <>
+          <Title order={3} mt={15} mb={10}>
+            Delete Mock Interview
+          </Title>
+          <Text>
+            Are you sure you want to kick this mock interview out of RSP? This action cannot be
+            undone.
+          </Text>
+        </>
       ),
       labels: { confirm: 'Delete', cancel: 'Cancel' },
       confirmProps: { color: 'red' },
       onConfirm: async () => {
-        await deleteMockInterview({ params: { mockInterviewId: row.original.mockInterviewId } });
-        await refetchMockInterviews();
-        modals.closeAll();
+        try {
+          await deleteMockInterview({ params: { mockInterviewId: row.original.mockInterviewId } });
+          await refetchMockInterviews();
+          modals.closeAll();
+          notifications.show({
+            color: 'green',
+            title: 'Success',
+            message: 'Mock interview deleted successfully.',
+          });
+        } catch (err) {
+          const response = (err as any)?.response.data as DeleteMockInterviewResponseApiResult;
+          notifications.show({
+            color: 'red',
+            title: 'Error',
+            autoClose: false,
+            message: response.error?.message,
+          });
+        }
       },
     });
   };

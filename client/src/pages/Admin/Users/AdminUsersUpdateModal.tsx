@@ -4,6 +4,7 @@ import { MRT_Row, MRT_TableInstance } from 'mantine-react-table';
 import { z } from 'zod';
 import { Button, Checkbox, Flex, Stack, TextInput, Title } from '@mantine/core';
 import { useForm } from '@mantine/form';
+import { notifications } from '@mantine/notifications';
 import {
   AdminListUserResponseApiResult,
   AdminUpdateUserRequest,
@@ -49,15 +50,27 @@ export const AdminUsersUpdateModal = ({
       await updateUser({ data: requestData });
       await refetchUsers();
       table.setEditingRow(null);
-    } catch (err: unknown) {
-      // eslint-disable-next-line no-console
-      console.log(err);
+      notifications.show({
+        color: 'green',
+        title: 'Success',
+        message: 'User updated successfully.',
+      });
+    } catch (err) {
+      const response = (err as any)?.response.data as AdminUpdateUserResponseApiResult;
+      notifications.show({
+        color: 'red',
+        title: 'Error',
+        autoClose: false,
+        message: response.error?.message,
+      });
     }
   };
 
   return (
     <Stack>
-      <Title order={3}>Update User</Title>
+      <Title order={3} mt={15}>
+        Update User
+      </Title>
       <form onSubmit={form.onSubmit(handleSubmit)}>
         <TextInput
           {...form.getInputProps('name')}

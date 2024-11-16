@@ -4,6 +4,7 @@ import { MRT_Row, MRT_TableInstance } from 'mantine-react-table';
 import { z } from 'zod';
 import { Button, Flex, Select, Stack, Title } from '@mantine/core';
 import { useForm } from '@mantine/form';
+import { notifications } from '@mantine/notifications';
 import {
   AdminListEnrollmentResponseApiResult,
   AdminUpdateEnrollmentRequest,
@@ -47,9 +48,19 @@ export const AdminEnrollmentsUpdateModal = ({
       await updateEnrollment({ data: requestData });
       await refetchEnrollments();
       table.setEditingRow(null);
-    } catch (err: unknown) {
-      // eslint-disable-next-line no-console
-      console.log(err);
+      notifications.show({
+        color: 'green',
+        title: 'Success',
+        message: 'Enrollment updated successfully.',
+      });
+    } catch (err) {
+      const response = (err as any)?.response.data as AdminUpdateEnrollmentResponseApiResult;
+      notifications.show({
+        color: 'red',
+        title: 'Error',
+        autoClose: false,
+        message: response.error?.message,
+      });
     }
   };
 
@@ -73,7 +84,9 @@ export const AdminEnrollmentsUpdateModal = ({
 
   return (
     <Stack>
-      <Title order={3}>Update Enrollment</Title>
+      <Title order={3} mt={15}>
+        Update Enrollment
+      </Title>
       <form onSubmit={form.onSubmit(handleSubmit)}>
         <Select
           {...form.getInputProps('seasonId')}

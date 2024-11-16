@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { Button, Flex, NumberInput, Select, Stack, Textarea, Title } from '@mantine/core';
 import { DateTimePicker } from '@mantine/dates';
 import { useForm } from '@mantine/form';
+import { notifications } from '@mantine/notifications';
 import {
   CreateProblemAttemptRequest,
   CreateProblemAttemptResponseApiResult,
@@ -63,9 +64,19 @@ export const LeetcodeProblemAttemptCreateModal = ({
       await createProblemAttempt({ data: requestData });
       await refetchProblemAttempts();
       table.setCreatingRow(null);
-    } catch (err: unknown) {
-      // eslint-disable-next-line no-console
-      console.log(err);
+      notifications.show({
+        color: 'green',
+        title: 'Success',
+        message: 'Problem attempt created successfully.',
+      });
+    } catch (err) {
+      const response = (err as any)?.response.data as CreateProblemAttemptResponseApiResult;
+      notifications.show({
+        color: 'red',
+        title: 'Error',
+        autoClose: false,
+        message: response.error?.message,
+      });
     }
   };
 
@@ -84,7 +95,9 @@ export const LeetcodeProblemAttemptCreateModal = ({
 
   return (
     <Stack>
-      <Title order={3}>Add Problem Attempt</Title>
+      <Title order={3} mt={15}>
+        Add Problem Attempt
+      </Title>
       <form onSubmit={form.onSubmit(handleSubmit)}>
         <Select
           {...form.getInputProps('leetcodeProblemId')}

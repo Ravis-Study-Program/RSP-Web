@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { Button, Flex, Select, Stack, TextInput, Title } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
 import { useForm } from '@mantine/form';
+import { notifications } from '@mantine/notifications';
 import {
   AdminListSeasonResponseApiResult,
   AdminUpdateSeasonRequest,
@@ -77,9 +78,19 @@ export const AdminSeasonsUpdateModal = ({
       await updateSeason({ data: requestData });
       await refetchSeasons();
       table.setEditingRow(null);
-    } catch (err: unknown) {
-      // eslint-disable-next-line no-console
-      console.log(err);
+      notifications.show({
+        color: 'green',
+        title: 'Success',
+        message: 'Season updated successfully.',
+      });
+    } catch (err) {
+      const response = (err as any)?.response.data as AdminUpdateSeasonResponseApiResult;
+      notifications.show({
+        color: 'red',
+        title: 'Error',
+        autoClose: false,
+        message: response.error?.message,
+      });
     }
   };
 
@@ -95,7 +106,9 @@ export const AdminSeasonsUpdateModal = ({
 
   return (
     <Stack>
-      <Title order={3}>Update Season</Title>
+      <Title order={3} mt={15}>
+        Update Season
+      </Title>
       <form onSubmit={form.onSubmit(handleSubmit)}>
         <TextInput
           {...form.getInputProps('name')}
