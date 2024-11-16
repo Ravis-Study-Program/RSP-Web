@@ -63,6 +63,9 @@ jobs:
           dotnet build
           dotnet test --no-restore --no-build
 
+      - name: Restore tool
+        run: dotnet tool restore
+
       - name: Run C# formatter
         run: dotnet csharpier .
 
