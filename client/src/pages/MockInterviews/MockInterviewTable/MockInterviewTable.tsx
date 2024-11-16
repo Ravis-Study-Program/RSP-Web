@@ -67,6 +67,14 @@ export const MockInterviewTable = ({
       },
     });
   };
+
+  const enrollmentColumn: MRT_ColumnDef<MockInterviewEntity> | null = (enrollmentId === null || enrollmentId === '') ? 
+  {
+    header: 'Season',
+    accessorFn: (row) => row.enrollment?.season?.slug || 'No Season',
+  }
+  : null;
+
   const columns = useMemo<MRT_ColumnDef<MockInterviewEntity>[]>(
     () => [
       {
@@ -78,6 +86,7 @@ export const MockInterviewTable = ({
           return <Text size="sm">{startFormatted}</Text>;
         },
       },
+      ...(enrollmentColumn ? [enrollmentColumn] : []),
       {
         header: 'Time Taken (mins)',
         accessorFn: (row) => row.timeTakenInMinutes,

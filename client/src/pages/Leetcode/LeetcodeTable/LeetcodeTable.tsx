@@ -75,7 +75,7 @@ export const LeetcodeTable = ({
   const enrollmentColumn: MRT_ColumnDef<ProblemAttemptEntity> | null = (enrollmentId === null || enrollmentId === '') ? 
   {
     header: 'Season',
-    accessorFn: (row) => row.enrollment?.season?.slug,
+    accessorFn: (row) => row.enrollment?.season?.slug || 'No Season',
   }
   : null;
 
