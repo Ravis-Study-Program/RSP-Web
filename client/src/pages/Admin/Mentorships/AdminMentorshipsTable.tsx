@@ -8,7 +8,9 @@ import {
 } from 'mantine-react-table';
 import { ActionIcon, Button, Flex, Text, Title, Tooltip } from '@mantine/core';
 import { modals } from '@mantine/modals';
+import { notifications } from '@mantine/notifications';
 import {
+  AdminDeleteMentorshipResponseApiResult,
   MentorshipResponse,
   useAdminCreateMentorship,
   useAdminDeleteMentorship,
@@ -63,9 +65,24 @@ export const AdminMentorshipsTable = () => {
       labels: { confirm: 'Delete', cancel: 'Cancel' },
       confirmProps: { color: 'red' },
       onConfirm: async () => {
-        await deleteMentorship({ params: { mentorshipId: row.original.mentorshipId! } });
-        await refetchMentorships();
-        modals.closeAll();
+        try {
+          await deleteMentorship({ params: { mentorshipId: row.original.mentorshipId! } });
+          await refetchMentorships();
+          modals.closeAll();
+          notifications.show({
+            color: 'green',
+            title: 'Success',
+            message: 'Mentorship deleted successfully.',
+          });
+        } catch (err) {
+          const response = (err as any)?.response.data as AdminDeleteMentorshipResponseApiResult;
+          notifications.show({
+            color: 'red',
+            title: 'Error',
+            autoClose: false,
+            message: response.error?.message,
+          });
+        }
       },
     });
   };

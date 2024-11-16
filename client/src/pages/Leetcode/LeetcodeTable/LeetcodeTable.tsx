@@ -20,7 +20,9 @@ import {
   useComputedColorScheme,
 } from '@mantine/core';
 import { modals } from '@mantine/modals';
+import { notifications } from '@mantine/notifications';
 import {
+  DeleteProblemAttemptResponseApiResult,
   GetProblemAttemptsResponseApiResult,
   LeetcodeProblemDifficulty,
   ProblemAttemptEntity,
@@ -71,9 +73,26 @@ export const LeetcodeTable = ({
       labels: { confirm: 'Delete', cancel: 'Cancel' },
       confirmProps: { color: 'red' },
       onConfirm: async () => {
-        await deleteProblemAttempt({ params: { problemAttemptId: row.original.problemAttemptId } });
-        await refetchProblemAttempts();
-        modals.closeAll();
+        try {
+          await deleteProblemAttempt({
+            params: { problemAttemptId: row.original.problemAttemptId },
+          });
+          await refetchProblemAttempts();
+          modals.closeAll();
+          notifications.show({
+            color: 'green',
+            title: 'Success',
+            message: 'Problem attempt deleted successfully.',
+          });
+        } catch (err) {
+          const response = (err as any)?.response.data as DeleteProblemAttemptResponseApiResult;
+          notifications.show({
+            color: 'red',
+            title: 'Error',
+            autoClose: false,
+            message: response.error?.message,
+          });
+        }
       },
     });
   };

@@ -8,7 +8,9 @@ import {
 } from 'mantine-react-table';
 import { ActionIcon, Button, Flex, Text, Title, Tooltip } from '@mantine/core';
 import { modals } from '@mantine/modals';
+import { notifications } from '@mantine/notifications';
 import {
+  AdminDeleteEnrollmentResponseApiResult,
   EnrollmentResponse,
   SeasonRole,
   useAdminCreateEnrollment,
@@ -64,9 +66,24 @@ export const AdminEnrollmentsTable = () => {
       labels: { confirm: 'Delete', cancel: 'Cancel' },
       confirmProps: { color: 'red' },
       onConfirm: async () => {
-        await deleteEnrollment({ params: { enrollmentId: row.original.enrollmentId! } });
-        await refetchEnrollments();
-        modals.closeAll();
+        try {
+          await deleteEnrollment({ params: { enrollmentId: row.original.enrollmentId! } });
+          await refetchEnrollments();
+          modals.closeAll();
+          notifications.show({
+            color: 'green',
+            title: 'Success',
+            message: 'Enrollment deleted successfully.',
+          });
+        } catch (err) {
+          const response = (err as any)?.response.data as AdminDeleteEnrollmentResponseApiResult;
+          notifications.show({
+            color: 'red',
+            title: 'Error',
+            autoClose: false,
+            message: response.error?.message,
+          });
+        }
       },
     });
   };

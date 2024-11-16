@@ -8,7 +8,9 @@ import {
 } from 'mantine-react-table';
 import { ActionIcon, Flex, Text, Title, Tooltip } from '@mantine/core';
 import { modals } from '@mantine/modals';
+import { notifications } from '@mantine/notifications';
 import {
+  KickStudentResponseApiResult,
   MenteeResponseDto,
   useGetCurrentUserMenteesList,
   useKickStudent,
@@ -42,14 +44,29 @@ export const MenteesTable = () => {
       labels: { confirm: 'Kick Mentee', cancel: 'Cancel' },
       confirmProps: { color: 'red' },
       onConfirm: async () => {
-        await kickStudent({
-          data: {
-            seasonSlug,
-            menteeEnrollmentId: row.original.menteeEnrollmentId,
-          },
-        });
-        await refetchMentees();
-        modals.closeAll();
+        try {
+          await kickStudent({
+            data: {
+              seasonSlug,
+              menteeEnrollmentId: row.original.menteeEnrollmentId,
+            },
+          });
+          await refetchMentees();
+          modals.closeAll();
+          notifications.show({
+            color: 'green',
+            title: 'Success',
+            message: 'Mentee deleted successfully.',
+          });
+        } catch (err) {
+          const response = (err as any)?.response.data as KickStudentResponseApiResult;
+          notifications.show({
+            color: 'red',
+            title: 'Error',
+            autoClose: false,
+            message: response.error?.message,
+          });
+        }
       },
     });
   };

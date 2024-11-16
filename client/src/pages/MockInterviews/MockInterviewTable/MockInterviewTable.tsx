@@ -10,7 +10,9 @@ import {
 } from 'mantine-react-table';
 import { ActionIcon, Anchor, Box, Button, Flex, Table, Text, Title, Tooltip } from '@mantine/core';
 import { modals } from '@mantine/modals';
+import { notifications } from '@mantine/notifications';
 import {
+  DeleteMockInterviewResponseApiResult,
   GetMockInterviewsResponseApiResult,
   MockInterviewEntity,
   MockInterviewRoundEntity,
@@ -67,9 +69,24 @@ export const MockInterviewTable = ({
       labels: { confirm: 'Delete', cancel: 'Cancel' },
       confirmProps: { color: 'red' },
       onConfirm: async () => {
-        await deleteMockInterview({ params: { mockInterviewId: row.original.mockInterviewId } });
-        await refetchMockInterviews();
-        modals.closeAll();
+        try {
+          await deleteMockInterview({ params: { mockInterviewId: row.original.mockInterviewId } });
+          await refetchMockInterviews();
+          modals.closeAll();
+          notifications.show({
+            color: 'green',
+            title: 'Success',
+            message: 'Mock interview deleted successfully.',
+          });
+        } catch (err) {
+          const response = (err as any)?.response.data as DeleteMockInterviewResponseApiResult;
+          notifications.show({
+            color: 'red',
+            title: 'Error',
+            autoClose: false,
+            message: response.error?.message,
+          });
+        }
       },
     });
   };
