@@ -45,6 +45,8 @@ public class AdminListEnrollmentTests : TestsHelper
               Location = DummyLocation,
             },
             User = new UserEntity { Name = "User Name", Email = DummyEmail },
+            Role = SeasonRole.Mentor,
+            StudentRolePromotion = SeasonStudentRolePromotion.NotApplicable,
           },
         }
       );
@@ -66,5 +68,7 @@ public class AdminListEnrollmentTests : TestsHelper
     Assert.Equal(DummyId1, enrollment.EnrollmentId);
     Assert.Equal("User Name", enrollment.UserName);
     Assert.Equal("Season Name", enrollment.SeasonName);
+    Assert.Equal(SeasonRole.Mentor, enrollment.Role);
+    Assert.Equal(SeasonStudentRolePromotion.NotApplicable, enrollment.StudentRolePromotion);
   }
 }

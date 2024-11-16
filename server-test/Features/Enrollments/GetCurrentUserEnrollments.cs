@@ -33,6 +33,7 @@ public class GetCurrentUserEnrollmentsTests : TestsHelper
       Role = SeasonRole.Mentor,
       Season = new SeasonEntity { SeasonId = DummyId1, Name = "Season Name" },
       User = new UserEntity { UserId = DummyId1, Email = DummyEmail },
+      StudentRolePromotion = SeasonStudentRolePromotion.NotApplicable,
     };
     _dbContextMock
       .Setup(x => x.Enrollments)
@@ -50,5 +51,6 @@ public class GetCurrentUserEnrollmentsTests : TestsHelper
     Assert.Equal(HttpStatusCode.OK, result.StatusCode);
     Assert.Equal(SeasonRole.Mentor, enrollment?.Role);
     Assert.Equal("Season Name", enrollment?.SeasonName);
+    Assert.Equal(SeasonStudentRolePromotion.NotApplicable, enrollment?.StudentRolePromotion);
   }
 }

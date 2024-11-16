@@ -54,6 +54,7 @@ public static class GetSeasonUsers
             DiscordId = e.User.DiscordId,
             ProfileImage = e.User.ProfileImage,
             Email = e.User.Email,
+            StudentRolePromotion = e.StudentRolePromotion,
           })
           .AsNoTracking()
           .ToListAsync(cancellationToken);
@@ -115,6 +116,9 @@ public record SeasonUserDto
 
   [Required]
   public string ProfileImage { get; set; } = string.Empty;
+
+  [Required]
+  public SeasonStudentRolePromotion StudentRolePromotion { get; set; }
 }
 
 public class GetSeasonUsersResponse

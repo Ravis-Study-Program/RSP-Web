@@ -20,6 +20,7 @@ public static class AdminUpdateEnrollment
     public string SeasonId { get; set; } = string.Empty;
     public string UserId { get; set; } = string.Empty;
     public SeasonRole Role { get; set; }
+    public SeasonStudentRolePromotion StudentRolePromotion { get; set; }
   }
 
   public class Validator : AbstractValidator<Command>
@@ -29,7 +30,8 @@ public static class AdminUpdateEnrollment
       RuleFor(c => c.EnrollmentId).NotEmpty();
       RuleFor(c => c.SeasonId).NotEmpty();
       RuleFor(c => c.UserId).NotEmpty();
-      RuleFor(c => c.Role).NotEmpty();
+      RuleFor(c => c.Role).IsInEnum();
+      RuleFor(c => c.StudentRolePromotion).IsInEnum();
     }
   }
 
@@ -62,9 +64,36 @@ public static class AdminUpdateEnrollment
         };
       }
 
+      switch (request.Role)
+      {
+        case SeasonRole.Student:
+          if (request.StudentRolePromotion == SeasonStudentRolePromotion.NotApplicable)
+          {
+            return new ApiResult<AdminUpdateEnrollmentResponse>
+            {
+              StatusCode = HttpStatusCode.BadRequest,
+              Error = new ApiError(Message.EnrollmentStudentMustHaveAppropriateRolePromotion),
+            };
+          }
+          break;
+
+        case SeasonRole.Mentor:
+        case SeasonRole.Coordinator:
+          if (request.StudentRolePromotion != SeasonStudentRolePromotion.NotApplicable)
+          {
+            return new ApiResult<AdminUpdateEnrollmentResponse>
+            {
+              StatusCode = HttpStatusCode.BadRequest,
+              Error = new ApiError(Message.EnrollmentMentorOrCoordinatorMustNotHaveRolePromotion),
+            };
+          }
+          break;
+      }
+
       existingEnrollment.SeasonId = request.SeasonId;
       existingEnrollment.UserId = request.UserId;
       existingEnrollment.Role = request.Role;
+      existingEnrollment.StudentRolePromotion = request.StudentRolePromotion;
 
       try
       {
@@ -80,6 +109,7 @@ public static class AdminUpdateEnrollment
             SeasonId = existingEnrollment.SeasonId,
             UserId = existingEnrollment.UserId,
             Role = existingEnrollment.Role,
+            StudentRolePromotion = existingEnrollment.StudentRolePromotion,
           },
           SuccessMessage = Message.EnrollmentUpdatedSuccessfully,
         };
@@ -112,6 +142,7 @@ public class AdminUpdateEnrollmentEndpoint : ICarterModule
             SeasonId = request.SeasonId,
             UserId = request.UserId,
             Role = request.Role,
+            StudentRolePromotion = request.StudentRolePromotion,
           };
           var response = await sender.Send(command);
 
@@ -135,6 +166,9 @@ public record AdminUpdateEnrollmentRequest
 
   [Required]
   public SeasonRole Role { get; set; }
+
+  [Required]
+  public SeasonStudentRolePromotion StudentRolePromotion { get; set; }
 }
 
 public class AdminUpdateEnrollmentResponse
@@ -150,4 +184,7 @@ public class AdminUpdateEnrollmentResponse
 
   [Required]
   public SeasonRole Role { get; set; }
+
+  [Required]
+  public SeasonStudentRolePromotion StudentRolePromotion { get; set; }
 }

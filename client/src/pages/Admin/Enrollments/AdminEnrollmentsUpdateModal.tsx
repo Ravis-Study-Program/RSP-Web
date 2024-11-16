@@ -12,13 +12,19 @@ import {
   EnrollmentResponse,
   SeasonEntity,
   SeasonRole,
+  SeasonStudentRolePromotion,
   UserEntity,
 } from '@/generated/api/client';
+import {
+  SeasonRoleReverseIndex,
+  SeasonStudentRolePromotionReverseIndex,
+} from '@/shared/entities/reverseIndex';
 
 const schema = z.object({
   seasonId: z.string(),
   userId: z.string(),
-  role: z.number(),
+  role: z.string(),
+  studentRolePromotion: z.string(),
 });
 
 export const AdminEnrollmentsUpdateModal = ({
@@ -34,16 +40,27 @@ export const AdminEnrollmentsUpdateModal = ({
     initialValues: {
       seasonId: enrollment.seasonId,
       userId: enrollment.userId,
-      role: enrollment.role,
+      role: SeasonRoleReverseIndex[enrollment.role],
+      studentRolePromotion: SeasonStudentRolePromotionReverseIndex[enrollment.studentRolePromotion],
     },
     validate: zodResolver(schema),
   });
 
-  const handleSubmit = async (values: { seasonId: string; userId: string; role: SeasonRole }) => {
+  const handleSubmit = async (values: {
+    seasonId: string;
+    userId: string;
+    role: string;
+    studentRolePromotion: string;
+  }) => {
     try {
       const requestData: AdminUpdateEnrollmentRequest = {
         ...values,
         enrollmentId: enrollment.enrollmentId,
+        role: SeasonRole[values.role as keyof typeof SeasonRole],
+        studentRolePromotion:
+          SeasonStudentRolePromotion[
+            values.studentRolePromotion as keyof typeof SeasonStudentRolePromotion
+          ],
       };
       await updateEnrollment({ data: requestData });
       await refetchEnrollments();
@@ -64,16 +81,22 @@ export const AdminEnrollmentsUpdateModal = ({
     }
   };
 
+  const roleOptions = Object.entries(SeasonRole).map(([key, _]) => ({
+    value: key,
+    label: key,
+  }));
+
+  const studentRolePromotionOptions = Object.entries(SeasonStudentRolePromotion).map(
+    ([key, _]) => ({
+      value: key,
+      label: key,
+    })
+  );
+
   const seasonOptions =
     seasons?.map((season) => ({
       value: season.seasonId,
       label: season.name,
-    })) || [];
-
-  const roleOptions =
-    Object.values(SeasonRole)?.map((role, index) => ({
-      value: index.toString(),
-      label: role.toString(),
     })) || [];
 
   const userOptions =
@@ -110,6 +133,15 @@ export const AdminEnrollmentsUpdateModal = ({
           label="Select Role"
           placeholder="Pick a role"
           data={roleOptions}
+          withAsterisk
+          mt="sm"
+          searchable
+        />
+        <Select
+          {...form.getInputProps('studentRolePromotion')}
+          label="Select Student Role Promotion"
+          placeholder="Pick a student role promotion"
+          data={studentRolePromotionOptions}
           withAsterisk
           mt="sm"
           searchable

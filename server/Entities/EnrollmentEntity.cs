@@ -19,6 +19,9 @@ public class EnrollmentEntity : ISoftDelete
   [Required]
   public SeasonRole Role { get; set; }
 
+  [Required]
+  public SeasonStudentRolePromotion StudentRolePromotion { get; set; }
+
   // Navigation
   public SeasonEntity Season { get; set; } = null!;
   public UserEntity User { get; set; } = null!;
@@ -59,6 +62,11 @@ public class EnrollmentEntityConfiguration : IEntityTypeConfiguration<Enrollment
       .Property(x => x.DeletedAtUtc)
       .HasColumnName("DeletedAtUtc")
       .HasColumnType("timestamptz");
+    builder
+      .Property(x => x.StudentRolePromotion)
+      .HasColumnName("StudentRolePromotion")
+      .HasColumnType("int")
+      .IsRequired();
 
     // Foreign Keys
     builder

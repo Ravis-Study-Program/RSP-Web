@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { IconTrash } from '@tabler/icons-react';
+import { IconEdit, IconTrash } from '@tabler/icons-react';
 import {
   MantineReactTable,
   MRT_ColumnDef,
@@ -12,10 +12,13 @@ import { notifications } from '@mantine/notifications';
 import {
   KickStudentResponseApiResult,
   MenteeResponseDto,
+  SeasonStudentRolePromotion,
   useGetCurrentUserMenteesList,
   useKickStudent,
+  useUpdateStudentRolePromotion,
 } from '@/generated/api/client';
 import { useSeasonSlug } from '@/shared/hooks/useSeasonSlug';
+import { StudentRolePromotionUpdateModal } from './StudentRolePromotionUpdateModal';
 import classes from './MenteesTable.module.css';
 
 export const MenteesTable = () => {
@@ -28,6 +31,8 @@ export const MenteesTable = () => {
     refetch: refetchMentees,
   } = useGetCurrentUserMenteesList(seasonSlug);
   const { mutateAsync: kickStudent, status: isKickingStudentStatus } = useKickStudent();
+  const { mutateAsync: updateStudentRolePromotion, status: isUpdatingStudentRolePromotionStatus } =
+    useUpdateStudentRolePromotion();
 
   const openKickMenteeConfirmModal = (row: MRT_Row<MenteeResponseDto>) => {
     modals.openConfirmModal({
@@ -77,6 +82,18 @@ export const MenteesTable = () => {
         accessorKey: 'menteeName',
         header: 'Name',
       },
+      {
+        header: 'Student Role Promotion',
+        accessorFn: (row) => {
+          const roleKey = Object.keys(SeasonStudentRolePromotion).find(
+            (key) =>
+              SeasonStudentRolePromotion[key as keyof typeof SeasonStudentRolePromotion] ===
+              row.studentRolePromotion
+          ) as keyof typeof SeasonStudentRolePromotion;
+
+          return roleKey ? roleKey : 'Unknown Role';
+        },
+      },
     ],
     []
   );
@@ -84,6 +101,14 @@ export const MenteesTable = () => {
   const table = useMantineReactTable({
     columns,
     data: menteeResponse?.responseBody?.mentees ?? [],
+    createDisplayMode: 'modal',
+    mantineEditRowModalProps: {
+      closeOnClickOutside: false,
+      withCloseButton: true,
+      closeButtonProps: {
+        className: classes.modalCloseButton,
+      },
+    },
     mantinePaperProps: {
       className: classes.table,
     },
@@ -106,8 +131,22 @@ export const MenteesTable = () => {
         }
       : undefined,
     isMultiSortEvent: () => true,
+    renderEditRowModalContent: ({ table, row }) => (
+      <StudentRolePromotionUpdateModal
+        table={table}
+        row={row}
+        updateStudentRolePromotion={updateStudentRolePromotion}
+        refetchMentees={refetchMentees}
+        seasonSlug={seasonSlug}
+      />
+    ),
     renderRowActions: ({ row }) => (
       <Flex gap="md">
+        <Tooltip label="Edit">
+          <ActionIcon variant="subtle" onClick={() => table.setEditingRow(row)}>
+            <IconEdit />
+          </ActionIcon>
+        </Tooltip>
         <Tooltip label="Delete">
           <ActionIcon variant="subtle" color="red" onClick={() => openKickMenteeConfirmModal(row)}>
             <IconTrash />
@@ -117,7 +156,8 @@ export const MenteesTable = () => {
     ),
     state: {
       isLoading: isLoadingMentees,
-      isSaving: isKickingStudentStatus === 'pending',
+      isSaving:
+        isKickingStudentStatus === 'pending' || isUpdatingStudentRolePromotionStatus === 'pending',
       showAlertBanner: isLoadingMenteesError,
       showProgressBars: isFetchingMentees,
     },

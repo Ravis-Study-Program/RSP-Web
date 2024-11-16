@@ -22,7 +22,13 @@ public class AdminCreateEnrollmentTests : TestsHelper
 
   private AdminCreateEnrollment.Command CreateDummyCommand()
   {
-    return new AdminCreateEnrollment.Command { SeasonId = DummyId1, UserId = DummyId1 };
+    return new AdminCreateEnrollment.Command
+    {
+      SeasonId = DummyId1,
+      UserId = DummyId1,
+      Role = SeasonRole.Coordinator,
+      StudentRolePromotion = SeasonStudentRolePromotion.NotApplicable,
+    };
   }
 
   [Fact]
@@ -33,6 +39,7 @@ public class AdminCreateEnrollmentTests : TestsHelper
       EnrollmentId = DummyId1,
       SeasonId = DummyId1,
       UserId = DummyId1,
+      Role = SeasonRole.Coordinator,
     };
     _dbContextMock
       .Setup(x => x.Enrollments)
@@ -47,6 +54,45 @@ public class AdminCreateEnrollmentTests : TestsHelper
     var result = await handler.Handle(command, CancellationToken.None);
     Assert.Equal(HttpStatusCode.BadRequest, result.StatusCode);
     Assert.Equal(Message.EnrollmentExists, result?.Error?.Message);
+  }
+
+  [Fact]
+  public async Task Handle_StudentWithInappropriateRolePromotion_BadRequest()
+  {
+    _dbContextMock.Setup(x => x.Enrollments).ReturnsDbSet(new List<EnrollmentEntity>());
+
+    var command = CreateDummyCommand();
+    command.Role = SeasonRole.Student;
+
+    var handler = new AdminCreateEnrollment.Handler(
+      _dbContextMock.Object,
+      Mock.Of<ILogger<AdminCreateEnrollment.Handler>>()
+    );
+
+    var result = await handler.Handle(command, CancellationToken.None);
+    Assert.Equal(HttpStatusCode.BadRequest, result.StatusCode);
+    Assert.Equal(Message.EnrollmentStudentMustHaveAppropriateRolePromotion, result?.Error?.Message);
+  }
+
+  [Fact]
+  public async Task Handle_CoordinatorWithInappropriateRolePromotion_BadRequest()
+  {
+    _dbContextMock.Setup(x => x.Enrollments).ReturnsDbSet(new List<EnrollmentEntity>());
+
+    var command = CreateDummyCommand();
+    command.StudentRolePromotion = SeasonStudentRolePromotion.Beginner;
+
+    var handler = new AdminCreateEnrollment.Handler(
+      _dbContextMock.Object,
+      Mock.Of<ILogger<AdminCreateEnrollment.Handler>>()
+    );
+
+    var result = await handler.Handle(command, CancellationToken.None);
+    Assert.Equal(HttpStatusCode.BadRequest, result.StatusCode);
+    Assert.Equal(
+      Message.EnrollmentMentorOrCoordinatorMustNotHaveRolePromotion,
+      result?.Error?.Message
+    );
   }
 
   [Fact]
