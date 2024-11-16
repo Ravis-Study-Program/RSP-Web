@@ -7,7 +7,6 @@ import { DateTimePicker } from '@mantine/dates';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import {
-  CreateMockInterviewResponseApiResult,
   GetMockInterviewsResponseApiResult,
   LeetcodeProblemDto,
   MockInterviewEntity,
