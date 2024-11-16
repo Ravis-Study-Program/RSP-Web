@@ -88,8 +88,38 @@ export interface UserEntity {
   userId: string;
 }
 
+export interface UpdateStudentRolePromotionResponse {
+  [key: string]: unknown;
+}
+
+export interface UpdateStudentRolePromotionResponseApiResult {
+  error?: ApiError;
+  readonly isSuccess?: boolean;
+  responseBody?: UpdateStudentRolePromotionResponse;
+  statusCode?: HttpStatusCode;
+  /** @nullable */
+  successMessage?: string | null;
+}
+
+export interface UpdateStudentRolePromotionRequest {
+  /** @minLength 1 */
+  menteeEnrollmentId: string;
+  /** @minLength 1 */
+  seasonSlug: string;
+  studentRolePromotion: SeasonStudentRolePromotion;
+}
+
 export interface UpdateProblemAttemptResponse {
   [key: string]: unknown;
+}
+
+export interface UpdateProblemAttemptResponseApiResult {
+  error?: ApiError;
+  readonly isSuccess?: boolean;
+  responseBody?: UpdateProblemAttemptResponse;
+  statusCode?: HttpStatusCode;
+  /** @nullable */
+  successMessage?: string | null;
 }
 
 export interface UpdateProblemAttemptRequest {
@@ -111,6 +141,39 @@ export interface UpdateMockInterviewResponse {
   [key: string]: unknown;
 }
 
+export interface UpdateMockInterviewResponseApiResult {
+  error?: ApiError;
+  readonly isSuccess?: boolean;
+  responseBody?: UpdateMockInterviewResponse;
+  statusCode?: HttpStatusCode;
+  /** @nullable */
+  successMessage?: string | null;
+}
+
+export interface UpdateMockInterviewRequest {
+  /** @nullable */
+  enrollmentId?: string | null;
+  /** @minLength 1 */
+  interviewerUserId: string;
+  /** @minLength 1 */
+  mockInterviewId: string;
+  mockInterviewRoundDtos: MockInterviewRoundDto[];
+  startDate: string;
+  timeTakenInMinutes: number;
+}
+
+export type SeasonStudentRolePromotion =
+  (typeof SeasonStudentRolePromotion)[keyof typeof SeasonStudentRolePromotion];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const SeasonStudentRolePromotion = {
+  NotApplicable: 0,
+  Novice: 1,
+  Beginner: 2,
+  Intermediate: 3,
+  Advanced: 4,
+} as const;
+
 export type SeasonRole = (typeof SeasonRole)[keyof typeof SeasonRole];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
@@ -130,6 +193,7 @@ export interface SeasonUserDto {
   /** @minLength 1 */
   profileImage: string;
   role: SeasonRole;
+  studentRolePromotion: SeasonStudentRolePromotion;
 }
 
 export interface SeasonEntity {
@@ -160,6 +224,29 @@ export interface ProblemEntity {
   title: string;
 }
 
+export interface ProblemAttemptEntity {
+  attemptStartDateUtc: string;
+  customProblem?: CustomProblemEntity;
+  /** @nullable */
+  customProblemId?: string | null;
+  /** @nullable */
+  deletedAtUtc?: string | null;
+  enrollment?: EnrollmentEntity;
+  /** @nullable */
+  enrollmentId?: string | null;
+  leetcodeProblem?: LeetcodeProblemEntity;
+  /** @nullable */
+  leetcodeProblemId?: string | null;
+  /** @minLength 1 */
+  notes: string;
+  /** @minLength 1 */
+  problemAttemptId: string;
+  timeTakenInMinutes: number;
+  user?: UserEntity;
+  /** @minLength 1 */
+  userId: string;
+}
+
 export interface MockInterviewRoundEntity {
   behaviouralMockInterviewRound?: BehaviouralMockInterviewRoundEntity;
   /** @nullable */
@@ -187,18 +274,6 @@ export interface MockInterviewRoundDto {
   leetcodeMockInterviewRound?: LeetcodeMockInterviewRoundDto;
   /** @nullable */
   mockInterviewRoundId?: string | null;
-}
-
-export interface UpdateMockInterviewRequest {
-  /** @nullable */
-  enrollmentId?: string | null;
-  /** @minLength 1 */
-  interviewerUserId: string;
-  /** @minLength 1 */
-  mockInterviewId: string;
-  mockInterviewRoundDtos: MockInterviewRoundDto[];
-  startDate: string;
-  timeTakenInMinutes: number;
 }
 
 export interface MockInterviewEntity {
@@ -259,6 +334,7 @@ export interface MenteeResponseDto {
   menteeEnrollmentId: string;
   /** @minLength 1 */
   menteeName: string;
+  studentRolePromotion: SeasonStudentRolePromotion;
 }
 
 export type LeetcodeProblemDifficulty =
@@ -270,6 +346,20 @@ export const LeetcodeProblemDifficulty = {
   Medium: 1,
   Hard: 2,
 } as const;
+
+export interface LeetcodeProblemEntity {
+  /** @nullable */
+  deletedAtUtc?: string | null;
+  isPremium: boolean;
+  /** @nullable */
+  leetcodeProblemCategories?: LeetcodeProblemCategoryEntity[] | null;
+  leetcodeProblemDifficulty: LeetcodeProblemDifficulty;
+  /** @minLength 1 */
+  leetcodeProblemId: string;
+  problem?: ProblemEntity;
+  /** @minLength 1 */
+  problemId: string;
+}
 
 export interface LeetcodeProblemDto {
   difficulty: LeetcodeProblemDifficulty;
@@ -289,43 +379,6 @@ export interface LeetcodeProblemCategoryEntity {
   leetcodeProblemCategoryId: string;
   /** @minLength 1 */
   name: string;
-}
-
-export interface LeetcodeProblemEntity {
-  /** @nullable */
-  deletedAtUtc?: string | null;
-  isPremium: boolean;
-  /** @nullable */
-  leetcodeProblemCategories?: LeetcodeProblemCategoryEntity[] | null;
-  leetcodeProblemDifficulty: LeetcodeProblemDifficulty;
-  /** @minLength 1 */
-  leetcodeProblemId: string;
-  problem?: ProblemEntity;
-  /** @minLength 1 */
-  problemId: string;
-}
-
-export interface ProblemAttemptEntity {
-  attemptStartDateUtc: string;
-  customProblem?: CustomProblemEntity;
-  /** @nullable */
-  customProblemId?: string | null;
-  /** @nullable */
-  deletedAtUtc?: string | null;
-  enrollment?: EnrollmentEntity;
-  /** @nullable */
-  enrollmentId?: string | null;
-  leetcodeProblem?: LeetcodeProblemEntity;
-  /** @nullable */
-  leetcodeProblemId?: string | null;
-  /** @minLength 1 */
-  notes: string;
-  /** @minLength 1 */
-  problemAttemptId: string;
-  timeTakenInMinutes: number;
-  user?: UserEntity;
-  /** @minLength 1 */
-  userId: string;
 }
 
 export interface LeetcodeMockInterviewRoundEntity {
@@ -440,24 +493,6 @@ export const HttpStatusCode = {
   NetworkAuthenticationRequired: 511,
 } as const;
 
-export interface UpdateProblemAttemptResponseApiResult {
-  error?: ApiError;
-  readonly isSuccess?: boolean;
-  responseBody?: UpdateProblemAttemptResponse;
-  statusCode?: HttpStatusCode;
-  /** @nullable */
-  successMessage?: string | null;
-}
-
-export interface UpdateMockInterviewResponseApiResult {
-  error?: ApiError;
-  readonly isSuccess?: boolean;
-  responseBody?: UpdateMockInterviewResponse;
-  statusCode?: HttpStatusCode;
-  /** @nullable */
-  successMessage?: string | null;
-}
-
 export interface GraduateDto {
   /** @minLength 1 */
   discordId: string;
@@ -539,6 +574,7 @@ export interface GetIsUserEnrolledResponse {
   enrollmentId: string;
   isEnrolled: boolean;
   role: SeasonRole;
+  studentRolePromotion: SeasonStudentRolePromotion;
 }
 
 export interface GetIsUserEnrolledResponseApiResult {
@@ -589,16 +625,6 @@ export interface GetCurrentUserMenteesListResponseApiResult {
   successMessage?: string | null;
 }
 
-export interface EnrollmentResponseDto {
-  role: SeasonRole;
-  /** @minLength 1 */
-  seasonImageUrl: string;
-  /** @minLength 1 */
-  seasonName: string;
-  /** @minLength 1 */
-  seasonSlug: string;
-}
-
 export interface GetCurrentUserEnrollmentsResponse {
   enrollments: EnrollmentResponseDto[];
 }
@@ -612,6 +638,17 @@ export interface GetCurrentUserEnrollmentsResponseApiResult {
   successMessage?: string | null;
 }
 
+export interface EnrollmentResponseDto {
+  role: SeasonRole;
+  /** @minLength 1 */
+  seasonImageUrl: string;
+  /** @minLength 1 */
+  seasonName: string;
+  /** @minLength 1 */
+  seasonSlug: string;
+  studentRolePromotion: SeasonStudentRolePromotion;
+}
+
 export interface EnrollmentResponse {
   /** @minLength 1 */
   enrollmentId: string;
@@ -620,6 +657,7 @@ export interface EnrollmentResponse {
   seasonId: string;
   /** @minLength 1 */
   seasonName: string;
+  studentRolePromotion: SeasonStudentRolePromotion;
   /** @minLength 1 */
   userId: string;
   /** @minLength 1 */
@@ -635,6 +673,7 @@ export interface EnrollmentEntity {
   season?: SeasonEntity;
   /** @minLength 1 */
   seasonId: string;
+  studentRolePromotion: SeasonStudentRolePromotion;
   user?: UserEntity;
   /** @minLength 1 */
   userId: string;
@@ -702,15 +741,6 @@ export interface CustomMockInterviewRoundDto {
 
 export interface CreateUserIfNotExistsResponse {
   [key: string]: unknown;
-}
-
-export interface CreateUserIfNotExistsResponseApiResult {
-  error?: ApiError;
-  readonly isSuccess?: boolean;
-  responseBody?: CreateUserIfNotExistsResponse;
-  statusCode?: HttpStatusCode;
-  /** @nullable */
-  successMessage?: string | null;
 }
 
 export interface CreateUserIfNotExistsRequest {
@@ -788,6 +818,15 @@ export interface ApiError {
   message?: string | null;
   /** @nullable */
   validationErrors?: ValidationError[] | null;
+}
+
+export interface CreateUserIfNotExistsResponseApiResult {
+  error?: ApiError;
+  readonly isSuccess?: boolean;
+  responseBody?: CreateUserIfNotExistsResponse;
+  statusCode?: HttpStatusCode;
+  /** @nullable */
+  successMessage?: string | null;
 }
 
 export interface AdminUpdateUserResponse {
@@ -897,6 +936,7 @@ export interface AdminUpdateEnrollmentResponse {
   role: SeasonRole;
   /** @minLength 1 */
   seasonId: string;
+  studentRolePromotion: SeasonStudentRolePromotion;
   /** @minLength 1 */
   userId: string;
 }
@@ -916,6 +956,7 @@ export interface AdminUpdateEnrollmentRequest {
   role: SeasonRole;
   /** @minLength 1 */
   seasonId: string;
+  studentRolePromotion: SeasonStudentRolePromotion;
   /** @minLength 1 */
   userId: string;
 }
@@ -1140,6 +1181,7 @@ export interface AdminCreateEnrollmentResponse {
   role: SeasonRole;
   /** @minLength 1 */
   seasonId: string;
+  studentRolePromotion: SeasonStudentRolePromotion;
   /** @minLength 1 */
   userId: string;
 }
@@ -1157,6 +1199,7 @@ export interface AdminCreateEnrollmentRequest {
   role: SeasonRole;
   /** @minLength 1 */
   seasonId: string;
+  studentRolePromotion: SeasonStudentRolePromotion;
   /** @minLength 1 */
   userId: string;
 }
@@ -4131,6 +4174,80 @@ export const useKickStudent = <
   TContext
 > => {
   const mutationOptions = getKickStudentMutationOptions(options);
+
+  return useMutation(mutationOptions);
+};
+
+export const updateStudentRolePromotion = (
+  updateStudentRolePromotionRequest: UpdateStudentRolePromotionRequest,
+  options?: SecondParameter<typeof CustomAxiosInstance>
+) => {
+  return CustomAxiosInstance<UpdateStudentRolePromotionResponseApiResult>(
+    {
+      url: `http://localhost:4000/enrollments/update-student-role-promotion`,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      data: updateStudentRolePromotionRequest,
+    },
+    options
+  );
+};
+
+export const getUpdateStudentRolePromotionMutationOptions = <
+  TError = UpdateStudentRolePromotionResponseApiResult,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updateStudentRolePromotion>>,
+    TError,
+    { data: UpdateStudentRolePromotionRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof updateStudentRolePromotion>>,
+  TError,
+  { data: UpdateStudentRolePromotionRequest },
+  TContext
+> => {
+  const { mutation: mutationOptions, request: requestOptions } = options ?? {};
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof updateStudentRolePromotion>>,
+    { data: UpdateStudentRolePromotionRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return updateStudentRolePromotion(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type UpdateStudentRolePromotionMutationResult = NonNullable<
+  Awaited<ReturnType<typeof updateStudentRolePromotion>>
+>;
+export type UpdateStudentRolePromotionMutationBody = UpdateStudentRolePromotionRequest;
+export type UpdateStudentRolePromotionMutationError = UpdateStudentRolePromotionResponseApiResult;
+
+export const useUpdateStudentRolePromotion = <
+  TError = UpdateStudentRolePromotionResponseApiResult,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updateStudentRolePromotion>>,
+    TError,
+    { data: UpdateStudentRolePromotionRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof updateStudentRolePromotion>>,
+  TError,
+  { data: UpdateStudentRolePromotionRequest },
+  TContext
+> => {
+  const mutationOptions = getUpdateStudentRolePromotionMutationOptions(options);
 
   return useMutation(mutationOptions);
 };

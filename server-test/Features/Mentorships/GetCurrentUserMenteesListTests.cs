@@ -58,6 +58,7 @@ public class GetCurrentUserMenteesListTests : TestsHelper
                 Slug = DummySlug,
               },
               User = new UserEntity { UserId = DummyId2, Name = DummyName },
+              StudentRolePromotion = SeasonStudentRolePromotion.Beginner,
             },
           },
         }
@@ -79,5 +80,6 @@ public class GetCurrentUserMenteesListTests : TestsHelper
     var mentorship = mentorships[0];
     Assert.Equal(DummyName, mentorship.MenteeName);
     Assert.Equal(DummyId2, mentorship.MenteeEnrollmentId);
+    Assert.Equal(SeasonStudentRolePromotion.Beginner, mentorship.StudentRolePromotion);
   }
 }

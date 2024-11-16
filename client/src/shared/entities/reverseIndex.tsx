@@ -1,4 +1,8 @@
-import { LeetcodeProblemDifficulty, SeasonRole } from '@/generated/api/client';
+import {
+  LeetcodeProblemDifficulty,
+  SeasonRole,
+  SeasonStudentRolePromotion,
+} from '@/generated/api/client';
 
 export const LeetcodeProblemDifficultyReverseIndex = Object.fromEntries(
   Object.entries(LeetcodeProblemDifficulty).map(([key, value]) => [value, key])
@@ -7,3 +11,7 @@ export const LeetcodeProblemDifficultyReverseIndex = Object.fromEntries(
 export const SeasonRoleReverseIndex = Object.fromEntries(
   Object.entries(SeasonRole).map(([key, value]) => [value, key])
 ) as { [key: number]: keyof typeof SeasonRole };
+
+export const SeasonStudentRolePromotionReverseIndex = Object.fromEntries(
+  Object.entries(SeasonStudentRolePromotion).map(([key, value]) => [value, key])
+) as { [key: number]: keyof typeof SeasonStudentRolePromotion };

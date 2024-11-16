@@ -19,6 +19,7 @@ public static class AdminCreateEnrollment
     public string SeasonId { get; set; } = string.Empty;
     public string UserId { get; set; } = string.Empty;
     public SeasonRole Role { get; set; }
+    public SeasonStudentRolePromotion StudentRolePromotion { get; set; }
   }
 
   public class Validator : AbstractValidator<Command>
@@ -28,6 +29,7 @@ public static class AdminCreateEnrollment
       RuleFor(c => c.SeasonId).NotEmpty();
       RuleFor(c => c.UserId).NotEmpty();
       RuleFor(c => c.Role).IsInEnum();
+      RuleFor(c => c.StudentRolePromotion).IsInEnum();
     }
   }
 
@@ -60,12 +62,39 @@ public static class AdminCreateEnrollment
         };
       }
 
+      switch (request.Role)
+      {
+        case SeasonRole.Student:
+          if (request.StudentRolePromotion == SeasonStudentRolePromotion.NotApplicable)
+          {
+            return new ApiResult<AdminCreateEnrollmentResponse>
+            {
+              StatusCode = HttpStatusCode.BadRequest,
+              Error = new ApiError(Message.EnrollmentStudentMustHaveAppropriateRolePromotion),
+            };
+          }
+          break;
+
+        case SeasonRole.Mentor:
+        case SeasonRole.Coordinator:
+          if (request.StudentRolePromotion != SeasonStudentRolePromotion.NotApplicable)
+          {
+            return new ApiResult<AdminCreateEnrollmentResponse>
+            {
+              StatusCode = HttpStatusCode.BadRequest,
+              Error = new ApiError(Message.EnrollmentMentorOrCoordinatorMustNotHaveRolePromotion),
+            };
+          }
+          break;
+      }
+
       var enrollment = new EnrollmentEntity
       {
         EnrollmentId = Database.Constants.GeneratePrimaryKeyId(),
         SeasonId = request.SeasonId,
         UserId = request.UserId,
         Role = request.Role,
+        StudentRolePromotion = request.StudentRolePromotion,
       };
 
       try
@@ -82,6 +111,7 @@ public static class AdminCreateEnrollment
             UserId = enrollment.UserId,
             EnrollmentId = enrollment.EnrollmentId,
             Role = enrollment.Role,
+            StudentRolePromotion = request.StudentRolePromotion,
           },
           SuccessMessage = Message.EnrollmentCreatedSuccessfully,
         };
@@ -113,6 +143,7 @@ public class AdminCreateEnrollmentEndpoint : ICarterModule
             SeasonId = request.SeasonId,
             UserId = request.UserId,
             Role = request.Role,
+            StudentRolePromotion = request.StudentRolePromotion,
           };
           var response = await sender.Send(command);
 
@@ -133,6 +164,9 @@ public record AdminCreateEnrollmentRequest
 
   [Required]
   public SeasonRole Role { get; set; }
+
+  [Required]
+  public SeasonStudentRolePromotion StudentRolePromotion { get; set; }
 }
 
 public class AdminCreateEnrollmentResponse
@@ -148,4 +182,7 @@ public class AdminCreateEnrollmentResponse
 
   [Required]
   public SeasonRole Role { get; set; }
+
+  [Required]
+  public SeasonStudentRolePromotion StudentRolePromotion { get; set; }
 }

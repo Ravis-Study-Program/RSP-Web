@@ -12,6 +12,7 @@ import {
   EnrollmentResponse,
   SeasonEntity,
   SeasonRole,
+  SeasonStudentRolePromotion,
   UserEntity,
 } from '@/generated/api/client';
 
@@ -19,6 +20,7 @@ const schema = z.object({
   seasonId: z.string(),
   userId: z.string(),
   role: z.string(),
+  studentRolePromotion: z.string(),
 });
 
 export const AdminEnrollmentsCreateModal = ({
@@ -34,15 +36,25 @@ export const AdminEnrollmentsCreateModal = ({
       seasonId: '',
       userId: '',
       role: '',
+      studentRolePromotion: '',
     },
     validate: zodResolver(schema),
   });
 
-  const handleSubmit = async (values: { seasonId: string; userId: string; role: string }) => {
+  const handleSubmit = async (values: {
+    seasonId: string;
+    userId: string;
+    role: string;
+    studentRolePromotion: string;
+  }) => {
     try {
       const requestData: AdminCreateEnrollmentRequest = {
         ...values,
         role: SeasonRole[values.role as keyof typeof SeasonRole],
+        studentRolePromotion:
+          SeasonStudentRolePromotion[
+            values.studentRolePromotion as keyof typeof SeasonStudentRolePromotion
+          ],
       };
       await createEnrollment({ data: requestData });
       await refetchEnrollments();
@@ -50,7 +62,7 @@ export const AdminEnrollmentsCreateModal = ({
       notifications.show({
         color: 'green',
         title: 'Success',
-        message: 'Enrollment updated successfully.',
+        message: 'Enrollment created successfully.',
       });
     } catch (err) {
       const response = (err as any)?.response.data as AdminCreateEnrollmentResponseApiResult;
@@ -73,6 +85,13 @@ export const AdminEnrollmentsCreateModal = ({
     value: key,
     label: key,
   }));
+
+  const studentRolePromotionOptions = Object.entries(SeasonStudentRolePromotion).map(
+    ([key, _]) => ({
+      value: key,
+      label: key,
+    })
+  );
 
   const userOptions =
     users?.map((user) => ({
@@ -108,6 +127,15 @@ export const AdminEnrollmentsCreateModal = ({
           label="Select Role"
           placeholder="Pick a role"
           data={roleOptions}
+          withAsterisk
+          mt="sm"
+          searchable
+        />
+        <Select
+          {...form.getInputProps('studentRolePromotion')}
+          label="Select Student Role Promotion"
+          placeholder="Pick a student role promotion"
+          data={studentRolePromotionOptions}
           withAsterisk
           mt="sm"
           searchable

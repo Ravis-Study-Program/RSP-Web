@@ -53,6 +53,7 @@ public static class GetCurrentUserEnrollments
             SeasonName = e.Season.Name,
             SeasonImageUrl = e.Season.ImageUrl,
             Role = e.Role,
+            StudentRolePromotion = e.StudentRolePromotion,
           })
           .AsNoTracking()
           .ToListAsync(cancellationToken);
@@ -110,6 +111,9 @@ public record EnrollmentResponseDto
 
   [Required]
   public SeasonRole Role { get; set; }
+
+  [Required]
+  public SeasonStudentRolePromotion StudentRolePromotion { get; set; }
 }
 
 public record GetCurrentUserEnrollmentsResponse

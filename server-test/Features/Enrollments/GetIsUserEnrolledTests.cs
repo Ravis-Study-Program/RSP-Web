@@ -37,6 +37,8 @@ public class GetIsUserEnrolledTests : TestsHelper
         Slug = "Season Slug",
       },
       User = new UserEntity { UserId = DummyId1, Email = DummyEmail },
+      Role = SeasonRole.Mentor,
+      StudentRolePromotion = SeasonStudentRolePromotion.NotApplicable,
     };
     _dbContextMock
       .Setup(x => x.Enrollments)
@@ -52,6 +54,8 @@ public class GetIsUserEnrolledTests : TestsHelper
     var response = result.ResponseBody;
     Assert.Equal(HttpStatusCode.OK, result.StatusCode);
     Assert.Equal(true, response?.IsEnrolled);
+    Assert.Equal(SeasonRole.Mentor, response?.Role);
+    Assert.Equal(SeasonStudentRolePromotion.NotApplicable, response?.StudentRolePromotion);
   }
 
   [Fact]

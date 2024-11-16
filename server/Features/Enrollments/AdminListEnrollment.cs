@@ -42,6 +42,7 @@ public static class AdminListEnrollment
             SeasonName = e.Season.Name,
             UserId = e.User.UserId,
             UserName = e.User.Name,
+            StudentRolePromotion = e.StudentRolePromotion,
           })
           .AsNoTracking()
           .ToListAsync(cancellationToken);
@@ -104,6 +105,9 @@ public class EnrollmentResponse
 
   [Required]
   public string UserName { get; set; } = string.Empty;
+
+  [Required]
+  public SeasonStudentRolePromotion StudentRolePromotion { get; set; }
 }
 
 public class AdminListEnrollmentResponse

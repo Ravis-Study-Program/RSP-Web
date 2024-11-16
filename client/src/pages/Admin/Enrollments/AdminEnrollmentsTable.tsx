@@ -13,6 +13,7 @@ import {
   AdminDeleteEnrollmentResponseApiResult,
   EnrollmentResponse,
   SeasonRole,
+  SeasonStudentRolePromotion,
   useAdminCreateEnrollment,
   useAdminDeleteEnrollment,
   useAdminListEnrollment,
@@ -104,6 +105,18 @@ export const AdminEnrollmentsTable = () => {
           const roleKey = Object.keys(SeasonRole).find(
             (key) => SeasonRole[key as keyof typeof SeasonRole] === row.role
           ) as keyof typeof SeasonRole;
+
+          return roleKey ? roleKey : 'Unknown Role';
+        },
+      },
+      {
+        header: 'Student Role Promotion',
+        accessorFn: (row) => {
+          const roleKey = Object.keys(SeasonStudentRolePromotion).find(
+            (key) =>
+              SeasonStudentRolePromotion[key as keyof typeof SeasonStudentRolePromotion] ===
+              row.studentRolePromotion
+          ) as keyof typeof SeasonStudentRolePromotion;
 
           return roleKey ? roleKey : 'Unknown Role';
         },

@@ -58,6 +58,10 @@ public static class Message
     "An unexpected error has occurred during enrollment list.";
   public const string EnrollmentIsUserEnrolledError =
     "Checked if user is enrolled in a given season error";
+  public const string EnrollmentStudentMustHaveAppropriateRolePromotion =
+    "A student role must have a valid Role Promotion";
+  public const string EnrollmentMentorOrCoordinatorMustNotHaveRolePromotion =
+    "A mentor or coordinator role must not have Role Promotion";
 
   public const string KickStudentCurrentUserEnrollmentDoesNotExists =
     "No enrollment found using the provided current user details.";
@@ -66,6 +70,15 @@ public static class Message
   public const string KickStudentSuccessfully = "Kick student successfully";
   public const string KickStudentUnexpectedError =
     "An unexpected error has occurred during kick student process.";
+
+  public const string UpdateStudentRolePromotionEnrollmentDoesNotExists =
+    "No enrollment found using the provided current user details.";
+  public const string UpdateStudentRolePromotionMenteeDoesntExist =
+    "No student enrollment found using the provided mentee details.";
+  public const string UpdateStudentRolePromotionSuccessfully =
+    "Updated role promotion successfully";
+  public const string UpdateStudentRolePromotionUnexpectedError =
+    "An unexpected error has occurred during update role promotion process.";
 
   public const string MentorshipExists = "A mentorship with this MentorshipId already exists.";
   public const string MentorshipDoesNotExists =

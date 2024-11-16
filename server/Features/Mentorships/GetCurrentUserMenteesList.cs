@@ -5,7 +5,9 @@ using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using RSPWebAPI.Database;
+using RSPWebAPI.Entities;
 using RSPWebAPI.Features.Constants;
+using RSPWebAPI.Migrations;
 using RSPWebAPI.Shared;
 using RSPWebAPI.Shared.Behaviours;
 
@@ -55,6 +57,7 @@ public static class GetCurrentUserMenteesList
           {
             MenteeName = m.MenteeEnrollment.User.Name,
             MenteeEnrollmentId = m.MenteeEnrollment.EnrollmentId,
+            StudentRolePromotion = m.MenteeEnrollment.StudentRolePromotion,
           })
           .AsNoTracking()
           .ToListAsync(cancellationToken);
@@ -111,6 +114,9 @@ public record MenteeResponseDto
 
   [Required]
   public string MenteeName { get; set; } = string.Empty;
+
+  [Required]
+  public SeasonStudentRolePromotion StudentRolePromotion { get; set; }
 }
 
 public record GetCurrentUserMenteesListResponse
