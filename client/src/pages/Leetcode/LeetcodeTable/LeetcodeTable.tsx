@@ -37,6 +37,7 @@ export const LeetcodeTable = ({
   refetchProblemAttempts,
   enrollmentId,
   problemAttempts,
+  enableEditing
 }: LeetcodeTableProps) => {
   const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
 
@@ -184,7 +185,7 @@ export const LeetcodeTable = ({
       },
     },
     editDisplayMode: 'modal',
-    enableEditing: true,
+    enableEditing,
     initialState: {
       density: 'xs',
       sorting: [
@@ -262,4 +263,5 @@ type LeetcodeTableProps = {
   >;
   problemAttempts: ProblemAttemptEntity[] | null | undefined;
   enrollmentId: string;
+  enableEditing: boolean;
 };

@@ -28,6 +28,7 @@ export default function LeetcodePage() {
         refetchProblemAttempts={refetchProblemAttempts}
         problemAttempts={problemAttemptsResponse?.responseBody?.problemAttempts}
         enrollmentId={userResponse?.responseBody?.enrollmentId || ''}
+        enableEditing
       />
     </Layout>
   );

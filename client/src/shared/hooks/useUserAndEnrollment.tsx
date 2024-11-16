@@ -29,6 +29,7 @@ export const useUserAndEnrollment = (seasonSlug: string) => {
     user,
     isAdmin,
     role,
+    enrollmentId: enrollmentsResponse?.responseBody?.enrollmentId,
     isLoading,
     isError: isLoadingUserError || isLoadingEnrollmentsError,
   };
