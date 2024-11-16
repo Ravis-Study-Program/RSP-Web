@@ -23,6 +23,7 @@ export default function MockInterviewPage() {
         refetchMockInterviews={refetchMockInterviews}
         mockInterviews={mockInterviewsResponse?.responseBody?.mockInterviews}
         enrollmentId={userResponse?.responseBody?.enrollmentId || ''}
+        enableEditing
       />
     </Layout>
   );

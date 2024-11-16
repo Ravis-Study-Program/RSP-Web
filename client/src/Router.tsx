@@ -1,13 +1,12 @@
 import React, { lazy, Suspense } from 'react';
 import { Route, Routes } from 'react-router-dom';
-import { Text } from '@mantine/core';
-import { Layout } from './components/Layout/Layout';
 import AdminRouteGuard from './shared/auth/AdminRouteGuard';
 import AuthRouteGuard from './shared/auth/AuthRouteGuard';
 import SeasonRouteGuard from './shared/auth/SeasonRouteGuard';
 import SeasonRoleViewRouter from './shared/auth/SeasonViewRouter';
 import ResourcesPage from './pages/Resources/Resources.page';
 import SeasonUsersPage from './pages/SeasonUsers/SeasonUsers.page';
+import ProfilePage from './pages/Profile/Profile.page';
 
 // Lazy load the page components
 const AdminEnrollmentsPage = lazy(() => import('./pages/Admin/Enrollments/AdminEnrollments.page'));
@@ -24,15 +23,6 @@ const SeasonsPage = lazy(() => import('./pages/Seasons/Seasons.page'));
 const SeasonsOverviewPage = lazy(() => import('./pages/Seasons/SeasonsOverview.page'));
 const SettingsPage = lazy(() => import('./pages/Settings/Settings.page'));
 
-// Placeholder for simple pages
-const placeholderPage = (title: string) => (
-  <Layout>
-    <Text size="lg" c="dimmed">
-      {title}
-    </Text>
-  </Layout>
-);
-
 const routes = (
   <Routes>
     {/* Authenticated Routes */}
@@ -45,7 +35,7 @@ const routes = (
         <Route path="mentorships" element={<AdminMentorshipsPage />} />
       </Route>
 
-      <Route path="profile" element={placeholderPage('Profile Page')} />
+      <Route path="profile" element={<ProfilePage />} />
       <Route path="seasons" element={<SeasonsPage />} />
       <Route path="settings" element={<SettingsPage />} />
       <Route path="graduates" element={<GraduatesPage />} />

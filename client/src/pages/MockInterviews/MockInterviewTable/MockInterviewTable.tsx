@@ -28,6 +28,7 @@ export const MockInterviewTable = ({
   refetchMockInterviews,
   enrollmentId,
   mockInterviews,
+  enableEditing
 }: MockInterviewTableProps) => {
   const {
     data: leetcodeProblemsResponse,
@@ -146,7 +147,7 @@ export const MockInterviewTable = ({
       },
     },
     editDisplayMode: 'modal',
-    enableEditing: true,
+    enableEditing,
     initialState: {
       density: 'xs',
       sorting: [
@@ -239,6 +240,7 @@ type MockInterviewTableProps = {
   >;
   mockInterviews: MockInterviewEntity[] | null | undefined;
   enrollmentId: string;
+  enableEditing: boolean;
 };
 
 const LeetcodeMockInterviewRoundsInnerTable = ({ rounds }: InnerMockInterviewTableProps) => {
