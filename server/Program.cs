@@ -89,8 +89,8 @@ var builder = WebApplication.CreateBuilder(args);
     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
-      options.Authority = "https://dev-gu5nqsqu82rthcq2.us.auth0.com/"; // $"https://{builder.Configuration["Auth0:Domain"]}/";
-      options.Audience = "http://localhost:3000"; //builder.Configuration["Auth0:Audience"];
+      options.Authority = builder.Configuration["Auth0:Domain"];
+      options.Audience = builder.Configuration["Auth0:Audience"];
       options.TokenValidationParameters = new TokenValidationParameters
       {
         NameClaimType = ClaimTypes.Email,

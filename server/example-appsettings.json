@@ -6,11 +6,11 @@
     }
   },
   "ConnectionStrings": {
-    "DefaultConnection": "Host=localhost;Port=5432;Database=rsp;Username=username;Password=password;Port=5432"
+    "DefaultConnection": "connection"
   },
   "Auth0": {
-    "Domain": "dev-gu5nqsqu82rthcq2.us.auth0.com",
-    "Audience": "http://localhost:3000"
+    "Domain": "domain",
+    "Audience": "audience"
   },
   "AllowedHosts": "*",
   "Kestrel": {
