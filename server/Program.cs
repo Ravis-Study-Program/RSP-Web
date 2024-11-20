@@ -107,6 +107,8 @@ var builder = WebApplication.CreateBuilder(args);
     {
       options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
     });
+
+  builder.Services.AddHealthChecks();
 }
 
 var app = builder.Build();
@@ -129,6 +131,7 @@ var app = builder.Build();
       return new ApiResult<string> { Error = new ApiError(exception?.Message ?? "Error occured") };
     }
   );
+  app.UseHealthChecks("/health");
 }
 
 app.Run();
