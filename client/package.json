@@ -18,6 +18,7 @@
     "vitest:watch": "vitest",
     "final": "npm run typecheck && npm run prettier:write && npm run lint && npm run vitest && npm run build",
     "format-and-test": "npm run generate:client && npm run typecheck && npm run prettier:write && npm run lint && npm run vitest",
+    "cicd-format-and-test": "npm run typecheck && npm run prettier:write && npm run lint && npm run vitest",
     "storybook": "storybook dev -p 6006",
     "storybook:build": "storybook build"
   },

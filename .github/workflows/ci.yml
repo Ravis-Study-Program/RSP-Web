@@ -34,7 +34,7 @@ jobs:
       - name: Format and test client
         run: |
           cd client
-          yarn run format-and-test
+          yarn run cicd-format-and-test
 
   server:
     name: Server Build and Test
