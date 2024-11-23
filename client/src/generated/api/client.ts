@@ -1377,7 +1377,7 @@ export const getAdminListUserQueryOptions = <
   const queryFn: QueryFunction<Awaited<ReturnType<typeof adminListUser>>> = ({ signal }) =>
     adminListUser(requestOptions, signal);
 
-  return { queryKey, queryFn, staleTime: 8000, ...queryOptions } as UseQueryOptions<
+  return { queryKey, queryFn, staleTime: Infinity, ...queryOptions } as UseQueryOptions<
     Awaited<ReturnType<typeof adminListUser>>,
     TError,
     TData
@@ -1621,7 +1621,7 @@ export const getGetCurrentUserQueryOptions = <
   const queryFn: QueryFunction<Awaited<ReturnType<typeof getCurrentUser>>> = ({ signal }) =>
     getCurrentUser(params, requestOptions, signal);
 
-  return { queryKey, queryFn, staleTime: 8000, ...queryOptions } as UseQueryOptions<
+  return { queryKey, queryFn, staleTime: Infinity, ...queryOptions } as UseQueryOptions<
     Awaited<ReturnType<typeof getCurrentUser>>,
     TError,
     TData
@@ -1717,7 +1717,7 @@ export const getGetUserListQueryOptions = <
   const queryFn: QueryFunction<Awaited<ReturnType<typeof getUserList>>> = ({ signal }) =>
     getUserList(requestOptions, signal);
 
-  return { queryKey, queryFn, staleTime: 8000, ...queryOptions } as UseQueryOptions<
+  return { queryKey, queryFn, staleTime: Infinity, ...queryOptions } as UseQueryOptions<
     Awaited<ReturnType<typeof getUserList>>,
     TError,
     TData
@@ -1813,7 +1813,7 @@ export const getGetSeasonUsersQueryOptions = <
     queryKey,
     queryFn,
     enabled: !!seasonSlug,
-    staleTime: 8000,
+    staleTime: Infinity,
     ...queryOptions,
   } as UseQueryOptions<Awaited<ReturnType<typeof getSeasonUsers>>, TError, TData> & {
     queryKey: QueryKey;
@@ -2052,7 +2052,7 @@ export const getAdminListSeasonQueryOptions = <
   const queryFn: QueryFunction<Awaited<ReturnType<typeof adminListSeason>>> = ({ signal }) =>
     adminListSeason(requestOptions, signal);
 
-  return { queryKey, queryFn, staleTime: 8000, ...queryOptions } as UseQueryOptions<
+  return { queryKey, queryFn, staleTime: Infinity, ...queryOptions } as UseQueryOptions<
     Awaited<ReturnType<typeof adminListSeason>>,
     TError,
     TData
@@ -2369,7 +2369,7 @@ export const getGetProblemAttemptsQueryOptions = <
   const queryFn: QueryFunction<Awaited<ReturnType<typeof getProblemAttempts>>> = ({ signal }) =>
     getProblemAttempts(params, requestOptions, signal);
 
-  return { queryKey, queryFn, staleTime: 8000, ...queryOptions } as UseQueryOptions<
+  return { queryKey, queryFn, staleTime: Infinity, ...queryOptions } as UseQueryOptions<
     Awaited<ReturnType<typeof getProblemAttempts>>,
     TError,
     TData
@@ -2772,7 +2772,7 @@ export const getGetMockInterviewsQueryOptions = <
   const queryFn: QueryFunction<Awaited<ReturnType<typeof getMockInterviews>>> = ({ signal }) =>
     getMockInterviews(params, requestOptions, signal);
 
-  return { queryKey, queryFn, staleTime: 8000, ...queryOptions } as UseQueryOptions<
+  return { queryKey, queryFn, staleTime: Infinity, ...queryOptions } as UseQueryOptions<
     Awaited<ReturnType<typeof getMockInterviews>>,
     TError,
     TData
@@ -3084,7 +3084,7 @@ export const getAdminListMentorshipQueryOptions = <
   const queryFn: QueryFunction<Awaited<ReturnType<typeof adminListMentorship>>> = ({ signal }) =>
     adminListMentorship(requestOptions, signal);
 
-  return { queryKey, queryFn, staleTime: 8000, ...queryOptions } as UseQueryOptions<
+  return { queryKey, queryFn, staleTime: Infinity, ...queryOptions } as UseQueryOptions<
     Awaited<ReturnType<typeof adminListMentorship>>,
     TError,
     TData
@@ -3261,7 +3261,7 @@ export const getGetCurrentUserMenteesListQueryOptions = <
     queryKey,
     queryFn,
     enabled: !!seasonSlug,
-    staleTime: 8000,
+    staleTime: Infinity,
     ...queryOptions,
   } as UseQueryOptions<Awaited<ReturnType<typeof getCurrentUserMenteesList>>, TError, TData> & {
     queryKey: QueryKey;
@@ -3382,7 +3382,7 @@ export const getAdminPopulateLeetcodeQuestionsQueryOptions = <
     signal,
   }) => adminPopulateLeetcodeQuestions(requestOptions, signal);
 
-  return { queryKey, queryFn, staleTime: 8000, ...queryOptions } as UseQueryOptions<
+  return { queryKey, queryFn, staleTime: Infinity, ...queryOptions } as UseQueryOptions<
     Awaited<ReturnType<typeof adminPopulateLeetcodeQuestions>>,
     TError,
     TData
@@ -3485,7 +3485,7 @@ export const getGetLeetcodeProblemsQueryOptions = <
   const queryFn: QueryFunction<Awaited<ReturnType<typeof getLeetcodeProblems>>> = ({ signal }) =>
     getLeetcodeProblems(requestOptions, signal);
 
-  return { queryKey, queryFn, staleTime: 8000, ...queryOptions } as UseQueryOptions<
+  return { queryKey, queryFn, staleTime: Infinity, ...queryOptions } as UseQueryOptions<
     Awaited<ReturnType<typeof getLeetcodeProblems>>,
     TError,
     TData
@@ -3571,7 +3571,7 @@ export const getGetGraduatesQueryOptions = <
   const queryFn: QueryFunction<Awaited<ReturnType<typeof getGraduates>>> = ({ signal }) =>
     getGraduates(requestOptions, signal);
 
-  return { queryKey, queryFn, staleTime: 8000, ...queryOptions } as UseQueryOptions<
+  return { queryKey, queryFn, staleTime: Infinity, ...queryOptions } as UseQueryOptions<
     Awaited<ReturnType<typeof getGraduates>>,
     TError,
     TData
@@ -3802,7 +3802,7 @@ export const getAdminListEnrollmentQueryOptions = <
   const queryFn: QueryFunction<Awaited<ReturnType<typeof adminListEnrollment>>> = ({ signal }) =>
     adminListEnrollment(requestOptions, signal);
 
-  return { queryKey, queryFn, staleTime: 8000, ...queryOptions } as UseQueryOptions<
+  return { queryKey, queryFn, staleTime: Infinity, ...queryOptions } as UseQueryOptions<
     Awaited<ReturnType<typeof adminListEnrollment>>,
     TError,
     TData
@@ -3971,7 +3971,7 @@ export const getGetCurrentUserEnrollmentsQueryOptions = <
     signal,
   }) => getCurrentUserEnrollments(requestOptions, signal);
 
-  return { queryKey, queryFn, staleTime: 8000, ...queryOptions } as UseQueryOptions<
+  return { queryKey, queryFn, staleTime: Infinity, ...queryOptions } as UseQueryOptions<
     Awaited<ReturnType<typeof getCurrentUserEnrollments>>,
     TError,
     TData
@@ -4087,7 +4087,7 @@ export const getGetIsUserEnrolledQueryOptions = <
     queryKey,
     queryFn,
     enabled: !!seasonSlug,
-    staleTime: 8000,
+    staleTime: Infinity,
     ...queryOptions,
   } as UseQueryOptions<Awaited<ReturnType<typeof getIsUserEnrolled>>, TError, TData> & {
     queryKey: QueryKey;

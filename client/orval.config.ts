@@ -29,7 +29,7 @@ export default defineConfig({
         query: {
           useQuery: true,
           options: {
-            staleTime: 8000, // TODO: need to tweak this properly
+            staleTime: Infinity,
           },
           signal: true,
         },
