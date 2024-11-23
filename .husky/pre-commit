@@ -1,6 +1,14 @@
 # Parallel for faster speed
 (cd client && yarn run format-and-test) & dotnet csharpier . & (cd server-test && dotnet restore --force --no-cache && dotnet build && dotnet test --no-restore --no-build) & wait
 
+# Exit if the generated file has localhost
+REPO_ROOT=$(git rev-parse --show-toplevel)
+FILE="$REPO_ROOT/client/src/generated/api/client.ts"
+if grep -q "localhost" "$FILE"; then
+  echo "Error: 'localhost' found in $FILE. Please regenerate client.ts."
+  exit 1
+fi
+
 # Exit if there are unstaged changes
 if ! git diff --exit-code; then
   echo "There are unstaged changes. Please stage them before committing."

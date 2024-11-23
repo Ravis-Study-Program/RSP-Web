@@ -1212,7 +1212,7 @@ export const adminCreateUser = (
 ) => {
   return CustomAxiosInstance<AdminCreateUserResponseApiResult>(
     {
-      url: `http://localhost:4000/api/admin/users`,
+      url: `https://rsp-server-test.up.railway.app/api/admin/users`,
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       data: adminCreateUserRequest,
@@ -1285,7 +1285,7 @@ export const adminDeleteUser = (
   options?: SecondParameter<typeof CustomAxiosInstance>
 ) => {
   return CustomAxiosInstance<AdminDeleteUserResponseApiResult>(
-    { url: `http://localhost:4000/api/admin/users`, method: 'DELETE', params },
+    { url: `https://rsp-server-test.up.railway.app/api/admin/users`, method: 'DELETE', params },
     options
   );
 };
@@ -1354,13 +1354,13 @@ export const adminListUser = (
   signal?: AbortSignal
 ) => {
   return CustomAxiosInstance<AdminListUserResponseApiResult>(
-    { url: `http://localhost:4000/api/admin/users`, method: 'GET', signal },
+    { url: `https://rsp-server-test.up.railway.app/api/admin/users`, method: 'GET', signal },
     options
   );
 };
 
 export const getAdminListUserQueryKey = () => {
-  return [`http://localhost:4000/api/admin/users`] as const;
+  return [`https://rsp-server-test.up.railway.app/api/admin/users`] as const;
 };
 
 export const getAdminListUserQueryOptions = <
@@ -1439,7 +1439,7 @@ export const adminUpdateUser = (
 ) => {
   return CustomAxiosInstance<AdminUpdateUserResponseApiResult>(
     {
-      url: `http://localhost:4000/api/admin/users`,
+      url: `https://rsp-server-test.up.railway.app/api/admin/users`,
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       data: adminUpdateUserRequest,
@@ -1513,7 +1513,7 @@ export const createUserIfNotExists = (
 ) => {
   return CustomAxiosInstance<CreateUserIfNotExistsResponseApiResult>(
     {
-      url: `http://localhost:4000/api/users/create-if-not-exists`,
+      url: `https://rsp-server-test.up.railway.app/api/users/create-if-not-exists`,
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       data: createUserIfNotExistsRequest,
@@ -1587,13 +1587,21 @@ export const getCurrentUser = (
   signal?: AbortSignal
 ) => {
   return CustomAxiosInstance<GetCurrentUserResponseApiResult>(
-    { url: `http://localhost:4000/api/users/get-current-user`, method: 'GET', params, signal },
+    {
+      url: `https://rsp-server-test.up.railway.app/api/users/get-current-user`,
+      method: 'GET',
+      params,
+      signal,
+    },
     options
   );
 };
 
 export const getGetCurrentUserQueryKey = (params?: GetCurrentUserParams) => {
-  return [`http://localhost:4000/api/users/get-current-user`, ...(params ? [params] : [])] as const;
+  return [
+    `https://rsp-server-test.up.railway.app/api/users/get-current-user`,
+    ...(params ? [params] : []),
+  ] as const;
 };
 
 export const getGetCurrentUserQueryOptions = <
@@ -1686,13 +1694,13 @@ export const getUserList = (
   signal?: AbortSignal
 ) => {
   return CustomAxiosInstance<GetUserListResponseApiResult>(
-    { url: `http://localhost:4000/api/users-list`, method: 'GET', signal },
+    { url: `https://rsp-server-test.up.railway.app/api/users-list`, method: 'GET', signal },
     options
   );
 };
 
 export const getGetUserListQueryKey = () => {
-  return [`http://localhost:4000/api/users-list`] as const;
+  return [`https://rsp-server-test.up.railway.app/api/users-list`] as const;
 };
 
 export const getGetUserListQueryOptions = <
@@ -1771,13 +1779,17 @@ export const getSeasonUsers = (
   signal?: AbortSignal
 ) => {
   return CustomAxiosInstance<GetSeasonUsersResponseApiResult>(
-    { url: `http://localhost:4000/api/season-users/${seasonSlug}`, method: 'GET', signal },
+    {
+      url: `https://rsp-server-test.up.railway.app/api/season-users/${seasonSlug}`,
+      method: 'GET',
+      signal,
+    },
     options
   );
 };
 
 export const getGetSeasonUsersQueryKey = (seasonSlug: string) => {
-  return [`http://localhost:4000/api/season-users/${seasonSlug}`] as const;
+  return [`https://rsp-server-test.up.railway.app/api/season-users/${seasonSlug}`] as const;
 };
 
 export const getGetSeasonUsersQueryOptions = <
@@ -1875,7 +1887,7 @@ export const adminCreateSeason = (
 ) => {
   return CustomAxiosInstance<AdminCreateSeasonResponseApiResult>(
     {
-      url: `http://localhost:4000/api/admin/seasons`,
+      url: `https://rsp-server-test.up.railway.app/api/admin/seasons`,
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       data: adminCreateSeasonRequest,
@@ -1948,7 +1960,7 @@ export const adminDeleteSeason = (
   options?: SecondParameter<typeof CustomAxiosInstance>
 ) => {
   return CustomAxiosInstance<AdminDeleteSeasonResponseApiResult>(
-    { url: `http://localhost:4000/api/admin/seasons`, method: 'DELETE', params },
+    { url: `https://rsp-server-test.up.railway.app/api/admin/seasons`, method: 'DELETE', params },
     options
   );
 };
@@ -2017,13 +2029,13 @@ export const adminListSeason = (
   signal?: AbortSignal
 ) => {
   return CustomAxiosInstance<AdminListSeasonResponseApiResult>(
-    { url: `http://localhost:4000/api/admin/seasons`, method: 'GET', signal },
+    { url: `https://rsp-server-test.up.railway.app/api/admin/seasons`, method: 'GET', signal },
     options
   );
 };
 
 export const getAdminListSeasonQueryKey = () => {
-  return [`http://localhost:4000/api/admin/seasons`] as const;
+  return [`https://rsp-server-test.up.railway.app/api/admin/seasons`] as const;
 };
 
 export const getAdminListSeasonQueryOptions = <
@@ -2102,7 +2114,7 @@ export const adminUpdateSeason = (
 ) => {
   return CustomAxiosInstance<AdminUpdateSeasonResponseApiResult>(
     {
-      url: `http://localhost:4000/api/admin/seasons`,
+      url: `https://rsp-server-test.up.railway.app/api/admin/seasons`,
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       data: adminUpdateSeasonRequest,
@@ -2176,7 +2188,7 @@ export const createProblemAttempt = (
 ) => {
   return CustomAxiosInstance<CreateProblemAttemptResponseApiResult>(
     {
-      url: `http://localhost:4000/api/problem-attempts`,
+      url: `https://rsp-server-test.up.railway.app/api/problem-attempts`,
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       data: createProblemAttemptRequest,
@@ -2249,7 +2261,11 @@ export const deleteProblemAttempt = (
   options?: SecondParameter<typeof CustomAxiosInstance>
 ) => {
   return CustomAxiosInstance<DeleteProblemAttemptResponseApiResult>(
-    { url: `http://localhost:4000/api/problem-attempts`, method: 'DELETE', params },
+    {
+      url: `https://rsp-server-test.up.railway.app/api/problem-attempts`,
+      method: 'DELETE',
+      params,
+    },
     options
   );
 };
@@ -2319,13 +2335,21 @@ export const getProblemAttempts = (
   signal?: AbortSignal
 ) => {
   return CustomAxiosInstance<GetProblemAttemptsResponseApiResult>(
-    { url: `http://localhost:4000/api/problem-attempts`, method: 'GET', params, signal },
+    {
+      url: `https://rsp-server-test.up.railway.app/api/problem-attempts`,
+      method: 'GET',
+      params,
+      signal,
+    },
     options
   );
 };
 
 export const getGetProblemAttemptsQueryKey = (params: GetProblemAttemptsParams) => {
-  return [`http://localhost:4000/api/problem-attempts`, ...(params ? [params] : [])] as const;
+  return [
+    `https://rsp-server-test.up.railway.app/api/problem-attempts`,
+    ...(params ? [params] : []),
+  ] as const;
 };
 
 export const getGetProblemAttemptsQueryOptions = <
@@ -2423,7 +2447,7 @@ export const updateProblemAttempt = (
 ) => {
   return CustomAxiosInstance<UpdateProblemAttemptResponseApiResult>(
     {
-      url: `http://localhost:4000/api/problem-attempts`,
+      url: `https://rsp-server-test.up.railway.app/api/problem-attempts`,
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       data: updateProblemAttemptRequest,
@@ -2497,7 +2521,7 @@ export const createMockInterview = (
 ) => {
   return CustomAxiosInstance<CreateMockInterviewResponseApiResult>(
     {
-      url: `http://localhost:4000/api/mock-interview`,
+      url: `https://rsp-server-test.up.railway.app/api/mock-interview`,
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       data: createMockInterviewRequest,
@@ -2571,7 +2595,7 @@ export const updateMockInterview = (
 ) => {
   return CustomAxiosInstance<UpdateMockInterviewResponseApiResult>(
     {
-      url: `http://localhost:4000/api/mock-interview`,
+      url: `https://rsp-server-test.up.railway.app/api/mock-interview`,
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       data: updateMockInterviewRequest,
@@ -2644,7 +2668,7 @@ export const deleteMockInterview = (
   options?: SecondParameter<typeof CustomAxiosInstance>
 ) => {
   return CustomAxiosInstance<DeleteMockInterviewResponseApiResult>(
-    { url: `http://localhost:4000/api/mock-interviews`, method: 'DELETE', params },
+    { url: `https://rsp-server-test.up.railway.app/api/mock-interviews`, method: 'DELETE', params },
     options
   );
 };
@@ -2714,13 +2738,21 @@ export const getMockInterviews = (
   signal?: AbortSignal
 ) => {
   return CustomAxiosInstance<GetMockInterviewsResponseApiResult>(
-    { url: `http://localhost:4000/api/mock-interviews`, method: 'GET', params, signal },
+    {
+      url: `https://rsp-server-test.up.railway.app/api/mock-interviews`,
+      method: 'GET',
+      params,
+      signal,
+    },
     options
   );
 };
 
 export const getGetMockInterviewsQueryKey = (params: GetMockInterviewsParams) => {
-  return [`http://localhost:4000/api/mock-interviews`, ...(params ? [params] : [])] as const;
+  return [
+    `https://rsp-server-test.up.railway.app/api/mock-interviews`,
+    ...(params ? [params] : []),
+  ] as const;
 };
 
 export const getGetMockInterviewsQueryOptions = <
@@ -2812,7 +2844,10 @@ export function useGetMockInterviews<
 
 export const mockCreateMockInterview = (options?: SecondParameter<typeof CustomAxiosInstance>) => {
   return CustomAxiosInstance<MockCreateMockInterviewResponseApiResult>(
-    { url: `http://localhost:4000/api/mock-interview/mock-create`, method: 'POST' },
+    {
+      url: `https://rsp-server-test.up.railway.app/api/mock-interview/mock-create`,
+      method: 'POST',
+    },
     options
   );
 };
@@ -2880,7 +2915,7 @@ export const adminCreateMentorship = (
 ) => {
   return CustomAxiosInstance<AdminCreateMentorshipResponseApiResult>(
     {
-      url: `http://localhost:4000/api/admin/mentorships`,
+      url: `https://rsp-server-test.up.railway.app/api/admin/mentorships`,
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       data: adminCreateMentorshipRequest,
@@ -2953,7 +2988,11 @@ export const adminDeleteMentorship = (
   options?: SecondParameter<typeof CustomAxiosInstance>
 ) => {
   return CustomAxiosInstance<AdminDeleteMentorshipResponseApiResult>(
-    { url: `http://localhost:4000/api/admin/mentorships`, method: 'DELETE', params },
+    {
+      url: `https://rsp-server-test.up.railway.app/api/admin/mentorships`,
+      method: 'DELETE',
+      params,
+    },
     options
   );
 };
@@ -3022,13 +3061,13 @@ export const adminListMentorship = (
   signal?: AbortSignal
 ) => {
   return CustomAxiosInstance<AdminListMentorshipResponseApiResult>(
-    { url: `http://localhost:4000/api/admin/mentorships`, method: 'GET', signal },
+    { url: `https://rsp-server-test.up.railway.app/api/admin/mentorships`, method: 'GET', signal },
     options
   );
 };
 
 export const getAdminListMentorshipQueryKey = () => {
-  return [`http://localhost:4000/api/admin/mentorships`] as const;
+  return [`https://rsp-server-test.up.railway.app/api/admin/mentorships`] as const;
 };
 
 export const getAdminListMentorshipQueryOptions = <
@@ -3109,7 +3148,7 @@ export const adminUpdateMentorship = (
 ) => {
   return CustomAxiosInstance<AdminUpdateMentorshipResponseApiResult>(
     {
-      url: `http://localhost:4000/api/admin/mentorships`,
+      url: `https://rsp-server-test.up.railway.app/api/admin/mentorships`,
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       data: adminUpdateMentorshipRequest,
@@ -3184,7 +3223,7 @@ export const getCurrentUserMenteesList = (
 ) => {
   return CustomAxiosInstance<GetCurrentUserMenteesListResponseApiResult>(
     {
-      url: `http://localhost:4000/api/mentorships/get-current-user-mentees-list/${seasonSlug}`,
+      url: `https://rsp-server-test.up.railway.app/api/mentorships/get-current-user-mentees-list/${seasonSlug}`,
       method: 'GET',
       signal,
     },
@@ -3194,7 +3233,7 @@ export const getCurrentUserMenteesList = (
 
 export const getGetCurrentUserMenteesListQueryKey = (seasonSlug: string) => {
   return [
-    `http://localhost:4000/api/mentorships/get-current-user-mentees-list/${seasonSlug}`,
+    `https://rsp-server-test.up.railway.app/api/mentorships/get-current-user-mentees-list/${seasonSlug}`,
   ] as const;
 };
 
@@ -3313,13 +3352,17 @@ export const adminPopulateLeetcodeQuestions = (
   signal?: AbortSignal
 ) => {
   return CustomAxiosInstance<AdminPopulateLeetcodeQuestionsResponseApiResult>(
-    { url: `http://localhost:4000/api/admin/leetcode/populate-questions`, method: 'GET', signal },
+    {
+      url: `https://rsp-server-test.up.railway.app/api/admin/leetcode/populate-questions`,
+      method: 'GET',
+      signal,
+    },
     options
   );
 };
 
 export const getAdminPopulateLeetcodeQuestionsQueryKey = () => {
-  return [`http://localhost:4000/api/admin/leetcode/populate-questions`] as const;
+  return [`https://rsp-server-test.up.railway.app/api/admin/leetcode/populate-questions`] as const;
 };
 
 export const getAdminPopulateLeetcodeQuestionsQueryOptions = <
@@ -3419,13 +3462,13 @@ export const getLeetcodeProblems = (
   signal?: AbortSignal
 ) => {
   return CustomAxiosInstance<GetLeetcodeProblemsResponseApiResult>(
-    { url: `http://localhost:4000/api/leetcode-problems`, method: 'GET', signal },
+    { url: `https://rsp-server-test.up.railway.app/api/leetcode-problems`, method: 'GET', signal },
     options
   );
 };
 
 export const getGetLeetcodeProblemsQueryKey = () => {
-  return [`http://localhost:4000/api/leetcode-problems`] as const;
+  return [`https://rsp-server-test.up.railway.app/api/leetcode-problems`] as const;
 };
 
 export const getGetLeetcodeProblemsQueryOptions = <
@@ -3505,13 +3548,13 @@ export const getGraduates = (
   signal?: AbortSignal
 ) => {
   return CustomAxiosInstance<GetGraduatesResponseApiResult>(
-    { url: `http://localhost:4000/api/graduates`, method: 'GET', signal },
+    { url: `https://rsp-server-test.up.railway.app/api/graduates`, method: 'GET', signal },
     options
   );
 };
 
 export const getGetGraduatesQueryKey = () => {
-  return [`http://localhost:4000/api/graduates`] as const;
+  return [`https://rsp-server-test.up.railway.app/api/graduates`] as const;
 };
 
 export const getGetGraduatesQueryOptions = <
@@ -3590,7 +3633,7 @@ export const adminCreateEnrollment = (
 ) => {
   return CustomAxiosInstance<AdminCreateEnrollmentResponseApiResult>(
     {
-      url: `http://localhost:4000/api/admin/enrollments`,
+      url: `https://rsp-server-test.up.railway.app/api/admin/enrollments`,
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       data: adminCreateEnrollmentRequest,
@@ -3663,7 +3706,11 @@ export const adminDeleteEnrollment = (
   options?: SecondParameter<typeof CustomAxiosInstance>
 ) => {
   return CustomAxiosInstance<AdminDeleteEnrollmentResponseApiResult>(
-    { url: `http://localhost:4000/api/admin/enrollments`, method: 'DELETE', params },
+    {
+      url: `https://rsp-server-test.up.railway.app/api/admin/enrollments`,
+      method: 'DELETE',
+      params,
+    },
     options
   );
 };
@@ -3732,13 +3779,13 @@ export const adminListEnrollment = (
   signal?: AbortSignal
 ) => {
   return CustomAxiosInstance<AdminListEnrollmentResponseApiResult>(
-    { url: `http://localhost:4000/api/admin/enrollments`, method: 'GET', signal },
+    { url: `https://rsp-server-test.up.railway.app/api/admin/enrollments`, method: 'GET', signal },
     options
   );
 };
 
 export const getAdminListEnrollmentQueryKey = () => {
-  return [`http://localhost:4000/api/admin/enrollments`] as const;
+  return [`https://rsp-server-test.up.railway.app/api/admin/enrollments`] as const;
 };
 
 export const getAdminListEnrollmentQueryOptions = <
@@ -3819,7 +3866,7 @@ export const adminUpdateEnrollment = (
 ) => {
   return CustomAxiosInstance<AdminUpdateEnrollmentResponseApiResult>(
     {
-      url: `http://localhost:4000/api/admin/enrollments`,
+      url: `https://rsp-server-test.up.railway.app/api/admin/enrollments`,
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       data: adminUpdateEnrollmentRequest,
@@ -3893,7 +3940,7 @@ export const getCurrentUserEnrollments = (
 ) => {
   return CustomAxiosInstance<GetCurrentUserEnrollmentsResponseApiResult>(
     {
-      url: `http://localhost:4000/api/enrollments/get-current-user-enrollments`,
+      url: `https://rsp-server-test.up.railway.app/api/enrollments/get-current-user-enrollments`,
       method: 'GET',
       signal,
     },
@@ -3902,7 +3949,9 @@ export const getCurrentUserEnrollments = (
 };
 
 export const getGetCurrentUserEnrollmentsQueryKey = () => {
-  return [`http://localhost:4000/api/enrollments/get-current-user-enrollments`] as const;
+  return [
+    `https://rsp-server-test.up.railway.app/api/enrollments/get-current-user-enrollments`,
+  ] as const;
 };
 
 export const getGetCurrentUserEnrollmentsQueryOptions = <
@@ -4003,7 +4052,7 @@ export const getIsUserEnrolled = (
 ) => {
   return CustomAxiosInstance<GetIsUserEnrolledResponseApiResult>(
     {
-      url: `http://localhost:4000/api/enrollments/get-is-user-enrolled/${seasonSlug}`,
+      url: `https://rsp-server-test.up.railway.app/api/enrollments/get-is-user-enrolled/${seasonSlug}`,
       method: 'GET',
       signal,
     },
@@ -4012,7 +4061,9 @@ export const getIsUserEnrolled = (
 };
 
 export const getGetIsUserEnrolledQueryKey = (seasonSlug: string) => {
-  return [`http://localhost:4000/api/enrollments/get-is-user-enrolled/${seasonSlug}`] as const;
+  return [
+    `https://rsp-server-test.up.railway.app/api/enrollments/get-is-user-enrolled/${seasonSlug}`,
+  ] as const;
 };
 
 export const getGetIsUserEnrolledQueryOptions = <
@@ -4112,7 +4163,7 @@ export const kickStudent = (
 ) => {
   return CustomAxiosInstance<KickStudentResponseApiResult>(
     {
-      url: `http://localhost:4000/enrollments/kick-student`,
+      url: `https://rsp-server-test.up.railway.app/enrollments/kick-student`,
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       data: kickStudentRequest,
@@ -4184,7 +4235,7 @@ export const updateStudentRolePromotion = (
 ) => {
   return CustomAxiosInstance<UpdateStudentRolePromotionResponseApiResult>(
     {
-      url: `http://localhost:4000/enrollments/update-student-role-promotion`,
+      url: `https://rsp-server-test.up.railway.app/enrollments/update-student-role-promotion`,
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       data: updateStudentRolePromotionRequest,

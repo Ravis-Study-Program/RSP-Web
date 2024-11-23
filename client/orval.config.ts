@@ -1,6 +1,10 @@
+import * as dotenv from 'dotenv';
 import { defineConfig } from 'orval';
 
-const serverUrl = 'http://localhost:4000';
+dotenv.config();
+
+const serverUrl = process.env.VITE_APP_SERVER_URL;
+const baseUrl = process.env.VITE_APP_BASE_API_URL;
 
 export default defineConfig({
   api: {
@@ -13,7 +17,7 @@ export default defineConfig({
       target: 'src/generated/api',
       client: 'react-query',
       mock: false,
-      baseUrl: serverUrl,
+      baseUrl,
       override: {
         title() {
           return 'title';

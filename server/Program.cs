@@ -13,11 +13,27 @@ using RSPWebAPI.Shared;
 using RSPWebAPI.Shared.Behaviours;
 
 var builder = WebApplication.CreateBuilder(args);
+DotNetEnv.Env.Load();
 
 
 {
-  var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+  var host = Environment.GetEnvironmentVariable("PGHOST");
+  var port = Environment.GetEnvironmentVariable("PGPORT");
+  var database = Environment.GetEnvironmentVariable("PGDATABASE");
+  var username = Environment.GetEnvironmentVariable("PGUSER");
+  var password = Environment.GetEnvironmentVariable("PGPASSWORD");
+  var serverPort = Environment.GetEnvironmentVariable("PORT");
+  var auth0Domain = Environment.GetEnvironmentVariable("AUTH0_DOMAIN");
+  var auth0Audience = Environment.GetEnvironmentVariable("AUTH0_AUDIENCE");
+
+  var connectionString =
+    $"Host={host};"
+    + $"Port={port};"
+    + $"Database={database};"
+    + $"Username={username};"
+    + $"Password={password};";
   var assembly = typeof(Program).Assembly;
+  builder.WebHost.UseUrls($"http://*:{serverPort}");
 
   builder
     .Services.AddCors(options =>
@@ -89,8 +105,8 @@ var builder = WebApplication.CreateBuilder(args);
     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
-      options.Authority = builder.Configuration["Auth0:Domain"];
-      options.Audience = builder.Configuration["Auth0:Audience"];
+      options.Authority = auth0Domain;
+      options.Audience = auth0Audience;
       options.TokenValidationParameters = new TokenValidationParameters
       {
         NameClaimType = ClaimTypes.Email,
@@ -128,10 +144,10 @@ var app = builder.Build();
     (HttpContext context) =>
     {
       var exception = context.Features.Get<IExceptionHandlerFeature>()?.Error;
-      return new ApiResult<string> { Error = new ApiError(exception?.Message ?? "Error occured") };
+      return new ApiResult<string> { Error = new ApiError(exception?.Message ?? "Error occurred") };
     }
   );
-  app.UseHealthChecks("/health");
+  app.MapHealthChecks("/health").AllowAnonymous();
 }
 
 app.Run();

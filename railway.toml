@@ -1,8 +1,0 @@
-[build]
-builder = "dockerfile"
-dockerfilePath = "./server/Dockerfile"
-
-[deploy]
-startCommand = "./server"
-restartPolicyType = "always"
-healthcheckPath = "/health"

@@ -4,7 +4,7 @@
   "type": "module",
   "version": "0.0.0",
   "scripts": {
-    "dev": "vite --host 0.0.0.0",
+    "dev": "npm run generate:client && vite --host 0.0.0.0",
     "build": "tsc && vite build",
     "generate:client": "rm -rf ./src/generated && orval",
     "preview": "vite preview",
@@ -17,7 +17,8 @@
     "vitest": "vitest run",
     "vitest:watch": "vitest",
     "final": "npm run typecheck && npm run prettier:write && npm run lint && npm run vitest && npm run build",
-    "format-and-test": "npm run typecheck && npm run prettier:write && npm run lint && npm run vitest",
+    "format-and-test": "npm run generate:client && npm run typecheck && npm run prettier:write && npm run lint && npm run vitest",
+    "cicd-format-and-test": "npm run typecheck && npm run prettier:write && npm run lint && npm run vitest",
     "storybook": "storybook dev -p 6006",
     "storybook:build": "storybook build"
   },
@@ -37,6 +38,7 @@
     "axios": "^1.7.7",
     "clsx": "^2.1.1",
     "dayjs": "^1.11.13",
+    "dotenv": "^16.4.5",
     "mantine-form-zod-resolver": "^1.1.0",
     "mantine-react-table": "^2.0.0-beta.6",
     "msw": "^2.4.9",
