@@ -8,12 +8,13 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Carter" Version="8.1.0"/>
-        <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.9.2"/>
-        <PackageReference Include="MediatR" Version="12.4.0"/>
-        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.8"/>
-        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.8"/>
-        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.8"/>
+        <PackageReference Include="Carter" Version="8.1.0" />
+        <PackageReference Include="DotNetEnv" Version="3.1.1" />
+        <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.9.2" />
+        <PackageReference Include="MediatR" Version="12.4.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.8" />
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.8" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.8" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.8">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -22,34 +23,34 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.4"/>
-        <PackageReference Include="Polly" Version="8.4.1"/>
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0"/>
+        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.4" />
+        <PackageReference Include="Polly" Version="8.4.1" />
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
     </ItemGroup>
 
     <ItemGroup>
         <Content Include="..\.dockerignore">
             <Link>.dockerignore</Link>
         </Content>
-        <Content Remove="server-test\**"/>
+        <Content Remove="server-test\**" />
     </ItemGroup>
 
     <ItemGroup>
-        <Compile Remove="server-test\**"/>
+        <Compile Remove="server-test\**" />
     </ItemGroup>
 
     <ItemGroup>
-        <EmbeddedResource Remove="server-test\**"/>
+        <EmbeddedResource Remove="server-test\**" />
     </ItemGroup>
 
     <ItemGroup>
-        <None Remove="server-test\**"/>
+        <None Remove="server-test\**" />
     </ItemGroup>
 
     <ItemGroup>
-        <_ContentIncludedByDefault Remove="server-test\obj\Debug\net8.0\RSPWebAPI.Tests.sourcelink.json"/>
-        <_ContentIncludedByDefault Remove="server-test\obj\project.assets.json"/>
-        <_ContentIncludedByDefault Remove="server-test\obj\project.packagespec.json"/>
-        <_ContentIncludedByDefault Remove="server-test\obj\RSPWebAPI.Tests.csproj.nuget.dgspec.json"/>
+        <_ContentIncludedByDefault Remove="server-test\obj\Debug\net8.0\RSPWebAPI.Tests.sourcelink.json" />
+        <_ContentIncludedByDefault Remove="server-test\obj\project.assets.json" />
+        <_ContentIncludedByDefault Remove="server-test\obj\project.packagespec.json" />
+        <_ContentIncludedByDefault Remove="server-test\obj\RSPWebAPI.Tests.csproj.nuget.dgspec.json" />
     </ItemGroup>
 </Project>
