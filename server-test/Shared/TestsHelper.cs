@@ -15,3 +15,23 @@ public class TestsHelper
   protected DateTime DummyEndDate = DateTime.Now.AddDays(10);
   protected DateTime DummyStartDate = DateTime.Now;
 }
+
+public class MockHttpMessageHandler : HttpMessageHandler
+{
+  private readonly Func<HttpRequestMessage, CancellationToken, HttpResponseMessage> _send;
+
+  public MockHttpMessageHandler(
+    Func<HttpRequestMessage, CancellationToken, HttpResponseMessage> send
+  )
+  {
+    _send = send;
+  }
+
+  protected override Task<HttpResponseMessage> SendAsync(
+    HttpRequestMessage request,
+    CancellationToken cancellationToken
+  )
+  {
+    return Task.FromResult(_send(request, cancellationToken));
+  }
+}

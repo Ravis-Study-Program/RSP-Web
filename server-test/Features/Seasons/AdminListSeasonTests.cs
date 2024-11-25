@@ -28,7 +28,22 @@ public class AdminListSeasonTests : TestsHelper
   [Fact]
   public async Task Handle_Success_OK()
   {
-    _dbContextMock.Setup(x => x.Seasons).ReturnsDbSet(new List<SeasonEntity>());
+    _dbContextMock
+      .Setup(x => x.Seasons)
+      .ReturnsDbSet(
+        new List<SeasonEntity>
+        {
+          new()
+          {
+            SeasonId = DummyId1,
+            Slug = DummySlug,
+            Name = DummyName,
+            Location = DummyLocation,
+            StartDateInclusiveUtc = DummyStartDate,
+            EndDateInclusiveUtc = DummyEndDate,
+          },
+        }
+      );
 
     var command = ListDummyCommand();
     var handler = new AdminListSeason.Handler(
@@ -39,5 +54,15 @@ public class AdminListSeasonTests : TestsHelper
     var result = await handler.Handle(command, CancellationToken.None);
     Assert.Equal(HttpStatusCode.OK, result.StatusCode);
     Assert.Equal(Message.SeasonListSuccessfully, result.SuccessMessage);
+    Assert.NotNull(result.ResponseBody?.Seasons);
+    Assert.Single(result.ResponseBody.Seasons);
+
+    var season = result.ResponseBody.Seasons.ToList();
+    Assert.Equal(DummyId1, season[0].SeasonId);
+    Assert.Equal(DummySlug, season[0].Slug);
+    Assert.Equal(DummyName, season[0].Name);
+    Assert.Equal(DummyLocation, season[0].Location);
+    Assert.Equal(DummyStartDate, season[0].StartDateInclusiveUtc);
+    Assert.Equal(DummyEndDate, season[0].EndDateInclusiveUtc);
   }
 }
