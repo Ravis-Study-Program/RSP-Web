@@ -102,7 +102,7 @@ public static class Message
 
   public const string ProblemAttemptCreatedSuccessfully = "ProblemAttempt created successfully.";
   public const string ProblemAttemptDoesNotExists =
-    "No mentorship found using the Problem Attempt Id provided.";
+    "No problem attempt found using the Problem Attempt Id provided.";
   public const string ProblemAttemptUpdatedSuccessfully = "ProblemAttempt updated successfully.";
   public const string ProblemAttemptCreationUnexpectedError =
     "An unexpected error has occurred during problem attempt creation.";

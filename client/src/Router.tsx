@@ -5,8 +5,8 @@ import ResourcesPage from './pages/Resources/Resources.page';
 import SeasonUsersPage from './pages/SeasonUsers/SeasonUsers.page';
 import AdminRouteGuard from './shared/auth/AdminRouteGuard';
 import AuthRouteGuard from './shared/auth/AuthRouteGuard';
+import SeasonRoleViewRouter from './shared/auth/SeasonRoleViewRouter';
 import SeasonRouteGuard from './shared/auth/SeasonRouteGuard';
-import SeasonRoleViewRouter from './shared/auth/SeasonViewRouter';
 
 // Lazy load the page components
 const AdminEnrollmentsPage = lazy(() => import('./pages/Admin/Enrollments/AdminEnrollments.page'));

@@ -55,9 +55,24 @@ public static class AdminPopulateLeetcodeQuestions
       var content = new StringContent(payload, null, "application/json");
       httpRequest.Content = content;
       var response = await _client.SendAsync(httpRequest, cancellationToken);
-      response.EnsureSuccessStatusCode();
-      var output = await response.Content.ReadAsStringAsync(cancellationToken);
 
+      if (!response.IsSuccessStatusCode)
+      {
+        var errorContent = await response.Content.ReadAsStringAsync(cancellationToken);
+        _logger.LogError(
+          "Request failed. Status: {StatusCode}, Response: {ResponseContent}",
+          response.StatusCode,
+          errorContent
+        );
+
+        return new ApiResult<AdminPopulateLeetcodeQuestionsResponse>
+        {
+          StatusCode = response.StatusCode,
+          Error = new ApiError("Failed to retrieve data from the Leetcode API."),
+        };
+      }
+
+      var output = await response.Content.ReadAsStringAsync(cancellationToken);
       var jsonData = JsonSerializer.Deserialize<LeetcodeProblemListApiResponse>(output);
       if (jsonData == null)
       {

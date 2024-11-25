@@ -113,15 +113,6 @@ export interface UpdateProblemAttemptResponse {
   [key: string]: unknown;
 }
 
-export interface UpdateProblemAttemptResponseApiResult {
-  error?: ApiError;
-  readonly isSuccess?: boolean;
-  responseBody?: UpdateProblemAttemptResponse;
-  statusCode?: HttpStatusCode;
-  /** @nullable */
-  successMessage?: string | null;
-}
-
 export interface UpdateProblemAttemptRequest {
   attemptStartDateUtc: string;
   /** @nullable */
@@ -139,15 +130,6 @@ export interface UpdateProblemAttemptRequest {
 
 export interface UpdateMockInterviewResponse {
   [key: string]: unknown;
-}
-
-export interface UpdateMockInterviewResponseApiResult {
-  error?: ApiError;
-  readonly isSuccess?: boolean;
-  responseBody?: UpdateMockInterviewResponse;
-  statusCode?: HttpStatusCode;
-  /** @nullable */
-  successMessage?: string | null;
 }
 
 export interface UpdateMockInterviewRequest {
@@ -268,14 +250,6 @@ export interface MockInterviewRoundEntity {
   mockInterviewRoundId: string;
 }
 
-export interface MockInterviewRoundDto {
-  behaviouralMockInterviewRound?: BehaviouralMockInterviewRoundDto;
-  customMockInterviewRound?: CustomMockInterviewRoundDto;
-  leetcodeMockInterviewRound?: LeetcodeMockInterviewRoundDto;
-  /** @nullable */
-  mockInterviewRoundId?: string | null;
-}
-
 export interface MockInterviewEntity {
   /** @nullable */
   deletedAtUtc?: string | null;
@@ -295,19 +269,6 @@ export interface MockInterviewEntity {
   mockInterviewRounds?: MockInterviewRoundEntity[] | null;
   startDate: string;
   timeTakenInMinutes: number;
-}
-
-export interface MockCreateMockInterviewResponse {
-  [key: string]: unknown;
-}
-
-export interface MockCreateMockInterviewResponseApiResult {
-  error?: ApiError;
-  readonly isSuccess?: boolean;
-  responseBody?: MockCreateMockInterviewResponse;
-  statusCode?: HttpStatusCode;
-  /** @nullable */
-  successMessage?: string | null;
 }
 
 export interface MentorshipResponse {
@@ -406,6 +367,14 @@ export interface LeetcodeMockInterviewRoundDto {
   testingScore: number;
 }
 
+export interface MockInterviewRoundDto {
+  behaviouralMockInterviewRound?: BehaviouralMockInterviewRoundDto;
+  customMockInterviewRound?: CustomMockInterviewRoundDto;
+  leetcodeMockInterviewRound?: LeetcodeMockInterviewRoundDto;
+  /** @nullable */
+  mockInterviewRoundId?: string | null;
+}
+
 export interface KickStudentResponse {
   [key: string]: unknown;
 }
@@ -492,6 +461,24 @@ export const HttpStatusCode = {
   NotExtended: 510,
   NetworkAuthenticationRequired: 511,
 } as const;
+
+export interface UpdateProblemAttemptResponseApiResult {
+  error?: ApiError;
+  readonly isSuccess?: boolean;
+  responseBody?: UpdateProblemAttemptResponse;
+  statusCode?: HttpStatusCode;
+  /** @nullable */
+  successMessage?: string | null;
+}
+
+export interface UpdateMockInterviewResponseApiResult {
+  error?: ApiError;
+  readonly isSuccess?: boolean;
+  responseBody?: UpdateMockInterviewResponse;
+  statusCode?: HttpStatusCode;
+  /** @nullable */
+  successMessage?: string | null;
+}
 
 export interface GraduateDto {
   /** @minLength 1 */
@@ -625,6 +612,17 @@ export interface GetCurrentUserMenteesListResponseApiResult {
   successMessage?: string | null;
 }
 
+export interface EnrollmentResponseDto {
+  role: SeasonRole;
+  /** @minLength 1 */
+  seasonImageUrl: string;
+  /** @minLength 1 */
+  seasonName: string;
+  /** @minLength 1 */
+  seasonSlug: string;
+  studentRolePromotion: SeasonStudentRolePromotion;
+}
+
 export interface GetCurrentUserEnrollmentsResponse {
   enrollments: EnrollmentResponseDto[];
 }
@@ -636,17 +634,6 @@ export interface GetCurrentUserEnrollmentsResponseApiResult {
   statusCode?: HttpStatusCode;
   /** @nullable */
   successMessage?: string | null;
-}
-
-export interface EnrollmentResponseDto {
-  role: SeasonRole;
-  /** @minLength 1 */
-  seasonImageUrl: string;
-  /** @minLength 1 */
-  seasonName: string;
-  /** @minLength 1 */
-  seasonSlug: string;
-  studentRolePromotion: SeasonStudentRolePromotion;
 }
 
 export interface EnrollmentResponse {
@@ -743,6 +730,15 @@ export interface CreateUserIfNotExistsResponse {
   [key: string]: unknown;
 }
 
+export interface CreateUserIfNotExistsResponseApiResult {
+  error?: ApiError;
+  readonly isSuccess?: boolean;
+  responseBody?: CreateUserIfNotExistsResponse;
+  statusCode?: HttpStatusCode;
+  /** @nullable */
+  successMessage?: string | null;
+}
+
 export interface CreateUserIfNotExistsRequest {
   /** @minLength 1 */
   discordId: string;
@@ -818,15 +814,6 @@ export interface ApiError {
   message?: string | null;
   /** @nullable */
   validationErrors?: ValidationError[] | null;
-}
-
-export interface CreateUserIfNotExistsResponseApiResult {
-  error?: ApiError;
-  readonly isSuccess?: boolean;
-  responseBody?: CreateUserIfNotExistsResponse;
-  statusCode?: HttpStatusCode;
-  /** @nullable */
-  successMessage?: string | null;
 }
 
 export interface AdminUpdateUserResponse {
@@ -2841,73 +2828,6 @@ export function useGetMockInterviews<
 
   return query;
 }
-
-export const mockCreateMockInterview = (options?: SecondParameter<typeof CustomAxiosInstance>) => {
-  return CustomAxiosInstance<MockCreateMockInterviewResponseApiResult>(
-    {
-      url: `https://rsp-server-test.up.railway.app/api/mock-interview/mock-create`,
-      method: 'POST',
-    },
-    options
-  );
-};
-
-export const getMockCreateMockInterviewMutationOptions = <
-  TError = MockCreateMockInterviewResponseApiResult,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof mockCreateMockInterview>>,
-    TError,
-    void,
-    TContext
-  >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof mockCreateMockInterview>>,
-  TError,
-  void,
-  TContext
-> => {
-  const { mutation: mutationOptions, request: requestOptions } = options ?? {};
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof mockCreateMockInterview>>,
-    void
-  > = () => {
-    return mockCreateMockInterview(requestOptions);
-  };
-
-  return { mutationFn, ...mutationOptions };
-};
-
-export type MockCreateMockInterviewMutationResult = NonNullable<
-  Awaited<ReturnType<typeof mockCreateMockInterview>>
->;
-
-export type MockCreateMockInterviewMutationError = MockCreateMockInterviewResponseApiResult;
-
-export const useMockCreateMockInterview = <
-  TError = MockCreateMockInterviewResponseApiResult,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof mockCreateMockInterview>>,
-    TError,
-    void,
-    TContext
-  >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseMutationResult<
-  Awaited<ReturnType<typeof mockCreateMockInterview>>,
-  TError,
-  void,
-  TContext
-> => {
-  const mutationOptions = getMockCreateMockInterviewMutationOptions(options);
-
-  return useMutation(mutationOptions);
-};
 
 export const adminCreateMentorship = (
   adminCreateMentorshipRequest: AdminCreateMentorshipRequest,
