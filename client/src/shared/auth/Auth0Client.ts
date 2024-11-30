@@ -7,4 +7,5 @@ export const auth0Client = new Auth0Client({
     redirect_uri: import.meta.env.VITE_APP_AUTH0_REDIRECT_URI as string,
     audience: import.meta.env.VITE_APP_AUTH0_AUDIENCE as string,
   },
+  cacheLocation: 'localstorage',
 });
