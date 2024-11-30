@@ -18,7 +18,7 @@ export default function LoginPage() {
 
   useEffect(() => {
     const initializeUser = async () => {
-      if (isAuth0Authenticated && Auth0User && !isUserCreated) {
+      if (!isAuth0Loading && isAuth0Authenticated && Auth0User && !isUserCreated) {
         try {
           const request: CreateUserIfNotExistsRequest = {
             profileImage: Auth0User.picture || '',
@@ -36,7 +36,7 @@ export default function LoginPage() {
     };
 
     initializeUser();
-  }, [isAuth0Authenticated, Auth0User, isUserCreated, createUser]);
+  }, [isAuth0Loading, isAuth0Authenticated, Auth0User, isUserCreated, createUser]);
 
   const shouldRedirect = useMemo(() => {
     if (isAuth0Authenticated) {
