@@ -43,6 +43,7 @@ public class GetMockInterviewsTests : TestsHelper
       MockInterviewId = DummyId1,
       EnrollmentId = DummyId1,
       Interviewer = new UserEntity { Email = "interviewer@example.com" },
+      Interviewee = new UserEntity { Email = DummyEmail },
       MockInterviewRounds = new List<MockInterviewRoundEntity>
       {
         new MockInterviewRoundEntity
@@ -69,9 +70,12 @@ public class GetMockInterviewsTests : TestsHelper
       User = new UserEntity { Email = DummyEmail },
     };
 
+    var user = enrollment.User;
+
     _dbContextMock
       .Setup(x => x.Enrollments)
       .ReturnsDbSet(new List<EnrollmentEntity> { enrollment });
+    _dbContextMock.Setup(x => x.Users).ReturnsDbSet(new List<UserEntity> { user });
     _dbContextMock
       .Setup(x => x.MockInterviews)
       .ReturnsDbSet(new List<MockInterviewEntity> { mockInterview });

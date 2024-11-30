@@ -12,7 +12,7 @@ import classes from './Profile.module.css';
 
 export default function ProfilePage() {
   const [searchParams] = useSearchParams();
-  const email = searchParams.get('email');
+  const email = searchParams.get('email') || '';
 
   const { seasonSlug } = useSeasonSlug();
   const { enrollmentId, user, role } = useUserAndEnrollment(seasonSlug, email);
@@ -22,6 +22,7 @@ export default function ProfilePage() {
     enrollmentId: enrollmentId || undefined,
     includeCustom: false,
     includeLeetcode: true,
+    email,
   });
 
   const { data: mockInterviewsResponse, refetch: refetchMockInterviews } = useGetMockInterviews({
@@ -29,6 +30,7 @@ export default function ProfilePage() {
     includeCustom: true,
     includeLeetcode: true,
     includeBehavioural: true,
+    email,
   });
 
   const MockInterviewComponent = useMemo(() => {

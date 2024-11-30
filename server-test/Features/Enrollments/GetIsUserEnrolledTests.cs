@@ -55,6 +55,7 @@ public class GetIsUserEnrolledTests : TestsHelper
     Assert.Equal(HttpStatusCode.OK, result.StatusCode);
     Assert.Equal(true, response?.IsEnrolled);
     Assert.Equal(SeasonRole.Mentor, response?.Role);
+    Assert.Equal(DummyEmail, response?.Email);
     Assert.Equal(SeasonStudentRolePromotion.NotApplicable, response?.StudentRolePromotion);
   }
 

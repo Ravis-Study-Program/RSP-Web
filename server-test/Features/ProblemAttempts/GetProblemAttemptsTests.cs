@@ -42,6 +42,7 @@ public class GetProblemAttemptsTests : TestsHelper
       ProblemAttemptId = DummyId1,
       EnrollmentId = DummyId1,
       UserId = DummyId1,
+      User = new UserEntity { Email = DummyEmail },
       Notes = "Test notes",
       TimeTakenInMinutes = 30,
       LeetcodeProblem = new LeetcodeProblemEntity
@@ -56,9 +57,12 @@ public class GetProblemAttemptsTests : TestsHelper
       User = new UserEntity { Email = DummyEmail },
     };
 
+    var user = enrollment.User;
+
     _dbContextMock
       .Setup(x => x.Enrollments)
       .ReturnsDbSet(new List<EnrollmentEntity> { enrollment });
+    _dbContextMock.Setup(x => x.Users).ReturnsDbSet(new List<UserEntity> { user });
     _dbContextMock
       .Setup(x => x.ProblemAttempts)
       .ReturnsDbSet(new List<ProblemAttemptEntity> { problemAttempt });

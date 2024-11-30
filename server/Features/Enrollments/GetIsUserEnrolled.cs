@@ -57,6 +57,7 @@ public static class GetIsUserEnrolled
             Role = e.Role,
             EnrollmentId = e.EnrollmentId,
             StudentRolePromotion = e.StudentRolePromotion,
+            Email = request.Email,
           })
           .AsNoTracking()
           .FirstOrDefaultAsync(cancellationToken);
@@ -72,6 +73,7 @@ public static class GetIsUserEnrolled
               Role = null,
               EnrollmentId = null,
               StudentRolePromotion = SeasonStudentRolePromotion.NotApplicable,
+              Email = request.Email,
             },
         };
       }
@@ -119,6 +121,9 @@ public record GetIsUserEnrolledResponse
 
   [Required]
   public string? EnrollmentId { get; set; }
+
+  [Required]
+  public string Email { get; set; } = string.Empty;
 
   [Required]
   public SeasonStudentRolePromotion StudentRolePromotion { get; set; }

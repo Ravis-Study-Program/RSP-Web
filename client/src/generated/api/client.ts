@@ -558,6 +558,8 @@ export interface GetLeetcodeProblemsResponseApiResult {
 
 export interface GetIsUserEnrolledResponse {
   /** @minLength 1 */
+  email: string;
+  /** @minLength 1 */
   enrollmentId: string;
   isEnrolled: boolean;
   role: SeasonRole;
