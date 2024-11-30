@@ -22,6 +22,7 @@ import {
   useGetUserList,
   useUpdateMockInterview,
 } from '@/generated/api/client';
+import { useUserAndEnrollment } from '@/shared/hooks/useUserAndEnrollment';
 import { MockInterviewCreateModal } from './MockInterviewCreateModal';
 import { MockInterviewUpdateModal } from './MockInterviewUpdateModal';
 import classes from './MockInterviewTable.module.css';
@@ -45,6 +46,8 @@ export const MockInterviewTable = ({
     isFetching: isFetchingUsers,
     isLoading: isLoadingUsers,
   } = useGetUserList();
+  const { user } = useUserAndEnrollment('');
+  const users = usersResponse?.responseBody?.users.filter((u) => u.email !== user?.email);
 
   const { mutateAsync: createMockInterview, status: isCreatingMockInterviewStatus } =
     useCreateMockInterview();
@@ -185,27 +188,29 @@ export const MockInterviewTable = ({
     getRowId: (row) => row.mockInterviewId?.toString(),
     mantineToolbarAlertBannerProps: undefined,
     isMultiSortEvent: () => true,
-    renderCreateRowModalContent: ({ table }) => (
-      <MockInterviewCreateModal
-        table={table}
-        users={usersResponse?.responseBody?.users}
-        leetcodeProblems={leetcodeProblemsResponse?.responseBody?.leetcodeProblems}
-        enrollmentId={enrollmentId || ''}
-        createMockInterview={createMockInterview}
-        refetchMockInterviews={refetchMockInterviews}
-      />
-    ),
-    renderEditRowModalContent: ({ table, row }) => (
-      <MockInterviewUpdateModal
-        table={table}
-        row={row}
-        users={usersResponse?.responseBody?.users}
-        leetcodeProblems={leetcodeProblemsResponse?.responseBody?.leetcodeProblems}
-        enrollmentId={enrollmentId || ''}
-        updateMockInterview={updateMockInterview}
-        refetchMockInterviews={refetchMockInterviews}
-      />
-    ),
+    renderCreateRowModalContent: ({ table }) =>
+      enableEditing && (
+        <MockInterviewCreateModal
+          table={table}
+          users={users}
+          leetcodeProblems={leetcodeProblemsResponse?.responseBody?.leetcodeProblems}
+          enrollmentId={enrollmentId || ''}
+          createMockInterview={createMockInterview}
+          refetchMockInterviews={refetchMockInterviews}
+        />
+      ),
+    renderEditRowModalContent: ({ table, row }) =>
+      enableEditing && (
+        <MockInterviewUpdateModal
+          table={table}
+          row={row}
+          users={users}
+          leetcodeProblems={leetcodeProblemsResponse?.responseBody?.leetcodeProblems}
+          enrollmentId={enrollmentId || ''}
+          updateMockInterview={updateMockInterview}
+          refetchMockInterviews={refetchMockInterviews}
+        />
+      ),
     renderDetailPanel: ({ row }) => {
       const rounds = row.original.mockInterviewRounds || [];
       const leetcodeRounds = rounds.filter((r) => r.leetcodeMockInterviewRound != null);
@@ -218,29 +223,31 @@ export const MockInterviewTable = ({
         </Flex>
       );
     },
-    renderRowActions: ({ row, table }) => (
-      <Flex gap="md">
-        <Tooltip label="Edit">
-          <ActionIcon variant="subtle" onClick={() => table.setEditingRow(row)}>
-            <IconEdit />
-          </ActionIcon>
-        </Tooltip>
-        <Tooltip label="Delete">
-          <ActionIcon variant="subtle" color="red" onClick={() => openDeleteConfirmModal(row)}>
-            <IconTrash />
-          </ActionIcon>
-        </Tooltip>
-      </Flex>
-    ),
-    renderTopToolbarCustomActions: ({ table }) => (
-      <Button
-        onClick={() => {
-          table.setCreatingRow(true);
-        }}
-      >
-        Create Mock Interview
-      </Button>
-    ),
+    renderRowActions: ({ row, table }) =>
+      enableEditing && (
+        <Flex gap="md">
+          <Tooltip label="Edit">
+            <ActionIcon variant="subtle" onClick={() => table.setEditingRow(row)}>
+              <IconEdit />
+            </ActionIcon>
+          </Tooltip>
+          <Tooltip label="Delete">
+            <ActionIcon variant="subtle" color="red" onClick={() => openDeleteConfirmModal(row)}>
+              <IconTrash />
+            </ActionIcon>
+          </Tooltip>
+        </Flex>
+      ),
+    renderTopToolbarCustomActions: ({ table }) =>
+      enableEditing && (
+        <Button
+          onClick={() => {
+            table.setCreatingRow(true);
+          }}
+        >
+          Create Mock Interview
+        </Button>
+      ),
     state: {
       isLoading: isLoadingLeetcodeProblems || isLoadingUsers,
       isSaving:

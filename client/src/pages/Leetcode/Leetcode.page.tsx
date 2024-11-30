@@ -17,6 +17,7 @@ export default function LeetcodePage() {
     enrollmentId: userResponse?.responseBody?.enrollmentId || undefined,
     includeCustom: !isLeetcode,
     includeLeetcode: isLeetcode,
+    email: userResponse?.responseBody?.email,
   });
 
   return (

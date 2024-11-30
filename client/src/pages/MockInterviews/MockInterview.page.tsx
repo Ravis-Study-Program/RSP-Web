@@ -15,6 +15,7 @@ export default function MockInterviewPage() {
     includeCustom: true,
     includeLeetcode: true,
     includeBehavioural: true,
+    email: userResponse?.responseBody?.email,
   });
 
   return (

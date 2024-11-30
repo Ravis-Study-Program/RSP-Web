@@ -224,48 +224,52 @@ export const LeetcodeTable = ({
     getRowId: (row) => row.problemAttemptId?.toString(),
     mantineToolbarAlertBannerProps: undefined,
     isMultiSortEvent: () => true,
-    renderCreateRowModalContent: ({ table }) => (
-      <LeetcodeProblemAttemptCreateModal
-        table={table}
-        leetcodeProblems={leetcodeProblemsResponse?.responseBody?.leetcodeProblems}
-        enrollmentId={enrollmentId || ''}
-        createProblemAttempt={createProblemAttempt}
-        refetchProblemAttempts={refetchProblemAttempts}
-      />
-    ),
-    renderEditRowModalContent: ({ table, row }) => (
-      <LeetcodeProblemAttemptUpdateModal
-        table={table}
-        row={row}
-        leetcodeProblems={leetcodeProblemsResponse?.responseBody?.leetcodeProblems}
-        enrollmentId={enrollmentId || ''}
-        updateProblemAttempt={updateProblemAttempt}
-        refetchProblemAttempts={refetchProblemAttempts}
-      />
-    ),
-    renderRowActions: ({ row, table }) => (
-      <Flex gap="md">
-        <Tooltip label="Edit">
-          <ActionIcon variant="subtle" onClick={() => table.setEditingRow(row)}>
-            <IconEdit />
-          </ActionIcon>
-        </Tooltip>
-        <Tooltip label="Delete">
-          <ActionIcon variant="subtle" color="red" onClick={() => openDeleteConfirmModal(row)}>
-            <IconTrash />
-          </ActionIcon>
-        </Tooltip>
-      </Flex>
-    ),
-    renderTopToolbarCustomActions: ({ table }) => (
-      <Button
-        onClick={() => {
-          table.setCreatingRow(true);
-        }}
-      >
-        Create New Problem Attempt
-      </Button>
-    ),
+    renderCreateRowModalContent: ({ table }) =>
+      enableEditing && (
+        <LeetcodeProblemAttemptCreateModal
+          table={table}
+          leetcodeProblems={leetcodeProblemsResponse?.responseBody?.leetcodeProblems}
+          enrollmentId={enrollmentId || ''}
+          createProblemAttempt={createProblemAttempt}
+          refetchProblemAttempts={refetchProblemAttempts}
+        />
+      ),
+    renderEditRowModalContent: ({ table, row }) =>
+      enableEditing && (
+        <LeetcodeProblemAttemptUpdateModal
+          table={table}
+          row={row}
+          leetcodeProblems={leetcodeProblemsResponse?.responseBody?.leetcodeProblems}
+          enrollmentId={enrollmentId || ''}
+          updateProblemAttempt={updateProblemAttempt}
+          refetchProblemAttempts={refetchProblemAttempts}
+        />
+      ),
+    renderRowActions: ({ row, table }) =>
+      enableEditing && (
+        <Flex gap="md">
+          <Tooltip label="Edit">
+            <ActionIcon variant="subtle" onClick={() => table.setEditingRow(row)}>
+              <IconEdit />
+            </ActionIcon>
+          </Tooltip>
+          <Tooltip label="Delete">
+            <ActionIcon variant="subtle" color="red" onClick={() => openDeleteConfirmModal(row)}>
+              <IconTrash />
+            </ActionIcon>
+          </Tooltip>
+        </Flex>
+      ),
+    renderTopToolbarCustomActions: ({ table }) =>
+      enableEditing && (
+        <Button
+          onClick={() => {
+            table.setCreatingRow(true);
+          }}
+        >
+          Create New Problem Attempt
+        </Button>
+      ),
     state: {
       isLoading: isLoadingLeetcodeProblems,
       isSaving:
