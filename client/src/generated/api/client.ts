@@ -55,6 +55,14 @@ export type AdminDeleteSeasonParams = {
   seasonId: string;
 };
 
+export type AdminListSeasonWeekParams = {
+  seasonId?: string;
+};
+
+export type AdminDeleteSeasonWeekParams = {
+  seasonWeekId: string;
+};
+
 export type GetCurrentUserParams = {
   email?: string;
 };
@@ -113,6 +121,15 @@ export interface UpdateProblemAttemptResponse {
   [key: string]: unknown;
 }
 
+export interface UpdateProblemAttemptResponseApiResult {
+  error?: ApiError;
+  readonly isSuccess?: boolean;
+  responseBody?: UpdateProblemAttemptResponse;
+  statusCode?: HttpStatusCode;
+  /** @nullable */
+  successMessage?: string | null;
+}
+
 export interface UpdateProblemAttemptRequest {
   attemptStartDateUtc: string;
   /** @nullable */
@@ -132,6 +149,15 @@ export interface UpdateMockInterviewResponse {
   [key: string]: unknown;
 }
 
+export interface UpdateMockInterviewResponseApiResult {
+  error?: ApiError;
+  readonly isSuccess?: boolean;
+  responseBody?: UpdateMockInterviewResponse;
+  statusCode?: HttpStatusCode;
+  /** @nullable */
+  successMessage?: string | null;
+}
+
 export interface UpdateMockInterviewRequest {
   /** @nullable */
   enrollmentId?: string | null;
@@ -142,6 +168,19 @@ export interface UpdateMockInterviewRequest {
   mockInterviewRoundDtos: MockInterviewRoundDto[];
   startDate: string;
   timeTakenInMinutes: number;
+}
+
+export interface SeasonWeekEntity {
+  /** @nullable */
+  deletedAtUtc?: string | null;
+  endDate: string;
+  season?: SeasonEntity;
+  /** @minLength 1 */
+  seasonId: string;
+  /** @minLength 1 */
+  seasonWeekId: string;
+  startDate: string;
+  weekNumber: number;
 }
 
 export type SeasonStudentRolePromotion =
@@ -250,6 +289,14 @@ export interface MockInterviewRoundEntity {
   mockInterviewRoundId: string;
 }
 
+export interface MockInterviewRoundDto {
+  behaviouralMockInterviewRound?: BehaviouralMockInterviewRoundDto;
+  customMockInterviewRound?: CustomMockInterviewRoundDto;
+  leetcodeMockInterviewRound?: LeetcodeMockInterviewRoundDto;
+  /** @nullable */
+  mockInterviewRoundId?: string | null;
+}
+
 export interface MockInterviewEntity {
   /** @nullable */
   deletedAtUtc?: string | null;
@@ -308,20 +355,6 @@ export const LeetcodeProblemDifficulty = {
   Hard: 2,
 } as const;
 
-export interface LeetcodeProblemEntity {
-  /** @nullable */
-  deletedAtUtc?: string | null;
-  isPremium: boolean;
-  /** @nullable */
-  leetcodeProblemCategories?: LeetcodeProblemCategoryEntity[] | null;
-  leetcodeProblemDifficulty: LeetcodeProblemDifficulty;
-  /** @minLength 1 */
-  leetcodeProblemId: string;
-  problem?: ProblemEntity;
-  /** @minLength 1 */
-  problemId: string;
-}
-
 export interface LeetcodeProblemDto {
   difficulty: LeetcodeProblemDifficulty;
   isPremium: boolean;
@@ -340,6 +373,20 @@ export interface LeetcodeProblemCategoryEntity {
   leetcodeProblemCategoryId: string;
   /** @minLength 1 */
   name: string;
+}
+
+export interface LeetcodeProblemEntity {
+  /** @nullable */
+  deletedAtUtc?: string | null;
+  isPremium: boolean;
+  /** @nullable */
+  leetcodeProblemCategories?: LeetcodeProblemCategoryEntity[] | null;
+  leetcodeProblemDifficulty: LeetcodeProblemDifficulty;
+  /** @minLength 1 */
+  leetcodeProblemId: string;
+  problem?: ProblemEntity;
+  /** @minLength 1 */
+  problemId: string;
 }
 
 export interface LeetcodeMockInterviewRoundEntity {
@@ -365,14 +412,6 @@ export interface LeetcodeMockInterviewRoundDto {
   /** @minLength 1 */
   leetcodeProblemId: string;
   testingScore: number;
-}
-
-export interface MockInterviewRoundDto {
-  behaviouralMockInterviewRound?: BehaviouralMockInterviewRoundDto;
-  customMockInterviewRound?: CustomMockInterviewRoundDto;
-  leetcodeMockInterviewRound?: LeetcodeMockInterviewRoundDto;
-  /** @nullable */
-  mockInterviewRoundId?: string | null;
 }
 
 export interface KickStudentResponse {
@@ -461,24 +500,6 @@ export const HttpStatusCode = {
   NotExtended: 510,
   NetworkAuthenticationRequired: 511,
 } as const;
-
-export interface UpdateProblemAttemptResponseApiResult {
-  error?: ApiError;
-  readonly isSuccess?: boolean;
-  responseBody?: UpdateProblemAttemptResponse;
-  statusCode?: HttpStatusCode;
-  /** @nullable */
-  successMessage?: string | null;
-}
-
-export interface UpdateMockInterviewResponseApiResult {
-  error?: ApiError;
-  readonly isSuccess?: boolean;
-  responseBody?: UpdateMockInterviewResponse;
-  statusCode?: HttpStatusCode;
-  /** @nullable */
-  successMessage?: string | null;
-}
 
 export interface GraduateDto {
   /** @minLength 1 */
@@ -853,6 +874,33 @@ export interface AdminUpdateUserRequest {
   profileImage: string;
 }
 
+export interface AdminUpdateSeasonWeekResponse {
+  endDate: string;
+  /** @minLength 1 */
+  seasonId: string;
+  /** @minLength 1 */
+  seasonWeekId: string;
+  startDate: string;
+  weekNumber: number;
+}
+
+export interface AdminUpdateSeasonWeekResponseApiResult {
+  error?: ApiError;
+  readonly isSuccess?: boolean;
+  responseBody?: AdminUpdateSeasonWeekResponse;
+  statusCode?: HttpStatusCode;
+  /** @nullable */
+  successMessage?: string | null;
+}
+
+export interface AdminUpdateSeasonWeekRequest {
+  endDate: string;
+  /** @minLength 1 */
+  seasonWeekId: string;
+  startDate: string;
+  weekNumber: number;
+}
+
 export interface AdminUpdateSeasonResponse {
   endDateInclusiveUtc: string;
   /** @minLength 1 */
@@ -976,6 +1024,19 @@ export interface AdminListUserResponseApiResult {
   successMessage?: string | null;
 }
 
+export interface AdminListSeasonWeekResponse {
+  seasonWeeks: SeasonWeekEntity[];
+}
+
+export interface AdminListSeasonWeekResponseApiResult {
+  error?: ApiError;
+  readonly isSuccess?: boolean;
+  responseBody?: AdminListSeasonWeekResponse;
+  statusCode?: HttpStatusCode;
+  /** @nullable */
+  successMessage?: string | null;
+}
+
 export interface AdminListSeasonResponse {
   seasons: SeasonEntity[];
 }
@@ -1023,6 +1084,19 @@ export interface AdminDeleteUserResponseApiResult {
   error?: ApiError;
   readonly isSuccess?: boolean;
   responseBody?: AdminDeleteUserResponse;
+  statusCode?: HttpStatusCode;
+  /** @nullable */
+  successMessage?: string | null;
+}
+
+export interface AdminDeleteSeasonWeekResponse {
+  [key: string]: unknown;
+}
+
+export interface AdminDeleteSeasonWeekResponseApiResult {
+  error?: ApiError;
+  readonly isSuccess?: boolean;
+  responseBody?: AdminDeleteSeasonWeekResponse;
   statusCode?: HttpStatusCode;
   /** @nullable */
   successMessage?: string | null;
@@ -1100,6 +1174,33 @@ export interface AdminCreateUserRequest {
   name: string;
   /** @minLength 1 */
   profileImage: string;
+}
+
+export interface AdminCreateSeasonWeekResponse {
+  endDate: string;
+  /** @minLength 1 */
+  seasonId: string;
+  /** @minLength 1 */
+  seasonWeekId: string;
+  startDate: string;
+  weekNumber: number;
+}
+
+export interface AdminCreateSeasonWeekResponseApiResult {
+  error?: ApiError;
+  readonly isSuccess?: boolean;
+  responseBody?: AdminCreateSeasonWeekResponse;
+  statusCode?: HttpStatusCode;
+  /** @nullable */
+  successMessage?: string | null;
+}
+
+export interface AdminCreateSeasonWeekRequest {
+  endDate: string;
+  /** @minLength 1 */
+  seasonId: string;
+  startDate: string;
+  weekNumber: number;
 }
 
 export interface AdminCreateSeasonResponse {
@@ -1761,6 +1862,347 @@ export function useGetUserList<
 
   return query;
 }
+
+export const adminCreateSeasonWeek = (
+  adminCreateSeasonWeekRequest: AdminCreateSeasonWeekRequest,
+  options?: SecondParameter<typeof CustomAxiosInstance>
+) => {
+  return CustomAxiosInstance<AdminCreateSeasonWeekResponseApiResult>(
+    {
+      url: `https://rsp-server-test.up.railway.app/api/admin/season-weeks`,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      data: adminCreateSeasonWeekRequest,
+    },
+    options
+  );
+};
+
+export const getAdminCreateSeasonWeekMutationOptions = <
+  TError = AdminCreateSeasonWeekResponseApiResult,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof adminCreateSeasonWeek>>,
+    TError,
+    { data: AdminCreateSeasonWeekRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof adminCreateSeasonWeek>>,
+  TError,
+  { data: AdminCreateSeasonWeekRequest },
+  TContext
+> => {
+  const { mutation: mutationOptions, request: requestOptions } = options ?? {};
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof adminCreateSeasonWeek>>,
+    { data: AdminCreateSeasonWeekRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return adminCreateSeasonWeek(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type AdminCreateSeasonWeekMutationResult = NonNullable<
+  Awaited<ReturnType<typeof adminCreateSeasonWeek>>
+>;
+export type AdminCreateSeasonWeekMutationBody = AdminCreateSeasonWeekRequest;
+export type AdminCreateSeasonWeekMutationError = AdminCreateSeasonWeekResponseApiResult;
+
+export const useAdminCreateSeasonWeek = <
+  TError = AdminCreateSeasonWeekResponseApiResult,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof adminCreateSeasonWeek>>,
+    TError,
+    { data: AdminCreateSeasonWeekRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof adminCreateSeasonWeek>>,
+  TError,
+  { data: AdminCreateSeasonWeekRequest },
+  TContext
+> => {
+  const mutationOptions = getAdminCreateSeasonWeekMutationOptions(options);
+
+  return useMutation(mutationOptions);
+};
+
+export const adminDeleteSeasonWeek = (
+  params: AdminDeleteSeasonWeekParams,
+  options?: SecondParameter<typeof CustomAxiosInstance>
+) => {
+  return CustomAxiosInstance<AdminDeleteSeasonWeekResponseApiResult>(
+    {
+      url: `https://rsp-server-test.up.railway.app/api/admin/season-weeks`,
+      method: 'DELETE',
+      params,
+    },
+    options
+  );
+};
+
+export const getAdminDeleteSeasonWeekMutationOptions = <
+  TError = AdminDeleteSeasonWeekResponseApiResult,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof adminDeleteSeasonWeek>>,
+    TError,
+    { params: AdminDeleteSeasonWeekParams },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof adminDeleteSeasonWeek>>,
+  TError,
+  { params: AdminDeleteSeasonWeekParams },
+  TContext
+> => {
+  const { mutation: mutationOptions, request: requestOptions } = options ?? {};
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof adminDeleteSeasonWeek>>,
+    { params: AdminDeleteSeasonWeekParams }
+  > = (props) => {
+    const { params } = props ?? {};
+
+    return adminDeleteSeasonWeek(params, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type AdminDeleteSeasonWeekMutationResult = NonNullable<
+  Awaited<ReturnType<typeof adminDeleteSeasonWeek>>
+>;
+
+export type AdminDeleteSeasonWeekMutationError = AdminDeleteSeasonWeekResponseApiResult;
+
+export const useAdminDeleteSeasonWeek = <
+  TError = AdminDeleteSeasonWeekResponseApiResult,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof adminDeleteSeasonWeek>>,
+    TError,
+    { params: AdminDeleteSeasonWeekParams },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof adminDeleteSeasonWeek>>,
+  TError,
+  { params: AdminDeleteSeasonWeekParams },
+  TContext
+> => {
+  const mutationOptions = getAdminDeleteSeasonWeekMutationOptions(options);
+
+  return useMutation(mutationOptions);
+};
+
+export const adminListSeasonWeek = (
+  params?: AdminListSeasonWeekParams,
+  options?: SecondParameter<typeof CustomAxiosInstance>,
+  signal?: AbortSignal
+) => {
+  return CustomAxiosInstance<AdminListSeasonWeekResponseApiResult>(
+    {
+      url: `https://rsp-server-test.up.railway.app/api/admin/season-weeks`,
+      method: 'GET',
+      params,
+      signal,
+    },
+    options
+  );
+};
+
+export const getAdminListSeasonWeekQueryKey = (params?: AdminListSeasonWeekParams) => {
+  return [
+    `https://rsp-server-test.up.railway.app/api/admin/season-weeks`,
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getAdminListSeasonWeekQueryOptions = <
+  TData = Awaited<ReturnType<typeof adminListSeasonWeek>>,
+  TError = AdminListSeasonWeekResponseApiResult,
+>(
+  params?: AdminListSeasonWeekParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof adminListSeasonWeek>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getAdminListSeasonWeekQueryKey(params);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof adminListSeasonWeek>>> = ({ signal }) =>
+    adminListSeasonWeek(params, requestOptions, signal);
+
+  return { queryKey, queryFn, staleTime: Infinity, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof adminListSeasonWeek>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type AdminListSeasonWeekQueryResult = NonNullable<
+  Awaited<ReturnType<typeof adminListSeasonWeek>>
+>;
+export type AdminListSeasonWeekQueryError = AdminListSeasonWeekResponseApiResult;
+
+export function useAdminListSeasonWeek<
+  TData = Awaited<ReturnType<typeof adminListSeasonWeek>>,
+  TError = AdminListSeasonWeekResponseApiResult,
+>(
+  params: undefined | AdminListSeasonWeekParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof adminListSeasonWeek>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<Awaited<ReturnType<typeof adminListSeasonWeek>>, TError, TData>,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): DefinedUseQueryResult<TData, TError> & { queryKey: QueryKey };
+export function useAdminListSeasonWeek<
+  TData = Awaited<ReturnType<typeof adminListSeasonWeek>>,
+  TError = AdminListSeasonWeekResponseApiResult,
+>(
+  params?: AdminListSeasonWeekParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof adminListSeasonWeek>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<Awaited<ReturnType<typeof adminListSeasonWeek>>, TError, TData>,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): UseQueryResult<TData, TError> & { queryKey: QueryKey };
+export function useAdminListSeasonWeek<
+  TData = Awaited<ReturnType<typeof adminListSeasonWeek>>,
+  TError = AdminListSeasonWeekResponseApiResult,
+>(
+  params?: AdminListSeasonWeekParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof adminListSeasonWeek>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+export function useAdminListSeasonWeek<
+  TData = Awaited<ReturnType<typeof adminListSeasonWeek>>,
+  TError = AdminListSeasonWeekResponseApiResult,
+>(
+  params?: AdminListSeasonWeekParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof adminListSeasonWeek>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getAdminListSeasonWeekQueryOptions(params, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+export const adminUpdateSeasonWeek = (
+  adminUpdateSeasonWeekRequest: AdminUpdateSeasonWeekRequest,
+  options?: SecondParameter<typeof CustomAxiosInstance>
+) => {
+  return CustomAxiosInstance<AdminUpdateSeasonWeekResponseApiResult>(
+    {
+      url: `https://rsp-server-test.up.railway.app/api/admin/season-weeks`,
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      data: adminUpdateSeasonWeekRequest,
+    },
+    options
+  );
+};
+
+export const getAdminUpdateSeasonWeekMutationOptions = <
+  TError = AdminUpdateSeasonWeekResponseApiResult,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof adminUpdateSeasonWeek>>,
+    TError,
+    { data: AdminUpdateSeasonWeekRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof adminUpdateSeasonWeek>>,
+  TError,
+  { data: AdminUpdateSeasonWeekRequest },
+  TContext
+> => {
+  const { mutation: mutationOptions, request: requestOptions } = options ?? {};
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof adminUpdateSeasonWeek>>,
+    { data: AdminUpdateSeasonWeekRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return adminUpdateSeasonWeek(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type AdminUpdateSeasonWeekMutationResult = NonNullable<
+  Awaited<ReturnType<typeof adminUpdateSeasonWeek>>
+>;
+export type AdminUpdateSeasonWeekMutationBody = AdminUpdateSeasonWeekRequest;
+export type AdminUpdateSeasonWeekMutationError = AdminUpdateSeasonWeekResponseApiResult;
+
+export const useAdminUpdateSeasonWeek = <
+  TError = AdminUpdateSeasonWeekResponseApiResult,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof adminUpdateSeasonWeek>>,
+    TError,
+    { data: AdminUpdateSeasonWeekRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof adminUpdateSeasonWeek>>,
+  TError,
+  { data: AdminUpdateSeasonWeekRequest },
+  TContext
+> => {
+  const mutationOptions = getAdminUpdateSeasonWeekMutationOptions(options);
+
+  return useMutation(mutationOptions);
+};
 
 export const getSeasonUsers = (
   seasonSlug: string,

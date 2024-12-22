@@ -3,6 +3,9 @@ namespace RSPWebAPI.Features.Constants;
 // TODO: cleanup and refactor
 public static class Message
 {
+  public const string EndDateMustBeGreaterThanStartDate =
+    "End date must be greater than start date.";
+
   public const string UserEmailExists = "A user with this email already exists.";
   public const string UserEmailDoesNotExists = "No user found using the email provided.";
   public const string UserCreatedSuccessfully = "User created successfully.";
@@ -136,4 +139,22 @@ public static class Message
     "List of Mock Interview retrieved successfully.";
   public const string MockInterviewListUnexpectedError =
     "An unexpected error has occurred during mock interviews list.";
+
+  public const string SeasonWeekCreatedSuccessfully = "Season Week created successfully.";
+  public const string SeasonWeekWeekNumberAlreadyExists = "Season Week Week Number already exists.";
+  public const string SeasonWeekDatesNotWithinSeasonDates =
+    "Season Week dates do not fall under Season dates";
+  public const string SeasonWeekListSuccessfully = "List of SeasonWeek retrieved successfully.";
+  public const string SeasonWeekUpdateSuccessfully = "Season Week updated successfully.";
+  public const string SeasonWeekCreationUnexpectedError =
+    "An unexpected error has occurred during season week creation.";
+  public const string SeasonWeekListUnexpectedError =
+    "An unexpected error has occurred during season week list.";
+  public const string SeasonWeekDeletionUnexpectedError =
+    "An unexpected error has occurred during season week deletion.";
+  public const string SeasonWeekUpdateUnexpectedError =
+    "An unexpected error has occurred during season week update.";
+  public const string SeasonWeekDoesNotExists =
+    "No mentorship found using the Season Week Id provided.";
+  public const string SeasonWeekDeletedSuccessfully = "Season Week deleted successfully.";
 }

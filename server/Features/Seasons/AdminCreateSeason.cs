@@ -39,7 +39,7 @@ public static class AdminCreateSeason
       RuleFor(c => c.EndDateInclusiveUtc)
         .NotEmpty()
         .GreaterThan(c => c.StartDateInclusiveUtc)
-        .WithMessage("End date must be greater than start date.");
+        .WithMessage(Message.EndDateMustBeGreaterThanStartDate);
       RuleFor(c => c.Location).NotEmpty();
       RuleFor(c => c.ImageUrl).NotEmpty();
     }
