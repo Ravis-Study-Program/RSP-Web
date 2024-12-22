@@ -1076,6 +1076,25 @@ export interface AdminListEnrollmentResponseApiResult {
   successMessage?: string | null;
 }
 
+export interface AdminGenerateDummyDataResponse {
+  numberOfSeasons: number;
+  numberOfUsers: number;
+}
+
+export interface AdminGenerateDummyDataResponseApiResult {
+  error?: ApiError;
+  readonly isSuccess?: boolean;
+  responseBody?: AdminGenerateDummyDataResponse;
+  statusCode?: HttpStatusCode;
+  /** @nullable */
+  successMessage?: string | null;
+}
+
+export interface AdminGenerateDummyDataRequest {
+  numberOfSeasons: number;
+  numberOfUsers: number;
+}
+
 export interface AdminDeleteUserResponse {
   [key: string]: unknown;
 }
@@ -4663,6 +4682,80 @@ export const useUpdateStudentRolePromotion = <
   TContext
 > => {
   const mutationOptions = getUpdateStudentRolePromotionMutationOptions(options);
+
+  return useMutation(mutationOptions);
+};
+
+export const adminGenerateDummyData = (
+  adminGenerateDummyDataRequest: AdminGenerateDummyDataRequest,
+  options?: SecondParameter<typeof CustomAxiosInstance>
+) => {
+  return CustomAxiosInstance<AdminGenerateDummyDataResponseApiResult>(
+    {
+      url: `https://rsp-server-test.up.railway.app/api/admin/generate-dummy-data`,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      data: adminGenerateDummyDataRequest,
+    },
+    options
+  );
+};
+
+export const getAdminGenerateDummyDataMutationOptions = <
+  TError = AdminGenerateDummyDataResponseApiResult,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof adminGenerateDummyData>>,
+    TError,
+    { data: AdminGenerateDummyDataRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof adminGenerateDummyData>>,
+  TError,
+  { data: AdminGenerateDummyDataRequest },
+  TContext
+> => {
+  const { mutation: mutationOptions, request: requestOptions } = options ?? {};
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof adminGenerateDummyData>>,
+    { data: AdminGenerateDummyDataRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return adminGenerateDummyData(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type AdminGenerateDummyDataMutationResult = NonNullable<
+  Awaited<ReturnType<typeof adminGenerateDummyData>>
+>;
+export type AdminGenerateDummyDataMutationBody = AdminGenerateDummyDataRequest;
+export type AdminGenerateDummyDataMutationError = AdminGenerateDummyDataResponseApiResult;
+
+export const useAdminGenerateDummyData = <
+  TError = AdminGenerateDummyDataResponseApiResult,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof adminGenerateDummyData>>,
+    TError,
+    { data: AdminGenerateDummyDataRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof adminGenerateDummyData>>,
+  TError,
+  { data: AdminGenerateDummyDataRequest },
+  TContext
+> => {
+  const mutationOptions = getAdminGenerateDummyDataMutationOptions(options);
 
   return useMutation(mutationOptions);
 };
