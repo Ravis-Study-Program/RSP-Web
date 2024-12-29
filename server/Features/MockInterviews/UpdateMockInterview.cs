@@ -84,6 +84,29 @@ public static class UpdateMockInterview
           };
         }
 
+        // Get season week
+        string? seasonWeekId = null;
+        if (request.EnrollmentId != null)
+        {
+          var currentDate = DateTime.UtcNow;
+          seasonWeekId = await _dbContext
+            .SeasonWeeks.Where(s =>
+              currentDate >= s.StartDate
+              && currentDate <= s.EndDate
+              && s.SeasonId == existingMockInterview.Enrollment.SeasonId
+            )
+            .Select(s => s.SeasonWeekId)
+            .FirstOrDefaultAsync(cancellationToken);
+          if (seasonWeekId == null)
+          {
+            return new ApiResult<UpdateMockInterviewResponse>
+            {
+              StatusCode = HttpStatusCode.BadRequest,
+              Error = new ApiError(Message.MockInterviewOutOfSeasonDateRange),
+            };
+          }
+        }
+
         // Get user for interviewee and interviewer
         var interviewee = await _dbContext
           .Users.Where(u => u.Email == request.IntervieweeEmail)
@@ -166,6 +189,7 @@ public static class UpdateMockInterview
         existingMockInterview.EnrollmentId = request.EnrollmentId;
         existingMockInterview.StartDate = request.StartDate;
         existingMockInterview.TimeTakenInMinutes = request.TimeTakenInMinutes;
+        existingMockInterview.SeasonWeekId = seasonWeekId;
 
         _dbContext.Update(existingMockInterview);
         await _dbContext.SaveChangesAsync(cancellationToken);
@@ -178,12 +202,12 @@ public static class UpdateMockInterview
       }
       catch (Exception ex)
       {
-        _logger.LogError(ex, Message.MockInterviewCreationUnexpectedError);
+        _logger.LogError(ex, Message.MockInterviewUpdateUnexpectedError);
 
         return new ApiResult<UpdateMockInterviewResponse>
         {
           StatusCode = HttpStatusCode.InternalServerError,
-          Error = new ApiError(Message.MockInterviewCreationUnexpectedError),
+          Error = new ApiError(Message.MockInterviewUpdateUnexpectedError),
         };
       }
     }

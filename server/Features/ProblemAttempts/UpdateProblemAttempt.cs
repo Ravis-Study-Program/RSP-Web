@@ -76,6 +76,29 @@ public static class UpdateProblemAttempt
           };
         }
 
+        // Get season week
+        string? seasonWeekId = null;
+        if (request.EnrollmentId != null)
+        {
+          var currentDate = DateTime.UtcNow;
+          seasonWeekId = await _dbContext
+            .SeasonWeeks.Where(s =>
+              currentDate >= s.StartDate
+              && currentDate <= s.EndDate
+              && s.SeasonId == existingProblemAttempt.Enrollment.SeasonId
+            )
+            .Select(s => s.SeasonWeekId)
+            .FirstOrDefaultAsync(cancellationToken);
+          if (seasonWeekId == null)
+          {
+            return new ApiResult<UpdateProblemAttemptResponse>
+            {
+              StatusCode = HttpStatusCode.BadRequest,
+              Error = new ApiError(Message.ProblemAttemptOutOfSeasonDateRange),
+            };
+          }
+        }
+
         // Leetcode should take precedence if CustomProblem is present for some reason
         if (request.CustomProblemId != null && request.LeetcodeProblemId != null)
         {
@@ -87,6 +110,7 @@ public static class UpdateProblemAttempt
         existingProblemAttempt.LeetcodeProblemId = request.LeetcodeProblemId;
         existingProblemAttempt.CustomProblemId = request.CustomProblemId;
         existingProblemAttempt.Notes = request.Notes;
+        existingProblemAttempt.SeasonWeekId = seasonWeekId;
 
         _dbContext.Update(existingProblemAttempt);
         await _dbContext.SaveChangesAsync(cancellationToken);

@@ -262,6 +262,9 @@ export interface ProblemAttemptEntity {
   notes: string;
   /** @minLength 1 */
   problemAttemptId: string;
+  seasonWeek?: SeasonWeekEntity;
+  /** @nullable */
+  seasonWeekId?: string | null;
   timeTakenInMinutes: number;
   user?: UserEntity;
   /** @minLength 1 */
@@ -314,6 +317,9 @@ export interface MockInterviewEntity {
   mockInterviewId: string;
   /** @nullable */
   mockInterviewRounds?: MockInterviewRoundEntity[] | null;
+  seasonWeek?: SeasonWeekEntity;
+  /** @nullable */
+  seasonWeekId?: string | null;
   startDate: string;
   timeTakenInMinutes: number;
 }

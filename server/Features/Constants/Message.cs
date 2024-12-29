@@ -118,6 +118,8 @@ public static class Message
     "List of ProblemAttempt retrieved successfully.";
   public const string ProblemAttemptListUnexpectedError =
     "An unexpected error has occurred during problem attempts list.";
+  public const string ProblemAttemptOutOfSeasonDateRange =
+    "Problem attempt date is out of season date range.";
 
   public const string LeetcodeProblemsListSuccessfully =
     "List of LeetcodeProblems retrieved successfully.";
@@ -126,7 +128,7 @@ public static class Message
 
   public const string MockInterviewCreatedSuccessfully = "Mock Interview created successfully.";
   public const string MockInterviewDoesNotExists =
-    "No mentorship found using the Mock Interview Id provided.";
+    "No mock interview found using the Mock Interview Id provided.";
   public const string MockInterviewUpdatedSuccessfully = "Mock Interview updated successfully.";
   public const string MockInterviewCreationUnexpectedError =
     "An unexpected error has occurred during mock interview creation.";
@@ -139,6 +141,8 @@ public static class Message
     "List of Mock Interview retrieved successfully.";
   public const string MockInterviewListUnexpectedError =
     "An unexpected error has occurred during mock interviews list.";
+  public const string MockInterviewOutOfSeasonDateRange =
+    "Mock interview date is out of season date range.";
 
   public const string SeasonWeekCreatedSuccessfully = "Season Week created successfully.";
   public const string SeasonWeekWeekNumberAlreadyExists = "Season Week Week Number already exists.";
