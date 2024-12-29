@@ -76,6 +76,35 @@ public static class AdminGenerateDummyData
       return seasons;
     }
 
+    private static List<SeasonWeekEntity> GenerateSeasonWeeks(
+      Faker faker,
+      List<SeasonEntity> seasons
+    )
+    {
+      var seasonWeeks = new List<SeasonWeekEntity>();
+      foreach (var season in seasons)
+      {
+        var seasonStartDate = season.StartDateInclusiveUtc;
+        for (var i = 1; i <= 12; i++)
+        {
+          var startDaysOffset = (i - 1) * 7;
+          var endDaysOffset = i * 7;
+          seasonWeeks.Add(
+            new SeasonWeekEntity
+            {
+              SeasonWeekId = Database.Constants.GeneratePrimaryKeyId(),
+              SeasonId = season.SeasonId,
+              WeekNumber = i,
+              StartDate = seasonStartDate.AddDays(startDaysOffset).AddSeconds(1),
+              EndDate = seasonStartDate.AddDays(endDaysOffset),
+              DeletedAtUtc = null,
+            }
+          );
+        }
+      }
+      return seasonWeeks;
+    }
+
     private static List<UserEntity> GenerateUsers(Faker faker, int total)
     {
       var users = new List<UserEntity>();
@@ -374,6 +403,10 @@ public static class AdminGenerateDummyData
 
         var seasons = GenerateSeasons(faker, request.NumberOfSeasons);
         await _dbContext.Seasons.AddRangeAsync(seasons, cancellationToken);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        var seasonWeeks = GenerateSeasonWeeks(faker, seasons);
+        await _dbContext.SeasonWeeks.AddRangeAsync(seasonWeeks, cancellationToken);
         await _dbContext.SaveChangesAsync(cancellationToken);
 
         var users = GenerateUsers(faker, request.NumberOfUsers);

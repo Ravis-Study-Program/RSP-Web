@@ -54,19 +54,41 @@ public static class CreateMockInterview
     {
       try
       {
-        // Check if the enrollment exists
+        // Check if the enrollment exists and get season week
+        string? seasonWeekId = null;
         if (request.EnrollmentId != null)
         {
-          var existingEnrollmentUserEmail = await _dbContext
-            .Enrollments.Where(e => e.EnrollmentId == request.EnrollmentId)
-            .Select(e => e.User.Email)
-            .FirstOrDefaultAsync(cancellationToken);
-          if (existingEnrollmentUserEmail != request.IntervieweeEmail)
+          var existingEnrollment = await _dbContext
+            .Enrollments.Include(e => e.User)
+            .FirstOrDefaultAsync(e => e.EnrollmentId == request.EnrollmentId, cancellationToken);
+          if (
+            existingEnrollment == null
+            || existingEnrollment.User.Email != request.IntervieweeEmail
+          )
           {
             return new ApiResult<CreateMockInterviewResponse>
             {
               StatusCode = HttpStatusCode.BadRequest,
               Error = new ApiError(Message.EnrollmentDoesNotExists),
+            };
+          }
+
+          // Get season week
+          var currentDate = DateTime.UtcNow;
+          seasonWeekId = await _dbContext
+            .SeasonWeeks.Where(s =>
+              currentDate >= s.StartDate
+              && currentDate <= s.EndDate
+              && s.SeasonId == existingEnrollment.SeasonId
+            )
+            .Select(s => s.SeasonWeekId)
+            .FirstOrDefaultAsync(cancellationToken);
+          if (seasonWeekId == null)
+          {
+            return new ApiResult<CreateMockInterviewResponse>
+            {
+              StatusCode = HttpStatusCode.BadRequest,
+              Error = new ApiError(Message.MockInterviewOutOfSeasonDateRange),
             };
           }
         }
@@ -166,6 +188,7 @@ public static class CreateMockInterview
           MockInterviewRounds = mockInterviewRounds,
           StartDate = request.StartDate,
           TimeTakenInMinutes = request.TimeTakenInMinutes,
+          SeasonWeekId = seasonWeekId,
         };
 
         // Attach mock interview and its rounds to the DbContext to avoid circular dependency issues

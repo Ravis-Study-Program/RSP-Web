@@ -25,14 +25,16 @@ public class MockInterviewEntity : ISoftDelete
   [Required]
   public string IntervieweeUserId { get; set; } = string.Empty;
 
-  // A null enrollment would mean the problem attempt is not tied to any season.
-  public string? EnrollmentId { get; set; } = string.Empty;
+  // A null enrollment and season week would mean the problem attempt is not tied to any season.
+  public string? EnrollmentId { get; set; }
+  public string? SeasonWeekId { get; set; }
 
   // Navigation
   public UserEntity Interviewer { get; set; } = null!;
   public UserEntity Interviewee { get; set; } = null!;
   public EnrollmentEntity Enrollment { get; set; } = null!;
   public ICollection<MockInterviewRoundEntity> MockInterviewRounds { get; set; } = null!;
+  public SeasonWeekEntity SeasonWeek { get; set; } = null!;
   public DateTime? DeletedAtUtc { get; set; }
 }
 
@@ -66,6 +68,10 @@ public class MockInterviewEntityConfiguration : IEntityTypeConfiguration<MockInt
       .HasColumnName("EnrollmentId")
       .HasColumnType("varchar(16)");
     builder
+      .Property(x => x.SeasonWeekId)
+      .HasColumnName("SeasonWeekId")
+      .HasColumnType("varchar(16)");
+    builder
       .Property(x => x.InterviewerUserId)
       .HasColumnName("InterviewerUserId")
       .HasColumnType("varchar(16)")
@@ -97,6 +103,12 @@ public class MockInterviewEntityConfiguration : IEntityTypeConfiguration<MockInt
       .HasOne(x => x.Enrollment)
       .WithMany()
       .HasForeignKey(x => x.EnrollmentId)
+      .OnDelete(DeleteBehavior.SetNull)
+      .IsRequired(false);
+    builder
+      .HasOne(x => x.SeasonWeek)
+      .WithMany()
+      .HasForeignKey(x => x.SeasonWeekId)
       .OnDelete(DeleteBehavior.SetNull)
       .IsRequired(false);
 

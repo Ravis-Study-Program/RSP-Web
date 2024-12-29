@@ -26,14 +26,16 @@ public class ProblemAttemptEntity : ISoftDelete
   public string? LeetcodeProblemId { get; set; }
   public string? CustomProblemId { get; set; }
 
-  // A null enrollment would mean the problem attempt is not tied to any season.
+  // A null enrollment and season week would mean the problem attempt is not tied to any season.
   public string? EnrollmentId { get; set; }
+  public string? SeasonWeekId { get; set; }
 
   // Navigation
   public UserEntity User { get; set; } = null!;
   public LeetcodeProblemEntity LeetcodeProblem { get; set; } = null!;
   public CustomProblemEntity CustomProblem { get; set; } = null!;
   public EnrollmentEntity Enrollment { get; set; } = null!;
+  public SeasonWeekEntity SeasonWeek { get; set; } = null!;
   public DateTime? DeletedAtUtc { get; set; }
 }
 
@@ -84,6 +86,10 @@ public class ProblemAttemptEntityConfiguration : IEntityTypeConfiguration<Proble
       .HasColumnName("EnrollmentId")
       .HasColumnType("varchar(16)");
     builder
+      .Property(x => x.SeasonWeekId)
+      .HasColumnName("SeasonWeekId")
+      .HasColumnType("varchar(16)");
+    builder
       .Property(x => x.DeletedAtUtc)
       .HasColumnName("DeletedAtUtc")
       .HasColumnType("timestamptz");
@@ -111,6 +117,12 @@ public class ProblemAttemptEntityConfiguration : IEntityTypeConfiguration<Proble
       .HasOne(x => x.Enrollment)
       .WithMany()
       .HasForeignKey(x => x.EnrollmentId)
+      .OnDelete(DeleteBehavior.SetNull)
+      .IsRequired(false);
+    builder
+      .HasOne(x => x.SeasonWeek)
+      .WithMany()
+      .HasForeignKey(x => x.SeasonWeekId)
       .OnDelete(DeleteBehavior.SetNull)
       .IsRequired(false);
   }

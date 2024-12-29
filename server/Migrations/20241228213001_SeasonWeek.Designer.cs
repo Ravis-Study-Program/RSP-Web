@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using RSPWebAPI.Database;
@@ -11,9 +12,11 @@ using RSPWebAPI.Database;
 namespace RSPWebAPI.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241228213001_SeasonWeek")]
+    partial class SeasonWeek
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -306,10 +309,6 @@ namespace RSPWebAPI.Migrations
                         .HasColumnType("boolean")
                         .HasColumnName("IsPass");
 
-                    b.Property<string>("SeasonWeekId")
-                        .HasColumnType("varchar(16)")
-                        .HasColumnName("SeasonWeekId");
-
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("timestamptz")
                         .HasColumnName("StartDate");
@@ -325,8 +324,6 @@ namespace RSPWebAPI.Migrations
                     b.HasIndex("IntervieweeUserId");
 
                     b.HasIndex("InterviewerUserId");
-
-                    b.HasIndex("SeasonWeekId");
 
                     b.ToTable("MockInterview", (string)null);
                 });
@@ -414,10 +411,6 @@ namespace RSPWebAPI.Migrations
                         .HasColumnType("varchar(10000)")
                         .HasColumnName("Notes");
 
-                    b.Property<string>("SeasonWeekId")
-                        .HasColumnType("varchar(16)")
-                        .HasColumnName("SeasonWeekId");
-
                     b.Property<int>("TimeTakenInMinutes")
                         .HasColumnType("int")
                         .HasColumnName("TimeTakenInMinutes");
@@ -434,8 +427,6 @@ namespace RSPWebAPI.Migrations
                     b.HasIndex("EnrollmentId");
 
                     b.HasIndex("LeetcodeProblemId");
-
-                    b.HasIndex("SeasonWeekId");
 
                     b.HasIndex("UserId");
 
@@ -692,18 +683,11 @@ namespace RSPWebAPI.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("RSPWebAPI.Entities.SeasonWeekEntity", "SeasonWeek")
-                        .WithMany()
-                        .HasForeignKey("SeasonWeekId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
                     b.Navigation("Enrollment");
 
                     b.Navigation("Interviewee");
 
                     b.Navigation("Interviewer");
-
-                    b.Navigation("SeasonWeek");
                 });
 
             modelBuilder.Entity("RSPWebAPI.Entities.MockInterviewRoundEntity", b =>
@@ -755,11 +739,6 @@ namespace RSPWebAPI.Migrations
                         .HasForeignKey("LeetcodeProblemId")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("RSPWebAPI.Entities.SeasonWeekEntity", "SeasonWeek")
-                        .WithMany()
-                        .HasForeignKey("SeasonWeekId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
                     b.HasOne("RSPWebAPI.Entities.UserEntity", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
@@ -771,8 +750,6 @@ namespace RSPWebAPI.Migrations
                     b.Navigation("Enrollment");
 
                     b.Navigation("LeetcodeProblem");
-
-                    b.Navigation("SeasonWeek");
 
                     b.Navigation("User");
                 });

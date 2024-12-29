@@ -53,7 +53,8 @@ public static class CreateProblemAttempt
     {
       try
       {
-        // Check if the enrollment exists
+        // Check if the enrollment exists and get season week
+        string? seasonWeekId = null;
         if (request.EnrollmentId != null)
         {
           var existingEnrollment = await _dbContext
@@ -65,6 +66,25 @@ public static class CreateProblemAttempt
             {
               StatusCode = HttpStatusCode.BadRequest,
               Error = new ApiError(Message.EnrollmentDoesNotExists),
+            };
+          }
+
+          // Get season week
+          var currentDate = DateTime.UtcNow;
+          seasonWeekId = await _dbContext
+            .SeasonWeeks.Where(s =>
+              currentDate >= s.StartDate
+              && currentDate <= s.EndDate
+              && s.SeasonId == existingEnrollment.SeasonId
+            )
+            .Select(s => s.SeasonWeekId)
+            .FirstOrDefaultAsync(cancellationToken);
+          if (seasonWeekId == null)
+          {
+            return new ApiResult<CreateProblemAttemptResponse>
+            {
+              StatusCode = HttpStatusCode.BadRequest,
+              Error = new ApiError(Message.ProblemAttemptOutOfSeasonDateRange),
             };
           }
         }
@@ -99,6 +119,7 @@ public static class CreateProblemAttempt
           Notes = request.Notes,
           EnrollmentId = request.EnrollmentId,
           UserId = existingUser.UserId,
+          SeasonWeekId = seasonWeekId,
         };
 
         _dbContext.Add(problemAttempt);
