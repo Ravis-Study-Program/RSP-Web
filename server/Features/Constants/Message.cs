@@ -6,6 +6,13 @@ public static class Message
   public const string EndDateMustBeGreaterThanStartDate =
     "End date must be greater than start date.";
 
+  public const string LeetcodeProblemRecommenderCreatedSuccessfully =
+    "Leetcode problem recommendation created successfully.";
+  public const string LeetcodeProblemRecommenderUnexpectedError =
+    "An unexpected error has occurred during leetcode problem recommendation.";
+  public const string LeetcodeProblemRecommenderNoLeetcodeProblemLeft =
+    "No recommendations are generated because all leetcode problems have been completed.";
+
   public const string UserEmailExists = "A user with this email already exists.";
   public const string UserEmailDoesNotExists = "No user found using the email provided.";
   public const string UserCreatedSuccessfully = "User created successfully.";

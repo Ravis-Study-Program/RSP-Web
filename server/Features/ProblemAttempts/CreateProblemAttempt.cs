@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using RSPWebAPI.Database;
 using RSPWebAPI.Entities;
 using RSPWebAPI.Features.Constants;
+using RSPWebAPI.Features.Leetcode;
 using RSPWebAPI.Shared;
 using RSPWebAPI.Shared.Behaviours;
 
@@ -124,6 +125,22 @@ public static class CreateProblemAttempt
 
         _dbContext.Add(problemAttempt);
         await _dbContext.SaveChangesAsync(cancellationToken);
+
+        // var existingRecommendation =
+        //   await _dbContext.LeetcodeProblemRecommendations.FirstOrDefaultAsync(l => l.LeetcodeProblemId == request.LeetcodeProblemId && l.ProblemAttemptId == null, cancellationToken);
+        // if (existingRecommendation != null)
+        // {
+        //   // Update existing recommendation to include problem attempt
+        //   existingRecommendation.ProblemAttemptId = problemAttempt.ProblemAttemptId;
+        //   await _dbContext.SaveChangesAsync(cancellationToken);
+
+        //   // Generate Leetcode problem recommendations for the new user
+        //   var recommendationCommand = new GenerateLeetcodeProblemRecommendations.Command
+        //   {
+        //     UserId = existingUser.UserId
+        //   };
+        //   await _recommendationHandler.Handle(recommendationCommand, cancellationToken);
+        // }
 
         return new ApiResult<CreateProblemAttemptResponse>
         {
