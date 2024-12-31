@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using RSPWebAPI.Database;
 using RSPWebAPI.Entities;
 using RSPWebAPI.Features.Constants;
+using RSPWebAPI.Features.Leetcode;
 using RSPWebAPI.Shared;
 using RSPWebAPI.Shared.Behaviours;
 
@@ -65,6 +66,22 @@ public static class CreateUserIfNotExists
         {
           _dbContext.Add(user);
           await _dbContext.SaveChangesAsync(cancellationToken);
+
+          // // Generate Leetcode problem recommendations for the new user
+          // var recommendationCommand = new GenerateLeetcodeProblemRecommendations.Command
+          // {
+          //   UserId = user.UserId
+          // };
+          // var recommendationResult = await _recommendationHandler.Handle(recommendationCommand, cancellationToken);
+          //
+          // if (recommendationResult.StatusCode != HttpStatusCode.OK)
+          // {
+          //   return new ApiResult<CreateUserIfNotExistsResponse>
+          //   {
+          //     StatusCode = recommendationResult.StatusCode,
+          //     Error = recommendationResult.Error
+          //   };
+          // }
         }
         catch (Exception ex)
         {

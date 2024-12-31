@@ -18,6 +18,7 @@ public class ApplicationDbContext : DbContext
   public virtual DbSet<LeetcodeMockInterviewRoundEntity> LeetcodeMockInterviewRounds { get; set; }
   public virtual DbSet<LeetcodeProblemEntity> LeetcodeProblems { get; set; }
   public virtual DbSet<LeetcodeProblemCategoryEntity> LeetcodeProblemCategories { get; set; }
+  public virtual DbSet<LeetcodeProblemRecommendationEntity> LeetcodeProblemRecommendations { get; set; }
   public virtual DbSet<MentorshipEntity> Mentorships { get; set; }
   public virtual DbSet<MockInterviewEntity> MockInterviews { get; set; }
   public virtual DbSet<MockInterviewRoundEntity> MockInterviewRounds { get; set; }
@@ -49,6 +50,9 @@ public class ApplicationDbContext : DbContext
       .HasQueryFilter(x => x.DeletedAtUtc.HasValue == false);
     modelBuilder
       .Entity<LeetcodeProblemCategoryEntity>()
+      .HasQueryFilter(x => x.DeletedAtUtc.HasValue == false);
+    modelBuilder
+      .Entity<LeetcodeProblemRecommendationEntity>()
       .HasQueryFilter(x => x.DeletedAtUtc.HasValue == false);
     modelBuilder.Entity<MentorshipEntity>().HasQueryFilter(x => x.DeletedAtUtc.HasValue == false);
     modelBuilder
