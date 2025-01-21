@@ -9,7 +9,8 @@ public class EnumSchemaFilter : ISchemaFilter
 {
   public void Apply(OpenApiSchema schema, SchemaFilterContext context)
   {
-    if (context.Type.IsEnum)
+    // Make sure it's an enum AND it's int-backed
+    if (context.Type.IsEnum && Enum.GetUnderlyingType(context.Type) == typeof(int))
     {
       schema.Enum.Clear();
       schema.Type = "integer";
@@ -29,7 +30,9 @@ public class EnumSchemaFilter : ISchemaFilter
           .FirstOrDefault();
 
         var name = enumMemberAttribute?.Value ?? enumValue?.ToString();
-        var intValue = enumValue != null ? (int)enumValue : -1;
+
+        // Safely convert to int
+        var intValue = Convert.ToInt32(enumValue);
 
         // Add to enumValues only if the value is unique
         if (uniqueEnumValues.Add(intValue))
@@ -38,7 +41,7 @@ public class EnumSchemaFilter : ISchemaFilter
         }
 
         // Add to enumNames only if the name is unique
-        if (uniqueEnumNames.Add(name))
+        if (name != null && uniqueEnumNames.Add(name))
         {
           enumNames.Add(new OpenApiString(name));
         }

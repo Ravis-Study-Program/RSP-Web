@@ -10986,7 +10986,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"openapi3-ts@npm:^4.2.2":
+"openapi3-ts@npm:^4.2.2, openapi3-ts@npm:^4.4.0":
   version: 4.4.0
   resolution: "openapi3-ts@npm:4.4.0"
   dependencies:
@@ -12426,6 +12426,7 @@ __metadata:
     mantine-form-zod-resolver: "npm:^1.1.0"
     mantine-react-table: "npm:^2.0.0-beta.6"
     msw: "npm:^2.4.9"
+    openapi3-ts: "npm:^4.4.0"
     orval: "npm:^7.1.1"
     postcss: "npm:^8.4.43"
     postcss-preset-mantine: "npm:1.17.0"

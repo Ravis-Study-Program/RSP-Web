@@ -1,8 +1,7 @@
 import { Button, Card, Grid, Group, Image, Skeleton, Text } from '@mantine/core';
 import { Layout } from '@/components/Layout/Layout';
-import { SeasonRole } from '@/generated/api/client';
+import { SeasonRole, useGetIsCurrentUserEnrolled } from '@/generated/api/client';
 import { useSeasonSlug } from '@/shared/hooks/useSeasonSlug';
-import { useUserAndEnrollment } from '@/shared/hooks/useUserAndEnrollment';
 import classes from './Resources.module.css';
 
 type Resource = {
@@ -13,7 +12,8 @@ type Resource = {
 
 export default function ResourcesPage() {
   const { seasonSlug } = useSeasonSlug();
-  const { role, isLoading } = useUserAndEnrollment(seasonSlug);
+  const { data, isLoading } = useGetIsCurrentUserEnrolled({ seasonSlug });
+  const role = data?.responseBody?.role;
 
   const coordinatorResources: Resource[] = [
     {

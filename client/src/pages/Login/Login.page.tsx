@@ -22,8 +22,7 @@ export default function LoginPage() {
         try {
           const request: CreateUserIfNotExistsRequest = {
             profileImage: Auth0User.picture || '',
-            name: Auth0User.given_name || '',
-            discordId: '',
+            name: Auth0User.given_name || 'New User',
           };
           await createUser({ data: request });
           setIsUserCreated(true);

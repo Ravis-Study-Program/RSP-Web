@@ -6,11 +6,12 @@ import { Button, Flex, Select, Stack, TextInput, Title } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import {
-  GetCurrentUserMenteesListResponseApiResult,
-  MenteeResponseDto,
+  GetCurrentUserMenteesListResponseApiResponse,
+  MentorshipResponse,
   SeasonStudentRolePromotion,
   UpdateStudentRolePromotionRequest,
-  UpdateStudentRolePromotionResponseApiResult,
+  UpdateStudentRolePromotionResponseApiResponse,
+  useGetCurrentUser,
 } from '@/generated/api/client';
 import { SeasonStudentRolePromotionReverseIndex } from '@/shared/entities/reverseIndex';
 
@@ -26,6 +27,9 @@ export const StudentRolePromotionUpdateModal = ({
   refetchMentees,
   seasonSlug,
 }: studentRolePromotionUpdateModalProps) => {
+  const { data: userResponse } = useGetCurrentUser();
+  const email = userResponse?.responseBody?.user.email ?? '';
+
   const form = useForm({
     mode: 'uncontrolled',
     initialValues: {
@@ -40,6 +44,7 @@ export const StudentRolePromotionUpdateModal = ({
       const requestData: UpdateStudentRolePromotionRequest = {
         menteeEnrollmentId: mentee.menteeEnrollmentId,
         seasonSlug,
+        email,
         studentRolePromotion:
           SeasonStudentRolePromotion[
             values.studentRolePromotion as keyof typeof SeasonStudentRolePromotion
@@ -54,7 +59,7 @@ export const StudentRolePromotionUpdateModal = ({
         message: 'Mentorship updated successfully.',
       });
     } catch (err) {
-      const response = (err as any)?.response.data as UpdateStudentRolePromotionResponseApiResult;
+      const response = (err as any)?.response.data as UpdateStudentRolePromotionResponseApiResponse;
       notifications.show({
         color: 'red',
         title: 'Error',
@@ -98,23 +103,18 @@ export const StudentRolePromotionUpdateModal = ({
 };
 
 type studentRolePromotionUpdateModalProps = {
-  table: MRT_TableInstance<MenteeResponseDto>;
+  table: MRT_TableInstance<MentorshipResponse>;
   updateStudentRolePromotion: UseMutateAsyncFunction<
-    UpdateStudentRolePromotionResponseApiResult,
-    UpdateStudentRolePromotionResponseApiResult,
+    UpdateStudentRolePromotionResponseApiResponse,
+    unknown,
     {
       data: UpdateStudentRolePromotionRequest;
     },
     unknown
   >;
-  row: MRT_Row<MenteeResponseDto>;
+  row: MRT_Row<MentorshipResponse>;
   refetchMentees: (
     options?: RefetchOptions
-  ) => Promise<
-    QueryObserverResult<
-      GetCurrentUserMenteesListResponseApiResult,
-      GetCurrentUserMenteesListResponseApiResult
-    >
-  >;
+  ) => Promise<QueryObserverResult<GetCurrentUserMenteesListResponseApiResponse, unknown>>;
   seasonSlug: string;
 };

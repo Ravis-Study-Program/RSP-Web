@@ -5,11 +5,13 @@ import { useUserAndEnrollment } from './useUserAndEnrollment';
 const mocks = vi.hoisted(() => ({
   useGetCurrentUser: vi.fn(),
   useGetIsUserEnrolled: vi.fn(),
+  useGetUser: vi.fn(), // Added mock for useGetUser
 }));
 
 vi.mock('@/generated/api/client', () => ({
   useGetCurrentUser: mocks.useGetCurrentUser,
-  useGetIsUserEnrolled: mocks.useGetIsUserEnrolled,
+  useGetIsCurrentUserEnrolled: mocks.useGetIsUserEnrolled,
+  useGetUser: mocks.useGetUser,
 }));
 
 describe('useUserAndEnrollment', () => {
@@ -29,6 +31,13 @@ describe('useUserAndEnrollment', () => {
       data: null,
       isLoading: true,
       isFetching: true,
+      isError: false,
+    });
+
+    mocks.useGetUser.mockReturnValue({
+      data: null,
+      isLoading: false,
+      isFetching: false,
       isError: false,
     });
 
@@ -53,6 +62,13 @@ describe('useUserAndEnrollment', () => {
       isLoading: false,
       isFetching: false,
       isError: true,
+    });
+
+    mocks.useGetUser.mockReturnValue({
+      data: null,
+      isLoading: false,
+      isFetching: false,
+      isError: false,
     });
 
     const { result } = renderHook(() => useUserAndEnrollment('test-season-slug'));
@@ -81,11 +97,19 @@ describe('useUserAndEnrollment', () => {
       isFetching: false,
       isError: false,
     });
+    // When no email is provided, useGetUser is disabled.
+    mocks.useGetUser.mockReturnValue({
+      data: null,
+      isLoading: false,
+      isFetching: false,
+      isError: false,
+    });
 
     const { result } = renderHook(() => useUserAndEnrollment('test-season-slug'));
 
     expect(result.current.isLoading).toBe(false);
     expect(result.current.isError).toBe(false);
+    // Fallback to the current user data from useGetCurrentUser
     expect(result.current.user).toEqual({ id: 'test-user-id', isAdmin: true });
     expect(result.current.isAdmin).toBe(true);
     expect(result.current.role).toBeNull();
@@ -115,6 +139,14 @@ describe('useUserAndEnrollment', () => {
       isError: false,
     });
 
+    // When no email is provided, useGetUser is disabled.
+    mocks.useGetUser.mockReturnValue({
+      data: null,
+      isLoading: false,
+      isFetching: false,
+      isError: false,
+    });
+
     const { result } = renderHook(() => useUserAndEnrollment('test-season-slug'));
 
     expect(result.current.isLoading).toBe(false);
@@ -129,7 +161,7 @@ describe('useUserAndEnrollment', () => {
     mocks.useGetCurrentUser.mockReturnValue({
       data: {
         responseBody: {
-          user: { id: 'test-user-id', isAdmin: false },
+          user: { id: 'test-user-id', isAdmin: false, email: 'user@gmail.com' },
         },
       },
       isLoading: false,
@@ -144,11 +176,24 @@ describe('useUserAndEnrollment', () => {
       isError: false,
     });
 
+    // Even when querying with an email, if useGetUser returns no data we fallback.
+    mocks.useGetUser.mockReturnValue({
+      data: null,
+      isLoading: false,
+      isFetching: false,
+      isError: false,
+    });
+
     const { result } = renderHook(() => useUserAndEnrollment('test-season-slug', 'user@gmail.com'));
 
     expect(result.current.isLoading).toBe(false);
     expect(result.current.isError).toBe(false);
-    expect(result.current.user).toEqual({ id: 'test-user-id', isAdmin: false });
+    // Fallback to the current user data if useGetUser data is not available.
+    expect(result.current.user).toEqual({
+      id: 'test-user-id',
+      isAdmin: false,
+      email: 'user@gmail.com',
+    });
     expect(result.current.isAdmin).toBe(false);
     expect(result.current.role).toBeNull();
   });

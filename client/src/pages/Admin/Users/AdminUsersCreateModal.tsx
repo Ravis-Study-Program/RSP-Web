@@ -7,8 +7,8 @@ import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import {
   AdminCreateUserRequest,
-  AdminCreateUserResponseApiResult,
-  AdminListUserResponseApiResult,
+  AdminCreateUserResponseApiResponse,
+  AdminListUserResponseApiResponse,
   UserEntity,
 } from '@/generated/api/client';
 
@@ -55,7 +55,7 @@ export const AdminUsersCreateModal = ({
         message: 'User created successfully.',
       });
     } catch (err) {
-      const response = (err as any)?.response.data as AdminCreateUserResponseApiResult;
+      const response = (err as any)?.response.data as AdminCreateUserResponseApiResponse;
       notifications.show({
         color: 'red',
         title: 'Error',
@@ -116,8 +116,8 @@ export const AdminUsersCreateModal = ({
 type AdminUsersCreateModalProps = {
   table: MRT_TableInstance<UserEntity>;
   createUser: UseMutateAsyncFunction<
-    AdminCreateUserResponseApiResult,
-    AdminCreateUserResponseApiResult,
+    AdminCreateUserResponseApiResponse,
+    unknown,
     {
       data: AdminCreateUserRequest;
     },
@@ -125,5 +125,5 @@ type AdminUsersCreateModalProps = {
   >;
   refetchUsers: (
     options?: RefetchOptions
-  ) => Promise<QueryObserverResult<AdminListUserResponseApiResult, AdminListUserResponseApiResult>>;
+  ) => Promise<QueryObserverResult<AdminListUserResponseApiResponse, unknown>>;
 };

@@ -10,8 +10,9 @@ import { ActionIcon, Button, Flex, Text, Title, Tooltip } from '@mantine/core';
 import { modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
 import {
-  AdminDeleteEnrollmentResponseApiResult,
-  EnrollmentResponse,
+  AdminDeleteEnrollmentResponseApiResponse,
+  EnrollmentEntity,
+  EnrollmentResponseDto,
   SeasonRole,
   SeasonStudentRolePromotion,
   useAdminCreateEnrollment,
@@ -52,7 +53,7 @@ export const AdminEnrollmentsTable = () => {
     isLoading: isLoadingUsers,
   } = useAdminListUser();
 
-  const openDeleteConfirmModal = (row: MRT_Row<EnrollmentResponse>) => {
+  const openDeleteConfirmModal = (row: MRT_Row<EnrollmentResponseDto>) => {
     modals.openConfirmModal({
       children: (
         <>
@@ -68,7 +69,7 @@ export const AdminEnrollmentsTable = () => {
       confirmProps: { color: 'red' },
       onConfirm: async () => {
         try {
-          await deleteEnrollment({ params: { enrollmentId: row.original.enrollmentId! } });
+          await deleteEnrollment({ data: { enrollmentId: row.original.enrollmentId! } });
           await refetchEnrollments();
           modals.closeAll();
           notifications.show({
@@ -77,7 +78,7 @@ export const AdminEnrollmentsTable = () => {
             message: 'Enrollment deleted successfully.',
           });
         } catch (err) {
-          const response = (err as any)?.response.data as AdminDeleteEnrollmentResponseApiResult;
+          const response = (err as any)?.response.data as AdminDeleteEnrollmentResponseApiResponse;
           notifications.show({
             color: 'red',
             title: 'Error',
@@ -89,7 +90,7 @@ export const AdminEnrollmentsTable = () => {
     });
   };
 
-  const columns = useMemo<MRT_ColumnDef<EnrollmentResponse>[]>(
+  const columns = useMemo<MRT_ColumnDef<EnrollmentResponseDto>[]>(
     () => [
       {
         accessorKey: 'seasonName',

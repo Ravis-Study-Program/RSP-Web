@@ -12,17 +12,17 @@ import { ActionIcon, Anchor, Box, Button, Flex, Table, Text, Title, Tooltip } fr
 import { modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
 import {
-  DeleteMockInterviewResponseApiResult,
-  GetMockInterviewsResponseApiResult,
+  DeleteMockInterviewResponseApiResponse,
+  ListMockInterviewResponseApiResponse,
   MockInterviewEntity,
   MockInterviewRoundEntity,
   useCreateMockInterview,
   useDeleteMockInterview,
-  useGetLeetcodeProblems,
-  useGetUserList,
+  useGetCurrentUser,
+  useGetGraduates,
+  useListLeetcodeProblems,
   useUpdateMockInterview,
 } from '@/generated/api/client';
-import { useUserAndEnrollment } from '@/shared/hooks/useUserAndEnrollment';
 import { MockInterviewCreateModal } from './MockInterviewCreateModal';
 import { MockInterviewUpdateModal } from './MockInterviewUpdateModal';
 import classes from './MockInterviewTable.module.css';
@@ -38,16 +38,17 @@ export const MockInterviewTable = ({
     isError: isLoadingLeetcodeProblemsError,
     isFetching: isFetchingLeetcodeProblems,
     isLoading: isLoadingLeetcodeProblems,
-  } = useGetLeetcodeProblems();
+  } = useListLeetcodeProblems();
 
   const {
     data: usersResponse,
     isError: isLoadingUsersError,
     isFetching: isFetchingUsers,
     isLoading: isLoadingUsers,
-  } = useGetUserList();
-  const { user } = useUserAndEnrollment('');
-  const users = usersResponse?.responseBody?.users.filter((u) => u.email !== user?.email);
+  } = useGetGraduates();
+  const { data: currentUserResponse } = useGetCurrentUser();
+  const currentUserEmail = currentUserResponse?.responseBody?.user.email ?? '';
+  const users = usersResponse?.responseBody?.graduates.filter((u) => u.email !== currentUserEmail);
 
   const { mutateAsync: createMockInterview, status: isCreatingMockInterviewStatus } =
     useCreateMockInterview();
@@ -73,7 +74,9 @@ export const MockInterviewTable = ({
       confirmProps: { color: 'red' },
       onConfirm: async () => {
         try {
-          await deleteMockInterview({ params: { mockInterviewId: row.original.mockInterviewId } });
+          await deleteMockInterview({
+            data: { mockInterviewId: row.original.mockInterviewId, email: currentUserEmail },
+          });
           await refetchMockInterviews();
           modals.closeAll();
           notifications.show({
@@ -82,7 +85,7 @@ export const MockInterviewTable = ({
             message: 'Mock interview deleted successfully.',
           });
         } catch (err) {
-          const response = (err as any)?.response.data as DeleteMockInterviewResponseApiResult;
+          const response = (err as any)?.response.data as DeleteMockInterviewResponseApiResponse;
           notifications.show({
             color: 'red',
             title: 'Error',
@@ -265,9 +268,7 @@ export const MockInterviewTable = ({
 type MockInterviewTableProps = {
   refetchMockInterviews: (
     options?: RefetchOptions
-  ) => Promise<
-    QueryObserverResult<GetMockInterviewsResponseApiResult, GetMockInterviewsResponseApiResult>
-  >;
+  ) => Promise<QueryObserverResult<ListMockInterviewResponseApiResponse, unknown>>;
   mockInterviews: MockInterviewEntity[] | null | undefined;
   enrollmentId: string;
   enableEditing: boolean;

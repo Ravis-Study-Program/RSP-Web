@@ -1,0 +1,358 @@
+using System.Linq.Expressions;
+using Microsoft.EntityFrameworkCore;
+using RSPWebAPI.Common;
+using RSPWebAPI.Common.Interfaces;
+using RSPWebAPI.Entities;
+using RSPWebAPI.Features.Constants;
+using RSPWebAPI.Features.Enrollments.Interfaces;
+using RSPWebAPI.Features.ProblemAttempts.Dtos;
+using RSPWebAPI.Features.ProblemAttempts.Interfaces;
+using RSPWebAPI.Features.SeasonWeeks.Interfaces;
+using RSPWebAPI.Features.Users.Interfaces;
+
+namespace RSPWebAPI.Features.ProblemAttempts;
+
+public class ProblemAttemptService : IProblemAttemptService
+{
+  private readonly IEnrollmentService _enrollmentService;
+  private readonly ILogger<ProblemAttemptService> _logger;
+  private readonly IRepository<ProblemAttemptEntity> _problemAttemptRepository;
+  private readonly ISeasonWeekService _seasonWeekService;
+  private readonly IUnitOfWork _unitOfWork;
+  private readonly IUserService _userService;
+
+  public ProblemAttemptService(
+    IRepository<ProblemAttemptEntity> problemAttemptRepository,
+    ISeasonWeekService seasonWeekService,
+    IUserService userService,
+    IEnrollmentService enrollmentService,
+    IUnitOfWork unitOfWork,
+    ILogger<ProblemAttemptService> logger
+  )
+  {
+    _problemAttemptRepository = problemAttemptRepository;
+    _seasonWeekService = seasonWeekService;
+    _userService = userService;
+    _enrollmentService = enrollmentService;
+    _unitOfWork = unitOfWork;
+    _logger = logger;
+  }
+
+  public async Task<IEnumerable<ProblemAttemptEntity>> GetAllProblemAttemptsAsync(
+    Expression<Func<ProblemAttemptEntity, bool>>? predicate = null,
+    CancellationToken cancellationToken = default,
+    Func<IQueryable<ProblemAttemptEntity>, IQueryable<ProblemAttemptEntity>>? include = null
+  )
+  {
+    return await _problemAttemptRepository.GetAllAsync(predicate, cancellationToken, include);
+  }
+
+  public async Task<ProblemAttemptEntity?> GetProblemAttemptByIdAsync(
+    string problemAttemptId,
+    CancellationToken cancellationToken = default,
+    Func<IQueryable<ProblemAttemptEntity>, IQueryable<ProblemAttemptEntity>>? include = null
+  )
+  {
+    return await _problemAttemptRepository.GetByIdAsync(
+      problemAttemptId,
+      cancellationToken,
+      include
+    );
+  }
+
+  public async Task<IServiceResponse<CreateProblemAttemptResponse>> CreateProblemAttempt(
+    CreateProblemAttemptRequest request,
+    CancellationToken cancellationToken = default
+  )
+  {
+    SeasonWeekEntity? seasonWeek = null;
+    if (request.EnrollmentId != null)
+    {
+      var existingEnrollment = await _enrollmentService.GetEnrollmentByIdAsync(
+        request.EnrollmentId,
+        cancellationToken,
+        q => q.Include(e => e.User)
+      );
+      if (existingEnrollment == null || existingEnrollment.User.Email != request.Email)
+      {
+        return new ErrorServiceResponse<CreateProblemAttemptResponse>(
+          Message.EnrollmentDoesNotExists
+        );
+      }
+
+      var currentDate = request.AttemptStartDateUtc;
+      var seasonWeeks = await _seasonWeekService.GetAllSeasonWeeksAsync(
+        q =>
+          q.StartDate <= currentDate
+          && q.EndDate >= currentDate
+          && q.SeasonId == existingEnrollment.SeasonId,
+        cancellationToken
+      );
+      seasonWeek = seasonWeeks.FirstOrDefault();
+      if (seasonWeek == null)
+      {
+        return new ErrorServiceResponse<CreateProblemAttemptResponse>(
+          Message.ProblemAttemptOutOfSeasonDateRange
+        );
+      }
+    }
+
+    // Leetcode should take precedence if CustomProblem is present
+    if (request.CustomProblemId != null && request.LeetcodeProblemId != null)
+    {
+      request.CustomProblemId = null;
+    }
+
+    var user = await _userService.GetUserByEmailAsync(request.Email, cancellationToken);
+    if (user == null)
+    {
+      return new ErrorServiceResponse<CreateProblemAttemptResponse>(Message.UserEmailDoesNotExists);
+    }
+
+    var problemAttempt = new ProblemAttemptEntity
+    {
+      ProblemAttemptId = Database.Constants.GeneratePrimaryKeyId(),
+      AttemptStartDateUtc = request.AttemptStartDateUtc,
+      TimeTakenInMinutes = request.TimeTakenInMinutes,
+      LeetcodeProblemId = request.LeetcodeProblemId,
+      CustomProblemId = request.CustomProblemId,
+      Notes = request.Notes,
+      EnrollmentId = request.EnrollmentId,
+      UserId = user.UserId,
+      SeasonWeekId = seasonWeek?.SeasonWeekId,
+    };
+
+    try
+    {
+      await AddProblemAttemptAsync(problemAttempt, cancellationToken);
+      await _unitOfWork.SaveChangesAsync(cancellationToken);
+      return new SuccessServiceResponse<CreateProblemAttemptResponse>(
+        Message.ProblemAttemptCreatedSuccessfully,
+        new CreateProblemAttemptResponse { ProblemAttemptId = problemAttempt.ProblemAttemptId }
+      );
+    }
+    catch (Exception ex)
+    {
+      _logger.LogError(ex, Message.ProblemAttemptCreationUnexpectedError);
+      return new ErrorServiceResponse<CreateProblemAttemptResponse>(
+        Message.ProblemAttemptCreationUnexpectedError
+      );
+    }
+  }
+
+  public async Task<IServiceResponse<DeleteProblemAttemptResponse>> DeleteProblemAttempt(
+    DeleteProblemAttemptRequest request,
+    CancellationToken cancellationToken = default
+  )
+  {
+    var existingProblemAttempt = await GetProblemAttemptByIdAsync(
+      request.ProblemAttemptId,
+      cancellationToken,
+      q => q.Include(p => p.User)
+    );
+    if (existingProblemAttempt == null || existingProblemAttempt.User.Email != request.Email)
+    {
+      return new ErrorServiceResponse<DeleteProblemAttemptResponse>(
+        Message.ProblemAttemptDoesNotExists
+      );
+    }
+
+    try
+    {
+      await DeleteProblemAttemptAsync(existingProblemAttempt.ProblemAttemptId, cancellationToken);
+      await _unitOfWork.SaveChangesAsync(cancellationToken);
+      return new SuccessServiceResponse<DeleteProblemAttemptResponse>(
+        Message.ProblemAttemptDeletedSuccessfully
+      );
+    }
+    catch (Exception ex)
+    {
+      _logger.LogError(ex, Message.ProblemAttemptDeletionUnexpectedError);
+      return new ErrorServiceResponse<DeleteProblemAttemptResponse>(
+        Message.ProblemAttemptDeletionUnexpectedError
+      );
+    }
+  }
+
+  public async Task<IServiceResponse<ListProblemAttemptResponse>> ListProblemAttempt(
+    ListProblemAttemptRequest request,
+    CancellationToken cancellationToken = default
+  )
+  {
+    var query = _problemAttemptRepository.Table;
+    if (request.EnrollmentId != null)
+    {
+      var existingEnrollment = await _enrollmentService.GetEnrollmentByIdAsync(
+        request.EnrollmentId,
+        cancellationToken,
+        q => q.Include(e => e.User)
+      );
+      if (existingEnrollment == null || existingEnrollment.User.Email != request.Email)
+      {
+        return new ErrorServiceResponse<ListProblemAttemptResponse>(
+          Message.EnrollmentDoesNotExists
+        );
+      }
+
+      query = query.Where(p => p.EnrollmentId == request.EnrollmentId);
+    }
+
+    if (request.IncludeLeetcode)
+    {
+      query = query
+        .Include(p => p.LeetcodeProblem)
+        .ThenInclude(l => l.LeetcodeProblemCategories)
+        .Include(p => p.LeetcodeProblem)
+        .ThenInclude(l => l.Problem);
+    }
+
+    if (request.IncludeCustom)
+    {
+      query = query.Include(p => p.CustomProblem).ThenInclude(c => c.Problem);
+    }
+
+    query = query.Include(e => e.User);
+
+    var problemAttempts = await _problemAttemptRepository.GetAllAsync(
+      p => p.User.Email == request.Email,
+      cancellationToken,
+      _ => query
+    );
+
+    try
+    {
+      return new SuccessServiceResponse<ListProblemAttemptResponse>(
+        Message.ProblemAttemptListSuccessfully,
+        new ListProblemAttemptResponse { ProblemAttempts = problemAttempts.ToList() }
+      );
+    }
+    catch (Exception ex)
+    {
+      _logger.LogError(ex, Message.ProblemAttemptListUnexpectedError);
+      return new ErrorServiceResponse<ListProblemAttemptResponse>(
+        Message.ProblemAttemptListUnexpectedError
+      );
+    }
+  }
+
+  public async Task<IServiceResponse<UpdateProblemAttemptResponse>> UpdateProblemAttempt(
+    UpdateProblemAttemptRequest request,
+    CancellationToken cancellationToken = default
+  )
+  {
+    var existingProblemAttempt = await _problemAttemptRepository.GetByIdAsync(
+      request.ProblemAttemptId,
+      cancellationToken,
+      q => q.Include(p => p.Enrollment)
+    );
+    if (
+      existingProblemAttempt == null
+      || request.EnrollmentId != existingProblemAttempt.EnrollmentId
+    )
+    {
+      return new ErrorServiceResponse<UpdateProblemAttemptResponse>(
+        Message.ProblemAttemptDoesNotExists
+      );
+    }
+
+    SeasonWeekEntity? seasonWeek = null;
+    if (request.EnrollmentId != null)
+    {
+      var currentDate = request.AttemptStartDateUtc;
+      var seasonWeeks = await _seasonWeekService.GetAllSeasonWeeksAsync(
+        q =>
+          q.StartDate <= currentDate
+          && q.EndDate >= currentDate
+          && q.SeasonId == existingProblemAttempt.Enrollment.SeasonId,
+        cancellationToken
+      );
+      seasonWeek = seasonWeeks.FirstOrDefault();
+      if (seasonWeek == null)
+      {
+        return new ErrorServiceResponse<UpdateProblemAttemptResponse>(
+          Message.ProblemAttemptOutOfSeasonDateRange
+        );
+      }
+    }
+
+    // Leetcode should take precedence if CustomProblem is present for some reason
+    if (request.CustomProblemId != null && request.LeetcodeProblemId != null)
+    {
+      request.CustomProblemId = null;
+    }
+
+    existingProblemAttempt.AttemptStartDateUtc = request.AttemptStartDateUtc;
+    existingProblemAttempt.TimeTakenInMinutes = request.TimeTakenInMinutes;
+    existingProblemAttempt.LeetcodeProblemId = request.LeetcodeProblemId;
+    existingProblemAttempt.CustomProblemId = request.CustomProblemId;
+    existingProblemAttempt.Notes = request.Notes;
+    existingProblemAttempt.SeasonWeekId = seasonWeek?.SeasonWeekId;
+
+    try
+    {
+      await UpdateProblemAttemptAsync(existingProblemAttempt, cancellationToken);
+      await _unitOfWork.SaveChangesAsync(cancellationToken);
+      return new SuccessServiceResponse<UpdateProblemAttemptResponse>(
+        Message.ProblemAttemptUpdatedSuccessfully
+      );
+    }
+    catch (Exception ex)
+    {
+      _logger.LogError(ex, Message.ProblemAttemptUpdateUnexpectedError);
+      return new ErrorServiceResponse<UpdateProblemAttemptResponse>(
+        Message.ProblemAttemptUpdateUnexpectedError
+      );
+    }
+  }
+
+  #region CRUD Operations
+
+  public async Task AddProblemAttemptAsync(
+    ProblemAttemptEntity problemAttempt,
+    CancellationToken cancellationToken = default
+  )
+  {
+    ArgumentNullException.ThrowIfNull(problemAttempt);
+
+    await _problemAttemptRepository.AddAsync(problemAttempt, cancellationToken);
+  }
+
+  public async Task DeleteProblemAttemptAsync(
+    string problemAttemptId,
+    CancellationToken cancellationToken = default
+  )
+  {
+    var problemAttempt = await _problemAttemptRepository.GetByIdAsync(
+      problemAttemptId,
+      cancellationToken
+    );
+
+    if (problemAttempt == null)
+    {
+      throw new KeyNotFoundException(Message.ProblemAttemptDoesNotExists);
+    }
+
+    _problemAttemptRepository.Delete(problemAttempt, cancellationToken);
+  }
+
+  public async Task UpdateProblemAttemptAsync(
+    ProblemAttemptEntity problemAttempt,
+    CancellationToken cancellationToken = default
+  )
+  {
+    ArgumentNullException.ThrowIfNull(problemAttempt);
+
+    var existingProblemAttempt = await _problemAttemptRepository.GetByIdAsync(
+      problemAttempt.ProblemAttemptId,
+      cancellationToken
+    );
+    if (existingProblemAttempt == null)
+    {
+      throw new KeyNotFoundException(Message.ProblemAttemptDoesNotExists);
+    }
+
+    _problemAttemptRepository.Update(problemAttempt, cancellationToken);
+  }
+
+  #endregion
+}

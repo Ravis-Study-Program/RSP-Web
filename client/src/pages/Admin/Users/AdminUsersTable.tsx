@@ -10,7 +10,7 @@ import { ActionIcon, Button, Flex, Text, Title, Tooltip } from '@mantine/core';
 import { modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
 import {
-  AdminDeleteUserResponseApiResult,
+  AdminDeleteUserResponseApiResponse,
   useAdminCreateUser,
   useAdminDeleteUser,
   useAdminListUser,
@@ -47,7 +47,7 @@ export const AdminUsersTable = () => {
       confirmProps: { color: 'red' },
       onConfirm: async () => {
         try {
-          await deleteUser({ params: { email: row.original.email } });
+          await deleteUser({ data: { email: row.original.email } });
           await refetchUsers();
           modals.closeAll();
           notifications.show({
@@ -56,7 +56,7 @@ export const AdminUsersTable = () => {
             message: 'User deleted successfully.',
           });
         } catch (err) {
-          const response = (err as any)?.response.data as AdminDeleteUserResponseApiResult;
+          const response = (err as any)?.response.data as AdminDeleteUserResponseApiResponse;
           notifications.show({
             color: 'red',
             title: 'Error',

@@ -8,11 +8,13 @@ import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import {
   CreateMockInterviewRequest,
-  CreateMockInterviewResponseApiResult,
-  GetMockInterviewsResponseApiResult,
+  CreateMockInterviewResponseApiResponse,
+  GraduateDto,
   LeetcodeProblemDto,
+  ListMockInterviewResponseApiResponse,
   MockInterviewEntity,
   MockInterviewRoundDto,
+  useGetCurrentUser,
   UserEntity,
 } from '@/generated/api/client';
 
@@ -51,6 +53,9 @@ export const MockInterviewCreateModal = ({
   enrollmentId,
   users,
 }: MockInterviewCreateModalProps) => {
+  const { data: currentUserResponse } = useGetCurrentUser();
+  const email = currentUserResponse?.responseBody?.user.email ?? '';
+
   const form = useForm({
     mode: 'uncontrolled',
     initialValues: {
@@ -93,15 +98,15 @@ export const MockInterviewCreateModal = ({
     test2: number;
   }) => {
     try {
-      const mockInterviewRoundDtos: MockInterviewRoundDto[] = [];
+      const mockInterviewRounds: MockInterviewRoundDto[] = [];
       // Behavioural
-      mockInterviewRoundDtos.push({
+      mockInterviewRounds.push({
         behaviouralMockInterviewRound: {
           behavioralScore: values.behaviouralScore,
         },
       });
       // Leetcode Problem 1
-      mockInterviewRoundDtos.push({
+      mockInterviewRounds.push({
         leetcodeMockInterviewRound: {
           leetcodeProblemId: values.leetcodeProblem1,
           confirmQuestionScore: values.confirmQuestion1,
@@ -112,7 +117,7 @@ export const MockInterviewCreateModal = ({
         },
       });
       // Leetcode Problem 2
-      mockInterviewRoundDtos.push({
+      mockInterviewRounds.push({
         leetcodeMockInterviewRound: {
           leetcodeProblemId: values.leetcodeProblem2,
           confirmQuestionScore: values.confirmQuestion2,
@@ -127,7 +132,8 @@ export const MockInterviewCreateModal = ({
         startDate: values.startDate.toISOString(),
         timeTakenInMinutes: values.timeTakenInMinutes,
         interviewerUserId: values.interviewer,
-        mockInterviewRoundDtos,
+        mockInterviewRounds,
+        intervieweeEmail: email,
       };
       if (enrollmentId !== '') {
         requestData.enrollmentId = enrollmentId;
@@ -142,7 +148,7 @@ export const MockInterviewCreateModal = ({
         message: 'Mock interview created successfully.',
       });
     } catch (err) {
-      const response = (err as any)?.response.data as CreateMockInterviewResponseApiResult;
+      const response = (err as any)?.response.data as CreateMockInterviewResponseApiResponse;
       notifications.show({
         color: 'red',
         title: 'Error',
@@ -338,8 +344,8 @@ export const MockInterviewCreateModal = ({
 type MockInterviewCreateModalProps = {
   table: MRT_TableInstance<MockInterviewEntity>;
   createMockInterview: UseMutateAsyncFunction<
-    CreateMockInterviewResponseApiResult,
-    CreateMockInterviewResponseApiResult,
+    CreateMockInterviewResponseApiResponse,
+    unknown,
     {
       data: CreateMockInterviewRequest;
     },
@@ -347,10 +353,8 @@ type MockInterviewCreateModalProps = {
   >;
   refetchMockInterviews: (
     options?: RefetchOptions
-  ) => Promise<
-    QueryObserverResult<GetMockInterviewsResponseApiResult, GetMockInterviewsResponseApiResult>
-  >;
+  ) => Promise<QueryObserverResult<ListMockInterviewResponseApiResponse, unknown>>;
   leetcodeProblems: LeetcodeProblemDto[] | null | undefined;
-  users: UserEntity[] | null | undefined;
+  users: GraduateDto[] | null | undefined;
   enrollmentId: string;
 };

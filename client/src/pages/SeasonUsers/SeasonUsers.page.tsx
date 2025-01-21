@@ -13,7 +13,7 @@ import {
   Text,
 } from '@mantine/core';
 import { Layout } from '@/components/Layout/Layout';
-import { SeasonUserDto, useGetSeasonUsers } from '@/generated/api/client';
+import { EnrollmentUserDto, useGetEnrollmentUsers } from '@/generated/api/client';
 import { SeasonRoleReverseIndex } from '@/shared/entities/reverseIndex';
 import { useSeasonSlug } from '@/shared/hooks/useSeasonSlug';
 import classes from './SeasonUsers.module.css';
@@ -25,14 +25,14 @@ export default function SeasonUsersPage() {
     isError: isLoadingSeasonUsersError,
     isFetching: isFetchingSeasonUsers,
     isLoading: isLoadingSeasonUsers,
-  } = useGetSeasonUsers(seasonSlug);
+  } = useGetEnrollmentUsers({ SeasonSlug: seasonSlug });
 
   return (
     <Layout>
       <Grid gutter={{ base: 'md', xs: 'md', md: 'xl', xl: 50 }}>
         {!isLoadingSeasonUsers && !isFetchingSeasonUsers && !isLoadingSeasonUsersError ? (
           <SeasonUserCards
-            seasonUsers={seasonUsersResponse?.responseBody?.seasonUsers}
+            seasonUsers={seasonUsersResponse?.responseBody?.enrollmentUsers}
             seasonSlug={seasonSlug}
           />
         ) : (
@@ -65,7 +65,7 @@ const SeasonUserSkeletonCards = () => {
 };
 
 type SeasonUserCardsProps = {
-  seasonUsers: SeasonUserDto[] | undefined;
+  seasonUsers: EnrollmentUserDto[] | undefined;
   seasonSlug: string;
 };
 

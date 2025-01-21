@@ -1,19 +1,42 @@
 using System.Security.Claims;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using Carter;
+using DotNetEnv;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using RSPWebAPI.Common;
+using RSPWebAPI.Common.Interfaces;
+using RSPWebAPI.Common.Middlewares;
 using RSPWebAPI.Database;
 using RSPWebAPI.Database.Interceptors;
+using RSPWebAPI.Features.Enrollments;
+using RSPWebAPI.Features.Enrollments.Interfaces;
+using RSPWebAPI.Features.LeetcodeProblemRecommendations;
+using RSPWebAPI.Features.LeetcodeProblemRecommendations.Interfaces;
+using RSPWebAPI.Features.Leetcodes;
+using RSPWebAPI.Features.Leetcodes.Interfaces;
+using RSPWebAPI.Features.Mentorships;
+using RSPWebAPI.Features.Mentorships.Interfaces;
+using RSPWebAPI.Features.MockInterviews;
+using RSPWebAPI.Features.MockInterviews.Interfaces;
+using RSPWebAPI.Features.ProblemAttempts;
+using RSPWebAPI.Features.ProblemAttempts.Interfaces;
+using RSPWebAPI.Features.Seasons;
+using RSPWebAPI.Features.Seasons.Interfaces;
+using RSPWebAPI.Features.SeasonWeeks;
+using RSPWebAPI.Features.SeasonWeeks.Interfaces;
+using RSPWebAPI.Features.Users;
+using RSPWebAPI.Features.Users.Interfaces;
 using RSPWebAPI.Shared;
-using RSPWebAPI.Shared.Behaviours;
+using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
-DotNetEnv.Env.Load();
+Env.Load();
 
 var config = new AppConfiguration();
 config.ValidateEnvironmentVariables();
@@ -75,19 +98,12 @@ builder
         Description = "RSP Web Application Backend Endpoints",
       }
     );
+    options.CustomOperationIds(r => r.ActionDescriptor.RouteValues["action"]);
   })
   .AddHttpContextAccessor()
   .AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString).AddInterceptors(new SoftDeleteInterceptor())
   )
-  .AddMediatR(config =>
-  {
-    config.RegisterServicesFromAssembly(typeof(Program).Assembly);
-    config.AddOpenBehavior(typeof(LoggingPipelineBehaviour<,>));
-    config.AddOpenBehavior(typeof(AuthenticationPipelineBehavior<,>));
-    config.AddOpenBehavior(typeof(AdminAuthenticationPipelineBehaviour<,>));
-    config.AddOpenBehavior(typeof(ValidationPipelineBehavior<,>));
-  })
   .AddValidatorsFromAssembly(typeof(Program).Assembly, includeInternalTypes: true)
   .AddCarter()
   .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -110,12 +126,46 @@ builder
   .AddJsonOptions(options =>
   {
     options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+    options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
   });
+
+builder.Services.AddValidatorsFromAssemblyContaining<UserTestDtoValidator>();
+builder.Services.AddFluentValidationAutoValidation(configuration =>
+{
+  // Replace the default result factory with a custom implementation.
+  configuration.OverrideDefaultResultFactoryWith<CustomValidatorResultFactory>();
+});
 
 builder.Services.AddHealthChecks();
 
+builder.Services.AddScoped<DbContext, ApplicationDbContext>();
+builder.Services.AddScoped(typeof(IRepository<>), typeof(EntityRepository<>));
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<AuthAttribute>();
+builder.Services.AddScoped<AdminAuthAttribute>();
+
+builder.Services.AddScoped<IEnrollmentService, EnrollmentService>();
+builder.Services.AddScoped<ILeetcodeService, LeetcodeService>();
+builder.Services.AddScoped<
+  ILeetcodeProblemRecommendationService,
+  LeetcodeProblemRecommendationService
+>();
+builder.Services.AddScoped<IMentorshipService, MentorshipService>();
+builder.Services.AddScoped<IMockInterviewService, MockInterviewService>();
+builder.Services.AddScoped<IProblemAttemptService, ProblemAttemptService>();
+builder.Services.AddScoped<ISeasonService, SeasonService>();
+builder.Services.AddScoped<ISeasonWeekService, SeasonWeekService>();
+builder.Services.AddScoped<IUserService, UserService>();
+
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+
 var app = builder.Build();
 
+app.UseMiddleware<RequestLoggingMiddleware>();
+
+app.UseRouting();
+app.MapControllers();
 app.UseCors("CorsPolicy");
 app.UseExceptionHandler("/error");
 app.UseHttpsRedirection();
@@ -189,3 +239,5 @@ public class AppConfiguration
     }
   }
 }
+
+public partial class Program { }

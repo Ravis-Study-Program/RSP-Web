@@ -6,6 +6,13 @@ public static class Message
   public const string EndDateMustBeGreaterThanStartDate =
     "End date must be greater than start date.";
 
+  public const string UserIsNotStudentInSeason = "User is not a student in the specified season";
+  public const string UserIsNotMentorInSeason = "User is not a mentor in the specified season";
+  public const string UserIsNotCoordinatorInSeason =
+    "User is not a coordinator in the specified season";
+
+  public const string UnexpectedError = "Unexpected error has occured";
+
   public const string LeetcodeProblemRecommenderCreatedSuccessfully =
     "Leetcode problem recommendation created successfully.";
   public const string LeetcodeProblemRecommenderUnexpectedError =
@@ -15,6 +22,7 @@ public static class Message
 
   public const string UserEmailExists = "A user with this email already exists.";
   public const string UserEmailDoesNotExists = "No user found using the email provided.";
+  public const string UserIdDoesNotExists = "No user found using the user id provided.";
   public const string UserCreatedSuccessfully = "User created successfully.";
   public const string UserCreationUnexpectedError =
     "An unexpected error has occurred during user creation.";
@@ -152,7 +160,7 @@ public static class Message
     "Mock interview date is out of season date range.";
 
   public const string SeasonWeekCreatedSuccessfully = "Season Week created successfully.";
-  public const string SeasonWeekWeekNumberAlreadyExists = "Season Week Week Number already exists.";
+  public const string SeasonWeekExists = "A season week with this SeasonWeekId already exists.";
   public const string SeasonWeekDatesNotWithinSeasonDates =
     "Season Week dates do not fall under Season dates";
   public const string SeasonWeekListSuccessfully = "List of SeasonWeek retrieved successfully.";
@@ -166,6 +174,6 @@ public static class Message
   public const string SeasonWeekUpdateUnexpectedError =
     "An unexpected error has occurred during season week update.";
   public const string SeasonWeekDoesNotExists =
-    "No mentorship found using the Season Week Id provided.";
+    "No season week found using the Season Week Id provided.";
   public const string SeasonWeekDeletedSuccessfully = "Season Week deleted successfully.";
 }

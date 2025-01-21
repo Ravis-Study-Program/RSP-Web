@@ -7,11 +7,12 @@ import { DateTimePicker } from '@mantine/dates';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import {
-  GetProblemAttemptsResponseApiResult,
   LeetcodeProblemDto,
+  ListProblemAttemptResponseApiResponse,
   ProblemAttemptEntity,
   UpdateProblemAttemptRequest,
-  UpdateProblemAttemptResponseApiResult,
+  UpdateProblemAttemptResponseApiResponse,
+  useGetCurrentUser,
 } from '@/generated/api/client';
 
 const schema = z.object({
@@ -36,6 +37,9 @@ export const LeetcodeProblemAttemptUpdateModal = ({
   leetcodeProblems,
   enrollmentId,
 }: LeetcodeProblemAttemptUpdateModalProps) => {
+  const { data: userResponse } = useGetCurrentUser();
+  const email = userResponse?.responseBody?.user.email ?? '';
+
   const form = useForm({
     mode: 'uncontrolled',
     initialValues: {
@@ -56,6 +60,7 @@ export const LeetcodeProblemAttemptUpdateModal = ({
     try {
       const requestData: UpdateProblemAttemptRequest = {
         ...values,
+        email,
         attemptStartDateUtc: values.attemptStartDateUtc.toISOString(),
         problemAttemptId: problemAttempt.problemAttemptId,
       };
@@ -72,7 +77,7 @@ export const LeetcodeProblemAttemptUpdateModal = ({
         message: 'Problem attempt updated successfully.',
       });
     } catch (err) {
-      const response = (err as any)?.response.data as UpdateProblemAttemptResponseApiResult;
+      const response = (err as any)?.response.data as UpdateProblemAttemptResponseApiResponse;
       notifications.show({
         color: 'red',
         title: 'Error',
@@ -155,8 +160,8 @@ export const LeetcodeProblemAttemptUpdateModal = ({
 type LeetcodeProblemAttemptUpdateModalProps = {
   table: MRT_TableInstance<ProblemAttemptEntity>;
   updateProblemAttempt: UseMutateAsyncFunction<
-    UpdateProblemAttemptResponseApiResult,
-    UpdateProblemAttemptResponseApiResult,
+    UpdateProblemAttemptResponseApiResponse,
+    unknown,
     {
       data: UpdateProblemAttemptRequest;
     },
@@ -165,9 +170,7 @@ type LeetcodeProblemAttemptUpdateModalProps = {
   row: MRT_Row<ProblemAttemptEntity>;
   refetchProblemAttempts: (
     options?: RefetchOptions
-  ) => Promise<
-    QueryObserverResult<GetProblemAttemptsResponseApiResult, GetProblemAttemptsResponseApiResult>
-  >;
+  ) => Promise<QueryObserverResult<ListProblemAttemptResponseApiResponse, unknown>>;
   leetcodeProblems: LeetcodeProblemDto[] | null | undefined;
   enrollmentId: string;
 };

@@ -1,5 +1,6 @@
 import * as dotenv from 'dotenv';
 import { defineConfig } from 'orval';
+import { customTransformer } from './src/shared/api/Transformer';
 
 dotenv.config();
 
@@ -10,6 +11,9 @@ export default defineConfig({
   api: {
     input: {
       target: `${serverUrl}/swagger/v1/swagger.json`,
+      override: {
+        transformer: customTransformer,
+      },
     },
     output: {
       mode: 'single',
