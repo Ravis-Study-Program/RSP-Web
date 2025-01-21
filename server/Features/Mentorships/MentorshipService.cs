@@ -355,7 +355,7 @@ public class MentorshipService : IMentorshipService
     }
     catch (Exception ex)
     {
-      _logger.LogError(ex, Message.MentorshipUpdateUnexpectedError);
+      _logger.LogError(ex, Message.MentorshipListUnexpectedError);
       return new ErrorServiceResponse<GetCurrentUserMenteesListResponse>(
         Message.MentorshipListUnexpectedError
       );
@@ -371,8 +371,8 @@ public class MentorshipService : IMentorshipService
   {
     var mentorships = await _mentorshipRepository.GetAllAsync(
       m =>
-        (mentorEnrollmentId == null || m.MentorEnrollmentId == mentorEnrollmentId)
-        && (menteeEnrollmentId == null || m.MenteeEnrollmentId == menteeEnrollmentId),
+        (m.MentorEnrollmentId == mentorEnrollmentId)
+        && (m.MenteeEnrollmentId == menteeEnrollmentId),
       cancellationToken,
       include
     );

@@ -103,7 +103,9 @@ public class MockInterviewService : IMockInterviewService
     );
     if (interviewee == null || interviewer == null)
     {
-      return new ErrorServiceResponse<CreateMockInterviewResponse>(Message.UserEmailDoesNotExists);
+      return new ErrorServiceResponse<CreateMockInterviewResponse>(
+        Message.MockInterviewInterviewerOrIntervieweeCannotBeFound
+      );
     }
 
     var (mockInterviewId, mockInterviewRounds) = GenerateMockInterviewRounds(
@@ -301,7 +303,9 @@ public class MockInterviewService : IMockInterviewService
     );
     if (interviewee == null || interviewer == null)
     {
-      return new ErrorServiceResponse<UpdateMockInterviewResponse>(Message.UserEmailDoesNotExists);
+      return new ErrorServiceResponse<UpdateMockInterviewResponse>(
+        Message.MockInterviewInterviewerOrIntervieweeCannotBeFound
+      );
     }
 
     UpdateMockInterviewRounds(

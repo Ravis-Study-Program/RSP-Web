@@ -167,7 +167,7 @@ public class UserTests : BaseIntegrationTest, IAsyncLifetime
 
     var gradsResponse = await UserService.GetGraduates(new GetGraduatesRequest());
     Assert.True(gradsResponse.IsSuccess);
-    Assert.Equal(Message.UserCreatedSuccessfully, gradsResponse.Message);
+    Assert.Equal(Message.GraduatesListSuccessfully, gradsResponse.Message);
 
     var graduates = gradsResponse.Data?.Graduates.ToList();
     Assert.NotNull(graduates);

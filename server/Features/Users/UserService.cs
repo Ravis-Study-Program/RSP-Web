@@ -116,7 +116,7 @@ public class UserService : IUserService
     var existingUser = await GetUserByIdAsync(request.UserId, cancellationToken);
     if (existingUser == null)
     {
-      return new ErrorServiceResponse<AdminUpdateUserResponse>(Message.UserEmailDoesNotExists);
+      return new ErrorServiceResponse<AdminUpdateUserResponse>(Message.UserIdDoesNotExists);
     }
 
     existingUser.DiscordId = request.DiscordId;
@@ -166,7 +166,7 @@ public class UserService : IUserService
     }
 
     return new SuccessServiceResponse<GetUserResponse>(
-      Message.UserEmailExists,
+      Message.GetUserSuccessfully,
       new GetUserResponse { User = user }
     );
   }
@@ -236,14 +236,14 @@ public class UserService : IUserService
         .ToListAsync(cancellationToken);
 
       return new SuccessServiceResponse<GetGraduatesResponse>(
-        Message.UserCreatedSuccessfully,
+        Message.GraduatesListSuccessfully,
         new GetGraduatesResponse { Graduates = graduates }
       );
     }
     catch (Exception ex)
     {
-      _logger.LogError(ex, Message.UserCreationUnexpectedError);
-      return new ErrorServiceResponse<GetGraduatesResponse>(Message.UserCreationUnexpectedError);
+      _logger.LogError(ex, Message.GraduatesListUnexpectedError);
+      return new ErrorServiceResponse<GetGraduatesResponse>(Message.GraduatesListUnexpectedError);
     }
   }
 

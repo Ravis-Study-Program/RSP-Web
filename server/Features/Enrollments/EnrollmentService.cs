@@ -221,15 +221,15 @@ public class EnrollmentService : IEnrollmentService
         .ToListAsync(cancellationToken);
       await _unitOfWork.SaveChangesAsync(cancellationToken);
       return new SuccessServiceResponse<GetCurrentUserEnrollmentsResponse>(
-        Message.EnrollmentUpdatedSuccessfully,
+        Message.EnrollmentUsersListSuccessfully,
         new GetCurrentUserEnrollmentsResponse { Enrollments = enrollments }
       );
     }
     catch (Exception ex)
     {
-      _logger.LogError(ex, Message.EnrollmentUpdateUnexpectedError);
+      _logger.LogError(ex, Message.EnrollmentUsersListUnexpectedError);
       return new ErrorServiceResponse<GetCurrentUserEnrollmentsResponse>(
-        Message.EnrollmentUpdateUnexpectedError
+        Message.EnrollmentUsersListUnexpectedError
       );
     }
   }
@@ -256,15 +256,15 @@ public class EnrollmentService : IEnrollmentService
         .ToListAsync(cancellationToken);
       await _unitOfWork.SaveChangesAsync(cancellationToken);
       return new SuccessServiceResponse<GetEnrollmentUsersResponse>(
-        Message.EnrollmentUpdatedSuccessfully,
+        Message.EnrollmentUsersListSuccessfully,
         new GetEnrollmentUsersResponse { EnrollmentUsers = enrollmentUsers }
       );
     }
     catch (Exception ex)
     {
-      _logger.LogError(ex, Message.EnrollmentUpdateUnexpectedError);
+      _logger.LogError(ex, Message.EnrollmentUsersListUnexpectedError);
       return new ErrorServiceResponse<GetEnrollmentUsersResponse>(
-        Message.EnrollmentUpdateUnexpectedError
+        Message.EnrollmentUsersListUnexpectedError
       );
     }
   }
@@ -365,7 +365,7 @@ public class EnrollmentService : IEnrollmentService
     }
     catch (Exception ex)
     {
-      _logger.LogError(ex, Message.EnrollmentUpdateUnexpectedError);
+      _logger.LogError(ex, Message.KickStudentUnexpectedError);
       return new ErrorServiceResponse<KickStudentResponse>(Message.KickStudentUnexpectedError);
     }
   }
@@ -447,9 +447,9 @@ public class EnrollmentService : IEnrollmentService
     }
     catch (Exception ex)
     {
-      _logger.LogError(ex, Message.EnrollmentUpdateUnexpectedError);
+      _logger.LogError(ex, Message.UpdateStudentRolePromotionUnexpectedError);
       return new ErrorServiceResponse<UpdateStudentRolePromotionResponse>(
-        Message.KickStudentUnexpectedError
+        Message.UpdateStudentRolePromotionUnexpectedError
       );
     }
   }

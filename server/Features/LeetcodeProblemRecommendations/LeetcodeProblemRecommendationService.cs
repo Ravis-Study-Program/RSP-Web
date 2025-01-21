@@ -57,6 +57,7 @@ public class LeetcodeProblemRecommendationService : ILeetcodeProblemRecommendati
     var existingRecommendation = await GetUnsolvedByUserId(request.UserId, cancellationToken);
     if (existingRecommendation != null)
     {
+      // Return success even though we didn't generate anything
       return new SuccessServiceResponse<GenerateLeetcodeProblemRecommendationResponse>(
         Message.LeetcodeProblemRecommenderCreatedSuccessfully
       );
@@ -65,7 +66,7 @@ public class LeetcodeProblemRecommendationService : ILeetcodeProblemRecommendati
     var user = await _userService.GetUserByIdAsync(request.UserId, cancellationToken);
     if (user == null)
     {
-      return new SuccessServiceResponse<GenerateLeetcodeProblemRecommendationResponse>(
+      return new ErrorServiceResponse<GenerateLeetcodeProblemRecommendationResponse>(
         Message.UserEmailDoesNotExists
       );
     }

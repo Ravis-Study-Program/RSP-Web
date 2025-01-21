@@ -168,7 +168,7 @@ namespace RSPWebAPI.Tests.Tests
       var request = new GetCurrentUserEnrollmentsRequest { Email = email };
       var enrollResp = await EnrollmentService.GetCurrentUserEnrollments(request);
       Assert.True(enrollResp.IsSuccess);
-      Assert.Equal(Message.EnrollmentUpdatedSuccessfully, enrollResp.Message);
+      Assert.Equal(Message.EnrollmentUsersListSuccessfully, enrollResp.Message);
       Assert.NotEmpty(enrollResp.Data!.Enrollments);
     }
 
@@ -184,7 +184,7 @@ namespace RSPWebAPI.Tests.Tests
       var request = new GetEnrollmentUsersRequest { SeasonSlug = season.Slug };
       var userResp = await EnrollmentService.GetEnrollmentUsers(request);
       Assert.True(userResp.IsSuccess);
-      Assert.Equal(Message.EnrollmentUpdatedSuccessfully, userResp.Message);
+      Assert.Equal(Message.EnrollmentUsersListSuccessfully, userResp.Message);
       Assert.NotEmpty(userResp.Data!.EnrollmentUsers);
     }
 
