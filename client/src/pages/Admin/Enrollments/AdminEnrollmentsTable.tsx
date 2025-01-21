@@ -11,7 +11,6 @@ import { modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
 import {
   AdminDeleteEnrollmentResponseApiResponse,
-  EnrollmentEntity,
   EnrollmentResponseDto,
   SeasonRole,
   SeasonStudentRolePromotion,

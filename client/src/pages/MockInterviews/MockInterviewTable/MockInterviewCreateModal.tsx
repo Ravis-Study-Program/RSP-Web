@@ -15,7 +15,6 @@ import {
   MockInterviewEntity,
   MockInterviewRoundDto,
   useGetCurrentUser,
-  UserEntity,
 } from '@/generated/api/client';
 
 const scoreSchema = z

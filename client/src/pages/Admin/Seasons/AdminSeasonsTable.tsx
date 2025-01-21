@@ -34,8 +34,6 @@ export const AdminSeasonsTable = () => {
   const { mutateAsync: updateSeason, status: isUpdatingSeasonStatus } = useAdminUpdateSeason();
   const { mutateAsync: deleteSeason, status: isDeletingSeasonStatus } = useAdminDeleteSeason();
 
-  console.log(seasonResponse?.responseBody?.seasons);
-
   const openDeleteConfirmModal = (row: MRT_Row<SeasonEntity>) => {
     modals.openConfirmModal({
       children: (
