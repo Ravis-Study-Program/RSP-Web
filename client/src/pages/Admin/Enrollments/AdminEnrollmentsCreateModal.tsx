@@ -7,9 +7,9 @@ import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import {
   AdminCreateEnrollmentRequest,
-  AdminCreateEnrollmentResponseApiResult,
-  AdminListEnrollmentResponseApiResult,
-  EnrollmentResponse,
+  AdminCreateEnrollmentResponseApiResponse,
+  AdminListEnrollmentResponseApiResponse,
+  EnrollmentResponseDto,
   SeasonEntity,
   SeasonRole,
   SeasonStudentRolePromotion,
@@ -65,7 +65,7 @@ export const AdminEnrollmentsCreateModal = ({
         message: 'Enrollment created successfully.',
       });
     } catch (err) {
-      const response = (err as any)?.response.data as AdminCreateEnrollmentResponseApiResult;
+      const response = (err as any)?.response.data as AdminCreateEnrollmentResponseApiResponse;
       notifications.show({
         color: 'red',
         title: 'Error',
@@ -151,10 +151,10 @@ export const AdminEnrollmentsCreateModal = ({
 };
 
 type AdminEnrollmentsCreateModalProps = {
-  table: MRT_TableInstance<EnrollmentResponse>;
+  table: MRT_TableInstance<EnrollmentResponseDto>;
   createEnrollment: UseMutateAsyncFunction<
-    AdminCreateEnrollmentResponseApiResult,
-    AdminCreateEnrollmentResponseApiResult,
+    AdminCreateEnrollmentResponseApiResponse,
+    unknown,
     {
       data: AdminCreateEnrollmentRequest;
     },
@@ -162,9 +162,7 @@ type AdminEnrollmentsCreateModalProps = {
   >;
   refetchEnrollments: (
     options?: RefetchOptions
-  ) => Promise<
-    QueryObserverResult<AdminListEnrollmentResponseApiResult, AdminListEnrollmentResponseApiResult>
-  >;
+  ) => Promise<QueryObserverResult<AdminListEnrollmentResponseApiResponse, unknown>>;
   seasons: SeasonEntity[] | null | undefined;
   users: UserEntity[] | null | undefined;
 };

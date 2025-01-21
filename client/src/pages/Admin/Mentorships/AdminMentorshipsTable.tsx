@@ -10,7 +10,7 @@ import { ActionIcon, Button, Flex, Text, Title, Tooltip } from '@mantine/core';
 import { modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
 import {
-  AdminDeleteMentorshipResponseApiResult,
+  AdminDeleteMentorshipResponseApiResponse,
   MentorshipResponse,
   useAdminCreateMentorship,
   useAdminDeleteMentorship,
@@ -66,7 +66,7 @@ export const AdminMentorshipsTable = () => {
       confirmProps: { color: 'red' },
       onConfirm: async () => {
         try {
-          await deleteMentorship({ params: { mentorshipId: row.original.mentorshipId! } });
+          await deleteMentorship({ data: { mentorshipId: row.original.mentorshipId! } });
           await refetchMentorships();
           modals.closeAll();
           notifications.show({
@@ -75,7 +75,7 @@ export const AdminMentorshipsTable = () => {
             message: 'Mentorship deleted successfully.',
           });
         } catch (err) {
-          const response = (err as any)?.response.data as AdminDeleteMentorshipResponseApiResult;
+          const response = (err as any)?.response.data as AdminDeleteMentorshipResponseApiResponse;
           notifications.show({
             color: 'red',
             title: 'Error',

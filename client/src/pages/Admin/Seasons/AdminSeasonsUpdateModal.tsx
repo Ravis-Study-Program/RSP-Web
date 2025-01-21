@@ -7,9 +7,9 @@ import { DatePickerInput } from '@mantine/dates';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import {
-  AdminListSeasonResponseApiResult,
+  AdminListSeasonResponseApiResponse,
   AdminUpdateSeasonRequest,
-  AdminUpdateSeasonResponseApiResult,
+  AdminUpdateSeasonResponseApiResponse,
   SeasonEntity,
 } from '@/generated/api/client';
 
@@ -84,7 +84,7 @@ export const AdminSeasonsUpdateModal = ({
         message: 'Season updated successfully.',
       });
     } catch (err) {
-      const response = (err as any)?.response.data as AdminUpdateSeasonResponseApiResult;
+      const response = (err as any)?.response.data as AdminUpdateSeasonResponseApiResponse;
       notifications.show({
         color: 'red',
         title: 'Error',
@@ -178,8 +178,8 @@ export const AdminSeasonsUpdateModal = ({
 type AdminSeasonsUpdateModalProps = {
   table: MRT_TableInstance<SeasonEntity>;
   updateSeason: UseMutateAsyncFunction<
-    AdminUpdateSeasonResponseApiResult,
-    AdminUpdateSeasonResponseApiResult,
+    AdminUpdateSeasonResponseApiResponse,
+    unknown,
     {
       data: AdminUpdateSeasonRequest;
     },
@@ -188,7 +188,5 @@ type AdminSeasonsUpdateModalProps = {
   row: MRT_Row<SeasonEntity>;
   refetchSeasons: (
     options?: RefetchOptions
-  ) => Promise<
-    QueryObserverResult<AdminListSeasonResponseApiResult, AdminListSeasonResponseApiResult>
-  >;
+  ) => Promise<QueryObserverResult<AdminListSeasonResponseApiResponse, unknown>>;
 };

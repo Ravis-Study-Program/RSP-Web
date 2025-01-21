@@ -1,37 +1,430 @@
+using Bogus;
+using Microsoft.EntityFrameworkCore;
+using RSPWebAPI.Common.Interfaces;
+using RSPWebAPI.Database;
+using RSPWebAPI.Entities;
+using RSPWebAPI.Features.Constants;
+using RSPWebAPI.Features.Enrollments.Dtos;
+using RSPWebAPI.Features.Enrollments.Interfaces;
+using RSPWebAPI.Features.Leetcodes.Interfaces;
+using RSPWebAPI.Features.Mentorships.Dtos;
+using RSPWebAPI.Features.Mentorships.Interfaces;
+using RSPWebAPI.Features.MockInterviews.Dtos;
+using RSPWebAPI.Features.MockInterviews.Interfaces;
+using RSPWebAPI.Features.ProblemAttempts.Interfaces;
+using RSPWebAPI.Features.Seasons;
+using RSPWebAPI.Features.Seasons.Dtos;
+using RSPWebAPI.Features.Seasons.Interfaces;
+using RSPWebAPI.Features.SeasonWeeks;
+using RSPWebAPI.Features.SeasonWeeks.Dtos;
+using RSPWebAPI.Features.SeasonWeeks.Interfaces;
+using RSPWebAPI.Features.Users;
+using RSPWebAPI.Features.Users.Dtos;
+using RSPWebAPI.Features.Users.Interfaces;
+using Xunit;
+
 namespace RSPWebAPI.Tests.Shared;
 
-public class TestsHelper
+public class TestDataSeeder
 {
-  protected const string DummyDiscordId = "Jason#1234";
-  protected const string DummyEmail = "abc@gmail.com";
-  protected const string DummyProfileImage = "https://profile-image.com";
-  protected const string DummyImageUrl = "https://image-url.com";
-  protected const string DummyName = "John Doe";
-  protected const string DummySlug = "ADL-2023-2024";
-  protected const string DummyLocation = "Sydney, Australia";
-  protected const string DummyId1 = "abc123";
-  protected const string DummyId2 = "qrs456";
-  protected const string DummyId3 = "xyz789";
-  protected DateTime DummyEndDate = DateTime.Now.AddDays(10);
-  protected DateTime DummyStartDate = DateTime.Now;
-}
+  private readonly IUserService _userService;
+  private readonly ISeasonService _seasonService;
+  private readonly ISeasonWeekService _seasonWeekService;
+  private readonly IEnrollmentService _enrollmentService;
+  private readonly IProblemAttemptService _problemAttemptService;
+  private readonly IMockInterviewService _mockInterviewService;
+  private readonly IMentorshipService _mentorshipService;
+  private readonly IRepository<LeetcodeProblemEntity> _leetcodeProblemRepository;
+  private readonly IRepository<LeetcodeProblemRecommendationEntity> _leetcodeProblemRecommendationRepository;
+  private readonly Faker _faker = new();
+  private readonly ApplicationDbContext _dbContext;
 
-public class MockHttpMessageHandler : HttpMessageHandler
-{
-  private readonly Func<HttpRequestMessage, CancellationToken, HttpResponseMessage> _send;
-
-  public MockHttpMessageHandler(
-    Func<HttpRequestMessage, CancellationToken, HttpResponseMessage> send
+  public TestDataSeeder(
+    ApplicationDbContext dbContext,
+    IUserService userService,
+    ISeasonService seasonService,
+    ISeasonWeekService seasonWeekService,
+    IEnrollmentService enrollmentService,
+    IProblemAttemptService problemAttemptService,
+    IMockInterviewService mockInterviewService,
+    IMentorshipService mentorshipService,
+    IRepository<LeetcodeProblemEntity> leetcodeProblemRepository,
+    IRepository<LeetcodeProblemRecommendationEntity> leetcodeProblemRecommendationRepository
   )
   {
-    _send = send;
+    _dbContext = dbContext;
+    _userService = userService;
+    _seasonService = seasonService;
+    _seasonWeekService = seasonWeekService;
+    _enrollmentService = enrollmentService;
+    _problemAttemptService = problemAttemptService;
+    _mockInterviewService = mockInterviewService;
+    _mentorshipService = mentorshipService;
+    _leetcodeProblemRepository = leetcodeProblemRepository;
+    _leetcodeProblemRecommendationRepository = leetcodeProblemRecommendationRepository;
   }
 
-  protected override Task<HttpResponseMessage> SendAsync(
-    HttpRequestMessage request,
-    CancellationToken cancellationToken
+  public async Task<string> SeedUserAsync(
+    string? emailOverride = null,
+    bool? isAdminOverride = null
   )
   {
-    return Task.FromResult(_send(request, cancellationToken));
+    var request = new AdminCreateUserRequest
+    {
+      Email = emailOverride ?? _faker.Internet.Email().ToLower(),
+      Name = _faker.Name.FullName(),
+      ProfileImage = _faker.Image.PicsumUrl(),
+      DiscordId = _faker.Random.AlphaNumeric(8),
+      IsAdmin = isAdminOverride ?? false,
+    };
+
+    var response = await _userService.CreateAdminUser(request);
+    Assert.Equal(Message.UserCreatedSuccessfully, response.Message);
+    Assert.NotNull(response.Data?.UserId);
+
+    return response.Data.UserId;
+  }
+
+  public async Task<string> SeedSeasonAsync(
+    string? slugOverride = null,
+    DateTime? startDateOverride = null,
+    DateTime? endDateOverride = null
+  )
+  {
+    var startDate = startDateOverride ?? DateTime.UtcNow;
+    var endDate = endDateOverride ?? startDate.AddDays(7 * 6);
+
+    var request = new AdminCreateSeasonRequest
+    {
+      Name = _faker.Name.FirstName(),
+      Slug = slugOverride ?? _faker.Name.FirstName(),
+      StartDateInclusiveUtc = startDate,
+      EndDateInclusiveUtc = endDate,
+      Location = _faker.Address.City(),
+      ImageUrl = _faker.Image.PicsumUrl(),
+    };
+
+    var response = await _seasonService.CreateAdminSeason(request);
+    Assert.Equal(Message.SeasonCreatedSuccessfully, response.Message);
+    Assert.NotNull(response.Data?.SeasonId);
+
+    return response.Data.SeasonId;
+  }
+
+  public async Task<string> SeedSeasonWeekAsync(string seasonId, int weekNumber)
+  {
+    var request = new AdminCreateSeasonWeekRequest
+    {
+      SeasonId = seasonId,
+      WeekNumber = weekNumber,
+      StartDate = DateTime.UtcNow.AddDays(weekNumber * 7),
+      EndDate = DateTime.UtcNow.AddDays((weekNumber + 1) * 7),
+    };
+
+    var response = await _seasonWeekService.CreateAdminSeasonWeek(request);
+    Assert.Equal(Message.SeasonWeekCreatedSuccessfully, response.Message);
+    Assert.NotNull(response.Data?.SeasonWeekId);
+
+    return response.Data.SeasonWeekId;
+  }
+
+  public async Task<string> SeedEnrollmentAsync(
+    string? seasonId = null,
+    string? userId = null,
+    SeasonRole role = SeasonRole.Student,
+    SeasonStudentRolePromotion rolePromotion = SeasonStudentRolePromotion.Beginner
+  )
+  {
+    if (string.IsNullOrWhiteSpace(seasonId))
+    {
+      seasonId = await SeedSeasonAsync();
+    }
+
+    if (string.IsNullOrWhiteSpace(userId))
+    {
+      userId = await SeedUserAsync();
+    }
+
+    var request = new AdminCreateEnrollmentRequest
+    {
+      SeasonId = seasonId,
+      UserId = userId,
+      Role = role,
+      StudentRolePromotion = rolePromotion,
+    };
+
+    var response = await _enrollmentService.CreateAdminEnrollment(request);
+    Assert.Equal(Message.EnrollmentCreatedSuccessfully, response.Message);
+    Assert.True(response.IsSuccess);
+    Assert.NotNull(response.Data?.EnrollmentId);
+
+    return response.Data.EnrollmentId;
+  }
+
+  public async Task<List<UserEntity>> GetAllUsersAsync()
+  {
+    var response = await _userService.ListAdminUser(new AdminListUserRequest());
+    Assert.True(response.IsSuccess);
+    Assert.Equal(Message.UserListSuccessfully, response.Message);
+
+    return response.Data!.Users.ToList();
+  }
+
+  public async Task<List<SeasonEntity>> GetAllSeasonsAsync()
+  {
+    var seasons = await _seasonService.GetAllSeasonsAsync();
+    return seasons.ToList();
+  }
+
+  public async Task<List<SeasonWeekEntity>> GetAllSeasonWeeksAsync()
+  {
+    var seasonWeeks = await _seasonWeekService.GetAllSeasonWeeksAsync();
+    return seasonWeeks.ToList();
+  }
+
+  public async Task<List<EnrollmentEntity>> GetAllEnrollmentsAsync()
+  {
+    var all = await _enrollmentService.GetAllEnrollmentsAsync();
+    return all.ToList();
+  }
+
+  public LeetcodeProblemEntity CreateLeetcodeProblemEntity()
+  {
+    var problem = new LeetcodeProblemEntity
+    {
+      LeetcodeProblemId = Constants.GeneratePrimaryKeyId(),
+      IsPremium = _faker.Random.Bool(),
+      LeetcodeProblemDifficulty = _faker.PickRandom<LeetcodeProblemDifficulty>(),
+      Problem = new ProblemEntity
+      {
+        ProblemId = Constants.GeneratePrimaryKeyId(),
+        Title = $"{_faker.Random.Number(1000, 9999)}. {_faker.Lorem.Word()}",
+        Link = "https://leetcode.com/problems/" + _faker.Lorem.Word(),
+      },
+      LeetcodeProblemCategories = new List<LeetcodeProblemCategoryEntity>(),
+    };
+    return problem;
+  }
+
+  public async Task<string> SeedLeetcodeProblemAsync()
+  {
+    var problem = new LeetcodeProblemEntity
+    {
+      LeetcodeProblemId = Constants.GeneratePrimaryKeyId(),
+      IsPremium = _faker.Random.Bool(),
+      LeetcodeProblemDifficulty = _faker.PickRandom<LeetcodeProblemDifficulty>(),
+      Problem = new ProblemEntity
+      {
+        ProblemId = Constants.GeneratePrimaryKeyId(),
+        Title = $"{_faker.Random.Number(1000, 9999)}. {_faker.Lorem.Word()}",
+        Link = "https://leetcode.com/problems/" + _faker.Lorem.Word(),
+      },
+      LeetcodeProblemCategories = new List<LeetcodeProblemCategoryEntity>(),
+    };
+
+    await _leetcodeProblemRepository.AddAsync(problem);
+    await _dbContext.SaveChangesAsync();
+    return problem.LeetcodeProblemId;
+  }
+
+  public async Task<string> SeedLeetcodeProblemRecommendationAsync(
+    string? userId = null,
+    string? leetcodeProblemId = null
+  )
+  {
+    if (string.IsNullOrWhiteSpace(userId))
+    {
+      userId = await SeedUserAsync();
+    }
+
+    if (string.IsNullOrWhiteSpace(leetcodeProblemId))
+    {
+      leetcodeProblemId = await SeedLeetcodeProblemAsync();
+    }
+
+    var entity = new LeetcodeProblemRecommendationEntity
+    {
+      LeetcodeProblemRecommendationId = Constants.GeneratePrimaryKeyId(),
+      UserId = userId,
+      LeetcodeProblemId = leetcodeProblemId,
+    };
+
+    await _leetcodeProblemRecommendationRepository.AddAsync(entity);
+    await _dbContext.SaveChangesAsync();
+
+    return entity.LeetcodeProblemRecommendationId;
+  }
+
+  public async Task<string> SeedProblemAttemptAsync(
+    string email,
+    string? enrollmentId = null,
+    string? leetcodeProblemId = null,
+    string? customProblemId = null
+  )
+  {
+    var user = await _userService.GetUserByEmailAsync(email);
+    Assert.NotNull(user);
+
+    if (string.IsNullOrWhiteSpace(enrollmentId))
+    {
+      // Optionally create an enrollment for them
+      enrollmentId = await SeedEnrollmentAsync();
+    }
+
+    var attempt = new ProblemAttemptEntity
+    {
+      ProblemAttemptId = Database.Constants.GeneratePrimaryKeyId(),
+      AttemptStartDateUtc = DateTime.UtcNow,
+      TimeTakenInMinutes = _faker.Random.Int(1, 60),
+      LeetcodeProblemId = leetcodeProblemId,
+      CustomProblemId = customProblemId,
+      Notes = _faker.Lorem.Sentence(),
+      EnrollmentId = enrollmentId,
+      UserId = user.UserId,
+      SeasonWeekId =
+        null // or set if needed
+      ,
+    };
+
+    await _dbContext.Set<ProblemAttemptEntity>().AddAsync(attempt);
+    await _dbContext.SaveChangesAsync();
+
+    return attempt.ProblemAttemptId;
+  }
+
+  public async Task<string> SeedMockInterviewAsync(
+    string intervieweeEmail,
+    string? enrollmentId = null,
+    string? interviewerUserId = null,
+    DateTime? startDate = null,
+    int? timeTakenInMinutes = null,
+    List<MockInterviewRoundDto>? rounds = null
+  )
+  {
+    var user = await _userService.GetUserByEmailAsync(intervieweeEmail);
+    Assert.NotNull(user);
+
+    if (string.IsNullOrWhiteSpace(enrollmentId))
+    {
+      // If none provided, create an enrollment that matches the user
+      var seasonId = await SeedSeasonAsync(null, DateTime.UtcNow, DateTime.UtcNow.AddDays(4 * 7));
+      enrollmentId = await SeedEnrollmentAsync(seasonId, user.UserId);
+      for (var i = 0; i <= 2; i++)
+      {
+        await SeedSeasonWeekAsync(seasonId, i);
+      }
+    }
+
+    if (string.IsNullOrWhiteSpace(interviewerUserId))
+    {
+      // Create a new user for the interviewer
+      interviewerUserId = await SeedUserAsync();
+    }
+
+    var request = new CreateMockInterviewRequest
+    {
+      IntervieweeEmail = intervieweeEmail,
+      InterviewerUserId = interviewerUserId,
+      EnrollmentId = enrollmentId,
+      StartDate = startDate ?? DateTime.UtcNow,
+      TimeTakenInMinutes = timeTakenInMinutes ?? _faker.Random.Int(10, 60),
+      MockInterviewRounds = rounds ?? new List<MockInterviewRoundDto>(),
+    };
+
+    var response = await _mockInterviewService.CreateMockInterview(request);
+    Assert.Equal(Message.MockInterviewCreatedSuccessfully, response.Message);
+    Assert.True(response.IsSuccess);
+    Assert.NotNull(response.Data?.MockInterviewId);
+
+    return response.Data.MockInterviewId;
+  }
+
+  public async Task<string> SeedSeasonAndSeasonWeeks()
+  {
+    var seasonId = await SeedSeasonAsync(null, DateTime.UtcNow, DateTime.UtcNow.AddDays(4 * 7));
+    for (var i = 0; i <= 2; i++)
+    {
+      await SeedSeasonWeekAsync(seasonId, i);
+    }
+
+    return seasonId;
+  }
+
+  public async Task<string> SeedMentorshipAsync(
+    string? mentorEnrollmentId = null,
+    string? menteeEnrollmentId = null,
+    string? seasonId = null
+  )
+  {
+    if (seasonId == null)
+    {
+      seasonId = await SeedSeasonAsync(null, DateTime.UtcNow, DateTime.UtcNow.AddDays(4 * 7));
+      for (var i = 0; i <= 2; i++)
+      {
+        await SeedSeasonWeekAsync(seasonId, i);
+      }
+    }
+
+    // If none provided, create a user with role=Mentor, get that enrollment
+    if (mentorEnrollmentId == null)
+    {
+      var mentorUserId = await SeedUserAsync();
+      mentorEnrollmentId = await SeedEnrollmentAsync(
+        seasonId,
+        mentorUserId,
+        SeasonRole.Mentor,
+        SeasonStudentRolePromotion.NotApplicable
+      );
+    }
+
+    // If none provided, create a user with role=Student, get that enrollment
+    if (menteeEnrollmentId == null)
+    {
+      var menteeUserId = await SeedUserAsync();
+      menteeEnrollmentId = await SeedEnrollmentAsync(
+        seasonId,
+        menteeUserId,
+        SeasonRole.Student,
+        SeasonStudentRolePromotion.Advanced
+      );
+    }
+
+    var request = new AdminCreateMentorshipRequest
+    {
+      MentorEnrollmentId = mentorEnrollmentId,
+      MenteeEnrollmentId = menteeEnrollmentId,
+    };
+
+    var response = await _mentorshipService.CreateAdminMentorship(request);
+    Assert.Equal(Message.MentorshipCreatedSuccessfully, response.Message);
+    Assert.True(response.IsSuccess);
+    Assert.NotNull(response.Data?.MentorshipId);
+
+    return response.Data.MentorshipId;
+  }
+
+  public async Task<
+    List<LeetcodeProblemRecommendationEntity>
+  > GetAllLeetcodeProblemRecommendationsAsync()
+  {
+    return await _leetcodeProblemRecommendationRepository.TableNoTracking.ToListAsync();
+  }
+
+  public async Task<List<ProblemAttemptEntity>> GetAllProblemAttemptsAsync()
+  {
+    var attempts = await _problemAttemptService.GetAllProblemAttemptsAsync();
+    return attempts.ToList();
+  }
+
+  public async Task<List<MockInterviewEntity>> GetAllMockInterviewsAsync()
+  {
+    var mockInterviews = await _mockInterviewService.GetAllMockInterviewsAsync();
+    return mockInterviews.ToList();
+  }
+
+  public async Task<List<MentorshipEntity>> GetAllMentorshipsAsync()
+  {
+    var mentorships = await _mentorshipService.GetAllMentorshipsAsync();
+    return mentorships.ToList();
   }
 }

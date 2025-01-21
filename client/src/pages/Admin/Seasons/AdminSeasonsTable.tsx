@@ -11,7 +11,7 @@ import { ActionIcon, Anchor, Button, Flex, Text, Title, Tooltip } from '@mantine
 import { modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
 import {
-  AdminDeleteSeasonResponseApiResult,
+  AdminDeleteSeasonResponseApiResponse,
   SeasonEntity,
   useAdminCreateSeason,
   useAdminDeleteSeason,
@@ -48,7 +48,7 @@ export const AdminSeasonsTable = () => {
       confirmProps: { color: 'red' },
       onConfirm: async () => {
         try {
-          await deleteSeason({ params: { seasonId: row.original.seasonId! } });
+          await deleteSeason({ data: { seasonId: row.original.seasonId! } });
           await refetchSeasons();
           modals.closeAll();
           notifications.show({
@@ -57,7 +57,7 @@ export const AdminSeasonsTable = () => {
             message: 'Season deleted successfully.',
           });
         } catch (err) {
-          const response = (err as any)?.response.data as AdminDeleteSeasonResponseApiResult;
+          const response = (err as any)?.response.data as AdminDeleteSeasonResponseApiResponse;
           notifications.show({
             color: 'red',
             title: 'Error',

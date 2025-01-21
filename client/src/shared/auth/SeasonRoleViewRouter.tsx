@@ -1,6 +1,6 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import { SeasonRole, useGetIsUserEnrolled } from '@/generated/api/client';
+import { SeasonRole, useGetIsCurrentUserEnrolled } from '@/generated/api/client';
 import NotFoundPage from '@/pages/NotFound/NotFound.page';
 
 const SeasonRoleViewRouter = ({
@@ -19,7 +19,7 @@ const SeasonRoleViewRouter = ({
     isError: isLoadingUserError,
     isFetching: isFetchingUser,
     isLoading: isLoadingUser,
-  } = useGetIsUserEnrolled(seasonSlug);
+  } = useGetIsCurrentUserEnrolled({ seasonSlug });
 
   if (isLoadingUser || isFetchingUser || isLoadingUserError) {
     return null;

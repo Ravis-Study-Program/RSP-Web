@@ -22,13 +22,14 @@ import {
 import { modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
 import {
-  DeleteProblemAttemptResponseApiResult,
-  GetProblemAttemptsResponseApiResult,
+  DeleteProblemAttemptResponseApiResponse,
   LeetcodeProblemDifficulty,
+  ListProblemAttemptResponseApiResponse,
   ProblemAttemptEntity,
   useCreateProblemAttempt,
   useDeleteProblemAttempt,
-  useGetLeetcodeProblems,
+  useGetCurrentUser,
+  useListLeetcodeProblems,
   useUpdateProblemAttempt,
 } from '@/generated/api/client';
 import { LeetcodeProblemDifficultyReverseIndex } from '@/shared/entities/reverseIndex';
@@ -44,12 +45,15 @@ export const LeetcodeTable = ({
 }: LeetcodeTableProps) => {
   const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
 
+  const { data: userResponse } = useGetCurrentUser();
+  const email = userResponse?.responseBody?.user.email ?? '';
+
   const {
     data: leetcodeProblemsResponse,
     isError: isLoadingLeetcodeProblemsError,
     isFetching: isFetchingLeetcodeProblems,
     isLoading: isLoadingLeetcodeProblems,
-  } = useGetLeetcodeProblems();
+  } = useListLeetcodeProblems();
 
   const { mutateAsync: createProblemAttempt, status: isCreatingProblemAttemptStatus } =
     useCreateProblemAttempt();
@@ -75,7 +79,7 @@ export const LeetcodeTable = ({
       onConfirm: async () => {
         try {
           await deleteProblemAttempt({
-            params: { problemAttemptId: row.original.problemAttemptId },
+            data: { problemAttemptId: row.original.problemAttemptId, email },
           });
           await refetchProblemAttempts();
           modals.closeAll();
@@ -85,7 +89,7 @@ export const LeetcodeTable = ({
             message: 'Problem attempt deleted successfully.',
           });
         } catch (err) {
-          const response = (err as any)?.response.data as DeleteProblemAttemptResponseApiResult;
+          const response = (err as any)?.response.data as DeleteProblemAttemptResponseApiResponse;
           notifications.show({
             color: 'red',
             title: 'Error',
@@ -287,9 +291,7 @@ export const LeetcodeTable = ({
 type LeetcodeTableProps = {
   refetchProblemAttempts: (
     options?: RefetchOptions
-  ) => Promise<
-    QueryObserverResult<GetProblemAttemptsResponseApiResult, GetProblemAttemptsResponseApiResult>
-  >;
+  ) => Promise<QueryObserverResult<ListProblemAttemptResponseApiResponse, unknown>>;
   problemAttempts: ProblemAttemptEntity[] | null | undefined;
   enrollmentId: string;
   enableEditing: boolean;

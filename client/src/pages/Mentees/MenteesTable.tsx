@@ -10,10 +10,11 @@ import { ActionIcon, Flex, Text, Title, Tooltip } from '@mantine/core';
 import { modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
 import {
-  KickStudentResponseApiResult,
-  MenteeResponseDto,
+  KickStudentResponseApiResponse,
+  MentorshipResponse,
   SeasonStudentRolePromotion,
-  useGetCurrentUserMenteesList,
+  useGetCurrentUser,
+  useGetCurrentUserMentees,
   useKickStudent,
   useUpdateStudentRolePromotion,
 } from '@/generated/api/client';
@@ -23,18 +24,20 @@ import classes from './MenteesTable.module.css';
 
 export const MenteesTable = () => {
   const { seasonSlug } = useSeasonSlug();
+  const { data: userResponse } = useGetCurrentUser();
+  const email = userResponse?.responseBody?.user.email ?? '';
   const {
     data: menteeResponse,
     isError: isLoadingMenteesError,
     isFetching: isFetchingMentees,
     isLoading: isLoadingMentees,
     refetch: refetchMentees,
-  } = useGetCurrentUserMenteesList(seasonSlug);
+  } = useGetCurrentUserMentees({ SeasonSlug: seasonSlug, Email: email });
   const { mutateAsync: kickStudent, status: isKickingStudentStatus } = useKickStudent();
   const { mutateAsync: updateStudentRolePromotion, status: isUpdatingStudentRolePromotionStatus } =
     useUpdateStudentRolePromotion();
 
-  const openKickMenteeConfirmModal = (row: MRT_Row<MenteeResponseDto>) => {
+  const openKickMenteeConfirmModal = (row: MRT_Row<MentorshipResponse>) => {
     modals.openConfirmModal({
       children: (
         <>
@@ -54,6 +57,7 @@ export const MenteesTable = () => {
             data: {
               seasonSlug,
               menteeEnrollmentId: row.original.menteeEnrollmentId,
+              email,
             },
           });
           await refetchMentees();
@@ -64,7 +68,7 @@ export const MenteesTable = () => {
             message: 'Mentee deleted successfully.',
           });
         } catch (err) {
-          const response = (err as any)?.response.data as KickStudentResponseApiResult;
+          const response = (err as any)?.response.data as KickStudentResponseApiResponse;
           notifications.show({
             color: 'red',
             title: 'Error',
@@ -76,7 +80,7 @@ export const MenteesTable = () => {
     });
   };
 
-  const columns = useMemo<MRT_ColumnDef<MenteeResponseDto>[]>(
+  const columns = useMemo<MRT_ColumnDef<MentorshipResponse>[]>(
     () => [
       {
         accessorKey: 'menteeName',
@@ -100,7 +104,7 @@ export const MenteesTable = () => {
 
   const table = useMantineReactTable({
     columns,
-    data: menteeResponse?.responseBody?.mentees ?? [],
+    data: menteeResponse?.responseBody?.mentorships ?? [],
     createDisplayMode: 'modal',
     mantineEditRowModalProps: {
       closeOnClickOutside: false,

@@ -6,9 +6,9 @@ import { Button, Checkbox, Flex, Stack, TextInput, Title } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import {
-  AdminListUserResponseApiResult,
+  AdminListUserResponseApiResponse,
   AdminUpdateUserRequest,
-  AdminUpdateUserResponseApiResult,
+  AdminUpdateUserResponseApiResponse,
   UserEntity,
 } from '@/generated/api/client';
 
@@ -46,7 +46,10 @@ export const AdminUsersUpdateModal = ({
     profileImage: string;
   }) => {
     try {
-      const requestData: AdminUpdateUserRequest = values;
+      const requestData: AdminUpdateUserRequest = {
+        ...values,
+        userId: user.userId,
+      };
       await updateUser({ data: requestData });
       await refetchUsers();
       table.setEditingRow(null);
@@ -56,7 +59,7 @@ export const AdminUsersUpdateModal = ({
         message: 'User updated successfully.',
       });
     } catch (err) {
-      const response = (err as any)?.response.data as AdminUpdateUserResponseApiResult;
+      const response = (err as any)?.response.data as AdminUpdateUserResponseApiResponse;
       notifications.show({
         color: 'red',
         title: 'Error',
@@ -117,8 +120,8 @@ export const AdminUsersUpdateModal = ({
 type AdminUsersUpdateModalProps = {
   table: MRT_TableInstance<UserEntity>;
   updateUser: UseMutateAsyncFunction<
-    AdminUpdateUserResponseApiResult,
-    AdminUpdateUserResponseApiResult,
+    AdminUpdateUserResponseApiResponse,
+    unknown,
     {
       data: AdminUpdateUserRequest;
     },
@@ -127,5 +130,5 @@ type AdminUsersUpdateModalProps = {
   row: MRT_Row<UserEntity>;
   refetchUsers: (
     options?: RefetchOptions
-  ) => Promise<QueryObserverResult<AdminListUserResponseApiResult, AdminListUserResponseApiResult>>;
+  ) => Promise<QueryObserverResult<AdminListUserResponseApiResponse, unknown>>;
 };

@@ -17,7 +17,7 @@ public class ApiError
     ValidationErrors = validationErrors;
   }
 
-  public string Message { get; set; }
+  public string Message { get; set; } = string.Empty;
 
   public ICollection<ValidationError> ValidationErrors { get; set; } = new List<ValidationError>();
 }

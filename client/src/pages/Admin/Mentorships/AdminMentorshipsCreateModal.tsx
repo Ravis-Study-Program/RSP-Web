@@ -8,9 +8,9 @@ import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import {
   AdminCreateMentorshipRequest,
-  AdminCreateMentorshipResponseApiResult,
-  AdminListMentorshipResponseApiResult,
-  EnrollmentResponse,
+  AdminCreateMentorshipResponseApiResponse,
+  AdminListMentorshipResponseApiResponse,
+  EnrollmentResponseDto,
   MentorshipResponse,
   SeasonEntity,
   SeasonRole,
@@ -58,7 +58,7 @@ export const AdminMentorshipsCreateModal = ({
         message: 'Mentorship created successfully.',
       });
     } catch (err) {
-      const response = (err as any)?.response.data as AdminCreateMentorshipResponseApiResult;
+      const response = (err as any)?.response.data as AdminCreateMentorshipResponseApiResponse;
       notifications.show({
         color: 'red',
         title: 'Error',
@@ -156,8 +156,8 @@ export const AdminMentorshipsCreateModal = ({
 type AdminMentorshipsCreateModalProps = {
   table: MRT_TableInstance<MentorshipResponse>;
   createMentorship: UseMutateAsyncFunction<
-    AdminCreateMentorshipResponseApiResult,
-    AdminCreateMentorshipResponseApiResult,
+    AdminCreateMentorshipResponseApiResponse,
+    unknown,
     {
       data: AdminCreateMentorshipRequest;
     },
@@ -165,9 +165,7 @@ type AdminMentorshipsCreateModalProps = {
   >;
   refetchMentorships: (
     options?: RefetchOptions
-  ) => Promise<
-    QueryObserverResult<AdminListMentorshipResponseApiResult, AdminListMentorshipResponseApiResult>
-  >;
+  ) => Promise<QueryObserverResult<AdminListMentorshipResponseApiResponse, unknown>>;
   seasons: SeasonEntity[] | null | undefined;
-  enrollments: EnrollmentResponse[] | null | undefined;
+  enrollments: EnrollmentResponseDto[] | null | undefined;
 };

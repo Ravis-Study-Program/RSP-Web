@@ -24,8 +24,8 @@ vi.mock('@auth0/auth0-react', () => ({
 vi.mock('react-router-dom', () => ({
   useLocation: vi.fn(() => dummyLocation),
   useNavigate: vi.fn(),
-  Navigate: vi.fn(() => NavigateMock),
-  Outlet: vi.fn(() => OutletMock),
+  Navigate: () => <NavigateMock />,
+  Outlet: () => <OutletMock />,
 }));
 
 describe('ProtectedRouteGuard', () => {

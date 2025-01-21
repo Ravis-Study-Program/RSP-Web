@@ -20,55 +20,72 @@ import type {
 } from '@tanstack/react-query';
 import { CustomAxiosInstance } from '../../shared/api/AxiosCustomInstance';
 
-export type AdminDeleteEnrollmentParams = {
-  enrollmentId: string;
+export type GetGraduatesParams = {
+  request?: GetGraduatesRequest;
 };
 
-export type AdminDeleteMentorshipParams = {
-  mentorshipId: string;
-};
-
-export type GetMockInterviewsParams = {
-  enrollmentId?: string;
-  email?: string;
-  includeLeetcode: boolean;
-  includeCustom: boolean;
-  includeBehavioural: boolean;
-};
-
-export type DeleteMockInterviewParams = {
-  mockInterviewId: string;
-};
-
-export type GetProblemAttemptsParams = {
-  enrollmentId?: string;
-  email?: string;
-  includeLeetcode: boolean;
-  includeCustom: boolean;
-};
-
-export type DeleteProblemAttemptParams = {
-  problemAttemptId: string;
-};
-
-export type AdminDeleteSeasonParams = {
-  seasonId: string;
-};
-
-export type AdminListSeasonWeekParams = {
-  seasonId?: string;
-};
-
-export type AdminDeleteSeasonWeekParams = {
-  seasonWeekId: string;
+export type GetUserParams = {
+  Email: string;
 };
 
 export type GetCurrentUserParams = {
-  email?: string;
+  request?: GetCurrentUserRequest;
 };
 
-export type AdminDeleteUserParams = {
-  email: string;
+export type AdminListUserParams = {
+  request?: AdminListUserRequest;
+};
+
+export type AdminListSeasonWeekParams = {
+  SeasonId: string;
+};
+
+export type AdminListSeasonParams = {
+  request?: AdminListSeasonRequest;
+};
+
+export type ListProblemAttemptParams = {
+  Email: string;
+  IncludeLeetcode: boolean;
+  IncludeCustom: boolean;
+  EnrollmentId?: string;
+};
+
+export type ListMockInterviewParams = {
+  Email: string;
+  IncludeLeetcode: boolean;
+  IncludeBehavioural: boolean;
+  IncludeCustom: boolean;
+  EnrollmentId?: string;
+};
+
+export type GetCurrentUserMenteesParams = {
+  Email: string;
+  SeasonSlug: string;
+};
+
+export type AdminListMentorshipParams = {
+  request?: AdminListMentorshipRequest;
+};
+
+export type ListLeetcodeProblemsParams = {
+  request?: ListLeetcodeProblemsRequest;
+};
+
+export type AdminPopulateLeetcodeQuestionsParams = {
+  request?: AdminPopulateLeetcodeQuestionsRequest;
+};
+
+export type GetEnrollmentUsersParams = {
+  SeasonSlug: string;
+};
+
+export type GetIsCurrentUserEnrolledParams = {
+  seasonSlug?: string;
+};
+
+export type AdminListEnrollmentParams = {
+  request?: AdminListEnrollmentRequest;
 };
 
 export interface ValidationError {
@@ -100,16 +117,16 @@ export interface UpdateStudentRolePromotionResponse {
   [key: string]: unknown;
 }
 
-export interface UpdateStudentRolePromotionResponseApiResult {
+export interface UpdateStudentRolePromotionResponseApiResponse {
   error?: ApiError;
-  readonly isSuccess?: boolean;
   responseBody?: UpdateStudentRolePromotionResponse;
-  statusCode?: HttpStatusCode;
   /** @nullable */
   successMessage?: string | null;
 }
 
 export interface UpdateStudentRolePromotionRequest {
+  /** @minLength 1 */
+  email: string;
   /** @minLength 1 */
   menteeEnrollmentId: string;
   /** @minLength 1 */
@@ -121,11 +138,9 @@ export interface UpdateProblemAttemptResponse {
   [key: string]: unknown;
 }
 
-export interface UpdateProblemAttemptResponseApiResult {
+export interface UpdateProblemAttemptResponseApiResponse {
   error?: ApiError;
-  readonly isSuccess?: boolean;
   responseBody?: UpdateProblemAttemptResponse;
-  statusCode?: HttpStatusCode;
   /** @nullable */
   successMessage?: string | null;
 }
@@ -134,6 +149,8 @@ export interface UpdateProblemAttemptRequest {
   attemptStartDateUtc: string;
   /** @nullable */
   customProblemId?: string | null;
+  /** @minLength 1 */
+  email: string;
   /** @nullable */
   enrollmentId?: string | null;
   /** @nullable */
@@ -149,11 +166,9 @@ export interface UpdateMockInterviewResponse {
   [key: string]: unknown;
 }
 
-export interface UpdateMockInterviewResponseApiResult {
+export interface UpdateMockInterviewResponseApiResponse {
   error?: ApiError;
-  readonly isSuccess?: boolean;
   responseBody?: UpdateMockInterviewResponse;
-  statusCode?: HttpStatusCode;
   /** @nullable */
   successMessage?: string | null;
 }
@@ -162,25 +177,14 @@ export interface UpdateMockInterviewRequest {
   /** @nullable */
   enrollmentId?: string | null;
   /** @minLength 1 */
+  intervieweeEmail: string;
+  /** @minLength 1 */
   interviewerUserId: string;
   /** @minLength 1 */
   mockInterviewId: string;
-  mockInterviewRoundDtos: MockInterviewRoundDto[];
+  mockInterviewRounds: MockInterviewRoundDto[];
   startDate: string;
   timeTakenInMinutes: number;
-}
-
-export interface SeasonWeekEntity {
-  /** @nullable */
-  deletedAtUtc?: string | null;
-  endDate: string;
-  season?: SeasonEntity;
-  /** @minLength 1 */
-  seasonId: string;
-  /** @minLength 1 */
-  seasonWeekId: string;
-  startDate: string;
-  weekNumber: number;
 }
 
 export type SeasonStudentRolePromotion =
@@ -204,19 +208,6 @@ export const SeasonRole = {
   Coordinator: 2,
 } as const;
 
-export interface SeasonUserDto {
-  /** @minLength 1 */
-  discordId: string;
-  /** @minLength 1 */
-  email: string;
-  /** @minLength 1 */
-  name: string;
-  /** @minLength 1 */
-  profileImage: string;
-  role: SeasonRole;
-  studentRolePromotion: SeasonStudentRolePromotion;
-}
-
 export interface SeasonEntity {
   /** @nullable */
   deletedAtUtc?: string | null;
@@ -232,6 +223,19 @@ export interface SeasonEntity {
   /** @minLength 1 */
   slug: string;
   startDateInclusiveUtc: string;
+}
+
+export interface SeasonWeekEntity {
+  /** @nullable */
+  deletedAtUtc?: string | null;
+  endDate: string;
+  season?: SeasonEntity;
+  /** @minLength 1 */
+  seasonId: string;
+  /** @minLength 1 */
+  seasonWeekId: string;
+  startDate: string;
+  weekNumber: number;
 }
 
 export interface ProblemEntity {
@@ -341,14 +345,40 @@ export interface MentorshipResponse {
   seasonName: string;
   /** @minLength 1 */
   seasonSlug: string;
+  studentRolePromotion: SeasonStudentRolePromotion;
 }
 
-export interface MenteeResponseDto {
-  /** @minLength 1 */
-  menteeEnrollmentId: string;
-  /** @minLength 1 */
-  menteeName: string;
-  studentRolePromotion: SeasonStudentRolePromotion;
+export interface ListProblemAttemptResponse {
+  problemAttempts: ProblemAttemptEntity[];
+}
+
+export interface ListProblemAttemptResponseApiResponse {
+  error?: ApiError;
+  responseBody?: ListProblemAttemptResponse;
+  /** @nullable */
+  successMessage?: string | null;
+}
+
+export interface ListMockInterviewResponse {
+  mockInterviews: MockInterviewEntity[];
+}
+
+export interface ListMockInterviewResponseApiResponse {
+  error?: ApiError;
+  responseBody?: ListMockInterviewResponse;
+  /** @nullable */
+  successMessage?: string | null;
+}
+
+export interface ListLeetcodeProblemsResponseApiResponse {
+  error?: ApiError;
+  responseBody?: ListLeetcodeProblemsResponse;
+  /** @nullable */
+  successMessage?: string | null;
+}
+
+export interface ListLeetcodeProblemsRequest {
+  [key: string]: unknown;
 }
 
 export type LeetcodeProblemDifficulty =
@@ -370,6 +400,10 @@ export interface LeetcodeProblemDto {
   link: string;
   /** @minLength 1 */
   title: string;
+}
+
+export interface ListLeetcodeProblemsResponse {
+  leetcodeProblems: LeetcodeProblemDto[];
 }
 
 export interface LeetcodeProblemCategoryEntity {
@@ -424,88 +458,21 @@ export interface KickStudentResponse {
   [key: string]: unknown;
 }
 
-export interface KickStudentResponseApiResult {
+export interface KickStudentResponseApiResponse {
   error?: ApiError;
-  readonly isSuccess?: boolean;
   responseBody?: KickStudentResponse;
-  statusCode?: HttpStatusCode;
   /** @nullable */
   successMessage?: string | null;
 }
 
 export interface KickStudentRequest {
   /** @minLength 1 */
+  email: string;
+  /** @minLength 1 */
   menteeEnrollmentId: string;
   /** @minLength 1 */
   seasonSlug: string;
 }
-
-export type HttpStatusCode = (typeof HttpStatusCode)[keyof typeof HttpStatusCode];
-
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export const HttpStatusCode = {
-  Continue: 100,
-  SwitchingProtocols: 101,
-  Processing: 102,
-  EarlyHints: 103,
-  OK: 200,
-  Created: 201,
-  Accepted: 202,
-  NonAuthoritativeInformation: 203,
-  NoContent: 204,
-  ResetContent: 205,
-  PartialContent: 206,
-  MultiStatus: 207,
-  AlreadyReported: 208,
-  IMUsed: 226,
-  MultipleChoices: 300,
-  MovedPermanently: 301,
-  Found: 302,
-  SeeOther: 303,
-  NotModified: 304,
-  UseProxy: 305,
-  Unused: 306,
-  RedirectKeepVerb: 307,
-  PermanentRedirect: 308,
-  BadRequest: 400,
-  Unauthorized: 401,
-  PaymentRequired: 402,
-  Forbidden: 403,
-  NotFound: 404,
-  MethodNotAllowed: 405,
-  NotAcceptable: 406,
-  ProxyAuthenticationRequired: 407,
-  RequestTimeout: 408,
-  Conflict: 409,
-  Gone: 410,
-  LengthRequired: 411,
-  PreconditionFailed: 412,
-  RequestEntityTooLarge: 413,
-  RequestUriTooLong: 414,
-  UnsupportedMediaType: 415,
-  RequestedRangeNotSatisfiable: 416,
-  ExpectationFailed: 417,
-  MisdirectedRequest: 421,
-  UnprocessableEntity: 422,
-  Locked: 423,
-  FailedDependency: 424,
-  UpgradeRequired: 426,
-  PreconditionRequired: 428,
-  TooManyRequests: 429,
-  RequestHeaderFieldsTooLarge: 431,
-  UnavailableForLegalReasons: 451,
-  InternalServerError: 500,
-  NotImplemented: 501,
-  BadGateway: 502,
-  ServiceUnavailable: 503,
-  GatewayTimeout: 504,
-  HttpVersionNotSupported: 505,
-  VariantAlsoNegotiates: 506,
-  InsufficientStorage: 507,
-  LoopDetected: 508,
-  NotExtended: 510,
-  NetworkAuthenticationRequired: 511,
-} as const;
 
 export interface GraduateDto {
   /** @minLength 1 */
@@ -516,69 +483,17 @@ export interface GraduateDto {
   name: string;
   /** @minLength 1 */
   profileImage: string;
+  /** @minLength 1 */
+  userId: string;
 }
 
-export interface GetUserListResponse {
-  users: UserEntity[];
+export interface GetUserResponse {
+  user: UserEntity;
 }
 
-export interface GetUserListResponseApiResult {
+export interface GetUserResponseApiResponse {
   error?: ApiError;
-  readonly isSuccess?: boolean;
-  responseBody?: GetUserListResponse;
-  statusCode?: HttpStatusCode;
-  /** @nullable */
-  successMessage?: string | null;
-}
-
-export interface GetSeasonUsersResponse {
-  seasonUsers: SeasonUserDto[];
-}
-
-export interface GetSeasonUsersResponseApiResult {
-  error?: ApiError;
-  readonly isSuccess?: boolean;
-  responseBody?: GetSeasonUsersResponse;
-  statusCode?: HttpStatusCode;
-  /** @nullable */
-  successMessage?: string | null;
-}
-
-export interface GetProblemAttemptsResponse {
-  problemAttempts: ProblemAttemptEntity[];
-}
-
-export interface GetProblemAttemptsResponseApiResult {
-  error?: ApiError;
-  readonly isSuccess?: boolean;
-  responseBody?: GetProblemAttemptsResponse;
-  statusCode?: HttpStatusCode;
-  /** @nullable */
-  successMessage?: string | null;
-}
-
-export interface GetMockInterviewsResponse {
-  mockInterviews: MockInterviewEntity[];
-}
-
-export interface GetMockInterviewsResponseApiResult {
-  error?: ApiError;
-  readonly isSuccess?: boolean;
-  responseBody?: GetMockInterviewsResponse;
-  statusCode?: HttpStatusCode;
-  /** @nullable */
-  successMessage?: string | null;
-}
-
-export interface GetLeetcodeProblemsResponse {
-  leetcodeProblems: LeetcodeProblemDto[];
-}
-
-export interface GetLeetcodeProblemsResponseApiResult {
-  error?: ApiError;
-  readonly isSuccess?: boolean;
-  responseBody?: GetLeetcodeProblemsResponse;
-  statusCode?: HttpStatusCode;
+  responseBody?: GetUserResponse;
   /** @nullable */
   successMessage?: string | null;
 }
@@ -593,11 +508,9 @@ export interface GetIsUserEnrolledResponse {
   studentRolePromotion: SeasonStudentRolePromotion;
 }
 
-export interface GetIsUserEnrolledResponseApiResult {
+export interface GetIsUserEnrolledResponseApiResponse {
   error?: ApiError;
-  readonly isSuccess?: boolean;
   responseBody?: GetIsUserEnrolledResponse;
-  statusCode?: HttpStatusCode;
   /** @nullable */
   successMessage?: string | null;
 }
@@ -606,11 +519,20 @@ export interface GetGraduatesResponse {
   graduates: GraduateDto[];
 }
 
-export interface GetGraduatesResponseApiResult {
+export interface GetGraduatesResponseApiResponse {
   error?: ApiError;
-  readonly isSuccess?: boolean;
   responseBody?: GetGraduatesResponse;
-  statusCode?: HttpStatusCode;
+  /** @nullable */
+  successMessage?: string | null;
+}
+
+export interface GetGraduatesRequest {
+  [key: string]: unknown;
+}
+
+export interface GetEnrollmentUsersResponseApiResponse {
+  error?: ApiError;
+  responseBody?: GetEnrollmentUsersResponse;
   /** @nullable */
   successMessage?: string | null;
 }
@@ -619,30 +541,68 @@ export interface GetCurrentUserResponse {
   user: UserEntity;
 }
 
-export interface GetCurrentUserResponseApiResult {
+export interface GetCurrentUserResponseApiResponse {
   error?: ApiError;
-  readonly isSuccess?: boolean;
   responseBody?: GetCurrentUserResponse;
-  statusCode?: HttpStatusCode;
   /** @nullable */
   successMessage?: string | null;
+}
+
+export interface GetCurrentUserRequest {
+  [key: string]: unknown;
 }
 
 export interface GetCurrentUserMenteesListResponse {
-  mentees: MenteeResponseDto[];
+  mentorships: MentorshipResponse[];
 }
 
-export interface GetCurrentUserMenteesListResponseApiResult {
+export interface GetCurrentUserMenteesListResponseApiResponse {
   error?: ApiError;
-  readonly isSuccess?: boolean;
   responseBody?: GetCurrentUserMenteesListResponse;
-  statusCode?: HttpStatusCode;
   /** @nullable */
   successMessage?: string | null;
 }
 
-export interface EnrollmentResponseDto {
+export interface GenerateLeetcodeProblemRecommendationResponse {
+  /** @minLength 1 */
+  leetcodeProblemRecommendationId: string;
+}
+
+export interface GenerateLeetcodeProblemRecommendationResponseApiResponse {
+  error?: ApiError;
+  responseBody?: GenerateLeetcodeProblemRecommendationResponse;
+  /** @nullable */
+  successMessage?: string | null;
+}
+
+export interface GenerateLeetcodeProblemRecommendationRequest {
+  /** @minLength 1 */
+  userId: string;
+}
+
+export interface EnrollmentUserDto {
+  /** @minLength 1 */
+  discordId: string;
+  /** @minLength 1 */
+  email: string;
+  /** @minLength 1 */
+  name: string;
+  /** @minLength 1 */
+  profileImage: string;
   role: SeasonRole;
+  studentRolePromotion: SeasonStudentRolePromotion;
+}
+
+export interface GetEnrollmentUsersResponse {
+  enrollmentUsers: EnrollmentUserDto[];
+}
+
+export interface EnrollmentResponseDto {
+  /** @minLength 1 */
+  enrollmentId: string;
+  role: SeasonRole;
+  /** @minLength 1 */
+  seasonId: string;
   /** @minLength 1 */
   seasonImageUrl: string;
   /** @minLength 1 */
@@ -650,34 +610,21 @@ export interface EnrollmentResponseDto {
   /** @minLength 1 */
   seasonSlug: string;
   studentRolePromotion: SeasonStudentRolePromotion;
+  /** @minLength 1 */
+  userId: string;
+  /** @minLength 1 */
+  userName: string;
 }
 
 export interface GetCurrentUserEnrollmentsResponse {
   enrollments: EnrollmentResponseDto[];
 }
 
-export interface GetCurrentUserEnrollmentsResponseApiResult {
+export interface GetCurrentUserEnrollmentsResponseApiResponse {
   error?: ApiError;
-  readonly isSuccess?: boolean;
   responseBody?: GetCurrentUserEnrollmentsResponse;
-  statusCode?: HttpStatusCode;
   /** @nullable */
   successMessage?: string | null;
-}
-
-export interface EnrollmentResponse {
-  /** @minLength 1 */
-  enrollmentId: string;
-  role: SeasonRole;
-  /** @minLength 1 */
-  seasonId: string;
-  /** @minLength 1 */
-  seasonName: string;
-  studentRolePromotion: SeasonStudentRolePromotion;
-  /** @minLength 1 */
-  userId: string;
-  /** @minLength 1 */
-  userName: string;
 }
 
 export interface EnrollmentEntity {
@@ -699,26 +646,36 @@ export interface DeleteProblemAttemptResponse {
   [key: string]: unknown;
 }
 
-export interface DeleteProblemAttemptResponseApiResult {
+export interface DeleteProblemAttemptResponseApiResponse {
   error?: ApiError;
-  readonly isSuccess?: boolean;
   responseBody?: DeleteProblemAttemptResponse;
-  statusCode?: HttpStatusCode;
   /** @nullable */
   successMessage?: string | null;
+}
+
+export interface DeleteProblemAttemptRequest {
+  /** @minLength 1 */
+  email: string;
+  /** @minLength 1 */
+  problemAttemptId: string;
 }
 
 export interface DeleteMockInterviewResponse {
   [key: string]: unknown;
 }
 
-export interface DeleteMockInterviewResponseApiResult {
+export interface DeleteMockInterviewResponseApiResponse {
   error?: ApiError;
-  readonly isSuccess?: boolean;
   responseBody?: DeleteMockInterviewResponse;
-  statusCode?: HttpStatusCode;
   /** @nullable */
   successMessage?: string | null;
+}
+
+export interface DeleteMockInterviewRequest {
+  /** @minLength 1 */
+  email: string;
+  /** @minLength 1 */
+  mockInterviewId: string;
 }
 
 export interface CustomProblemEntity {
@@ -756,44 +713,37 @@ export interface CustomMockInterviewRoundDto {
 }
 
 export interface CreateUserIfNotExistsResponse {
-  [key: string]: unknown;
+  /** @minLength 1 */
+  userId: string;
 }
 
-export interface CreateUserIfNotExistsResponseApiResult {
+export interface CreateUserIfNotExistsResponseApiResponse {
   error?: ApiError;
-  readonly isSuccess?: boolean;
   responseBody?: CreateUserIfNotExistsResponse;
-  statusCode?: HttpStatusCode;
   /** @nullable */
   successMessage?: string | null;
 }
 
 export interface CreateUserIfNotExistsRequest {
-  /** @minLength 1 */
-  discordId: string;
-  /** @minLength 1 */
-  name: string;
-  /** @minLength 1 */
-  profileImage: string;
+  /** @nullable */
+  discordId?: string | null;
+  /** @nullable */
+  name?: string | null;
+  /** @nullable */
+  profileImage?: string | null;
 }
 
 export interface CreateProblemAttemptResponse {
-  [key: string]: unknown;
-}
-
-export interface CreateProblemAttemptResponseApiResult {
-  error?: ApiError;
-  readonly isSuccess?: boolean;
-  responseBody?: CreateProblemAttemptResponse;
-  statusCode?: HttpStatusCode;
-  /** @nullable */
-  successMessage?: string | null;
+  /** @minLength 1 */
+  problemAttemptId: string;
 }
 
 export interface CreateProblemAttemptRequest {
   attemptStartDateUtc: string;
   /** @nullable */
   customProblemId?: string | null;
+  /** @minLength 1 */
+  email: string;
   /** @nullable */
   enrollmentId?: string | null;
   /** @nullable */
@@ -804,14 +754,13 @@ export interface CreateProblemAttemptRequest {
 }
 
 export interface CreateMockInterviewResponse {
-  [key: string]: unknown;
+  /** @minLength 1 */
+  mockInterviewId: string;
 }
 
-export interface CreateMockInterviewResponseApiResult {
+export interface CreateMockInterviewResponseApiResponse {
   error?: ApiError;
-  readonly isSuccess?: boolean;
   responseBody?: CreateMockInterviewResponse;
-  statusCode?: HttpStatusCode;
   /** @nullable */
   successMessage?: string | null;
 }
@@ -820,8 +769,10 @@ export interface CreateMockInterviewRequest {
   /** @nullable */
   enrollmentId?: string | null;
   /** @minLength 1 */
+  intervieweeEmail: string;
+  /** @minLength 1 */
   interviewerUserId: string;
-  mockInterviewRoundDtos: MockInterviewRoundDto[];
+  mockInterviewRounds: MockInterviewRoundDto[];
   startDate: string;
   timeTakenInMinutes: number;
 }
@@ -845,25 +796,20 @@ export interface ApiError {
   validationErrors?: ValidationError[] | null;
 }
 
-export interface AdminUpdateUserResponse {
-  /** @minLength 1 */
-  discordId: string;
-  /** @minLength 1 */
-  email: string;
-  isAdmin: boolean;
-  /** @minLength 1 */
-  name: string;
-  /** @minLength 1 */
-  profileImage: string;
-  /** @minLength 1 */
-  userId: string;
+export interface CreateProblemAttemptResponseApiResponse {
+  error?: ApiError;
+  responseBody?: CreateProblemAttemptResponse;
+  /** @nullable */
+  successMessage?: string | null;
 }
 
-export interface AdminUpdateUserResponseApiResult {
+export interface AdminUpdateUserResponse {
+  [key: string]: unknown;
+}
+
+export interface AdminUpdateUserResponseApiResponse {
   error?: ApiError;
-  readonly isSuccess?: boolean;
   responseBody?: AdminUpdateUserResponse;
-  statusCode?: HttpStatusCode;
   /** @nullable */
   successMessage?: string | null;
 }
@@ -878,23 +824,17 @@ export interface AdminUpdateUserRequest {
   name: string;
   /** @minLength 1 */
   profileImage: string;
+  /** @minLength 1 */
+  userId: string;
 }
 
 export interface AdminUpdateSeasonWeekResponse {
-  endDate: string;
-  /** @minLength 1 */
-  seasonId: string;
-  /** @minLength 1 */
-  seasonWeekId: string;
-  startDate: string;
-  weekNumber: number;
+  [key: string]: unknown;
 }
 
-export interface AdminUpdateSeasonWeekResponseApiResult {
+export interface AdminUpdateSeasonWeekResponseApiResponse {
   error?: ApiError;
-  readonly isSuccess?: boolean;
   responseBody?: AdminUpdateSeasonWeekResponse;
-  statusCode?: HttpStatusCode;
   /** @nullable */
   successMessage?: string | null;
 }
@@ -908,25 +848,12 @@ export interface AdminUpdateSeasonWeekRequest {
 }
 
 export interface AdminUpdateSeasonResponse {
-  endDateInclusiveUtc: string;
-  /** @minLength 1 */
-  imageUrl: string;
-  /** @minLength 1 */
-  location: string;
-  /** @minLength 1 */
-  name: string;
-  /** @minLength 1 */
-  seasonId: string;
-  /** @minLength 1 */
-  slug: string;
-  startDateInclusiveUtc: string;
+  [key: string]: unknown;
 }
 
-export interface AdminUpdateSeasonResponseApiResult {
+export interface AdminUpdateSeasonResponseApiResponse {
   error?: ApiError;
-  readonly isSuccess?: boolean;
   responseBody?: AdminUpdateSeasonResponse;
-  statusCode?: HttpStatusCode;
   /** @nullable */
   successMessage?: string | null;
 }
@@ -947,19 +874,12 @@ export interface AdminUpdateSeasonRequest {
 }
 
 export interface AdminUpdateMentorshipResponse {
-  /** @minLength 1 */
-  menteeEnrollmentId: string;
-  /** @minLength 1 */
-  mentorEnrollmentId: string;
-  /** @minLength 1 */
-  mentorshipId: string;
+  [key: string]: unknown;
 }
 
-export interface AdminUpdateMentorshipResponseApiResult {
+export interface AdminUpdateMentorshipResponseApiResponse {
   error?: ApiError;
-  readonly isSuccess?: boolean;
   responseBody?: AdminUpdateMentorshipResponse;
-  statusCode?: HttpStatusCode;
   /** @nullable */
   successMessage?: string | null;
 }
@@ -976,19 +896,11 @@ export interface AdminUpdateMentorshipRequest {
 export interface AdminUpdateEnrollmentResponse {
   /** @minLength 1 */
   enrollmentId: string;
-  role: SeasonRole;
-  /** @minLength 1 */
-  seasonId: string;
-  studentRolePromotion: SeasonStudentRolePromotion;
-  /** @minLength 1 */
-  userId: string;
 }
 
-export interface AdminUpdateEnrollmentResponseApiResult {
+export interface AdminUpdateEnrollmentResponseApiResponse {
   error?: ApiError;
-  readonly isSuccess?: boolean;
   responseBody?: AdminUpdateEnrollmentResponse;
-  statusCode?: HttpStatusCode;
   /** @nullable */
   successMessage?: string | null;
 }
@@ -1008,37 +920,39 @@ export interface AdminPopulateLeetcodeQuestionsResponse {
   [key: string]: unknown;
 }
 
-export interface AdminPopulateLeetcodeQuestionsResponseApiResult {
+export interface AdminPopulateLeetcodeQuestionsResponseApiResponse {
   error?: ApiError;
-  readonly isSuccess?: boolean;
   responseBody?: AdminPopulateLeetcodeQuestionsResponse;
-  statusCode?: HttpStatusCode;
   /** @nullable */
   successMessage?: string | null;
+}
+
+export interface AdminPopulateLeetcodeQuestionsRequest {
+  [key: string]: unknown;
 }
 
 export interface AdminListUserResponse {
   users: UserEntity[];
 }
 
-export interface AdminListUserResponseApiResult {
+export interface AdminListUserResponseApiResponse {
   error?: ApiError;
-  readonly isSuccess?: boolean;
   responseBody?: AdminListUserResponse;
-  statusCode?: HttpStatusCode;
   /** @nullable */
   successMessage?: string | null;
+}
+
+export interface AdminListUserRequest {
+  [key: string]: unknown;
 }
 
 export interface AdminListSeasonWeekResponse {
   seasonWeeks: SeasonWeekEntity[];
 }
 
-export interface AdminListSeasonWeekResponseApiResult {
+export interface AdminListSeasonWeekResponseApiResponse {
   error?: ApiError;
-  readonly isSuccess?: boolean;
   responseBody?: AdminListSeasonWeekResponse;
-  statusCode?: HttpStatusCode;
   /** @nullable */
   successMessage?: string | null;
 }
@@ -1047,144 +961,135 @@ export interface AdminListSeasonResponse {
   seasons: SeasonEntity[];
 }
 
-export interface AdminListSeasonResponseApiResult {
+export interface AdminListSeasonResponseApiResponse {
   error?: ApiError;
-  readonly isSuccess?: boolean;
   responseBody?: AdminListSeasonResponse;
-  statusCode?: HttpStatusCode;
   /** @nullable */
   successMessage?: string | null;
+}
+
+export interface AdminListSeasonRequest {
+  [key: string]: unknown;
 }
 
 export interface AdminListMentorshipResponse {
   mentorships: MentorshipResponse[];
 }
 
-export interface AdminListMentorshipResponseApiResult {
+export interface AdminListMentorshipResponseApiResponse {
   error?: ApiError;
-  readonly isSuccess?: boolean;
   responseBody?: AdminListMentorshipResponse;
-  statusCode?: HttpStatusCode;
   /** @nullable */
   successMessage?: string | null;
+}
+
+export interface AdminListMentorshipRequest {
+  [key: string]: unknown;
 }
 
 export interface AdminListEnrollmentResponse {
-  enrollments: EnrollmentResponse[];
+  enrollments: EnrollmentResponseDto[];
 }
 
-export interface AdminListEnrollmentResponseApiResult {
+export interface AdminListEnrollmentResponseApiResponse {
   error?: ApiError;
-  readonly isSuccess?: boolean;
   responseBody?: AdminListEnrollmentResponse;
-  statusCode?: HttpStatusCode;
   /** @nullable */
   successMessage?: string | null;
 }
 
-export interface AdminGenerateDummyDataResponse {
-  numberOfSeasons: number;
-  numberOfUsers: number;
-}
-
-export interface AdminGenerateDummyDataResponseApiResult {
-  error?: ApiError;
-  readonly isSuccess?: boolean;
-  responseBody?: AdminGenerateDummyDataResponse;
-  statusCode?: HttpStatusCode;
-  /** @nullable */
-  successMessage?: string | null;
-}
-
-export interface AdminGenerateDummyDataRequest {
-  numberOfSeasons: number;
-  numberOfUsers: number;
+export interface AdminListEnrollmentRequest {
+  [key: string]: unknown;
 }
 
 export interface AdminDeleteUserResponse {
   [key: string]: unknown;
 }
 
-export interface AdminDeleteUserResponseApiResult {
+export interface AdminDeleteUserResponseApiResponse {
   error?: ApiError;
-  readonly isSuccess?: boolean;
   responseBody?: AdminDeleteUserResponse;
-  statusCode?: HttpStatusCode;
   /** @nullable */
   successMessage?: string | null;
+}
+
+export interface AdminDeleteUserRequest {
+  /** @minLength 1 */
+  email: string;
 }
 
 export interface AdminDeleteSeasonWeekResponse {
   [key: string]: unknown;
 }
 
-export interface AdminDeleteSeasonWeekResponseApiResult {
+export interface AdminDeleteSeasonWeekResponseApiResponse {
   error?: ApiError;
-  readonly isSuccess?: boolean;
   responseBody?: AdminDeleteSeasonWeekResponse;
-  statusCode?: HttpStatusCode;
   /** @nullable */
   successMessage?: string | null;
+}
+
+export interface AdminDeleteSeasonWeekRequest {
+  /** @minLength 1 */
+  seasonWeekId: string;
 }
 
 export interface AdminDeleteSeasonResponse {
   [key: string]: unknown;
 }
 
-export interface AdminDeleteSeasonResponseApiResult {
+export interface AdminDeleteSeasonResponseApiResponse {
   error?: ApiError;
-  readonly isSuccess?: boolean;
   responseBody?: AdminDeleteSeasonResponse;
-  statusCode?: HttpStatusCode;
   /** @nullable */
   successMessage?: string | null;
+}
+
+export interface AdminDeleteSeasonRequest {
+  /** @minLength 1 */
+  seasonId: string;
 }
 
 export interface AdminDeleteMentorshipResponse {
   [key: string]: unknown;
 }
 
-export interface AdminDeleteMentorshipResponseApiResult {
+export interface AdminDeleteMentorshipResponseApiResponse {
   error?: ApiError;
-  readonly isSuccess?: boolean;
   responseBody?: AdminDeleteMentorshipResponse;
-  statusCode?: HttpStatusCode;
   /** @nullable */
   successMessage?: string | null;
+}
+
+export interface AdminDeleteMentorshipRequest {
+  /** @minLength 1 */
+  mentorshipId: string;
 }
 
 export interface AdminDeleteEnrollmentResponse {
   [key: string]: unknown;
 }
 
-export interface AdminDeleteEnrollmentResponseApiResult {
+export interface AdminDeleteEnrollmentResponseApiResponse {
   error?: ApiError;
-  readonly isSuccess?: boolean;
   responseBody?: AdminDeleteEnrollmentResponse;
-  statusCode?: HttpStatusCode;
   /** @nullable */
   successMessage?: string | null;
 }
 
+export interface AdminDeleteEnrollmentRequest {
+  /** @minLength 1 */
+  enrollmentId: string;
+}
+
 export interface AdminCreateUserResponse {
-  /** @minLength 1 */
-  discordId: string;
-  /** @minLength 1 */
-  email: string;
-  isAdmin: boolean;
-  /** @minLength 1 */
-  name: string;
-  /** @minLength 1 */
-  profileImage: string;
   /** @minLength 1 */
   userId: string;
 }
 
-export interface AdminCreateUserResponseApiResult {
+export interface AdminCreateUserResponseApiResponse {
   error?: ApiError;
-  readonly isSuccess?: boolean;
   responseBody?: AdminCreateUserResponse;
-  statusCode?: HttpStatusCode;
   /** @nullable */
   successMessage?: string | null;
 }
@@ -1202,20 +1107,13 @@ export interface AdminCreateUserRequest {
 }
 
 export interface AdminCreateSeasonWeekResponse {
-  endDate: string;
-  /** @minLength 1 */
-  seasonId: string;
   /** @minLength 1 */
   seasonWeekId: string;
-  startDate: string;
-  weekNumber: number;
 }
 
-export interface AdminCreateSeasonWeekResponseApiResult {
+export interface AdminCreateSeasonWeekResponseApiResponse {
   error?: ApiError;
-  readonly isSuccess?: boolean;
   responseBody?: AdminCreateSeasonWeekResponse;
-  statusCode?: HttpStatusCode;
   /** @nullable */
   successMessage?: string | null;
 }
@@ -1229,25 +1127,13 @@ export interface AdminCreateSeasonWeekRequest {
 }
 
 export interface AdminCreateSeasonResponse {
-  endDateInclusiveUtc: string;
-  /** @minLength 1 */
-  imageUrl: string;
-  /** @minLength 1 */
-  location: string;
-  /** @minLength 1 */
-  name: string;
   /** @minLength 1 */
   seasonId: string;
-  /** @minLength 1 */
-  slug: string;
-  startDateInclusiveUtc: string;
 }
 
-export interface AdminCreateSeasonResponseApiResult {
+export interface AdminCreateSeasonResponseApiResponse {
   error?: ApiError;
-  readonly isSuccess?: boolean;
   responseBody?: AdminCreateSeasonResponse;
-  statusCode?: HttpStatusCode;
   /** @nullable */
   successMessage?: string | null;
 }
@@ -1267,18 +1153,12 @@ export interface AdminCreateSeasonRequest {
 
 export interface AdminCreateMentorshipResponse {
   /** @minLength 1 */
-  menteeEnrollmentId: string;
-  /** @minLength 1 */
-  mentorEnrollmentId: string;
-  /** @minLength 1 */
   mentorshipId: string;
 }
 
-export interface AdminCreateMentorshipResponseApiResult {
+export interface AdminCreateMentorshipResponseApiResponse {
   error?: ApiError;
-  readonly isSuccess?: boolean;
   responseBody?: AdminCreateMentorshipResponse;
-  statusCode?: HttpStatusCode;
   /** @nullable */
   successMessage?: string | null;
 }
@@ -1293,19 +1173,11 @@ export interface AdminCreateMentorshipRequest {
 export interface AdminCreateEnrollmentResponse {
   /** @minLength 1 */
   enrollmentId: string;
-  role: SeasonRole;
-  /** @minLength 1 */
-  seasonId: string;
-  studentRolePromotion: SeasonStudentRolePromotion;
-  /** @minLength 1 */
-  userId: string;
 }
 
-export interface AdminCreateEnrollmentResponseApiResult {
+export interface AdminCreateEnrollmentResponseApiResponse {
   error?: ApiError;
-  readonly isSuccess?: boolean;
   responseBody?: AdminCreateEnrollmentResponse;
-  statusCode?: HttpStatusCode;
   /** @nullable */
   successMessage?: string | null;
 }
@@ -1321,2708 +1193,13 @@ export interface AdminCreateEnrollmentRequest {
 
 type SecondParameter<T extends (...args: any) => any> = Parameters<T>[1];
 
-export const adminCreateUser = (
-  adminCreateUserRequest: AdminCreateUserRequest,
-  options?: SecondParameter<typeof CustomAxiosInstance>
-) => {
-  return CustomAxiosInstance<AdminCreateUserResponseApiResult>(
-    {
-      url: `https://rsp-server-test.up.railway.app/api/admin/users`,
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      data: adminCreateUserRequest,
-    },
-    options
-  );
-};
-
-export const getAdminCreateUserMutationOptions = <
-  TError = AdminCreateUserResponseApiResult,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof adminCreateUser>>,
-    TError,
-    { data: AdminCreateUserRequest },
-    TContext
-  >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof adminCreateUser>>,
-  TError,
-  { data: AdminCreateUserRequest },
-  TContext
-> => {
-  const { mutation: mutationOptions, request: requestOptions } = options ?? {};
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof adminCreateUser>>,
-    { data: AdminCreateUserRequest }
-  > = (props) => {
-    const { data } = props ?? {};
-
-    return adminCreateUser(data, requestOptions);
-  };
-
-  return { mutationFn, ...mutationOptions };
-};
-
-export type AdminCreateUserMutationResult = NonNullable<
-  Awaited<ReturnType<typeof adminCreateUser>>
->;
-export type AdminCreateUserMutationBody = AdminCreateUserRequest;
-export type AdminCreateUserMutationError = AdminCreateUserResponseApiResult;
-
-export const useAdminCreateUser = <
-  TError = AdminCreateUserResponseApiResult,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof adminCreateUser>>,
-    TError,
-    { data: AdminCreateUserRequest },
-    TContext
-  >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseMutationResult<
-  Awaited<ReturnType<typeof adminCreateUser>>,
-  TError,
-  { data: AdminCreateUserRequest },
-  TContext
-> => {
-  const mutationOptions = getAdminCreateUserMutationOptions(options);
-
-  return useMutation(mutationOptions);
-};
-
-export const adminDeleteUser = (
-  params: AdminDeleteUserParams,
-  options?: SecondParameter<typeof CustomAxiosInstance>
-) => {
-  return CustomAxiosInstance<AdminDeleteUserResponseApiResult>(
-    { url: `https://rsp-server-test.up.railway.app/api/admin/users`, method: 'DELETE', params },
-    options
-  );
-};
-
-export const getAdminDeleteUserMutationOptions = <
-  TError = AdminDeleteUserResponseApiResult,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof adminDeleteUser>>,
-    TError,
-    { params: AdminDeleteUserParams },
-    TContext
-  >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof adminDeleteUser>>,
-  TError,
-  { params: AdminDeleteUserParams },
-  TContext
-> => {
-  const { mutation: mutationOptions, request: requestOptions } = options ?? {};
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof adminDeleteUser>>,
-    { params: AdminDeleteUserParams }
-  > = (props) => {
-    const { params } = props ?? {};
-
-    return adminDeleteUser(params, requestOptions);
-  };
-
-  return { mutationFn, ...mutationOptions };
-};
-
-export type AdminDeleteUserMutationResult = NonNullable<
-  Awaited<ReturnType<typeof adminDeleteUser>>
->;
-
-export type AdminDeleteUserMutationError = AdminDeleteUserResponseApiResult;
-
-export const useAdminDeleteUser = <
-  TError = AdminDeleteUserResponseApiResult,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof adminDeleteUser>>,
-    TError,
-    { params: AdminDeleteUserParams },
-    TContext
-  >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseMutationResult<
-  Awaited<ReturnType<typeof adminDeleteUser>>,
-  TError,
-  { params: AdminDeleteUserParams },
-  TContext
-> => {
-  const mutationOptions = getAdminDeleteUserMutationOptions(options);
-
-  return useMutation(mutationOptions);
-};
-
-export const adminListUser = (
-  options?: SecondParameter<typeof CustomAxiosInstance>,
-  signal?: AbortSignal
-) => {
-  return CustomAxiosInstance<AdminListUserResponseApiResult>(
-    { url: `https://rsp-server-test.up.railway.app/api/admin/users`, method: 'GET', signal },
-    options
-  );
-};
-
-export const getAdminListUserQueryKey = () => {
-  return [`https://rsp-server-test.up.railway.app/api/admin/users`] as const;
-};
-
-export const getAdminListUserQueryOptions = <
-  TData = Awaited<ReturnType<typeof adminListUser>>,
-  TError = AdminListUserResponseApiResult,
->(options?: {
-  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof adminListUser>>, TError, TData>>;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {};
-
-  const queryKey = queryOptions?.queryKey ?? getAdminListUserQueryKey();
-
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof adminListUser>>> = ({ signal }) =>
-    adminListUser(requestOptions, signal);
-
-  return { queryKey, queryFn, staleTime: Infinity, ...queryOptions } as UseQueryOptions<
-    Awaited<ReturnType<typeof adminListUser>>,
-    TError,
-    TData
-  > & { queryKey: QueryKey };
-};
-
-export type AdminListUserQueryResult = NonNullable<Awaited<ReturnType<typeof adminListUser>>>;
-export type AdminListUserQueryError = AdminListUserResponseApiResult;
-
-export function useAdminListUser<
-  TData = Awaited<ReturnType<typeof adminListUser>>,
-  TError = AdminListUserResponseApiResult,
->(options: {
-  query: Partial<UseQueryOptions<Awaited<ReturnType<typeof adminListUser>>, TError, TData>> &
-    Pick<
-      DefinedInitialDataOptions<Awaited<ReturnType<typeof adminListUser>>, TError, TData>,
-      'initialData'
-    >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): DefinedUseQueryResult<TData, TError> & { queryKey: QueryKey };
-export function useAdminListUser<
-  TData = Awaited<ReturnType<typeof adminListUser>>,
-  TError = AdminListUserResponseApiResult,
->(options?: {
-  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof adminListUser>>, TError, TData>> &
-    Pick<
-      UndefinedInitialDataOptions<Awaited<ReturnType<typeof adminListUser>>, TError, TData>,
-      'initialData'
-    >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseQueryResult<TData, TError> & { queryKey: QueryKey };
-export function useAdminListUser<
-  TData = Awaited<ReturnType<typeof adminListUser>>,
-  TError = AdminListUserResponseApiResult,
->(options?: {
-  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof adminListUser>>, TError, TData>>;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseQueryResult<TData, TError> & { queryKey: QueryKey };
-
-export function useAdminListUser<
-  TData = Awaited<ReturnType<typeof adminListUser>>,
-  TError = AdminListUserResponseApiResult,
->(options?: {
-  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof adminListUser>>, TError, TData>>;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
-  const queryOptions = getAdminListUserQueryOptions(options);
-
-  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & { queryKey: QueryKey };
-
-  query.queryKey = queryOptions.queryKey;
-
-  return query;
-}
-
-export const adminUpdateUser = (
-  adminUpdateUserRequest: AdminUpdateUserRequest,
-  options?: SecondParameter<typeof CustomAxiosInstance>
-) => {
-  return CustomAxiosInstance<AdminUpdateUserResponseApiResult>(
-    {
-      url: `https://rsp-server-test.up.railway.app/api/admin/users`,
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      data: adminUpdateUserRequest,
-    },
-    options
-  );
-};
-
-export const getAdminUpdateUserMutationOptions = <
-  TError = AdminUpdateUserResponseApiResult,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof adminUpdateUser>>,
-    TError,
-    { data: AdminUpdateUserRequest },
-    TContext
-  >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof adminUpdateUser>>,
-  TError,
-  { data: AdminUpdateUserRequest },
-  TContext
-> => {
-  const { mutation: mutationOptions, request: requestOptions } = options ?? {};
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof adminUpdateUser>>,
-    { data: AdminUpdateUserRequest }
-  > = (props) => {
-    const { data } = props ?? {};
-
-    return adminUpdateUser(data, requestOptions);
-  };
-
-  return { mutationFn, ...mutationOptions };
-};
-
-export type AdminUpdateUserMutationResult = NonNullable<
-  Awaited<ReturnType<typeof adminUpdateUser>>
->;
-export type AdminUpdateUserMutationBody = AdminUpdateUserRequest;
-export type AdminUpdateUserMutationError = AdminUpdateUserResponseApiResult;
-
-export const useAdminUpdateUser = <
-  TError = AdminUpdateUserResponseApiResult,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof adminUpdateUser>>,
-    TError,
-    { data: AdminUpdateUserRequest },
-    TContext
-  >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseMutationResult<
-  Awaited<ReturnType<typeof adminUpdateUser>>,
-  TError,
-  { data: AdminUpdateUserRequest },
-  TContext
-> => {
-  const mutationOptions = getAdminUpdateUserMutationOptions(options);
-
-  return useMutation(mutationOptions);
-};
-
-export const createUserIfNotExists = (
-  createUserIfNotExistsRequest: CreateUserIfNotExistsRequest,
-  options?: SecondParameter<typeof CustomAxiosInstance>
-) => {
-  return CustomAxiosInstance<CreateUserIfNotExistsResponseApiResult>(
-    {
-      url: `https://rsp-server-test.up.railway.app/api/users/create-if-not-exists`,
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      data: createUserIfNotExistsRequest,
-    },
-    options
-  );
-};
-
-export const getCreateUserIfNotExistsMutationOptions = <
-  TError = CreateUserIfNotExistsResponseApiResult,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof createUserIfNotExists>>,
-    TError,
-    { data: CreateUserIfNotExistsRequest },
-    TContext
-  >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof createUserIfNotExists>>,
-  TError,
-  { data: CreateUserIfNotExistsRequest },
-  TContext
-> => {
-  const { mutation: mutationOptions, request: requestOptions } = options ?? {};
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof createUserIfNotExists>>,
-    { data: CreateUserIfNotExistsRequest }
-  > = (props) => {
-    const { data } = props ?? {};
-
-    return createUserIfNotExists(data, requestOptions);
-  };
-
-  return { mutationFn, ...mutationOptions };
-};
-
-export type CreateUserIfNotExistsMutationResult = NonNullable<
-  Awaited<ReturnType<typeof createUserIfNotExists>>
->;
-export type CreateUserIfNotExistsMutationBody = CreateUserIfNotExistsRequest;
-export type CreateUserIfNotExistsMutationError = CreateUserIfNotExistsResponseApiResult;
-
-export const useCreateUserIfNotExists = <
-  TError = CreateUserIfNotExistsResponseApiResult,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof createUserIfNotExists>>,
-    TError,
-    { data: CreateUserIfNotExistsRequest },
-    TContext
-  >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseMutationResult<
-  Awaited<ReturnType<typeof createUserIfNotExists>>,
-  TError,
-  { data: CreateUserIfNotExistsRequest },
-  TContext
-> => {
-  const mutationOptions = getCreateUserIfNotExistsMutationOptions(options);
-
-  return useMutation(mutationOptions);
-};
-
-export const getCurrentUser = (
-  params?: GetCurrentUserParams,
-  options?: SecondParameter<typeof CustomAxiosInstance>,
-  signal?: AbortSignal
-) => {
-  return CustomAxiosInstance<GetCurrentUserResponseApiResult>(
-    {
-      url: `https://rsp-server-test.up.railway.app/api/users/get-current-user`,
-      method: 'GET',
-      params,
-      signal,
-    },
-    options
-  );
-};
-
-export const getGetCurrentUserQueryKey = (params?: GetCurrentUserParams) => {
-  return [
-    `https://rsp-server-test.up.railway.app/api/users/get-current-user`,
-    ...(params ? [params] : []),
-  ] as const;
-};
-
-export const getGetCurrentUserQueryOptions = <
-  TData = Awaited<ReturnType<typeof getCurrentUser>>,
-  TError = GetCurrentUserResponseApiResult,
->(
-  params?: GetCurrentUserParams,
-  options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getCurrentUser>>, TError, TData>>;
-    request?: SecondParameter<typeof CustomAxiosInstance>;
-  }
-) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {};
-
-  const queryKey = queryOptions?.queryKey ?? getGetCurrentUserQueryKey(params);
-
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof getCurrentUser>>> = ({ signal }) =>
-    getCurrentUser(params, requestOptions, signal);
-
-  return { queryKey, queryFn, staleTime: Infinity, ...queryOptions } as UseQueryOptions<
-    Awaited<ReturnType<typeof getCurrentUser>>,
-    TError,
-    TData
-  > & { queryKey: QueryKey };
-};
-
-export type GetCurrentUserQueryResult = NonNullable<Awaited<ReturnType<typeof getCurrentUser>>>;
-export type GetCurrentUserQueryError = GetCurrentUserResponseApiResult;
-
-export function useGetCurrentUser<
-  TData = Awaited<ReturnType<typeof getCurrentUser>>,
-  TError = GetCurrentUserResponseApiResult,
->(
-  params: undefined | GetCurrentUserParams,
-  options: {
-    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getCurrentUser>>, TError, TData>> &
-      Pick<
-        DefinedInitialDataOptions<Awaited<ReturnType<typeof getCurrentUser>>, TError, TData>,
-        'initialData'
-      >;
-    request?: SecondParameter<typeof CustomAxiosInstance>;
-  }
-): DefinedUseQueryResult<TData, TError> & { queryKey: QueryKey };
-export function useGetCurrentUser<
-  TData = Awaited<ReturnType<typeof getCurrentUser>>,
-  TError = GetCurrentUserResponseApiResult,
->(
-  params?: GetCurrentUserParams,
-  options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getCurrentUser>>, TError, TData>> &
-      Pick<
-        UndefinedInitialDataOptions<Awaited<ReturnType<typeof getCurrentUser>>, TError, TData>,
-        'initialData'
-      >;
-    request?: SecondParameter<typeof CustomAxiosInstance>;
-  }
-): UseQueryResult<TData, TError> & { queryKey: QueryKey };
-export function useGetCurrentUser<
-  TData = Awaited<ReturnType<typeof getCurrentUser>>,
-  TError = GetCurrentUserResponseApiResult,
->(
-  params?: GetCurrentUserParams,
-  options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getCurrentUser>>, TError, TData>>;
-    request?: SecondParameter<typeof CustomAxiosInstance>;
-  }
-): UseQueryResult<TData, TError> & { queryKey: QueryKey };
-
-export function useGetCurrentUser<
-  TData = Awaited<ReturnType<typeof getCurrentUser>>,
-  TError = GetCurrentUserResponseApiResult,
->(
-  params?: GetCurrentUserParams,
-  options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getCurrentUser>>, TError, TData>>;
-    request?: SecondParameter<typeof CustomAxiosInstance>;
-  }
-): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
-  const queryOptions = getGetCurrentUserQueryOptions(params, options);
-
-  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & { queryKey: QueryKey };
-
-  query.queryKey = queryOptions.queryKey;
-
-  return query;
-}
-
-export const getUserList = (
-  options?: SecondParameter<typeof CustomAxiosInstance>,
-  signal?: AbortSignal
-) => {
-  return CustomAxiosInstance<GetUserListResponseApiResult>(
-    { url: `https://rsp-server-test.up.railway.app/api/users-list`, method: 'GET', signal },
-    options
-  );
-};
-
-export const getGetUserListQueryKey = () => {
-  return [`https://rsp-server-test.up.railway.app/api/users-list`] as const;
-};
-
-export const getGetUserListQueryOptions = <
-  TData = Awaited<ReturnType<typeof getUserList>>,
-  TError = GetUserListResponseApiResult,
->(options?: {
-  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserList>>, TError, TData>>;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {};
-
-  const queryKey = queryOptions?.queryKey ?? getGetUserListQueryKey();
-
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof getUserList>>> = ({ signal }) =>
-    getUserList(requestOptions, signal);
-
-  return { queryKey, queryFn, staleTime: Infinity, ...queryOptions } as UseQueryOptions<
-    Awaited<ReturnType<typeof getUserList>>,
-    TError,
-    TData
-  > & { queryKey: QueryKey };
-};
-
-export type GetUserListQueryResult = NonNullable<Awaited<ReturnType<typeof getUserList>>>;
-export type GetUserListQueryError = GetUserListResponseApiResult;
-
-export function useGetUserList<
-  TData = Awaited<ReturnType<typeof getUserList>>,
-  TError = GetUserListResponseApiResult,
->(options: {
-  query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserList>>, TError, TData>> &
-    Pick<
-      DefinedInitialDataOptions<Awaited<ReturnType<typeof getUserList>>, TError, TData>,
-      'initialData'
-    >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): DefinedUseQueryResult<TData, TError> & { queryKey: QueryKey };
-export function useGetUserList<
-  TData = Awaited<ReturnType<typeof getUserList>>,
-  TError = GetUserListResponseApiResult,
->(options?: {
-  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserList>>, TError, TData>> &
-    Pick<
-      UndefinedInitialDataOptions<Awaited<ReturnType<typeof getUserList>>, TError, TData>,
-      'initialData'
-    >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseQueryResult<TData, TError> & { queryKey: QueryKey };
-export function useGetUserList<
-  TData = Awaited<ReturnType<typeof getUserList>>,
-  TError = GetUserListResponseApiResult,
->(options?: {
-  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserList>>, TError, TData>>;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseQueryResult<TData, TError> & { queryKey: QueryKey };
-
-export function useGetUserList<
-  TData = Awaited<ReturnType<typeof getUserList>>,
-  TError = GetUserListResponseApiResult,
->(options?: {
-  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserList>>, TError, TData>>;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
-  const queryOptions = getGetUserListQueryOptions(options);
-
-  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & { queryKey: QueryKey };
-
-  query.queryKey = queryOptions.queryKey;
-
-  return query;
-}
-
-export const adminCreateSeasonWeek = (
-  adminCreateSeasonWeekRequest: AdminCreateSeasonWeekRequest,
-  options?: SecondParameter<typeof CustomAxiosInstance>
-) => {
-  return CustomAxiosInstance<AdminCreateSeasonWeekResponseApiResult>(
-    {
-      url: `https://rsp-server-test.up.railway.app/api/admin/season-weeks`,
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      data: adminCreateSeasonWeekRequest,
-    },
-    options
-  );
-};
-
-export const getAdminCreateSeasonWeekMutationOptions = <
-  TError = AdminCreateSeasonWeekResponseApiResult,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof adminCreateSeasonWeek>>,
-    TError,
-    { data: AdminCreateSeasonWeekRequest },
-    TContext
-  >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof adminCreateSeasonWeek>>,
-  TError,
-  { data: AdminCreateSeasonWeekRequest },
-  TContext
-> => {
-  const { mutation: mutationOptions, request: requestOptions } = options ?? {};
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof adminCreateSeasonWeek>>,
-    { data: AdminCreateSeasonWeekRequest }
-  > = (props) => {
-    const { data } = props ?? {};
-
-    return adminCreateSeasonWeek(data, requestOptions);
-  };
-
-  return { mutationFn, ...mutationOptions };
-};
-
-export type AdminCreateSeasonWeekMutationResult = NonNullable<
-  Awaited<ReturnType<typeof adminCreateSeasonWeek>>
->;
-export type AdminCreateSeasonWeekMutationBody = AdminCreateSeasonWeekRequest;
-export type AdminCreateSeasonWeekMutationError = AdminCreateSeasonWeekResponseApiResult;
-
-export const useAdminCreateSeasonWeek = <
-  TError = AdminCreateSeasonWeekResponseApiResult,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof adminCreateSeasonWeek>>,
-    TError,
-    { data: AdminCreateSeasonWeekRequest },
-    TContext
-  >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseMutationResult<
-  Awaited<ReturnType<typeof adminCreateSeasonWeek>>,
-  TError,
-  { data: AdminCreateSeasonWeekRequest },
-  TContext
-> => {
-  const mutationOptions = getAdminCreateSeasonWeekMutationOptions(options);
-
-  return useMutation(mutationOptions);
-};
-
-export const adminDeleteSeasonWeek = (
-  params: AdminDeleteSeasonWeekParams,
-  options?: SecondParameter<typeof CustomAxiosInstance>
-) => {
-  return CustomAxiosInstance<AdminDeleteSeasonWeekResponseApiResult>(
-    {
-      url: `https://rsp-server-test.up.railway.app/api/admin/season-weeks`,
-      method: 'DELETE',
-      params,
-    },
-    options
-  );
-};
-
-export const getAdminDeleteSeasonWeekMutationOptions = <
-  TError = AdminDeleteSeasonWeekResponseApiResult,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof adminDeleteSeasonWeek>>,
-    TError,
-    { params: AdminDeleteSeasonWeekParams },
-    TContext
-  >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof adminDeleteSeasonWeek>>,
-  TError,
-  { params: AdminDeleteSeasonWeekParams },
-  TContext
-> => {
-  const { mutation: mutationOptions, request: requestOptions } = options ?? {};
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof adminDeleteSeasonWeek>>,
-    { params: AdminDeleteSeasonWeekParams }
-  > = (props) => {
-    const { params } = props ?? {};
-
-    return adminDeleteSeasonWeek(params, requestOptions);
-  };
-
-  return { mutationFn, ...mutationOptions };
-};
-
-export type AdminDeleteSeasonWeekMutationResult = NonNullable<
-  Awaited<ReturnType<typeof adminDeleteSeasonWeek>>
->;
-
-export type AdminDeleteSeasonWeekMutationError = AdminDeleteSeasonWeekResponseApiResult;
-
-export const useAdminDeleteSeasonWeek = <
-  TError = AdminDeleteSeasonWeekResponseApiResult,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof adminDeleteSeasonWeek>>,
-    TError,
-    { params: AdminDeleteSeasonWeekParams },
-    TContext
-  >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseMutationResult<
-  Awaited<ReturnType<typeof adminDeleteSeasonWeek>>,
-  TError,
-  { params: AdminDeleteSeasonWeekParams },
-  TContext
-> => {
-  const mutationOptions = getAdminDeleteSeasonWeekMutationOptions(options);
-
-  return useMutation(mutationOptions);
-};
-
-export const adminListSeasonWeek = (
-  params?: AdminListSeasonWeekParams,
-  options?: SecondParameter<typeof CustomAxiosInstance>,
-  signal?: AbortSignal
-) => {
-  return CustomAxiosInstance<AdminListSeasonWeekResponseApiResult>(
-    {
-      url: `https://rsp-server-test.up.railway.app/api/admin/season-weeks`,
-      method: 'GET',
-      params,
-      signal,
-    },
-    options
-  );
-};
-
-export const getAdminListSeasonWeekQueryKey = (params?: AdminListSeasonWeekParams) => {
-  return [
-    `https://rsp-server-test.up.railway.app/api/admin/season-weeks`,
-    ...(params ? [params] : []),
-  ] as const;
-};
-
-export const getAdminListSeasonWeekQueryOptions = <
-  TData = Awaited<ReturnType<typeof adminListSeasonWeek>>,
-  TError = AdminListSeasonWeekResponseApiResult,
->(
-  params?: AdminListSeasonWeekParams,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof adminListSeasonWeek>>, TError, TData>
-    >;
-    request?: SecondParameter<typeof CustomAxiosInstance>;
-  }
-) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {};
-
-  const queryKey = queryOptions?.queryKey ?? getAdminListSeasonWeekQueryKey(params);
-
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof adminListSeasonWeek>>> = ({ signal }) =>
-    adminListSeasonWeek(params, requestOptions, signal);
-
-  return { queryKey, queryFn, staleTime: Infinity, ...queryOptions } as UseQueryOptions<
-    Awaited<ReturnType<typeof adminListSeasonWeek>>,
-    TError,
-    TData
-  > & { queryKey: QueryKey };
-};
-
-export type AdminListSeasonWeekQueryResult = NonNullable<
-  Awaited<ReturnType<typeof adminListSeasonWeek>>
->;
-export type AdminListSeasonWeekQueryError = AdminListSeasonWeekResponseApiResult;
-
-export function useAdminListSeasonWeek<
-  TData = Awaited<ReturnType<typeof adminListSeasonWeek>>,
-  TError = AdminListSeasonWeekResponseApiResult,
->(
-  params: undefined | AdminListSeasonWeekParams,
-  options: {
-    query: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof adminListSeasonWeek>>, TError, TData>
-    > &
-      Pick<
-        DefinedInitialDataOptions<Awaited<ReturnType<typeof adminListSeasonWeek>>, TError, TData>,
-        'initialData'
-      >;
-    request?: SecondParameter<typeof CustomAxiosInstance>;
-  }
-): DefinedUseQueryResult<TData, TError> & { queryKey: QueryKey };
-export function useAdminListSeasonWeek<
-  TData = Awaited<ReturnType<typeof adminListSeasonWeek>>,
-  TError = AdminListSeasonWeekResponseApiResult,
->(
-  params?: AdminListSeasonWeekParams,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof adminListSeasonWeek>>, TError, TData>
-    > &
-      Pick<
-        UndefinedInitialDataOptions<Awaited<ReturnType<typeof adminListSeasonWeek>>, TError, TData>,
-        'initialData'
-      >;
-    request?: SecondParameter<typeof CustomAxiosInstance>;
-  }
-): UseQueryResult<TData, TError> & { queryKey: QueryKey };
-export function useAdminListSeasonWeek<
-  TData = Awaited<ReturnType<typeof adminListSeasonWeek>>,
-  TError = AdminListSeasonWeekResponseApiResult,
->(
-  params?: AdminListSeasonWeekParams,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof adminListSeasonWeek>>, TError, TData>
-    >;
-    request?: SecondParameter<typeof CustomAxiosInstance>;
-  }
-): UseQueryResult<TData, TError> & { queryKey: QueryKey };
-
-export function useAdminListSeasonWeek<
-  TData = Awaited<ReturnType<typeof adminListSeasonWeek>>,
-  TError = AdminListSeasonWeekResponseApiResult,
->(
-  params?: AdminListSeasonWeekParams,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof adminListSeasonWeek>>, TError, TData>
-    >;
-    request?: SecondParameter<typeof CustomAxiosInstance>;
-  }
-): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
-  const queryOptions = getAdminListSeasonWeekQueryOptions(params, options);
-
-  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & { queryKey: QueryKey };
-
-  query.queryKey = queryOptions.queryKey;
-
-  return query;
-}
-
-export const adminUpdateSeasonWeek = (
-  adminUpdateSeasonWeekRequest: AdminUpdateSeasonWeekRequest,
-  options?: SecondParameter<typeof CustomAxiosInstance>
-) => {
-  return CustomAxiosInstance<AdminUpdateSeasonWeekResponseApiResult>(
-    {
-      url: `https://rsp-server-test.up.railway.app/api/admin/season-weeks`,
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      data: adminUpdateSeasonWeekRequest,
-    },
-    options
-  );
-};
-
-export const getAdminUpdateSeasonWeekMutationOptions = <
-  TError = AdminUpdateSeasonWeekResponseApiResult,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof adminUpdateSeasonWeek>>,
-    TError,
-    { data: AdminUpdateSeasonWeekRequest },
-    TContext
-  >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof adminUpdateSeasonWeek>>,
-  TError,
-  { data: AdminUpdateSeasonWeekRequest },
-  TContext
-> => {
-  const { mutation: mutationOptions, request: requestOptions } = options ?? {};
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof adminUpdateSeasonWeek>>,
-    { data: AdminUpdateSeasonWeekRequest }
-  > = (props) => {
-    const { data } = props ?? {};
-
-    return adminUpdateSeasonWeek(data, requestOptions);
-  };
-
-  return { mutationFn, ...mutationOptions };
-};
-
-export type AdminUpdateSeasonWeekMutationResult = NonNullable<
-  Awaited<ReturnType<typeof adminUpdateSeasonWeek>>
->;
-export type AdminUpdateSeasonWeekMutationBody = AdminUpdateSeasonWeekRequest;
-export type AdminUpdateSeasonWeekMutationError = AdminUpdateSeasonWeekResponseApiResult;
-
-export const useAdminUpdateSeasonWeek = <
-  TError = AdminUpdateSeasonWeekResponseApiResult,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof adminUpdateSeasonWeek>>,
-    TError,
-    { data: AdminUpdateSeasonWeekRequest },
-    TContext
-  >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseMutationResult<
-  Awaited<ReturnType<typeof adminUpdateSeasonWeek>>,
-  TError,
-  { data: AdminUpdateSeasonWeekRequest },
-  TContext
-> => {
-  const mutationOptions = getAdminUpdateSeasonWeekMutationOptions(options);
-
-  return useMutation(mutationOptions);
-};
-
-export const getSeasonUsers = (
-  seasonSlug: string,
-  options?: SecondParameter<typeof CustomAxiosInstance>,
-  signal?: AbortSignal
-) => {
-  return CustomAxiosInstance<GetSeasonUsersResponseApiResult>(
-    {
-      url: `https://rsp-server-test.up.railway.app/api/season-users/${seasonSlug}`,
-      method: 'GET',
-      signal,
-    },
-    options
-  );
-};
-
-export const getGetSeasonUsersQueryKey = (seasonSlug: string) => {
-  return [`https://rsp-server-test.up.railway.app/api/season-users/${seasonSlug}`] as const;
-};
-
-export const getGetSeasonUsersQueryOptions = <
-  TData = Awaited<ReturnType<typeof getSeasonUsers>>,
-  TError = GetSeasonUsersResponseApiResult,
->(
-  seasonSlug: string,
-  options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getSeasonUsers>>, TError, TData>>;
-    request?: SecondParameter<typeof CustomAxiosInstance>;
-  }
-) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {};
-
-  const queryKey = queryOptions?.queryKey ?? getGetSeasonUsersQueryKey(seasonSlug);
-
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof getSeasonUsers>>> = ({ signal }) =>
-    getSeasonUsers(seasonSlug, requestOptions, signal);
-
-  return {
-    queryKey,
-    queryFn,
-    enabled: !!seasonSlug,
-    staleTime: Infinity,
-    ...queryOptions,
-  } as UseQueryOptions<Awaited<ReturnType<typeof getSeasonUsers>>, TError, TData> & {
-    queryKey: QueryKey;
-  };
-};
-
-export type GetSeasonUsersQueryResult = NonNullable<Awaited<ReturnType<typeof getSeasonUsers>>>;
-export type GetSeasonUsersQueryError = GetSeasonUsersResponseApiResult;
-
-export function useGetSeasonUsers<
-  TData = Awaited<ReturnType<typeof getSeasonUsers>>,
-  TError = GetSeasonUsersResponseApiResult,
->(
-  seasonSlug: string,
-  options: {
-    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getSeasonUsers>>, TError, TData>> &
-      Pick<
-        DefinedInitialDataOptions<Awaited<ReturnType<typeof getSeasonUsers>>, TError, TData>,
-        'initialData'
-      >;
-    request?: SecondParameter<typeof CustomAxiosInstance>;
-  }
-): DefinedUseQueryResult<TData, TError> & { queryKey: QueryKey };
-export function useGetSeasonUsers<
-  TData = Awaited<ReturnType<typeof getSeasonUsers>>,
-  TError = GetSeasonUsersResponseApiResult,
->(
-  seasonSlug: string,
-  options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getSeasonUsers>>, TError, TData>> &
-      Pick<
-        UndefinedInitialDataOptions<Awaited<ReturnType<typeof getSeasonUsers>>, TError, TData>,
-        'initialData'
-      >;
-    request?: SecondParameter<typeof CustomAxiosInstance>;
-  }
-): UseQueryResult<TData, TError> & { queryKey: QueryKey };
-export function useGetSeasonUsers<
-  TData = Awaited<ReturnType<typeof getSeasonUsers>>,
-  TError = GetSeasonUsersResponseApiResult,
->(
-  seasonSlug: string,
-  options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getSeasonUsers>>, TError, TData>>;
-    request?: SecondParameter<typeof CustomAxiosInstance>;
-  }
-): UseQueryResult<TData, TError> & { queryKey: QueryKey };
-
-export function useGetSeasonUsers<
-  TData = Awaited<ReturnType<typeof getSeasonUsers>>,
-  TError = GetSeasonUsersResponseApiResult,
->(
-  seasonSlug: string,
-  options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getSeasonUsers>>, TError, TData>>;
-    request?: SecondParameter<typeof CustomAxiosInstance>;
-  }
-): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
-  const queryOptions = getGetSeasonUsersQueryOptions(seasonSlug, options);
-
-  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & { queryKey: QueryKey };
-
-  query.queryKey = queryOptions.queryKey;
-
-  return query;
-}
-
-export const adminCreateSeason = (
-  adminCreateSeasonRequest: AdminCreateSeasonRequest,
-  options?: SecondParameter<typeof CustomAxiosInstance>
-) => {
-  return CustomAxiosInstance<AdminCreateSeasonResponseApiResult>(
-    {
-      url: `https://rsp-server-test.up.railway.app/api/admin/seasons`,
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      data: adminCreateSeasonRequest,
-    },
-    options
-  );
-};
-
-export const getAdminCreateSeasonMutationOptions = <
-  TError = AdminCreateSeasonResponseApiResult,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof adminCreateSeason>>,
-    TError,
-    { data: AdminCreateSeasonRequest },
-    TContext
-  >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof adminCreateSeason>>,
-  TError,
-  { data: AdminCreateSeasonRequest },
-  TContext
-> => {
-  const { mutation: mutationOptions, request: requestOptions } = options ?? {};
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof adminCreateSeason>>,
-    { data: AdminCreateSeasonRequest }
-  > = (props) => {
-    const { data } = props ?? {};
-
-    return adminCreateSeason(data, requestOptions);
-  };
-
-  return { mutationFn, ...mutationOptions };
-};
-
-export type AdminCreateSeasonMutationResult = NonNullable<
-  Awaited<ReturnType<typeof adminCreateSeason>>
->;
-export type AdminCreateSeasonMutationBody = AdminCreateSeasonRequest;
-export type AdminCreateSeasonMutationError = AdminCreateSeasonResponseApiResult;
-
-export const useAdminCreateSeason = <
-  TError = AdminCreateSeasonResponseApiResult,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof adminCreateSeason>>,
-    TError,
-    { data: AdminCreateSeasonRequest },
-    TContext
-  >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseMutationResult<
-  Awaited<ReturnType<typeof adminCreateSeason>>,
-  TError,
-  { data: AdminCreateSeasonRequest },
-  TContext
-> => {
-  const mutationOptions = getAdminCreateSeasonMutationOptions(options);
-
-  return useMutation(mutationOptions);
-};
-
-export const adminDeleteSeason = (
-  params: AdminDeleteSeasonParams,
-  options?: SecondParameter<typeof CustomAxiosInstance>
-) => {
-  return CustomAxiosInstance<AdminDeleteSeasonResponseApiResult>(
-    { url: `https://rsp-server-test.up.railway.app/api/admin/seasons`, method: 'DELETE', params },
-    options
-  );
-};
-
-export const getAdminDeleteSeasonMutationOptions = <
-  TError = AdminDeleteSeasonResponseApiResult,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof adminDeleteSeason>>,
-    TError,
-    { params: AdminDeleteSeasonParams },
-    TContext
-  >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof adminDeleteSeason>>,
-  TError,
-  { params: AdminDeleteSeasonParams },
-  TContext
-> => {
-  const { mutation: mutationOptions, request: requestOptions } = options ?? {};
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof adminDeleteSeason>>,
-    { params: AdminDeleteSeasonParams }
-  > = (props) => {
-    const { params } = props ?? {};
-
-    return adminDeleteSeason(params, requestOptions);
-  };
-
-  return { mutationFn, ...mutationOptions };
-};
-
-export type AdminDeleteSeasonMutationResult = NonNullable<
-  Awaited<ReturnType<typeof adminDeleteSeason>>
->;
-
-export type AdminDeleteSeasonMutationError = AdminDeleteSeasonResponseApiResult;
-
-export const useAdminDeleteSeason = <
-  TError = AdminDeleteSeasonResponseApiResult,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof adminDeleteSeason>>,
-    TError,
-    { params: AdminDeleteSeasonParams },
-    TContext
-  >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseMutationResult<
-  Awaited<ReturnType<typeof adminDeleteSeason>>,
-  TError,
-  { params: AdminDeleteSeasonParams },
-  TContext
-> => {
-  const mutationOptions = getAdminDeleteSeasonMutationOptions(options);
-
-  return useMutation(mutationOptions);
-};
-
-export const adminListSeason = (
-  options?: SecondParameter<typeof CustomAxiosInstance>,
-  signal?: AbortSignal
-) => {
-  return CustomAxiosInstance<AdminListSeasonResponseApiResult>(
-    { url: `https://rsp-server-test.up.railway.app/api/admin/seasons`, method: 'GET', signal },
-    options
-  );
-};
-
-export const getAdminListSeasonQueryKey = () => {
-  return [`https://rsp-server-test.up.railway.app/api/admin/seasons`] as const;
-};
-
-export const getAdminListSeasonQueryOptions = <
-  TData = Awaited<ReturnType<typeof adminListSeason>>,
-  TError = AdminListSeasonResponseApiResult,
->(options?: {
-  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof adminListSeason>>, TError, TData>>;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {};
-
-  const queryKey = queryOptions?.queryKey ?? getAdminListSeasonQueryKey();
-
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof adminListSeason>>> = ({ signal }) =>
-    adminListSeason(requestOptions, signal);
-
-  return { queryKey, queryFn, staleTime: Infinity, ...queryOptions } as UseQueryOptions<
-    Awaited<ReturnType<typeof adminListSeason>>,
-    TError,
-    TData
-  > & { queryKey: QueryKey };
-};
-
-export type AdminListSeasonQueryResult = NonNullable<Awaited<ReturnType<typeof adminListSeason>>>;
-export type AdminListSeasonQueryError = AdminListSeasonResponseApiResult;
-
-export function useAdminListSeason<
-  TData = Awaited<ReturnType<typeof adminListSeason>>,
-  TError = AdminListSeasonResponseApiResult,
->(options: {
-  query: Partial<UseQueryOptions<Awaited<ReturnType<typeof adminListSeason>>, TError, TData>> &
-    Pick<
-      DefinedInitialDataOptions<Awaited<ReturnType<typeof adminListSeason>>, TError, TData>,
-      'initialData'
-    >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): DefinedUseQueryResult<TData, TError> & { queryKey: QueryKey };
-export function useAdminListSeason<
-  TData = Awaited<ReturnType<typeof adminListSeason>>,
-  TError = AdminListSeasonResponseApiResult,
->(options?: {
-  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof adminListSeason>>, TError, TData>> &
-    Pick<
-      UndefinedInitialDataOptions<Awaited<ReturnType<typeof adminListSeason>>, TError, TData>,
-      'initialData'
-    >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseQueryResult<TData, TError> & { queryKey: QueryKey };
-export function useAdminListSeason<
-  TData = Awaited<ReturnType<typeof adminListSeason>>,
-  TError = AdminListSeasonResponseApiResult,
->(options?: {
-  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof adminListSeason>>, TError, TData>>;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseQueryResult<TData, TError> & { queryKey: QueryKey };
-
-export function useAdminListSeason<
-  TData = Awaited<ReturnType<typeof adminListSeason>>,
-  TError = AdminListSeasonResponseApiResult,
->(options?: {
-  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof adminListSeason>>, TError, TData>>;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
-  const queryOptions = getAdminListSeasonQueryOptions(options);
-
-  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & { queryKey: QueryKey };
-
-  query.queryKey = queryOptions.queryKey;
-
-  return query;
-}
-
-export const adminUpdateSeason = (
-  adminUpdateSeasonRequest: AdminUpdateSeasonRequest,
-  options?: SecondParameter<typeof CustomAxiosInstance>
-) => {
-  return CustomAxiosInstance<AdminUpdateSeasonResponseApiResult>(
-    {
-      url: `https://rsp-server-test.up.railway.app/api/admin/seasons`,
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      data: adminUpdateSeasonRequest,
-    },
-    options
-  );
-};
-
-export const getAdminUpdateSeasonMutationOptions = <
-  TError = AdminUpdateSeasonResponseApiResult,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof adminUpdateSeason>>,
-    TError,
-    { data: AdminUpdateSeasonRequest },
-    TContext
-  >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof adminUpdateSeason>>,
-  TError,
-  { data: AdminUpdateSeasonRequest },
-  TContext
-> => {
-  const { mutation: mutationOptions, request: requestOptions } = options ?? {};
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof adminUpdateSeason>>,
-    { data: AdminUpdateSeasonRequest }
-  > = (props) => {
-    const { data } = props ?? {};
-
-    return adminUpdateSeason(data, requestOptions);
-  };
-
-  return { mutationFn, ...mutationOptions };
-};
-
-export type AdminUpdateSeasonMutationResult = NonNullable<
-  Awaited<ReturnType<typeof adminUpdateSeason>>
->;
-export type AdminUpdateSeasonMutationBody = AdminUpdateSeasonRequest;
-export type AdminUpdateSeasonMutationError = AdminUpdateSeasonResponseApiResult;
-
-export const useAdminUpdateSeason = <
-  TError = AdminUpdateSeasonResponseApiResult,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof adminUpdateSeason>>,
-    TError,
-    { data: AdminUpdateSeasonRequest },
-    TContext
-  >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseMutationResult<
-  Awaited<ReturnType<typeof adminUpdateSeason>>,
-  TError,
-  { data: AdminUpdateSeasonRequest },
-  TContext
-> => {
-  const mutationOptions = getAdminUpdateSeasonMutationOptions(options);
-
-  return useMutation(mutationOptions);
-};
-
-export const createProblemAttempt = (
-  createProblemAttemptRequest: CreateProblemAttemptRequest,
-  options?: SecondParameter<typeof CustomAxiosInstance>
-) => {
-  return CustomAxiosInstance<CreateProblemAttemptResponseApiResult>(
-    {
-      url: `https://rsp-server-test.up.railway.app/api/problem-attempts`,
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      data: createProblemAttemptRequest,
-    },
-    options
-  );
-};
-
-export const getCreateProblemAttemptMutationOptions = <
-  TError = CreateProblemAttemptResponseApiResult,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof createProblemAttempt>>,
-    TError,
-    { data: CreateProblemAttemptRequest },
-    TContext
-  >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof createProblemAttempt>>,
-  TError,
-  { data: CreateProblemAttemptRequest },
-  TContext
-> => {
-  const { mutation: mutationOptions, request: requestOptions } = options ?? {};
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof createProblemAttempt>>,
-    { data: CreateProblemAttemptRequest }
-  > = (props) => {
-    const { data } = props ?? {};
-
-    return createProblemAttempt(data, requestOptions);
-  };
-
-  return { mutationFn, ...mutationOptions };
-};
-
-export type CreateProblemAttemptMutationResult = NonNullable<
-  Awaited<ReturnType<typeof createProblemAttempt>>
->;
-export type CreateProblemAttemptMutationBody = CreateProblemAttemptRequest;
-export type CreateProblemAttemptMutationError = CreateProblemAttemptResponseApiResult;
-
-export const useCreateProblemAttempt = <
-  TError = CreateProblemAttemptResponseApiResult,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof createProblemAttempt>>,
-    TError,
-    { data: CreateProblemAttemptRequest },
-    TContext
-  >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseMutationResult<
-  Awaited<ReturnType<typeof createProblemAttempt>>,
-  TError,
-  { data: CreateProblemAttemptRequest },
-  TContext
-> => {
-  const mutationOptions = getCreateProblemAttemptMutationOptions(options);
-
-  return useMutation(mutationOptions);
-};
-
-export const deleteProblemAttempt = (
-  params: DeleteProblemAttemptParams,
-  options?: SecondParameter<typeof CustomAxiosInstance>
-) => {
-  return CustomAxiosInstance<DeleteProblemAttemptResponseApiResult>(
-    {
-      url: `https://rsp-server-test.up.railway.app/api/problem-attempts`,
-      method: 'DELETE',
-      params,
-    },
-    options
-  );
-};
-
-export const getDeleteProblemAttemptMutationOptions = <
-  TError = DeleteProblemAttemptResponseApiResult,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof deleteProblemAttempt>>,
-    TError,
-    { params: DeleteProblemAttemptParams },
-    TContext
-  >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof deleteProblemAttempt>>,
-  TError,
-  { params: DeleteProblemAttemptParams },
-  TContext
-> => {
-  const { mutation: mutationOptions, request: requestOptions } = options ?? {};
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof deleteProblemAttempt>>,
-    { params: DeleteProblemAttemptParams }
-  > = (props) => {
-    const { params } = props ?? {};
-
-    return deleteProblemAttempt(params, requestOptions);
-  };
-
-  return { mutationFn, ...mutationOptions };
-};
-
-export type DeleteProblemAttemptMutationResult = NonNullable<
-  Awaited<ReturnType<typeof deleteProblemAttempt>>
->;
-
-export type DeleteProblemAttemptMutationError = DeleteProblemAttemptResponseApiResult;
-
-export const useDeleteProblemAttempt = <
-  TError = DeleteProblemAttemptResponseApiResult,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof deleteProblemAttempt>>,
-    TError,
-    { params: DeleteProblemAttemptParams },
-    TContext
-  >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseMutationResult<
-  Awaited<ReturnType<typeof deleteProblemAttempt>>,
-  TError,
-  { params: DeleteProblemAttemptParams },
-  TContext
-> => {
-  const mutationOptions = getDeleteProblemAttemptMutationOptions(options);
-
-  return useMutation(mutationOptions);
-};
-
-export const getProblemAttempts = (
-  params: GetProblemAttemptsParams,
-  options?: SecondParameter<typeof CustomAxiosInstance>,
-  signal?: AbortSignal
-) => {
-  return CustomAxiosInstance<GetProblemAttemptsResponseApiResult>(
-    {
-      url: `https://rsp-server-test.up.railway.app/api/problem-attempts`,
-      method: 'GET',
-      params,
-      signal,
-    },
-    options
-  );
-};
-
-export const getGetProblemAttemptsQueryKey = (params: GetProblemAttemptsParams) => {
-  return [
-    `https://rsp-server-test.up.railway.app/api/problem-attempts`,
-    ...(params ? [params] : []),
-  ] as const;
-};
-
-export const getGetProblemAttemptsQueryOptions = <
-  TData = Awaited<ReturnType<typeof getProblemAttempts>>,
-  TError = GetProblemAttemptsResponseApiResult,
->(
-  params: GetProblemAttemptsParams,
-  options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getProblemAttempts>>, TError, TData>>;
-    request?: SecondParameter<typeof CustomAxiosInstance>;
-  }
-) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {};
-
-  const queryKey = queryOptions?.queryKey ?? getGetProblemAttemptsQueryKey(params);
-
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof getProblemAttempts>>> = ({ signal }) =>
-    getProblemAttempts(params, requestOptions, signal);
-
-  return { queryKey, queryFn, staleTime: Infinity, ...queryOptions } as UseQueryOptions<
-    Awaited<ReturnType<typeof getProblemAttempts>>,
-    TError,
-    TData
-  > & { queryKey: QueryKey };
-};
-
-export type GetProblemAttemptsQueryResult = NonNullable<
-  Awaited<ReturnType<typeof getProblemAttempts>>
->;
-export type GetProblemAttemptsQueryError = GetProblemAttemptsResponseApiResult;
-
-export function useGetProblemAttempts<
-  TData = Awaited<ReturnType<typeof getProblemAttempts>>,
-  TError = GetProblemAttemptsResponseApiResult,
->(
-  params: GetProblemAttemptsParams,
-  options: {
-    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getProblemAttempts>>, TError, TData>> &
-      Pick<
-        DefinedInitialDataOptions<Awaited<ReturnType<typeof getProblemAttempts>>, TError, TData>,
-        'initialData'
-      >;
-    request?: SecondParameter<typeof CustomAxiosInstance>;
-  }
-): DefinedUseQueryResult<TData, TError> & { queryKey: QueryKey };
-export function useGetProblemAttempts<
-  TData = Awaited<ReturnType<typeof getProblemAttempts>>,
-  TError = GetProblemAttemptsResponseApiResult,
->(
-  params: GetProblemAttemptsParams,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getProblemAttempts>>, TError, TData>
-    > &
-      Pick<
-        UndefinedInitialDataOptions<Awaited<ReturnType<typeof getProblemAttempts>>, TError, TData>,
-        'initialData'
-      >;
-    request?: SecondParameter<typeof CustomAxiosInstance>;
-  }
-): UseQueryResult<TData, TError> & { queryKey: QueryKey };
-export function useGetProblemAttempts<
-  TData = Awaited<ReturnType<typeof getProblemAttempts>>,
-  TError = GetProblemAttemptsResponseApiResult,
->(
-  params: GetProblemAttemptsParams,
-  options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getProblemAttempts>>, TError, TData>>;
-    request?: SecondParameter<typeof CustomAxiosInstance>;
-  }
-): UseQueryResult<TData, TError> & { queryKey: QueryKey };
-
-export function useGetProblemAttempts<
-  TData = Awaited<ReturnType<typeof getProblemAttempts>>,
-  TError = GetProblemAttemptsResponseApiResult,
->(
-  params: GetProblemAttemptsParams,
-  options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getProblemAttempts>>, TError, TData>>;
-    request?: SecondParameter<typeof CustomAxiosInstance>;
-  }
-): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
-  const queryOptions = getGetProblemAttemptsQueryOptions(params, options);
-
-  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & { queryKey: QueryKey };
-
-  query.queryKey = queryOptions.queryKey;
-
-  return query;
-}
-
-export const updateProblemAttempt = (
-  updateProblemAttemptRequest: UpdateProblemAttemptRequest,
-  options?: SecondParameter<typeof CustomAxiosInstance>
-) => {
-  return CustomAxiosInstance<UpdateProblemAttemptResponseApiResult>(
-    {
-      url: `https://rsp-server-test.up.railway.app/api/problem-attempts`,
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      data: updateProblemAttemptRequest,
-    },
-    options
-  );
-};
-
-export const getUpdateProblemAttemptMutationOptions = <
-  TError = UpdateProblemAttemptResponseApiResult,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof updateProblemAttempt>>,
-    TError,
-    { data: UpdateProblemAttemptRequest },
-    TContext
-  >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof updateProblemAttempt>>,
-  TError,
-  { data: UpdateProblemAttemptRequest },
-  TContext
-> => {
-  const { mutation: mutationOptions, request: requestOptions } = options ?? {};
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof updateProblemAttempt>>,
-    { data: UpdateProblemAttemptRequest }
-  > = (props) => {
-    const { data } = props ?? {};
-
-    return updateProblemAttempt(data, requestOptions);
-  };
-
-  return { mutationFn, ...mutationOptions };
-};
-
-export type UpdateProblemAttemptMutationResult = NonNullable<
-  Awaited<ReturnType<typeof updateProblemAttempt>>
->;
-export type UpdateProblemAttemptMutationBody = UpdateProblemAttemptRequest;
-export type UpdateProblemAttemptMutationError = UpdateProblemAttemptResponseApiResult;
-
-export const useUpdateProblemAttempt = <
-  TError = UpdateProblemAttemptResponseApiResult,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof updateProblemAttempt>>,
-    TError,
-    { data: UpdateProblemAttemptRequest },
-    TContext
-  >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseMutationResult<
-  Awaited<ReturnType<typeof updateProblemAttempt>>,
-  TError,
-  { data: UpdateProblemAttemptRequest },
-  TContext
-> => {
-  const mutationOptions = getUpdateProblemAttemptMutationOptions(options);
-
-  return useMutation(mutationOptions);
-};
-
-export const createMockInterview = (
-  createMockInterviewRequest: CreateMockInterviewRequest,
-  options?: SecondParameter<typeof CustomAxiosInstance>
-) => {
-  return CustomAxiosInstance<CreateMockInterviewResponseApiResult>(
-    {
-      url: `https://rsp-server-test.up.railway.app/api/mock-interview`,
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      data: createMockInterviewRequest,
-    },
-    options
-  );
-};
-
-export const getCreateMockInterviewMutationOptions = <
-  TError = CreateMockInterviewResponseApiResult,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof createMockInterview>>,
-    TError,
-    { data: CreateMockInterviewRequest },
-    TContext
-  >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof createMockInterview>>,
-  TError,
-  { data: CreateMockInterviewRequest },
-  TContext
-> => {
-  const { mutation: mutationOptions, request: requestOptions } = options ?? {};
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof createMockInterview>>,
-    { data: CreateMockInterviewRequest }
-  > = (props) => {
-    const { data } = props ?? {};
-
-    return createMockInterview(data, requestOptions);
-  };
-
-  return { mutationFn, ...mutationOptions };
-};
-
-export type CreateMockInterviewMutationResult = NonNullable<
-  Awaited<ReturnType<typeof createMockInterview>>
->;
-export type CreateMockInterviewMutationBody = CreateMockInterviewRequest;
-export type CreateMockInterviewMutationError = CreateMockInterviewResponseApiResult;
-
-export const useCreateMockInterview = <
-  TError = CreateMockInterviewResponseApiResult,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof createMockInterview>>,
-    TError,
-    { data: CreateMockInterviewRequest },
-    TContext
-  >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseMutationResult<
-  Awaited<ReturnType<typeof createMockInterview>>,
-  TError,
-  { data: CreateMockInterviewRequest },
-  TContext
-> => {
-  const mutationOptions = getCreateMockInterviewMutationOptions(options);
-
-  return useMutation(mutationOptions);
-};
-
-export const updateMockInterview = (
-  updateMockInterviewRequest: UpdateMockInterviewRequest,
-  options?: SecondParameter<typeof CustomAxiosInstance>
-) => {
-  return CustomAxiosInstance<UpdateMockInterviewResponseApiResult>(
-    {
-      url: `https://rsp-server-test.up.railway.app/api/mock-interview`,
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      data: updateMockInterviewRequest,
-    },
-    options
-  );
-};
-
-export const getUpdateMockInterviewMutationOptions = <
-  TError = UpdateMockInterviewResponseApiResult,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof updateMockInterview>>,
-    TError,
-    { data: UpdateMockInterviewRequest },
-    TContext
-  >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof updateMockInterview>>,
-  TError,
-  { data: UpdateMockInterviewRequest },
-  TContext
-> => {
-  const { mutation: mutationOptions, request: requestOptions } = options ?? {};
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof updateMockInterview>>,
-    { data: UpdateMockInterviewRequest }
-  > = (props) => {
-    const { data } = props ?? {};
-
-    return updateMockInterview(data, requestOptions);
-  };
-
-  return { mutationFn, ...mutationOptions };
-};
-
-export type UpdateMockInterviewMutationResult = NonNullable<
-  Awaited<ReturnType<typeof updateMockInterview>>
->;
-export type UpdateMockInterviewMutationBody = UpdateMockInterviewRequest;
-export type UpdateMockInterviewMutationError = UpdateMockInterviewResponseApiResult;
-
-export const useUpdateMockInterview = <
-  TError = UpdateMockInterviewResponseApiResult,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof updateMockInterview>>,
-    TError,
-    { data: UpdateMockInterviewRequest },
-    TContext
-  >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseMutationResult<
-  Awaited<ReturnType<typeof updateMockInterview>>,
-  TError,
-  { data: UpdateMockInterviewRequest },
-  TContext
-> => {
-  const mutationOptions = getUpdateMockInterviewMutationOptions(options);
-
-  return useMutation(mutationOptions);
-};
-
-export const deleteMockInterview = (
-  params: DeleteMockInterviewParams,
-  options?: SecondParameter<typeof CustomAxiosInstance>
-) => {
-  return CustomAxiosInstance<DeleteMockInterviewResponseApiResult>(
-    { url: `https://rsp-server-test.up.railway.app/api/mock-interviews`, method: 'DELETE', params },
-    options
-  );
-};
-
-export const getDeleteMockInterviewMutationOptions = <
-  TError = DeleteMockInterviewResponseApiResult,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof deleteMockInterview>>,
-    TError,
-    { params: DeleteMockInterviewParams },
-    TContext
-  >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof deleteMockInterview>>,
-  TError,
-  { params: DeleteMockInterviewParams },
-  TContext
-> => {
-  const { mutation: mutationOptions, request: requestOptions } = options ?? {};
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof deleteMockInterview>>,
-    { params: DeleteMockInterviewParams }
-  > = (props) => {
-    const { params } = props ?? {};
-
-    return deleteMockInterview(params, requestOptions);
-  };
-
-  return { mutationFn, ...mutationOptions };
-};
-
-export type DeleteMockInterviewMutationResult = NonNullable<
-  Awaited<ReturnType<typeof deleteMockInterview>>
->;
-
-export type DeleteMockInterviewMutationError = DeleteMockInterviewResponseApiResult;
-
-export const useDeleteMockInterview = <
-  TError = DeleteMockInterviewResponseApiResult,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof deleteMockInterview>>,
-    TError,
-    { params: DeleteMockInterviewParams },
-    TContext
-  >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseMutationResult<
-  Awaited<ReturnType<typeof deleteMockInterview>>,
-  TError,
-  { params: DeleteMockInterviewParams },
-  TContext
-> => {
-  const mutationOptions = getDeleteMockInterviewMutationOptions(options);
-
-  return useMutation(mutationOptions);
-};
-
-export const getMockInterviews = (
-  params: GetMockInterviewsParams,
-  options?: SecondParameter<typeof CustomAxiosInstance>,
-  signal?: AbortSignal
-) => {
-  return CustomAxiosInstance<GetMockInterviewsResponseApiResult>(
-    {
-      url: `https://rsp-server-test.up.railway.app/api/mock-interviews`,
-      method: 'GET',
-      params,
-      signal,
-    },
-    options
-  );
-};
-
-export const getGetMockInterviewsQueryKey = (params: GetMockInterviewsParams) => {
-  return [
-    `https://rsp-server-test.up.railway.app/api/mock-interviews`,
-    ...(params ? [params] : []),
-  ] as const;
-};
-
-export const getGetMockInterviewsQueryOptions = <
-  TData = Awaited<ReturnType<typeof getMockInterviews>>,
-  TError = GetMockInterviewsResponseApiResult,
->(
-  params: GetMockInterviewsParams,
-  options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMockInterviews>>, TError, TData>>;
-    request?: SecondParameter<typeof CustomAxiosInstance>;
-  }
-) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {};
-
-  const queryKey = queryOptions?.queryKey ?? getGetMockInterviewsQueryKey(params);
-
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof getMockInterviews>>> = ({ signal }) =>
-    getMockInterviews(params, requestOptions, signal);
-
-  return { queryKey, queryFn, staleTime: Infinity, ...queryOptions } as UseQueryOptions<
-    Awaited<ReturnType<typeof getMockInterviews>>,
-    TError,
-    TData
-  > & { queryKey: QueryKey };
-};
-
-export type GetMockInterviewsQueryResult = NonNullable<
-  Awaited<ReturnType<typeof getMockInterviews>>
->;
-export type GetMockInterviewsQueryError = GetMockInterviewsResponseApiResult;
-
-export function useGetMockInterviews<
-  TData = Awaited<ReturnType<typeof getMockInterviews>>,
-  TError = GetMockInterviewsResponseApiResult,
->(
-  params: GetMockInterviewsParams,
-  options: {
-    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMockInterviews>>, TError, TData>> &
-      Pick<
-        DefinedInitialDataOptions<Awaited<ReturnType<typeof getMockInterviews>>, TError, TData>,
-        'initialData'
-      >;
-    request?: SecondParameter<typeof CustomAxiosInstance>;
-  }
-): DefinedUseQueryResult<TData, TError> & { queryKey: QueryKey };
-export function useGetMockInterviews<
-  TData = Awaited<ReturnType<typeof getMockInterviews>>,
-  TError = GetMockInterviewsResponseApiResult,
->(
-  params: GetMockInterviewsParams,
-  options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMockInterviews>>, TError, TData>> &
-      Pick<
-        UndefinedInitialDataOptions<Awaited<ReturnType<typeof getMockInterviews>>, TError, TData>,
-        'initialData'
-      >;
-    request?: SecondParameter<typeof CustomAxiosInstance>;
-  }
-): UseQueryResult<TData, TError> & { queryKey: QueryKey };
-export function useGetMockInterviews<
-  TData = Awaited<ReturnType<typeof getMockInterviews>>,
-  TError = GetMockInterviewsResponseApiResult,
->(
-  params: GetMockInterviewsParams,
-  options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMockInterviews>>, TError, TData>>;
-    request?: SecondParameter<typeof CustomAxiosInstance>;
-  }
-): UseQueryResult<TData, TError> & { queryKey: QueryKey };
-
-export function useGetMockInterviews<
-  TData = Awaited<ReturnType<typeof getMockInterviews>>,
-  TError = GetMockInterviewsResponseApiResult,
->(
-  params: GetMockInterviewsParams,
-  options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMockInterviews>>, TError, TData>>;
-    request?: SecondParameter<typeof CustomAxiosInstance>;
-  }
-): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
-  const queryOptions = getGetMockInterviewsQueryOptions(params, options);
-
-  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & { queryKey: QueryKey };
-
-  query.queryKey = queryOptions.queryKey;
-
-  return query;
-}
-
-export const adminCreateMentorship = (
-  adminCreateMentorshipRequest: AdminCreateMentorshipRequest,
-  options?: SecondParameter<typeof CustomAxiosInstance>
-) => {
-  return CustomAxiosInstance<AdminCreateMentorshipResponseApiResult>(
-    {
-      url: `https://rsp-server-test.up.railway.app/api/admin/mentorships`,
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      data: adminCreateMentorshipRequest,
-    },
-    options
-  );
-};
-
-export const getAdminCreateMentorshipMutationOptions = <
-  TError = AdminCreateMentorshipResponseApiResult,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof adminCreateMentorship>>,
-    TError,
-    { data: AdminCreateMentorshipRequest },
-    TContext
-  >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof adminCreateMentorship>>,
-  TError,
-  { data: AdminCreateMentorshipRequest },
-  TContext
-> => {
-  const { mutation: mutationOptions, request: requestOptions } = options ?? {};
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof adminCreateMentorship>>,
-    { data: AdminCreateMentorshipRequest }
-  > = (props) => {
-    const { data } = props ?? {};
-
-    return adminCreateMentorship(data, requestOptions);
-  };
-
-  return { mutationFn, ...mutationOptions };
-};
-
-export type AdminCreateMentorshipMutationResult = NonNullable<
-  Awaited<ReturnType<typeof adminCreateMentorship>>
->;
-export type AdminCreateMentorshipMutationBody = AdminCreateMentorshipRequest;
-export type AdminCreateMentorshipMutationError = AdminCreateMentorshipResponseApiResult;
-
-export const useAdminCreateMentorship = <
-  TError = AdminCreateMentorshipResponseApiResult,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof adminCreateMentorship>>,
-    TError,
-    { data: AdminCreateMentorshipRequest },
-    TContext
-  >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseMutationResult<
-  Awaited<ReturnType<typeof adminCreateMentorship>>,
-  TError,
-  { data: AdminCreateMentorshipRequest },
-  TContext
-> => {
-  const mutationOptions = getAdminCreateMentorshipMutationOptions(options);
-
-  return useMutation(mutationOptions);
-};
-
-export const adminDeleteMentorship = (
-  params: AdminDeleteMentorshipParams,
-  options?: SecondParameter<typeof CustomAxiosInstance>
-) => {
-  return CustomAxiosInstance<AdminDeleteMentorshipResponseApiResult>(
-    {
-      url: `https://rsp-server-test.up.railway.app/api/admin/mentorships`,
-      method: 'DELETE',
-      params,
-    },
-    options
-  );
-};
-
-export const getAdminDeleteMentorshipMutationOptions = <
-  TError = AdminDeleteMentorshipResponseApiResult,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof adminDeleteMentorship>>,
-    TError,
-    { params: AdminDeleteMentorshipParams },
-    TContext
-  >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof adminDeleteMentorship>>,
-  TError,
-  { params: AdminDeleteMentorshipParams },
-  TContext
-> => {
-  const { mutation: mutationOptions, request: requestOptions } = options ?? {};
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof adminDeleteMentorship>>,
-    { params: AdminDeleteMentorshipParams }
-  > = (props) => {
-    const { params } = props ?? {};
-
-    return adminDeleteMentorship(params, requestOptions);
-  };
-
-  return { mutationFn, ...mutationOptions };
-};
-
-export type AdminDeleteMentorshipMutationResult = NonNullable<
-  Awaited<ReturnType<typeof adminDeleteMentorship>>
->;
-
-export type AdminDeleteMentorshipMutationError = AdminDeleteMentorshipResponseApiResult;
-
-export const useAdminDeleteMentorship = <
-  TError = AdminDeleteMentorshipResponseApiResult,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof adminDeleteMentorship>>,
-    TError,
-    { params: AdminDeleteMentorshipParams },
-    TContext
-  >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseMutationResult<
-  Awaited<ReturnType<typeof adminDeleteMentorship>>,
-  TError,
-  { params: AdminDeleteMentorshipParams },
-  TContext
-> => {
-  const mutationOptions = getAdminDeleteMentorshipMutationOptions(options);
-
-  return useMutation(mutationOptions);
-};
-
-export const adminListMentorship = (
-  options?: SecondParameter<typeof CustomAxiosInstance>,
-  signal?: AbortSignal
-) => {
-  return CustomAxiosInstance<AdminListMentorshipResponseApiResult>(
-    { url: `https://rsp-server-test.up.railway.app/api/admin/mentorships`, method: 'GET', signal },
-    options
-  );
-};
-
-export const getAdminListMentorshipQueryKey = () => {
-  return [`https://rsp-server-test.up.railway.app/api/admin/mentorships`] as const;
-};
-
-export const getAdminListMentorshipQueryOptions = <
-  TData = Awaited<ReturnType<typeof adminListMentorship>>,
-  TError = AdminListMentorshipResponseApiResult,
->(options?: {
-  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof adminListMentorship>>, TError, TData>>;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {};
-
-  const queryKey = queryOptions?.queryKey ?? getAdminListMentorshipQueryKey();
-
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof adminListMentorship>>> = ({ signal }) =>
-    adminListMentorship(requestOptions, signal);
-
-  return { queryKey, queryFn, staleTime: Infinity, ...queryOptions } as UseQueryOptions<
-    Awaited<ReturnType<typeof adminListMentorship>>,
-    TError,
-    TData
-  > & { queryKey: QueryKey };
-};
-
-export type AdminListMentorshipQueryResult = NonNullable<
-  Awaited<ReturnType<typeof adminListMentorship>>
->;
-export type AdminListMentorshipQueryError = AdminListMentorshipResponseApiResult;
-
-export function useAdminListMentorship<
-  TData = Awaited<ReturnType<typeof adminListMentorship>>,
-  TError = AdminListMentorshipResponseApiResult,
->(options: {
-  query: Partial<UseQueryOptions<Awaited<ReturnType<typeof adminListMentorship>>, TError, TData>> &
-    Pick<
-      DefinedInitialDataOptions<Awaited<ReturnType<typeof adminListMentorship>>, TError, TData>,
-      'initialData'
-    >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): DefinedUseQueryResult<TData, TError> & { queryKey: QueryKey };
-export function useAdminListMentorship<
-  TData = Awaited<ReturnType<typeof adminListMentorship>>,
-  TError = AdminListMentorshipResponseApiResult,
->(options?: {
-  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof adminListMentorship>>, TError, TData>> &
-    Pick<
-      UndefinedInitialDataOptions<Awaited<ReturnType<typeof adminListMentorship>>, TError, TData>,
-      'initialData'
-    >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseQueryResult<TData, TError> & { queryKey: QueryKey };
-export function useAdminListMentorship<
-  TData = Awaited<ReturnType<typeof adminListMentorship>>,
-  TError = AdminListMentorshipResponseApiResult,
->(options?: {
-  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof adminListMentorship>>, TError, TData>>;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseQueryResult<TData, TError> & { queryKey: QueryKey };
-
-export function useAdminListMentorship<
-  TData = Awaited<ReturnType<typeof adminListMentorship>>,
-  TError = AdminListMentorshipResponseApiResult,
->(options?: {
-  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof adminListMentorship>>, TError, TData>>;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
-  const queryOptions = getAdminListMentorshipQueryOptions(options);
-
-  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & { queryKey: QueryKey };
-
-  query.queryKey = queryOptions.queryKey;
-
-  return query;
-}
-
-export const adminUpdateMentorship = (
-  adminUpdateMentorshipRequest: AdminUpdateMentorshipRequest,
-  options?: SecondParameter<typeof CustomAxiosInstance>
-) => {
-  return CustomAxiosInstance<AdminUpdateMentorshipResponseApiResult>(
-    {
-      url: `https://rsp-server-test.up.railway.app/api/admin/mentorships`,
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      data: adminUpdateMentorshipRequest,
-    },
-    options
-  );
-};
-
-export const getAdminUpdateMentorshipMutationOptions = <
-  TError = AdminUpdateMentorshipResponseApiResult,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof adminUpdateMentorship>>,
-    TError,
-    { data: AdminUpdateMentorshipRequest },
-    TContext
-  >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof adminUpdateMentorship>>,
-  TError,
-  { data: AdminUpdateMentorshipRequest },
-  TContext
-> => {
-  const { mutation: mutationOptions, request: requestOptions } = options ?? {};
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof adminUpdateMentorship>>,
-    { data: AdminUpdateMentorshipRequest }
-  > = (props) => {
-    const { data } = props ?? {};
-
-    return adminUpdateMentorship(data, requestOptions);
-  };
-
-  return { mutationFn, ...mutationOptions };
-};
-
-export type AdminUpdateMentorshipMutationResult = NonNullable<
-  Awaited<ReturnType<typeof adminUpdateMentorship>>
->;
-export type AdminUpdateMentorshipMutationBody = AdminUpdateMentorshipRequest;
-export type AdminUpdateMentorshipMutationError = AdminUpdateMentorshipResponseApiResult;
-
-export const useAdminUpdateMentorship = <
-  TError = AdminUpdateMentorshipResponseApiResult,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof adminUpdateMentorship>>,
-    TError,
-    { data: AdminUpdateMentorshipRequest },
-    TContext
-  >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseMutationResult<
-  Awaited<ReturnType<typeof adminUpdateMentorship>>,
-  TError,
-  { data: AdminUpdateMentorshipRequest },
-  TContext
-> => {
-  const mutationOptions = getAdminUpdateMentorshipMutationOptions(options);
-
-  return useMutation(mutationOptions);
-};
-
-export const getCurrentUserMenteesList = (
-  seasonSlug: string,
-  options?: SecondParameter<typeof CustomAxiosInstance>,
-  signal?: AbortSignal
-) => {
-  return CustomAxiosInstance<GetCurrentUserMenteesListResponseApiResult>(
-    {
-      url: `https://rsp-server-test.up.railway.app/api/mentorships/get-current-user-mentees-list/${seasonSlug}`,
-      method: 'GET',
-      signal,
-    },
-    options
-  );
-};
-
-export const getGetCurrentUserMenteesListQueryKey = (seasonSlug: string) => {
-  return [
-    `https://rsp-server-test.up.railway.app/api/mentorships/get-current-user-mentees-list/${seasonSlug}`,
-  ] as const;
-};
-
-export const getGetCurrentUserMenteesListQueryOptions = <
-  TData = Awaited<ReturnType<typeof getCurrentUserMenteesList>>,
-  TError = GetCurrentUserMenteesListResponseApiResult,
->(
-  seasonSlug: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getCurrentUserMenteesList>>, TError, TData>
-    >;
-    request?: SecondParameter<typeof CustomAxiosInstance>;
-  }
-) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {};
-
-  const queryKey = queryOptions?.queryKey ?? getGetCurrentUserMenteesListQueryKey(seasonSlug);
-
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof getCurrentUserMenteesList>>> = ({
-    signal,
-  }) => getCurrentUserMenteesList(seasonSlug, requestOptions, signal);
-
-  return {
-    queryKey,
-    queryFn,
-    enabled: !!seasonSlug,
-    staleTime: Infinity,
-    ...queryOptions,
-  } as UseQueryOptions<Awaited<ReturnType<typeof getCurrentUserMenteesList>>, TError, TData> & {
-    queryKey: QueryKey;
-  };
-};
-
-export type GetCurrentUserMenteesListQueryResult = NonNullable<
-  Awaited<ReturnType<typeof getCurrentUserMenteesList>>
->;
-export type GetCurrentUserMenteesListQueryError = GetCurrentUserMenteesListResponseApiResult;
-
-export function useGetCurrentUserMenteesList<
-  TData = Awaited<ReturnType<typeof getCurrentUserMenteesList>>,
-  TError = GetCurrentUserMenteesListResponseApiResult,
->(
-  seasonSlug: string,
-  options: {
-    query: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getCurrentUserMenteesList>>, TError, TData>
-    > &
-      Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getCurrentUserMenteesList>>,
-          TError,
-          TData
-        >,
-        'initialData'
-      >;
-    request?: SecondParameter<typeof CustomAxiosInstance>;
-  }
-): DefinedUseQueryResult<TData, TError> & { queryKey: QueryKey };
-export function useGetCurrentUserMenteesList<
-  TData = Awaited<ReturnType<typeof getCurrentUserMenteesList>>,
-  TError = GetCurrentUserMenteesListResponseApiResult,
->(
-  seasonSlug: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getCurrentUserMenteesList>>, TError, TData>
-    > &
-      Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getCurrentUserMenteesList>>,
-          TError,
-          TData
-        >,
-        'initialData'
-      >;
-    request?: SecondParameter<typeof CustomAxiosInstance>;
-  }
-): UseQueryResult<TData, TError> & { queryKey: QueryKey };
-export function useGetCurrentUserMenteesList<
-  TData = Awaited<ReturnType<typeof getCurrentUserMenteesList>>,
-  TError = GetCurrentUserMenteesListResponseApiResult,
->(
-  seasonSlug: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getCurrentUserMenteesList>>, TError, TData>
-    >;
-    request?: SecondParameter<typeof CustomAxiosInstance>;
-  }
-): UseQueryResult<TData, TError> & { queryKey: QueryKey };
-
-export function useGetCurrentUserMenteesList<
-  TData = Awaited<ReturnType<typeof getCurrentUserMenteesList>>,
-  TError = GetCurrentUserMenteesListResponseApiResult,
->(
-  seasonSlug: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof getCurrentUserMenteesList>>, TError, TData>
-    >;
-    request?: SecondParameter<typeof CustomAxiosInstance>;
-  }
-): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
-  const queryOptions = getGetCurrentUserMenteesListQueryOptions(seasonSlug, options);
-
-  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & { queryKey: QueryKey };
-
-  query.queryKey = queryOptions.queryKey;
-
-  return query;
-}
-
-export const adminPopulateLeetcodeQuestions = (
-  options?: SecondParameter<typeof CustomAxiosInstance>,
-  signal?: AbortSignal
-) => {
-  return CustomAxiosInstance<AdminPopulateLeetcodeQuestionsResponseApiResult>(
-    {
-      url: `https://rsp-server-test.up.railway.app/api/admin/leetcode/populate-questions`,
-      method: 'GET',
-      signal,
-    },
-    options
-  );
-};
-
-export const getAdminPopulateLeetcodeQuestionsQueryKey = () => {
-  return [`https://rsp-server-test.up.railway.app/api/admin/leetcode/populate-questions`] as const;
-};
-
-export const getAdminPopulateLeetcodeQuestionsQueryOptions = <
-  TData = Awaited<ReturnType<typeof adminPopulateLeetcodeQuestions>>,
-  TError = AdminPopulateLeetcodeQuestionsResponseApiResult,
->(options?: {
-  query?: Partial<
-    UseQueryOptions<Awaited<ReturnType<typeof adminPopulateLeetcodeQuestions>>, TError, TData>
-  >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {};
-
-  const queryKey = queryOptions?.queryKey ?? getAdminPopulateLeetcodeQuestionsQueryKey();
-
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof adminPopulateLeetcodeQuestions>>> = ({
-    signal,
-  }) => adminPopulateLeetcodeQuestions(requestOptions, signal);
-
-  return { queryKey, queryFn, staleTime: Infinity, ...queryOptions } as UseQueryOptions<
-    Awaited<ReturnType<typeof adminPopulateLeetcodeQuestions>>,
-    TError,
-    TData
-  > & { queryKey: QueryKey };
-};
-
-export type AdminPopulateLeetcodeQuestionsQueryResult = NonNullable<
-  Awaited<ReturnType<typeof adminPopulateLeetcodeQuestions>>
->;
-export type AdminPopulateLeetcodeQuestionsQueryError =
-  AdminPopulateLeetcodeQuestionsResponseApiResult;
-
-export function useAdminPopulateLeetcodeQuestions<
-  TData = Awaited<ReturnType<typeof adminPopulateLeetcodeQuestions>>,
-  TError = AdminPopulateLeetcodeQuestionsResponseApiResult,
->(options: {
-  query: Partial<
-    UseQueryOptions<Awaited<ReturnType<typeof adminPopulateLeetcodeQuestions>>, TError, TData>
-  > &
-    Pick<
-      DefinedInitialDataOptions<
-        Awaited<ReturnType<typeof adminPopulateLeetcodeQuestions>>,
-        TError,
-        TData
-      >,
-      'initialData'
-    >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): DefinedUseQueryResult<TData, TError> & { queryKey: QueryKey };
-export function useAdminPopulateLeetcodeQuestions<
-  TData = Awaited<ReturnType<typeof adminPopulateLeetcodeQuestions>>,
-  TError = AdminPopulateLeetcodeQuestionsResponseApiResult,
->(options?: {
-  query?: Partial<
-    UseQueryOptions<Awaited<ReturnType<typeof adminPopulateLeetcodeQuestions>>, TError, TData>
-  > &
-    Pick<
-      UndefinedInitialDataOptions<
-        Awaited<ReturnType<typeof adminPopulateLeetcodeQuestions>>,
-        TError,
-        TData
-      >,
-      'initialData'
-    >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseQueryResult<TData, TError> & { queryKey: QueryKey };
-export function useAdminPopulateLeetcodeQuestions<
-  TData = Awaited<ReturnType<typeof adminPopulateLeetcodeQuestions>>,
-  TError = AdminPopulateLeetcodeQuestionsResponseApiResult,
->(options?: {
-  query?: Partial<
-    UseQueryOptions<Awaited<ReturnType<typeof adminPopulateLeetcodeQuestions>>, TError, TData>
-  >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseQueryResult<TData, TError> & { queryKey: QueryKey };
-
-export function useAdminPopulateLeetcodeQuestions<
-  TData = Awaited<ReturnType<typeof adminPopulateLeetcodeQuestions>>,
-  TError = AdminPopulateLeetcodeQuestionsResponseApiResult,
->(options?: {
-  query?: Partial<
-    UseQueryOptions<Awaited<ReturnType<typeof adminPopulateLeetcodeQuestions>>, TError, TData>
-  >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
-  const queryOptions = getAdminPopulateLeetcodeQuestionsQueryOptions(options);
-
-  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & { queryKey: QueryKey };
-
-  query.queryKey = queryOptions.queryKey;
-
-  return query;
-}
-
-export const getLeetcodeProblems = (
-  options?: SecondParameter<typeof CustomAxiosInstance>,
-  signal?: AbortSignal
-) => {
-  return CustomAxiosInstance<GetLeetcodeProblemsResponseApiResult>(
-    { url: `https://rsp-server-test.up.railway.app/api/leetcode-problems`, method: 'GET', signal },
-    options
-  );
-};
-
-export const getGetLeetcodeProblemsQueryKey = () => {
-  return [`https://rsp-server-test.up.railway.app/api/leetcode-problems`] as const;
-};
-
-export const getGetLeetcodeProblemsQueryOptions = <
-  TData = Awaited<ReturnType<typeof getLeetcodeProblems>>,
-  TError = GetLeetcodeProblemsResponseApiResult,
->(options?: {
-  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getLeetcodeProblems>>, TError, TData>>;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {};
-
-  const queryKey = queryOptions?.queryKey ?? getGetLeetcodeProblemsQueryKey();
-
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof getLeetcodeProblems>>> = ({ signal }) =>
-    getLeetcodeProblems(requestOptions, signal);
-
-  return { queryKey, queryFn, staleTime: Infinity, ...queryOptions } as UseQueryOptions<
-    Awaited<ReturnType<typeof getLeetcodeProblems>>,
-    TError,
-    TData
-  > & { queryKey: QueryKey };
-};
-
-export type GetLeetcodeProblemsQueryResult = NonNullable<
-  Awaited<ReturnType<typeof getLeetcodeProblems>>
->;
-export type GetLeetcodeProblemsQueryError = GetLeetcodeProblemsResponseApiResult;
-
-export function useGetLeetcodeProblems<
-  TData = Awaited<ReturnType<typeof getLeetcodeProblems>>,
-  TError = GetLeetcodeProblemsResponseApiResult,
->(options: {
-  query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getLeetcodeProblems>>, TError, TData>> &
-    Pick<
-      DefinedInitialDataOptions<Awaited<ReturnType<typeof getLeetcodeProblems>>, TError, TData>,
-      'initialData'
-    >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): DefinedUseQueryResult<TData, TError> & { queryKey: QueryKey };
-export function useGetLeetcodeProblems<
-  TData = Awaited<ReturnType<typeof getLeetcodeProblems>>,
-  TError = GetLeetcodeProblemsResponseApiResult,
->(options?: {
-  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getLeetcodeProblems>>, TError, TData>> &
-    Pick<
-      UndefinedInitialDataOptions<Awaited<ReturnType<typeof getLeetcodeProblems>>, TError, TData>,
-      'initialData'
-    >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseQueryResult<TData, TError> & { queryKey: QueryKey };
-export function useGetLeetcodeProblems<
-  TData = Awaited<ReturnType<typeof getLeetcodeProblems>>,
-  TError = GetLeetcodeProblemsResponseApiResult,
->(options?: {
-  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getLeetcodeProblems>>, TError, TData>>;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseQueryResult<TData, TError> & { queryKey: QueryKey };
-
-export function useGetLeetcodeProblems<
-  TData = Awaited<ReturnType<typeof getLeetcodeProblems>>,
-  TError = GetLeetcodeProblemsResponseApiResult,
->(options?: {
-  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getLeetcodeProblems>>, TError, TData>>;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
-  const queryOptions = getGetLeetcodeProblemsQueryOptions(options);
-
-  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & { queryKey: QueryKey };
-
-  query.queryKey = queryOptions.queryKey;
-
-  return query;
-}
-
-export const getGraduates = (
-  options?: SecondParameter<typeof CustomAxiosInstance>,
-  signal?: AbortSignal
-) => {
-  return CustomAxiosInstance<GetGraduatesResponseApiResult>(
-    { url: `https://rsp-server-test.up.railway.app/api/graduates`, method: 'GET', signal },
-    options
-  );
-};
-
-export const getGetGraduatesQueryKey = () => {
-  return [`https://rsp-server-test.up.railway.app/api/graduates`] as const;
-};
-
-export const getGetGraduatesQueryOptions = <
-  TData = Awaited<ReturnType<typeof getGraduates>>,
-  TError = GetGraduatesResponseApiResult,
->(options?: {
-  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getGraduates>>, TError, TData>>;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {};
-
-  const queryKey = queryOptions?.queryKey ?? getGetGraduatesQueryKey();
-
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof getGraduates>>> = ({ signal }) =>
-    getGraduates(requestOptions, signal);
-
-  return { queryKey, queryFn, staleTime: Infinity, ...queryOptions } as UseQueryOptions<
-    Awaited<ReturnType<typeof getGraduates>>,
-    TError,
-    TData
-  > & { queryKey: QueryKey };
-};
-
-export type GetGraduatesQueryResult = NonNullable<Awaited<ReturnType<typeof getGraduates>>>;
-export type GetGraduatesQueryError = GetGraduatesResponseApiResult;
-
-export function useGetGraduates<
-  TData = Awaited<ReturnType<typeof getGraduates>>,
-  TError = GetGraduatesResponseApiResult,
->(options: {
-  query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getGraduates>>, TError, TData>> &
-    Pick<
-      DefinedInitialDataOptions<Awaited<ReturnType<typeof getGraduates>>, TError, TData>,
-      'initialData'
-    >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): DefinedUseQueryResult<TData, TError> & { queryKey: QueryKey };
-export function useGetGraduates<
-  TData = Awaited<ReturnType<typeof getGraduates>>,
-  TError = GetGraduatesResponseApiResult,
->(options?: {
-  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getGraduates>>, TError, TData>> &
-    Pick<
-      UndefinedInitialDataOptions<Awaited<ReturnType<typeof getGraduates>>, TError, TData>,
-      'initialData'
-    >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseQueryResult<TData, TError> & { queryKey: QueryKey };
-export function useGetGraduates<
-  TData = Awaited<ReturnType<typeof getGraduates>>,
-  TError = GetGraduatesResponseApiResult,
->(options?: {
-  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getGraduates>>, TError, TData>>;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseQueryResult<TData, TError> & { queryKey: QueryKey };
-
-export function useGetGraduates<
-  TData = Awaited<ReturnType<typeof getGraduates>>,
-  TError = GetGraduatesResponseApiResult,
->(options?: {
-  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getGraduates>>, TError, TData>>;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
-  const queryOptions = getGetGraduatesQueryOptions(options);
-
-  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & { queryKey: QueryKey };
-
-  query.queryKey = queryOptions.queryKey;
-
-  return query;
-}
-
 export const adminCreateEnrollment = (
   adminCreateEnrollmentRequest: AdminCreateEnrollmentRequest,
   options?: SecondParameter<typeof CustomAxiosInstance>
 ) => {
-  return CustomAxiosInstance<AdminCreateEnrollmentResponseApiResult>(
+  return CustomAxiosInstance<AdminCreateEnrollmentResponseApiResponse>(
     {
-      url: `https://rsp-server-test.up.railway.app/api/admin/enrollments`,
+      url: `https://rsp-server-test.up.railway.app/api/v1/enrollments/admin/create`,
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       data: adminCreateEnrollmentRequest,
@@ -4032,7 +1209,7 @@ export const adminCreateEnrollment = (
 };
 
 export const getAdminCreateEnrollmentMutationOptions = <
-  TError = AdminCreateEnrollmentResponseApiResult,
+  TError = unknown,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -4066,12 +1243,9 @@ export type AdminCreateEnrollmentMutationResult = NonNullable<
   Awaited<ReturnType<typeof adminCreateEnrollment>>
 >;
 export type AdminCreateEnrollmentMutationBody = AdminCreateEnrollmentRequest;
-export type AdminCreateEnrollmentMutationError = AdminCreateEnrollmentResponseApiResult;
+export type AdminCreateEnrollmentMutationError = unknown;
 
-export const useAdminCreateEnrollment = <
-  TError = AdminCreateEnrollmentResponseApiResult,
-  TContext = unknown,
->(options?: {
+export const useAdminCreateEnrollment = <TError = unknown, TContext = unknown>(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof adminCreateEnrollment>>,
     TError,
@@ -4091,45 +1265,46 @@ export const useAdminCreateEnrollment = <
 };
 
 export const adminDeleteEnrollment = (
-  params: AdminDeleteEnrollmentParams,
+  adminDeleteEnrollmentRequest: AdminDeleteEnrollmentRequest,
   options?: SecondParameter<typeof CustomAxiosInstance>
 ) => {
-  return CustomAxiosInstance<AdminDeleteEnrollmentResponseApiResult>(
+  return CustomAxiosInstance<AdminDeleteEnrollmentResponseApiResponse>(
     {
-      url: `https://rsp-server-test.up.railway.app/api/admin/enrollments`,
+      url: `https://rsp-server-test.up.railway.app/api/v1/enrollments/admin/delete`,
       method: 'DELETE',
-      params,
+      headers: { 'Content-Type': 'application/json' },
+      data: adminDeleteEnrollmentRequest,
     },
     options
   );
 };
 
 export const getAdminDeleteEnrollmentMutationOptions = <
-  TError = AdminDeleteEnrollmentResponseApiResult,
+  TError = unknown,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof adminDeleteEnrollment>>,
     TError,
-    { params: AdminDeleteEnrollmentParams },
+    { data: AdminDeleteEnrollmentRequest },
     TContext
   >;
   request?: SecondParameter<typeof CustomAxiosInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof adminDeleteEnrollment>>,
   TError,
-  { params: AdminDeleteEnrollmentParams },
+  { data: AdminDeleteEnrollmentRequest },
   TContext
 > => {
   const { mutation: mutationOptions, request: requestOptions } = options ?? {};
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof adminDeleteEnrollment>>,
-    { params: AdminDeleteEnrollmentParams }
+    { data: AdminDeleteEnrollmentRequest }
   > = (props) => {
-    const { params } = props ?? {};
+    const { data } = props ?? {};
 
-    return adminDeleteEnrollment(params, requestOptions);
+    return adminDeleteEnrollment(data, requestOptions);
   };
 
   return { mutationFn, ...mutationOptions };
@@ -4138,24 +1313,21 @@ export const getAdminDeleteEnrollmentMutationOptions = <
 export type AdminDeleteEnrollmentMutationResult = NonNullable<
   Awaited<ReturnType<typeof adminDeleteEnrollment>>
 >;
+export type AdminDeleteEnrollmentMutationBody = AdminDeleteEnrollmentRequest;
+export type AdminDeleteEnrollmentMutationError = unknown;
 
-export type AdminDeleteEnrollmentMutationError = AdminDeleteEnrollmentResponseApiResult;
-
-export const useAdminDeleteEnrollment = <
-  TError = AdminDeleteEnrollmentResponseApiResult,
-  TContext = unknown,
->(options?: {
+export const useAdminDeleteEnrollment = <TError = unknown, TContext = unknown>(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof adminDeleteEnrollment>>,
     TError,
-    { params: AdminDeleteEnrollmentParams },
+    { data: AdminDeleteEnrollmentRequest },
     TContext
   >;
   request?: SecondParameter<typeof CustomAxiosInstance>;
 }): UseMutationResult<
   Awaited<ReturnType<typeof adminDeleteEnrollment>>,
   TError,
-  { params: AdminDeleteEnrollmentParams },
+  { data: AdminDeleteEnrollmentRequest },
   TContext
 > => {
   const mutationOptions = getAdminDeleteEnrollmentMutationOptions(options);
@@ -4164,32 +1336,46 @@ export const useAdminDeleteEnrollment = <
 };
 
 export const adminListEnrollment = (
+  params?: AdminListEnrollmentParams,
   options?: SecondParameter<typeof CustomAxiosInstance>,
   signal?: AbortSignal
 ) => {
-  return CustomAxiosInstance<AdminListEnrollmentResponseApiResult>(
-    { url: `https://rsp-server-test.up.railway.app/api/admin/enrollments`, method: 'GET', signal },
+  return CustomAxiosInstance<AdminListEnrollmentResponseApiResponse>(
+    {
+      url: `https://rsp-server-test.up.railway.app/api/v1/enrollments/admin/get`,
+      method: 'GET',
+      params,
+      signal,
+    },
     options
   );
 };
 
-export const getAdminListEnrollmentQueryKey = () => {
-  return [`https://rsp-server-test.up.railway.app/api/admin/enrollments`] as const;
+export const getAdminListEnrollmentQueryKey = (params?: AdminListEnrollmentParams) => {
+  return [
+    `https://rsp-server-test.up.railway.app/api/v1/enrollments/admin/get`,
+    ...(params ? [params] : []),
+  ] as const;
 };
 
 export const getAdminListEnrollmentQueryOptions = <
   TData = Awaited<ReturnType<typeof adminListEnrollment>>,
-  TError = AdminListEnrollmentResponseApiResult,
->(options?: {
-  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof adminListEnrollment>>, TError, TData>>;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}) => {
+  TError = unknown,
+>(
+  params?: AdminListEnrollmentParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof adminListEnrollment>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+) => {
   const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey = queryOptions?.queryKey ?? getAdminListEnrollmentQueryKey();
+  const queryKey = queryOptions?.queryKey ?? getAdminListEnrollmentQueryKey(params);
 
   const queryFn: QueryFunction<Awaited<ReturnType<typeof adminListEnrollment>>> = ({ signal }) =>
-    adminListEnrollment(requestOptions, signal);
+    adminListEnrollment(params, requestOptions, signal);
 
   return { queryKey, queryFn, staleTime: Infinity, ...queryOptions } as UseQueryOptions<
     Awaited<ReturnType<typeof adminListEnrollment>>,
@@ -4201,46 +1387,66 @@ export const getAdminListEnrollmentQueryOptions = <
 export type AdminListEnrollmentQueryResult = NonNullable<
   Awaited<ReturnType<typeof adminListEnrollment>>
 >;
-export type AdminListEnrollmentQueryError = AdminListEnrollmentResponseApiResult;
+export type AdminListEnrollmentQueryError = unknown;
 
 export function useAdminListEnrollment<
   TData = Awaited<ReturnType<typeof adminListEnrollment>>,
-  TError = AdminListEnrollmentResponseApiResult,
->(options: {
-  query: Partial<UseQueryOptions<Awaited<ReturnType<typeof adminListEnrollment>>, TError, TData>> &
-    Pick<
-      DefinedInitialDataOptions<Awaited<ReturnType<typeof adminListEnrollment>>, TError, TData>,
-      'initialData'
-    >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): DefinedUseQueryResult<TData, TError> & { queryKey: QueryKey };
+  TError = unknown,
+>(
+  params: undefined | AdminListEnrollmentParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof adminListEnrollment>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<Awaited<ReturnType<typeof adminListEnrollment>>, TError, TData>,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): DefinedUseQueryResult<TData, TError> & { queryKey: QueryKey };
 export function useAdminListEnrollment<
   TData = Awaited<ReturnType<typeof adminListEnrollment>>,
-  TError = AdminListEnrollmentResponseApiResult,
->(options?: {
-  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof adminListEnrollment>>, TError, TData>> &
-    Pick<
-      UndefinedInitialDataOptions<Awaited<ReturnType<typeof adminListEnrollment>>, TError, TData>,
-      'initialData'
-    >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseQueryResult<TData, TError> & { queryKey: QueryKey };
+  TError = unknown,
+>(
+  params?: AdminListEnrollmentParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof adminListEnrollment>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<Awaited<ReturnType<typeof adminListEnrollment>>, TError, TData>,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): UseQueryResult<TData, TError> & { queryKey: QueryKey };
 export function useAdminListEnrollment<
   TData = Awaited<ReturnType<typeof adminListEnrollment>>,
-  TError = AdminListEnrollmentResponseApiResult,
->(options?: {
-  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof adminListEnrollment>>, TError, TData>>;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseQueryResult<TData, TError> & { queryKey: QueryKey };
+  TError = unknown,
+>(
+  params?: AdminListEnrollmentParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof adminListEnrollment>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): UseQueryResult<TData, TError> & { queryKey: QueryKey };
 
 export function useAdminListEnrollment<
   TData = Awaited<ReturnType<typeof adminListEnrollment>>,
-  TError = AdminListEnrollmentResponseApiResult,
->(options?: {
-  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof adminListEnrollment>>, TError, TData>>;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
-  const queryOptions = getAdminListEnrollmentQueryOptions(options);
+  TError = unknown,
+>(
+  params?: AdminListEnrollmentParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof adminListEnrollment>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getAdminListEnrollmentQueryOptions(params, options);
 
   const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & { queryKey: QueryKey };
 
@@ -4253,9 +1459,9 @@ export const adminUpdateEnrollment = (
   adminUpdateEnrollmentRequest: AdminUpdateEnrollmentRequest,
   options?: SecondParameter<typeof CustomAxiosInstance>
 ) => {
-  return CustomAxiosInstance<AdminUpdateEnrollmentResponseApiResult>(
+  return CustomAxiosInstance<AdminUpdateEnrollmentResponseApiResponse>(
     {
-      url: `https://rsp-server-test.up.railway.app/api/admin/enrollments`,
+      url: `https://rsp-server-test.up.railway.app/api/v1/enrollments/admin/update`,
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       data: adminUpdateEnrollmentRequest,
@@ -4265,7 +1471,7 @@ export const adminUpdateEnrollment = (
 };
 
 export const getAdminUpdateEnrollmentMutationOptions = <
-  TError = AdminUpdateEnrollmentResponseApiResult,
+  TError = unknown,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -4299,12 +1505,9 @@ export type AdminUpdateEnrollmentMutationResult = NonNullable<
   Awaited<ReturnType<typeof adminUpdateEnrollment>>
 >;
 export type AdminUpdateEnrollmentMutationBody = AdminUpdateEnrollmentRequest;
-export type AdminUpdateEnrollmentMutationError = AdminUpdateEnrollmentResponseApiResult;
+export type AdminUpdateEnrollmentMutationError = unknown;
 
-export const useAdminUpdateEnrollment = <
-  TError = AdminUpdateEnrollmentResponseApiResult,
-  TContext = unknown,
->(options?: {
+export const useAdminUpdateEnrollment = <TError = unknown, TContext = unknown>(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof adminUpdateEnrollment>>,
     TError,
@@ -4327,9 +1530,9 @@ export const getCurrentUserEnrollments = (
   options?: SecondParameter<typeof CustomAxiosInstance>,
   signal?: AbortSignal
 ) => {
-  return CustomAxiosInstance<GetCurrentUserEnrollmentsResponseApiResult>(
+  return CustomAxiosInstance<GetCurrentUserEnrollmentsResponseApiResponse>(
     {
-      url: `https://rsp-server-test.up.railway.app/api/enrollments/get-current-user-enrollments`,
+      url: `https://rsp-server-test.up.railway.app/api/v1/enrollments/get-current-user-enrollments`,
       method: 'GET',
       signal,
     },
@@ -4339,13 +1542,13 @@ export const getCurrentUserEnrollments = (
 
 export const getGetCurrentUserEnrollmentsQueryKey = () => {
   return [
-    `https://rsp-server-test.up.railway.app/api/enrollments/get-current-user-enrollments`,
+    `https://rsp-server-test.up.railway.app/api/v1/enrollments/get-current-user-enrollments`,
   ] as const;
 };
 
 export const getGetCurrentUserEnrollmentsQueryOptions = <
   TData = Awaited<ReturnType<typeof getCurrentUserEnrollments>>,
-  TError = GetCurrentUserEnrollmentsResponseApiResult,
+  TError = unknown,
 >(options?: {
   query?: Partial<
     UseQueryOptions<Awaited<ReturnType<typeof getCurrentUserEnrollments>>, TError, TData>
@@ -4370,11 +1573,11 @@ export const getGetCurrentUserEnrollmentsQueryOptions = <
 export type GetCurrentUserEnrollmentsQueryResult = NonNullable<
   Awaited<ReturnType<typeof getCurrentUserEnrollments>>
 >;
-export type GetCurrentUserEnrollmentsQueryError = GetCurrentUserEnrollmentsResponseApiResult;
+export type GetCurrentUserEnrollmentsQueryError = unknown;
 
 export function useGetCurrentUserEnrollments<
   TData = Awaited<ReturnType<typeof getCurrentUserEnrollments>>,
-  TError = GetCurrentUserEnrollmentsResponseApiResult,
+  TError = unknown,
 >(options: {
   query: Partial<
     UseQueryOptions<Awaited<ReturnType<typeof getCurrentUserEnrollments>>, TError, TData>
@@ -4391,7 +1594,7 @@ export function useGetCurrentUserEnrollments<
 }): DefinedUseQueryResult<TData, TError> & { queryKey: QueryKey };
 export function useGetCurrentUserEnrollments<
   TData = Awaited<ReturnType<typeof getCurrentUserEnrollments>>,
-  TError = GetCurrentUserEnrollmentsResponseApiResult,
+  TError = unknown,
 >(options?: {
   query?: Partial<
     UseQueryOptions<Awaited<ReturnType<typeof getCurrentUserEnrollments>>, TError, TData>
@@ -4408,7 +1611,7 @@ export function useGetCurrentUserEnrollments<
 }): UseQueryResult<TData, TError> & { queryKey: QueryKey };
 export function useGetCurrentUserEnrollments<
   TData = Awaited<ReturnType<typeof getCurrentUserEnrollments>>,
-  TError = GetCurrentUserEnrollmentsResponseApiResult,
+  TError = unknown,
 >(options?: {
   query?: Partial<
     UseQueryOptions<Awaited<ReturnType<typeof getCurrentUserEnrollments>>, TError, TData>
@@ -4418,7 +1621,7 @@ export function useGetCurrentUserEnrollments<
 
 export function useGetCurrentUserEnrollments<
   TData = Awaited<ReturnType<typeof getCurrentUserEnrollments>>,
-  TError = GetCurrentUserEnrollmentsResponseApiResult,
+  TError = unknown,
 >(options?: {
   query?: Partial<
     UseQueryOptions<Awaited<ReturnType<typeof getCurrentUserEnrollments>>, TError, TData>
@@ -4434,110 +1637,239 @@ export function useGetCurrentUserEnrollments<
   return query;
 }
 
-export const getIsUserEnrolled = (
-  seasonSlug: string,
+export const getIsCurrentUserEnrolled = (
+  params?: GetIsCurrentUserEnrolledParams,
   options?: SecondParameter<typeof CustomAxiosInstance>,
   signal?: AbortSignal
 ) => {
-  return CustomAxiosInstance<GetIsUserEnrolledResponseApiResult>(
+  return CustomAxiosInstance<GetIsUserEnrolledResponseApiResponse>(
     {
-      url: `https://rsp-server-test.up.railway.app/api/enrollments/get-is-user-enrolled/${seasonSlug}`,
+      url: `https://rsp-server-test.up.railway.app/api/v1/enrollments/is-current-user-enrolled`,
       method: 'GET',
+      params,
       signal,
     },
     options
   );
 };
 
-export const getGetIsUserEnrolledQueryKey = (seasonSlug: string) => {
+export const getGetIsCurrentUserEnrolledQueryKey = (params?: GetIsCurrentUserEnrolledParams) => {
   return [
-    `https://rsp-server-test.up.railway.app/api/enrollments/get-is-user-enrolled/${seasonSlug}`,
+    `https://rsp-server-test.up.railway.app/api/v1/enrollments/is-current-user-enrolled`,
+    ...(params ? [params] : []),
   ] as const;
 };
 
-export const getGetIsUserEnrolledQueryOptions = <
-  TData = Awaited<ReturnType<typeof getIsUserEnrolled>>,
-  TError = GetIsUserEnrolledResponseApiResult,
+export const getGetIsCurrentUserEnrolledQueryOptions = <
+  TData = Awaited<ReturnType<typeof getIsCurrentUserEnrolled>>,
+  TError = unknown,
 >(
-  seasonSlug: string,
+  params?: GetIsCurrentUserEnrolledParams,
   options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getIsUserEnrolled>>, TError, TData>>;
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getIsCurrentUserEnrolled>>, TError, TData>
+    >;
     request?: SecondParameter<typeof CustomAxiosInstance>;
   }
 ) => {
   const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey = queryOptions?.queryKey ?? getGetIsUserEnrolledQueryKey(seasonSlug);
+  const queryKey = queryOptions?.queryKey ?? getGetIsCurrentUserEnrolledQueryKey(params);
 
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof getIsUserEnrolled>>> = ({ signal }) =>
-    getIsUserEnrolled(seasonSlug, requestOptions, signal);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getIsCurrentUserEnrolled>>> = ({
+    signal,
+  }) => getIsCurrentUserEnrolled(params, requestOptions, signal);
 
-  return {
-    queryKey,
-    queryFn,
-    enabled: !!seasonSlug,
-    staleTime: Infinity,
-    ...queryOptions,
-  } as UseQueryOptions<Awaited<ReturnType<typeof getIsUserEnrolled>>, TError, TData> & {
-    queryKey: QueryKey;
-  };
+  return { queryKey, queryFn, staleTime: Infinity, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getIsCurrentUserEnrolled>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
 };
 
-export type GetIsUserEnrolledQueryResult = NonNullable<
-  Awaited<ReturnType<typeof getIsUserEnrolled>>
+export type GetIsCurrentUserEnrolledQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getIsCurrentUserEnrolled>>
 >;
-export type GetIsUserEnrolledQueryError = GetIsUserEnrolledResponseApiResult;
+export type GetIsCurrentUserEnrolledQueryError = unknown;
 
-export function useGetIsUserEnrolled<
-  TData = Awaited<ReturnType<typeof getIsUserEnrolled>>,
-  TError = GetIsUserEnrolledResponseApiResult,
+export function useGetIsCurrentUserEnrolled<
+  TData = Awaited<ReturnType<typeof getIsCurrentUserEnrolled>>,
+  TError = unknown,
 >(
-  seasonSlug: string,
+  params: undefined | GetIsCurrentUserEnrolledParams,
   options: {
-    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getIsUserEnrolled>>, TError, TData>> &
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getIsCurrentUserEnrolled>>, TError, TData>
+    > &
       Pick<
-        DefinedInitialDataOptions<Awaited<ReturnType<typeof getIsUserEnrolled>>, TError, TData>,
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getIsCurrentUserEnrolled>>,
+          TError,
+          TData
+        >,
         'initialData'
       >;
     request?: SecondParameter<typeof CustomAxiosInstance>;
   }
 ): DefinedUseQueryResult<TData, TError> & { queryKey: QueryKey };
-export function useGetIsUserEnrolled<
-  TData = Awaited<ReturnType<typeof getIsUserEnrolled>>,
-  TError = GetIsUserEnrolledResponseApiResult,
+export function useGetIsCurrentUserEnrolled<
+  TData = Awaited<ReturnType<typeof getIsCurrentUserEnrolled>>,
+  TError = unknown,
 >(
-  seasonSlug: string,
+  params?: GetIsCurrentUserEnrolledParams,
   options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getIsUserEnrolled>>, TError, TData>> &
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getIsCurrentUserEnrolled>>, TError, TData>
+    > &
       Pick<
-        UndefinedInitialDataOptions<Awaited<ReturnType<typeof getIsUserEnrolled>>, TError, TData>,
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getIsCurrentUserEnrolled>>,
+          TError,
+          TData
+        >,
         'initialData'
       >;
     request?: SecondParameter<typeof CustomAxiosInstance>;
   }
 ): UseQueryResult<TData, TError> & { queryKey: QueryKey };
-export function useGetIsUserEnrolled<
-  TData = Awaited<ReturnType<typeof getIsUserEnrolled>>,
-  TError = GetIsUserEnrolledResponseApiResult,
+export function useGetIsCurrentUserEnrolled<
+  TData = Awaited<ReturnType<typeof getIsCurrentUserEnrolled>>,
+  TError = unknown,
 >(
-  seasonSlug: string,
+  params?: GetIsCurrentUserEnrolledParams,
   options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getIsUserEnrolled>>, TError, TData>>;
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getIsCurrentUserEnrolled>>, TError, TData>
+    >;
     request?: SecondParameter<typeof CustomAxiosInstance>;
   }
 ): UseQueryResult<TData, TError> & { queryKey: QueryKey };
 
-export function useGetIsUserEnrolled<
-  TData = Awaited<ReturnType<typeof getIsUserEnrolled>>,
-  TError = GetIsUserEnrolledResponseApiResult,
+export function useGetIsCurrentUserEnrolled<
+  TData = Awaited<ReturnType<typeof getIsCurrentUserEnrolled>>,
+  TError = unknown,
 >(
-  seasonSlug: string,
+  params?: GetIsCurrentUserEnrolledParams,
   options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getIsUserEnrolled>>, TError, TData>>;
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getIsCurrentUserEnrolled>>, TError, TData>
+    >;
     request?: SecondParameter<typeof CustomAxiosInstance>;
   }
 ): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
-  const queryOptions = getGetIsUserEnrolledQueryOptions(seasonSlug, options);
+  const queryOptions = getGetIsCurrentUserEnrolledQueryOptions(params, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+export const getEnrollmentUsers = (
+  params: GetEnrollmentUsersParams,
+  options?: SecondParameter<typeof CustomAxiosInstance>,
+  signal?: AbortSignal
+) => {
+  return CustomAxiosInstance<GetEnrollmentUsersResponseApiResponse>(
+    {
+      url: `https://rsp-server-test.up.railway.app/api/v1/enrollments/get-enrollment-users`,
+      method: 'GET',
+      params,
+      signal,
+    },
+    options
+  );
+};
+
+export const getGetEnrollmentUsersQueryKey = (params: GetEnrollmentUsersParams) => {
+  return [
+    `https://rsp-server-test.up.railway.app/api/v1/enrollments/get-enrollment-users`,
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getGetEnrollmentUsersQueryOptions = <
+  TData = Awaited<ReturnType<typeof getEnrollmentUsers>>,
+  TError = unknown,
+>(
+  params: GetEnrollmentUsersParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getEnrollmentUsers>>, TError, TData>>;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetEnrollmentUsersQueryKey(params);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getEnrollmentUsers>>> = ({ signal }) =>
+    getEnrollmentUsers(params, requestOptions, signal);
+
+  return { queryKey, queryFn, staleTime: Infinity, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getEnrollmentUsers>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetEnrollmentUsersQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getEnrollmentUsers>>
+>;
+export type GetEnrollmentUsersQueryError = unknown;
+
+export function useGetEnrollmentUsers<
+  TData = Awaited<ReturnType<typeof getEnrollmentUsers>>,
+  TError = unknown,
+>(
+  params: GetEnrollmentUsersParams,
+  options: {
+    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getEnrollmentUsers>>, TError, TData>> &
+      Pick<
+        DefinedInitialDataOptions<Awaited<ReturnType<typeof getEnrollmentUsers>>, TError, TData>,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): DefinedUseQueryResult<TData, TError> & { queryKey: QueryKey };
+export function useGetEnrollmentUsers<
+  TData = Awaited<ReturnType<typeof getEnrollmentUsers>>,
+  TError = unknown,
+>(
+  params: GetEnrollmentUsersParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getEnrollmentUsers>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<Awaited<ReturnType<typeof getEnrollmentUsers>>, TError, TData>,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): UseQueryResult<TData, TError> & { queryKey: QueryKey };
+export function useGetEnrollmentUsers<
+  TData = Awaited<ReturnType<typeof getEnrollmentUsers>>,
+  TError = unknown,
+>(
+  params: GetEnrollmentUsersParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getEnrollmentUsers>>, TError, TData>>;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+export function useGetEnrollmentUsers<
+  TData = Awaited<ReturnType<typeof getEnrollmentUsers>>,
+  TError = unknown,
+>(
+  params: GetEnrollmentUsersParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getEnrollmentUsers>>, TError, TData>>;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetEnrollmentUsersQueryOptions(params, options);
 
   const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & { queryKey: QueryKey };
 
@@ -4550,9 +1882,9 @@ export const kickStudent = (
   kickStudentRequest: KickStudentRequest,
   options?: SecondParameter<typeof CustomAxiosInstance>
 ) => {
-  return CustomAxiosInstance<KickStudentResponseApiResult>(
+  return CustomAxiosInstance<KickStudentResponseApiResponse>(
     {
-      url: `https://rsp-server-test.up.railway.app/enrollments/kick-student`,
+      url: `https://rsp-server-test.up.railway.app/api/v1/enrollments/kick-student`,
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       data: kickStudentRequest,
@@ -4561,10 +1893,7 @@ export const kickStudent = (
   );
 };
 
-export const getKickStudentMutationOptions = <
-  TError = KickStudentResponseApiResult,
-  TContext = unknown,
->(options?: {
+export const getKickStudentMutationOptions = <TError = unknown, TContext = unknown>(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof kickStudent>>,
     TError,
@@ -4594,12 +1923,9 @@ export const getKickStudentMutationOptions = <
 
 export type KickStudentMutationResult = NonNullable<Awaited<ReturnType<typeof kickStudent>>>;
 export type KickStudentMutationBody = KickStudentRequest;
-export type KickStudentMutationError = KickStudentResponseApiResult;
+export type KickStudentMutationError = unknown;
 
-export const useKickStudent = <
-  TError = KickStudentResponseApiResult,
-  TContext = unknown,
->(options?: {
+export const useKickStudent = <TError = unknown, TContext = unknown>(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof kickStudent>>,
     TError,
@@ -4622,9 +1948,9 @@ export const updateStudentRolePromotion = (
   updateStudentRolePromotionRequest: UpdateStudentRolePromotionRequest,
   options?: SecondParameter<typeof CustomAxiosInstance>
 ) => {
-  return CustomAxiosInstance<UpdateStudentRolePromotionResponseApiResult>(
+  return CustomAxiosInstance<UpdateStudentRolePromotionResponseApiResponse>(
     {
-      url: `https://rsp-server-test.up.railway.app/enrollments/update-student-role-promotion`,
+      url: `https://rsp-server-test.up.railway.app/api/v1/enrollments/update-student-role-promotion`,
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       data: updateStudentRolePromotionRequest,
@@ -4634,7 +1960,7 @@ export const updateStudentRolePromotion = (
 };
 
 export const getUpdateStudentRolePromotionMutationOptions = <
-  TError = UpdateStudentRolePromotionResponseApiResult,
+  TError = unknown,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -4668,12 +1994,9 @@ export type UpdateStudentRolePromotionMutationResult = NonNullable<
   Awaited<ReturnType<typeof updateStudentRolePromotion>>
 >;
 export type UpdateStudentRolePromotionMutationBody = UpdateStudentRolePromotionRequest;
-export type UpdateStudentRolePromotionMutationError = UpdateStudentRolePromotionResponseApiResult;
+export type UpdateStudentRolePromotionMutationError = unknown;
 
-export const useUpdateStudentRolePromotion = <
-  TError = UpdateStudentRolePromotionResponseApiResult,
-  TContext = unknown,
->(options?: {
+export const useUpdateStudentRolePromotion = <TError = unknown, TContext = unknown>(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof updateStudentRolePromotion>>,
     TError,
@@ -4692,76 +2015,2774 @@ export const useUpdateStudentRolePromotion = <
   return useMutation(mutationOptions);
 };
 
-export const adminGenerateDummyData = (
-  adminGenerateDummyDataRequest: AdminGenerateDummyDataRequest,
-  options?: SecondParameter<typeof CustomAxiosInstance>
+export const adminPopulateLeetcodeQuestions = (
+  params?: AdminPopulateLeetcodeQuestionsParams,
+  options?: SecondParameter<typeof CustomAxiosInstance>,
+  signal?: AbortSignal
 ) => {
-  return CustomAxiosInstance<AdminGenerateDummyDataResponseApiResult>(
+  return CustomAxiosInstance<AdminPopulateLeetcodeQuestionsResponseApiResponse>(
     {
-      url: `https://rsp-server-test.up.railway.app/api/admin/generate-dummy-data`,
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      data: adminGenerateDummyDataRequest,
+      url: `https://rsp-server-test.up.railway.app/api/v1/leetcode/admin/populate-leetcode-questions`,
+      method: 'GET',
+      params,
+      signal,
     },
     options
   );
 };
 
-export const getAdminGenerateDummyDataMutationOptions = <
-  TError = AdminGenerateDummyDataResponseApiResult,
+export const getAdminPopulateLeetcodeQuestionsQueryKey = (
+  params?: AdminPopulateLeetcodeQuestionsParams
+) => {
+  return [
+    `https://rsp-server-test.up.railway.app/api/v1/leetcode/admin/populate-leetcode-questions`,
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getAdminPopulateLeetcodeQuestionsQueryOptions = <
+  TData = Awaited<ReturnType<typeof adminPopulateLeetcodeQuestions>>,
+  TError = unknown,
+>(
+  params?: AdminPopulateLeetcodeQuestionsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof adminPopulateLeetcodeQuestions>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getAdminPopulateLeetcodeQuestionsQueryKey(params);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof adminPopulateLeetcodeQuestions>>> = ({
+    signal,
+  }) => adminPopulateLeetcodeQuestions(params, requestOptions, signal);
+
+  return { queryKey, queryFn, staleTime: Infinity, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof adminPopulateLeetcodeQuestions>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type AdminPopulateLeetcodeQuestionsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof adminPopulateLeetcodeQuestions>>
+>;
+export type AdminPopulateLeetcodeQuestionsQueryError = unknown;
+
+export function useAdminPopulateLeetcodeQuestions<
+  TData = Awaited<ReturnType<typeof adminPopulateLeetcodeQuestions>>,
+  TError = unknown,
+>(
+  params: undefined | AdminPopulateLeetcodeQuestionsParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof adminPopulateLeetcodeQuestions>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof adminPopulateLeetcodeQuestions>>,
+          TError,
+          TData
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): DefinedUseQueryResult<TData, TError> & { queryKey: QueryKey };
+export function useAdminPopulateLeetcodeQuestions<
+  TData = Awaited<ReturnType<typeof adminPopulateLeetcodeQuestions>>,
+  TError = unknown,
+>(
+  params?: AdminPopulateLeetcodeQuestionsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof adminPopulateLeetcodeQuestions>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof adminPopulateLeetcodeQuestions>>,
+          TError,
+          TData
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): UseQueryResult<TData, TError> & { queryKey: QueryKey };
+export function useAdminPopulateLeetcodeQuestions<
+  TData = Awaited<ReturnType<typeof adminPopulateLeetcodeQuestions>>,
+  TError = unknown,
+>(
+  params?: AdminPopulateLeetcodeQuestionsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof adminPopulateLeetcodeQuestions>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+export function useAdminPopulateLeetcodeQuestions<
+  TData = Awaited<ReturnType<typeof adminPopulateLeetcodeQuestions>>,
+  TError = unknown,
+>(
+  params?: AdminPopulateLeetcodeQuestionsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof adminPopulateLeetcodeQuestions>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getAdminPopulateLeetcodeQuestionsQueryOptions(params, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+export const listLeetcodeProblems = (
+  params?: ListLeetcodeProblemsParams,
+  options?: SecondParameter<typeof CustomAxiosInstance>,
+  signal?: AbortSignal
+) => {
+  return CustomAxiosInstance<ListLeetcodeProblemsResponseApiResponse>(
+    {
+      url: `https://rsp-server-test.up.railway.app/api/v1/leetcode/list-leetcode-problems`,
+      method: 'GET',
+      params,
+      signal,
+    },
+    options
+  );
+};
+
+export const getListLeetcodeProblemsQueryKey = (params?: ListLeetcodeProblemsParams) => {
+  return [
+    `https://rsp-server-test.up.railway.app/api/v1/leetcode/list-leetcode-problems`,
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getListLeetcodeProblemsQueryOptions = <
+  TData = Awaited<ReturnType<typeof listLeetcodeProblems>>,
+  TError = unknown,
+>(
+  params?: ListLeetcodeProblemsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof listLeetcodeProblems>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getListLeetcodeProblemsQueryKey(params);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof listLeetcodeProblems>>> = ({ signal }) =>
+    listLeetcodeProblems(params, requestOptions, signal);
+
+  return { queryKey, queryFn, staleTime: Infinity, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listLeetcodeProblems>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type ListLeetcodeProblemsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listLeetcodeProblems>>
+>;
+export type ListLeetcodeProblemsQueryError = unknown;
+
+export function useListLeetcodeProblems<
+  TData = Awaited<ReturnType<typeof listLeetcodeProblems>>,
+  TError = unknown,
+>(
+  params: undefined | ListLeetcodeProblemsParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof listLeetcodeProblems>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<Awaited<ReturnType<typeof listLeetcodeProblems>>, TError, TData>,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): DefinedUseQueryResult<TData, TError> & { queryKey: QueryKey };
+export function useListLeetcodeProblems<
+  TData = Awaited<ReturnType<typeof listLeetcodeProblems>>,
+  TError = unknown,
+>(
+  params?: ListLeetcodeProblemsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof listLeetcodeProblems>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listLeetcodeProblems>>,
+          TError,
+          TData
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): UseQueryResult<TData, TError> & { queryKey: QueryKey };
+export function useListLeetcodeProblems<
+  TData = Awaited<ReturnType<typeof listLeetcodeProblems>>,
+  TError = unknown,
+>(
+  params?: ListLeetcodeProblemsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof listLeetcodeProblems>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+export function useListLeetcodeProblems<
+  TData = Awaited<ReturnType<typeof listLeetcodeProblems>>,
+  TError = unknown,
+>(
+  params?: ListLeetcodeProblemsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof listLeetcodeProblems>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getListLeetcodeProblemsQueryOptions(params, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+export const generateLeetcodeProblemRecommendation = (
+  generateLeetcodeProblemRecommendationRequest: GenerateLeetcodeProblemRecommendationRequest,
+  options?: SecondParameter<typeof CustomAxiosInstance>
+) => {
+  return CustomAxiosInstance<GenerateLeetcodeProblemRecommendationResponseApiResponse>(
+    {
+      url: `https://rsp-server-test.up.railway.app/api/v1/leetcode-recommendations/generate`,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      data: generateLeetcodeProblemRecommendationRequest,
+    },
+    options
+  );
+};
+
+export const getGenerateLeetcodeProblemRecommendationMutationOptions = <
+  TError = unknown,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof adminGenerateDummyData>>,
+    Awaited<ReturnType<typeof generateLeetcodeProblemRecommendation>>,
     TError,
-    { data: AdminGenerateDummyDataRequest },
+    { data: GenerateLeetcodeProblemRecommendationRequest },
     TContext
   >;
   request?: SecondParameter<typeof CustomAxiosInstance>;
 }): UseMutationOptions<
-  Awaited<ReturnType<typeof adminGenerateDummyData>>,
+  Awaited<ReturnType<typeof generateLeetcodeProblemRecommendation>>,
   TError,
-  { data: AdminGenerateDummyDataRequest },
+  { data: GenerateLeetcodeProblemRecommendationRequest },
   TContext
 > => {
   const { mutation: mutationOptions, request: requestOptions } = options ?? {};
 
   const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof adminGenerateDummyData>>,
-    { data: AdminGenerateDummyDataRequest }
+    Awaited<ReturnType<typeof generateLeetcodeProblemRecommendation>>,
+    { data: GenerateLeetcodeProblemRecommendationRequest }
   > = (props) => {
     const { data } = props ?? {};
 
-    return adminGenerateDummyData(data, requestOptions);
+    return generateLeetcodeProblemRecommendation(data, requestOptions);
   };
 
   return { mutationFn, ...mutationOptions };
 };
 
-export type AdminGenerateDummyDataMutationResult = NonNullable<
-  Awaited<ReturnType<typeof adminGenerateDummyData>>
+export type GenerateLeetcodeProblemRecommendationMutationResult = NonNullable<
+  Awaited<ReturnType<typeof generateLeetcodeProblemRecommendation>>
 >;
-export type AdminGenerateDummyDataMutationBody = AdminGenerateDummyDataRequest;
-export type AdminGenerateDummyDataMutationError = AdminGenerateDummyDataResponseApiResult;
+export type GenerateLeetcodeProblemRecommendationMutationBody =
+  GenerateLeetcodeProblemRecommendationRequest;
+export type GenerateLeetcodeProblemRecommendationMutationError = unknown;
 
-export const useAdminGenerateDummyData = <
-  TError = AdminGenerateDummyDataResponseApiResult,
+export const useGenerateLeetcodeProblemRecommendation = <
+  TError = unknown,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof adminGenerateDummyData>>,
+    Awaited<ReturnType<typeof generateLeetcodeProblemRecommendation>>,
     TError,
-    { data: AdminGenerateDummyDataRequest },
+    { data: GenerateLeetcodeProblemRecommendationRequest },
     TContext
   >;
   request?: SecondParameter<typeof CustomAxiosInstance>;
 }): UseMutationResult<
-  Awaited<ReturnType<typeof adminGenerateDummyData>>,
+  Awaited<ReturnType<typeof generateLeetcodeProblemRecommendation>>,
   TError,
-  { data: AdminGenerateDummyDataRequest },
+  { data: GenerateLeetcodeProblemRecommendationRequest },
   TContext
 > => {
-  const mutationOptions = getAdminGenerateDummyDataMutationOptions(options);
+  const mutationOptions = getGenerateLeetcodeProblemRecommendationMutationOptions(options);
 
   return useMutation(mutationOptions);
 };
+
+export const adminCreateMentorship = (
+  adminCreateMentorshipRequest: AdminCreateMentorshipRequest,
+  options?: SecondParameter<typeof CustomAxiosInstance>
+) => {
+  return CustomAxiosInstance<AdminCreateMentorshipResponseApiResponse>(
+    {
+      url: `https://rsp-server-test.up.railway.app/api/v1/mentorships/admin/create`,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      data: adminCreateMentorshipRequest,
+    },
+    options
+  );
+};
+
+export const getAdminCreateMentorshipMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof adminCreateMentorship>>,
+    TError,
+    { data: AdminCreateMentorshipRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof adminCreateMentorship>>,
+  TError,
+  { data: AdminCreateMentorshipRequest },
+  TContext
+> => {
+  const { mutation: mutationOptions, request: requestOptions } = options ?? {};
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof adminCreateMentorship>>,
+    { data: AdminCreateMentorshipRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return adminCreateMentorship(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type AdminCreateMentorshipMutationResult = NonNullable<
+  Awaited<ReturnType<typeof adminCreateMentorship>>
+>;
+export type AdminCreateMentorshipMutationBody = AdminCreateMentorshipRequest;
+export type AdminCreateMentorshipMutationError = unknown;
+
+export const useAdminCreateMentorship = <TError = unknown, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof adminCreateMentorship>>,
+    TError,
+    { data: AdminCreateMentorshipRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof adminCreateMentorship>>,
+  TError,
+  { data: AdminCreateMentorshipRequest },
+  TContext
+> => {
+  const mutationOptions = getAdminCreateMentorshipMutationOptions(options);
+
+  return useMutation(mutationOptions);
+};
+
+export const adminDeleteMentorship = (
+  adminDeleteMentorshipRequest: AdminDeleteMentorshipRequest,
+  options?: SecondParameter<typeof CustomAxiosInstance>
+) => {
+  return CustomAxiosInstance<AdminDeleteMentorshipResponseApiResponse>(
+    {
+      url: `https://rsp-server-test.up.railway.app/api/v1/mentorships/admin/delete`,
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      data: adminDeleteMentorshipRequest,
+    },
+    options
+  );
+};
+
+export const getAdminDeleteMentorshipMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof adminDeleteMentorship>>,
+    TError,
+    { data: AdminDeleteMentorshipRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof adminDeleteMentorship>>,
+  TError,
+  { data: AdminDeleteMentorshipRequest },
+  TContext
+> => {
+  const { mutation: mutationOptions, request: requestOptions } = options ?? {};
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof adminDeleteMentorship>>,
+    { data: AdminDeleteMentorshipRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return adminDeleteMentorship(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type AdminDeleteMentorshipMutationResult = NonNullable<
+  Awaited<ReturnType<typeof adminDeleteMentorship>>
+>;
+export type AdminDeleteMentorshipMutationBody = AdminDeleteMentorshipRequest;
+export type AdminDeleteMentorshipMutationError = unknown;
+
+export const useAdminDeleteMentorship = <TError = unknown, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof adminDeleteMentorship>>,
+    TError,
+    { data: AdminDeleteMentorshipRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof adminDeleteMentorship>>,
+  TError,
+  { data: AdminDeleteMentorshipRequest },
+  TContext
+> => {
+  const mutationOptions = getAdminDeleteMentorshipMutationOptions(options);
+
+  return useMutation(mutationOptions);
+};
+
+export const adminListMentorship = (
+  params?: AdminListMentorshipParams,
+  options?: SecondParameter<typeof CustomAxiosInstance>,
+  signal?: AbortSignal
+) => {
+  return CustomAxiosInstance<AdminListMentorshipResponseApiResponse>(
+    {
+      url: `https://rsp-server-test.up.railway.app/api/v1/mentorships/admin/get`,
+      method: 'GET',
+      params,
+      signal,
+    },
+    options
+  );
+};
+
+export const getAdminListMentorshipQueryKey = (params?: AdminListMentorshipParams) => {
+  return [
+    `https://rsp-server-test.up.railway.app/api/v1/mentorships/admin/get`,
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getAdminListMentorshipQueryOptions = <
+  TData = Awaited<ReturnType<typeof adminListMentorship>>,
+  TError = unknown,
+>(
+  params?: AdminListMentorshipParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof adminListMentorship>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getAdminListMentorshipQueryKey(params);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof adminListMentorship>>> = ({ signal }) =>
+    adminListMentorship(params, requestOptions, signal);
+
+  return { queryKey, queryFn, staleTime: Infinity, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof adminListMentorship>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type AdminListMentorshipQueryResult = NonNullable<
+  Awaited<ReturnType<typeof adminListMentorship>>
+>;
+export type AdminListMentorshipQueryError = unknown;
+
+export function useAdminListMentorship<
+  TData = Awaited<ReturnType<typeof adminListMentorship>>,
+  TError = unknown,
+>(
+  params: undefined | AdminListMentorshipParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof adminListMentorship>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<Awaited<ReturnType<typeof adminListMentorship>>, TError, TData>,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): DefinedUseQueryResult<TData, TError> & { queryKey: QueryKey };
+export function useAdminListMentorship<
+  TData = Awaited<ReturnType<typeof adminListMentorship>>,
+  TError = unknown,
+>(
+  params?: AdminListMentorshipParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof adminListMentorship>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<Awaited<ReturnType<typeof adminListMentorship>>, TError, TData>,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): UseQueryResult<TData, TError> & { queryKey: QueryKey };
+export function useAdminListMentorship<
+  TData = Awaited<ReturnType<typeof adminListMentorship>>,
+  TError = unknown,
+>(
+  params?: AdminListMentorshipParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof adminListMentorship>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+export function useAdminListMentorship<
+  TData = Awaited<ReturnType<typeof adminListMentorship>>,
+  TError = unknown,
+>(
+  params?: AdminListMentorshipParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof adminListMentorship>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getAdminListMentorshipQueryOptions(params, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+export const adminUpdateMentorship = (
+  adminUpdateMentorshipRequest: AdminUpdateMentorshipRequest,
+  options?: SecondParameter<typeof CustomAxiosInstance>
+) => {
+  return CustomAxiosInstance<AdminUpdateMentorshipResponseApiResponse>(
+    {
+      url: `https://rsp-server-test.up.railway.app/api/v1/mentorships/admin/update`,
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      data: adminUpdateMentorshipRequest,
+    },
+    options
+  );
+};
+
+export const getAdminUpdateMentorshipMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof adminUpdateMentorship>>,
+    TError,
+    { data: AdminUpdateMentorshipRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof adminUpdateMentorship>>,
+  TError,
+  { data: AdminUpdateMentorshipRequest },
+  TContext
+> => {
+  const { mutation: mutationOptions, request: requestOptions } = options ?? {};
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof adminUpdateMentorship>>,
+    { data: AdminUpdateMentorshipRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return adminUpdateMentorship(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type AdminUpdateMentorshipMutationResult = NonNullable<
+  Awaited<ReturnType<typeof adminUpdateMentorship>>
+>;
+export type AdminUpdateMentorshipMutationBody = AdminUpdateMentorshipRequest;
+export type AdminUpdateMentorshipMutationError = unknown;
+
+export const useAdminUpdateMentorship = <TError = unknown, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof adminUpdateMentorship>>,
+    TError,
+    { data: AdminUpdateMentorshipRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof adminUpdateMentorship>>,
+  TError,
+  { data: AdminUpdateMentorshipRequest },
+  TContext
+> => {
+  const mutationOptions = getAdminUpdateMentorshipMutationOptions(options);
+
+  return useMutation(mutationOptions);
+};
+
+export const getCurrentUserMentees = (
+  params: GetCurrentUserMenteesParams,
+  options?: SecondParameter<typeof CustomAxiosInstance>,
+  signal?: AbortSignal
+) => {
+  return CustomAxiosInstance<GetCurrentUserMenteesListResponseApiResponse>(
+    {
+      url: `https://rsp-server-test.up.railway.app/api/v1/mentorships/get-current-user-mentees`,
+      method: 'GET',
+      params,
+      signal,
+    },
+    options
+  );
+};
+
+export const getGetCurrentUserMenteesQueryKey = (params: GetCurrentUserMenteesParams) => {
+  return [
+    `https://rsp-server-test.up.railway.app/api/v1/mentorships/get-current-user-mentees`,
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getGetCurrentUserMenteesQueryOptions = <
+  TData = Awaited<ReturnType<typeof getCurrentUserMentees>>,
+  TError = unknown,
+>(
+  params: GetCurrentUserMenteesParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getCurrentUserMentees>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetCurrentUserMenteesQueryKey(params);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getCurrentUserMentees>>> = ({ signal }) =>
+    getCurrentUserMentees(params, requestOptions, signal);
+
+  return { queryKey, queryFn, staleTime: Infinity, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getCurrentUserMentees>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetCurrentUserMenteesQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getCurrentUserMentees>>
+>;
+export type GetCurrentUserMenteesQueryError = unknown;
+
+export function useGetCurrentUserMentees<
+  TData = Awaited<ReturnType<typeof getCurrentUserMentees>>,
+  TError = unknown,
+>(
+  params: GetCurrentUserMenteesParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getCurrentUserMentees>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<Awaited<ReturnType<typeof getCurrentUserMentees>>, TError, TData>,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): DefinedUseQueryResult<TData, TError> & { queryKey: QueryKey };
+export function useGetCurrentUserMentees<
+  TData = Awaited<ReturnType<typeof getCurrentUserMentees>>,
+  TError = unknown,
+>(
+  params: GetCurrentUserMenteesParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getCurrentUserMentees>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getCurrentUserMentees>>,
+          TError,
+          TData
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): UseQueryResult<TData, TError> & { queryKey: QueryKey };
+export function useGetCurrentUserMentees<
+  TData = Awaited<ReturnType<typeof getCurrentUserMentees>>,
+  TError = unknown,
+>(
+  params: GetCurrentUserMenteesParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getCurrentUserMentees>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+export function useGetCurrentUserMentees<
+  TData = Awaited<ReturnType<typeof getCurrentUserMentees>>,
+  TError = unknown,
+>(
+  params: GetCurrentUserMenteesParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getCurrentUserMentees>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetCurrentUserMenteesQueryOptions(params, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+export const createMockInterview = (
+  createMockInterviewRequest: CreateMockInterviewRequest,
+  options?: SecondParameter<typeof CustomAxiosInstance>
+) => {
+  return CustomAxiosInstance<CreateMockInterviewResponseApiResponse>(
+    {
+      url: `https://rsp-server-test.up.railway.app/api/v1/mock-interviews/create`,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      data: createMockInterviewRequest,
+    },
+    options
+  );
+};
+
+export const getCreateMockInterviewMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createMockInterview>>,
+    TError,
+    { data: CreateMockInterviewRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof createMockInterview>>,
+  TError,
+  { data: CreateMockInterviewRequest },
+  TContext
+> => {
+  const { mutation: mutationOptions, request: requestOptions } = options ?? {};
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof createMockInterview>>,
+    { data: CreateMockInterviewRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return createMockInterview(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CreateMockInterviewMutationResult = NonNullable<
+  Awaited<ReturnType<typeof createMockInterview>>
+>;
+export type CreateMockInterviewMutationBody = CreateMockInterviewRequest;
+export type CreateMockInterviewMutationError = unknown;
+
+export const useCreateMockInterview = <TError = unknown, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createMockInterview>>,
+    TError,
+    { data: CreateMockInterviewRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof createMockInterview>>,
+  TError,
+  { data: CreateMockInterviewRequest },
+  TContext
+> => {
+  const mutationOptions = getCreateMockInterviewMutationOptions(options);
+
+  return useMutation(mutationOptions);
+};
+
+export const deleteMockInterview = (
+  deleteMockInterviewRequest: DeleteMockInterviewRequest,
+  options?: SecondParameter<typeof CustomAxiosInstance>
+) => {
+  return CustomAxiosInstance<DeleteMockInterviewResponseApiResponse>(
+    {
+      url: `https://rsp-server-test.up.railway.app/api/v1/mock-interviews/delete`,
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      data: deleteMockInterviewRequest,
+    },
+    options
+  );
+};
+
+export const getDeleteMockInterviewMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteMockInterview>>,
+    TError,
+    { data: DeleteMockInterviewRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof deleteMockInterview>>,
+  TError,
+  { data: DeleteMockInterviewRequest },
+  TContext
+> => {
+  const { mutation: mutationOptions, request: requestOptions } = options ?? {};
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof deleteMockInterview>>,
+    { data: DeleteMockInterviewRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return deleteMockInterview(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type DeleteMockInterviewMutationResult = NonNullable<
+  Awaited<ReturnType<typeof deleteMockInterview>>
+>;
+export type DeleteMockInterviewMutationBody = DeleteMockInterviewRequest;
+export type DeleteMockInterviewMutationError = unknown;
+
+export const useDeleteMockInterview = <TError = unknown, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteMockInterview>>,
+    TError,
+    { data: DeleteMockInterviewRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof deleteMockInterview>>,
+  TError,
+  { data: DeleteMockInterviewRequest },
+  TContext
+> => {
+  const mutationOptions = getDeleteMockInterviewMutationOptions(options);
+
+  return useMutation(mutationOptions);
+};
+
+export const listMockInterview = (
+  params: ListMockInterviewParams,
+  options?: SecondParameter<typeof CustomAxiosInstance>,
+  signal?: AbortSignal
+) => {
+  return CustomAxiosInstance<ListMockInterviewResponseApiResponse>(
+    {
+      url: `https://rsp-server-test.up.railway.app/api/v1/mock-interviews/get`,
+      method: 'GET',
+      params,
+      signal,
+    },
+    options
+  );
+};
+
+export const getListMockInterviewQueryKey = (params: ListMockInterviewParams) => {
+  return [
+    `https://rsp-server-test.up.railway.app/api/v1/mock-interviews/get`,
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getListMockInterviewQueryOptions = <
+  TData = Awaited<ReturnType<typeof listMockInterview>>,
+  TError = unknown,
+>(
+  params: ListMockInterviewParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof listMockInterview>>, TError, TData>>;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getListMockInterviewQueryKey(params);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof listMockInterview>>> = ({ signal }) =>
+    listMockInterview(params, requestOptions, signal);
+
+  return { queryKey, queryFn, staleTime: Infinity, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listMockInterview>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type ListMockInterviewQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listMockInterview>>
+>;
+export type ListMockInterviewQueryError = unknown;
+
+export function useListMockInterview<
+  TData = Awaited<ReturnType<typeof listMockInterview>>,
+  TError = unknown,
+>(
+  params: ListMockInterviewParams,
+  options: {
+    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof listMockInterview>>, TError, TData>> &
+      Pick<
+        DefinedInitialDataOptions<Awaited<ReturnType<typeof listMockInterview>>, TError, TData>,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): DefinedUseQueryResult<TData, TError> & { queryKey: QueryKey };
+export function useListMockInterview<
+  TData = Awaited<ReturnType<typeof listMockInterview>>,
+  TError = unknown,
+>(
+  params: ListMockInterviewParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof listMockInterview>>, TError, TData>> &
+      Pick<
+        UndefinedInitialDataOptions<Awaited<ReturnType<typeof listMockInterview>>, TError, TData>,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): UseQueryResult<TData, TError> & { queryKey: QueryKey };
+export function useListMockInterview<
+  TData = Awaited<ReturnType<typeof listMockInterview>>,
+  TError = unknown,
+>(
+  params: ListMockInterviewParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof listMockInterview>>, TError, TData>>;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+export function useListMockInterview<
+  TData = Awaited<ReturnType<typeof listMockInterview>>,
+  TError = unknown,
+>(
+  params: ListMockInterviewParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof listMockInterview>>, TError, TData>>;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getListMockInterviewQueryOptions(params, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+export const updateMockInterview = (
+  updateMockInterviewRequest: UpdateMockInterviewRequest,
+  options?: SecondParameter<typeof CustomAxiosInstance>
+) => {
+  return CustomAxiosInstance<UpdateMockInterviewResponseApiResponse>(
+    {
+      url: `https://rsp-server-test.up.railway.app/api/v1/mock-interviews/update`,
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      data: updateMockInterviewRequest,
+    },
+    options
+  );
+};
+
+export const getUpdateMockInterviewMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updateMockInterview>>,
+    TError,
+    { data: UpdateMockInterviewRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof updateMockInterview>>,
+  TError,
+  { data: UpdateMockInterviewRequest },
+  TContext
+> => {
+  const { mutation: mutationOptions, request: requestOptions } = options ?? {};
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof updateMockInterview>>,
+    { data: UpdateMockInterviewRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return updateMockInterview(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type UpdateMockInterviewMutationResult = NonNullable<
+  Awaited<ReturnType<typeof updateMockInterview>>
+>;
+export type UpdateMockInterviewMutationBody = UpdateMockInterviewRequest;
+export type UpdateMockInterviewMutationError = unknown;
+
+export const useUpdateMockInterview = <TError = unknown, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updateMockInterview>>,
+    TError,
+    { data: UpdateMockInterviewRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof updateMockInterview>>,
+  TError,
+  { data: UpdateMockInterviewRequest },
+  TContext
+> => {
+  const mutationOptions = getUpdateMockInterviewMutationOptions(options);
+
+  return useMutation(mutationOptions);
+};
+
+export const createProblemAttempt = (
+  createProblemAttemptRequest: CreateProblemAttemptRequest,
+  options?: SecondParameter<typeof CustomAxiosInstance>
+) => {
+  return CustomAxiosInstance<CreateProblemAttemptResponseApiResponse>(
+    {
+      url: `https://rsp-server-test.up.railway.app/api/v1/problem-attempts/create`,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      data: createProblemAttemptRequest,
+    },
+    options
+  );
+};
+
+export const getCreateProblemAttemptMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createProblemAttempt>>,
+    TError,
+    { data: CreateProblemAttemptRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof createProblemAttempt>>,
+  TError,
+  { data: CreateProblemAttemptRequest },
+  TContext
+> => {
+  const { mutation: mutationOptions, request: requestOptions } = options ?? {};
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof createProblemAttempt>>,
+    { data: CreateProblemAttemptRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return createProblemAttempt(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CreateProblemAttemptMutationResult = NonNullable<
+  Awaited<ReturnType<typeof createProblemAttempt>>
+>;
+export type CreateProblemAttemptMutationBody = CreateProblemAttemptRequest;
+export type CreateProblemAttemptMutationError = unknown;
+
+export const useCreateProblemAttempt = <TError = unknown, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createProblemAttempt>>,
+    TError,
+    { data: CreateProblemAttemptRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof createProblemAttempt>>,
+  TError,
+  { data: CreateProblemAttemptRequest },
+  TContext
+> => {
+  const mutationOptions = getCreateProblemAttemptMutationOptions(options);
+
+  return useMutation(mutationOptions);
+};
+
+export const deleteProblemAttempt = (
+  deleteProblemAttemptRequest: DeleteProblemAttemptRequest,
+  options?: SecondParameter<typeof CustomAxiosInstance>
+) => {
+  return CustomAxiosInstance<DeleteProblemAttemptResponseApiResponse>(
+    {
+      url: `https://rsp-server-test.up.railway.app/api/v1/problem-attempts/delete`,
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      data: deleteProblemAttemptRequest,
+    },
+    options
+  );
+};
+
+export const getDeleteProblemAttemptMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteProblemAttempt>>,
+    TError,
+    { data: DeleteProblemAttemptRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof deleteProblemAttempt>>,
+  TError,
+  { data: DeleteProblemAttemptRequest },
+  TContext
+> => {
+  const { mutation: mutationOptions, request: requestOptions } = options ?? {};
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof deleteProblemAttempt>>,
+    { data: DeleteProblemAttemptRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return deleteProblemAttempt(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type DeleteProblemAttemptMutationResult = NonNullable<
+  Awaited<ReturnType<typeof deleteProblemAttempt>>
+>;
+export type DeleteProblemAttemptMutationBody = DeleteProblemAttemptRequest;
+export type DeleteProblemAttemptMutationError = unknown;
+
+export const useDeleteProblemAttempt = <TError = unknown, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteProblemAttempt>>,
+    TError,
+    { data: DeleteProblemAttemptRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof deleteProblemAttempt>>,
+  TError,
+  { data: DeleteProblemAttemptRequest },
+  TContext
+> => {
+  const mutationOptions = getDeleteProblemAttemptMutationOptions(options);
+
+  return useMutation(mutationOptions);
+};
+
+export const listProblemAttempt = (
+  params: ListProblemAttemptParams,
+  options?: SecondParameter<typeof CustomAxiosInstance>,
+  signal?: AbortSignal
+) => {
+  return CustomAxiosInstance<ListProblemAttemptResponseApiResponse>(
+    {
+      url: `https://rsp-server-test.up.railway.app/api/v1/problem-attempts/get`,
+      method: 'GET',
+      params,
+      signal,
+    },
+    options
+  );
+};
+
+export const getListProblemAttemptQueryKey = (params: ListProblemAttemptParams) => {
+  return [
+    `https://rsp-server-test.up.railway.app/api/v1/problem-attempts/get`,
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getListProblemAttemptQueryOptions = <
+  TData = Awaited<ReturnType<typeof listProblemAttempt>>,
+  TError = unknown,
+>(
+  params: ListProblemAttemptParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof listProblemAttempt>>, TError, TData>>;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getListProblemAttemptQueryKey(params);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof listProblemAttempt>>> = ({ signal }) =>
+    listProblemAttempt(params, requestOptions, signal);
+
+  return { queryKey, queryFn, staleTime: Infinity, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listProblemAttempt>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type ListProblemAttemptQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listProblemAttempt>>
+>;
+export type ListProblemAttemptQueryError = unknown;
+
+export function useListProblemAttempt<
+  TData = Awaited<ReturnType<typeof listProblemAttempt>>,
+  TError = unknown,
+>(
+  params: ListProblemAttemptParams,
+  options: {
+    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof listProblemAttempt>>, TError, TData>> &
+      Pick<
+        DefinedInitialDataOptions<Awaited<ReturnType<typeof listProblemAttempt>>, TError, TData>,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): DefinedUseQueryResult<TData, TError> & { queryKey: QueryKey };
+export function useListProblemAttempt<
+  TData = Awaited<ReturnType<typeof listProblemAttempt>>,
+  TError = unknown,
+>(
+  params: ListProblemAttemptParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof listProblemAttempt>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<Awaited<ReturnType<typeof listProblemAttempt>>, TError, TData>,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): UseQueryResult<TData, TError> & { queryKey: QueryKey };
+export function useListProblemAttempt<
+  TData = Awaited<ReturnType<typeof listProblemAttempt>>,
+  TError = unknown,
+>(
+  params: ListProblemAttemptParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof listProblemAttempt>>, TError, TData>>;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+export function useListProblemAttempt<
+  TData = Awaited<ReturnType<typeof listProblemAttempt>>,
+  TError = unknown,
+>(
+  params: ListProblemAttemptParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof listProblemAttempt>>, TError, TData>>;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getListProblemAttemptQueryOptions(params, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+export const updateProblemAttempt = (
+  updateProblemAttemptRequest: UpdateProblemAttemptRequest,
+  options?: SecondParameter<typeof CustomAxiosInstance>
+) => {
+  return CustomAxiosInstance<UpdateProblemAttemptResponseApiResponse>(
+    {
+      url: `https://rsp-server-test.up.railway.app/api/v1/problem-attempts/update`,
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      data: updateProblemAttemptRequest,
+    },
+    options
+  );
+};
+
+export const getUpdateProblemAttemptMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updateProblemAttempt>>,
+    TError,
+    { data: UpdateProblemAttemptRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof updateProblemAttempt>>,
+  TError,
+  { data: UpdateProblemAttemptRequest },
+  TContext
+> => {
+  const { mutation: mutationOptions, request: requestOptions } = options ?? {};
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof updateProblemAttempt>>,
+    { data: UpdateProblemAttemptRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return updateProblemAttempt(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type UpdateProblemAttemptMutationResult = NonNullable<
+  Awaited<ReturnType<typeof updateProblemAttempt>>
+>;
+export type UpdateProblemAttemptMutationBody = UpdateProblemAttemptRequest;
+export type UpdateProblemAttemptMutationError = unknown;
+
+export const useUpdateProblemAttempt = <TError = unknown, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updateProblemAttempt>>,
+    TError,
+    { data: UpdateProblemAttemptRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof updateProblemAttempt>>,
+  TError,
+  { data: UpdateProblemAttemptRequest },
+  TContext
+> => {
+  const mutationOptions = getUpdateProblemAttemptMutationOptions(options);
+
+  return useMutation(mutationOptions);
+};
+
+export const adminCreateSeason = (
+  adminCreateSeasonRequest: AdminCreateSeasonRequest,
+  options?: SecondParameter<typeof CustomAxiosInstance>
+) => {
+  return CustomAxiosInstance<AdminCreateSeasonResponseApiResponse>(
+    {
+      url: `https://rsp-server-test.up.railway.app/api/v1/seasons/admin/create`,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      data: adminCreateSeasonRequest,
+    },
+    options
+  );
+};
+
+export const getAdminCreateSeasonMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof adminCreateSeason>>,
+    TError,
+    { data: AdminCreateSeasonRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof adminCreateSeason>>,
+  TError,
+  { data: AdminCreateSeasonRequest },
+  TContext
+> => {
+  const { mutation: mutationOptions, request: requestOptions } = options ?? {};
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof adminCreateSeason>>,
+    { data: AdminCreateSeasonRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return adminCreateSeason(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type AdminCreateSeasonMutationResult = NonNullable<
+  Awaited<ReturnType<typeof adminCreateSeason>>
+>;
+export type AdminCreateSeasonMutationBody = AdminCreateSeasonRequest;
+export type AdminCreateSeasonMutationError = unknown;
+
+export const useAdminCreateSeason = <TError = unknown, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof adminCreateSeason>>,
+    TError,
+    { data: AdminCreateSeasonRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof adminCreateSeason>>,
+  TError,
+  { data: AdminCreateSeasonRequest },
+  TContext
+> => {
+  const mutationOptions = getAdminCreateSeasonMutationOptions(options);
+
+  return useMutation(mutationOptions);
+};
+
+export const adminDeleteSeason = (
+  adminDeleteSeasonRequest: AdminDeleteSeasonRequest,
+  options?: SecondParameter<typeof CustomAxiosInstance>
+) => {
+  return CustomAxiosInstance<AdminDeleteSeasonResponseApiResponse>(
+    {
+      url: `https://rsp-server-test.up.railway.app/api/v1/seasons/admin/delete`,
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      data: adminDeleteSeasonRequest,
+    },
+    options
+  );
+};
+
+export const getAdminDeleteSeasonMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof adminDeleteSeason>>,
+    TError,
+    { data: AdminDeleteSeasonRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof adminDeleteSeason>>,
+  TError,
+  { data: AdminDeleteSeasonRequest },
+  TContext
+> => {
+  const { mutation: mutationOptions, request: requestOptions } = options ?? {};
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof adminDeleteSeason>>,
+    { data: AdminDeleteSeasonRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return adminDeleteSeason(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type AdminDeleteSeasonMutationResult = NonNullable<
+  Awaited<ReturnType<typeof adminDeleteSeason>>
+>;
+export type AdminDeleteSeasonMutationBody = AdminDeleteSeasonRequest;
+export type AdminDeleteSeasonMutationError = unknown;
+
+export const useAdminDeleteSeason = <TError = unknown, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof adminDeleteSeason>>,
+    TError,
+    { data: AdminDeleteSeasonRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof adminDeleteSeason>>,
+  TError,
+  { data: AdminDeleteSeasonRequest },
+  TContext
+> => {
+  const mutationOptions = getAdminDeleteSeasonMutationOptions(options);
+
+  return useMutation(mutationOptions);
+};
+
+export const adminListSeason = (
+  params?: AdminListSeasonParams,
+  options?: SecondParameter<typeof CustomAxiosInstance>,
+  signal?: AbortSignal
+) => {
+  return CustomAxiosInstance<AdminListSeasonResponseApiResponse>(
+    {
+      url: `https://rsp-server-test.up.railway.app/api/v1/seasons/admin/get`,
+      method: 'GET',
+      params,
+      signal,
+    },
+    options
+  );
+};
+
+export const getAdminListSeasonQueryKey = (params?: AdminListSeasonParams) => {
+  return [
+    `https://rsp-server-test.up.railway.app/api/v1/seasons/admin/get`,
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getAdminListSeasonQueryOptions = <
+  TData = Awaited<ReturnType<typeof adminListSeason>>,
+  TError = unknown,
+>(
+  params?: AdminListSeasonParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof adminListSeason>>, TError, TData>>;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getAdminListSeasonQueryKey(params);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof adminListSeason>>> = ({ signal }) =>
+    adminListSeason(params, requestOptions, signal);
+
+  return { queryKey, queryFn, staleTime: Infinity, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof adminListSeason>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type AdminListSeasonQueryResult = NonNullable<Awaited<ReturnType<typeof adminListSeason>>>;
+export type AdminListSeasonQueryError = unknown;
+
+export function useAdminListSeason<
+  TData = Awaited<ReturnType<typeof adminListSeason>>,
+  TError = unknown,
+>(
+  params: undefined | AdminListSeasonParams,
+  options: {
+    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof adminListSeason>>, TError, TData>> &
+      Pick<
+        DefinedInitialDataOptions<Awaited<ReturnType<typeof adminListSeason>>, TError, TData>,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): DefinedUseQueryResult<TData, TError> & { queryKey: QueryKey };
+export function useAdminListSeason<
+  TData = Awaited<ReturnType<typeof adminListSeason>>,
+  TError = unknown,
+>(
+  params?: AdminListSeasonParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof adminListSeason>>, TError, TData>> &
+      Pick<
+        UndefinedInitialDataOptions<Awaited<ReturnType<typeof adminListSeason>>, TError, TData>,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): UseQueryResult<TData, TError> & { queryKey: QueryKey };
+export function useAdminListSeason<
+  TData = Awaited<ReturnType<typeof adminListSeason>>,
+  TError = unknown,
+>(
+  params?: AdminListSeasonParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof adminListSeason>>, TError, TData>>;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+export function useAdminListSeason<
+  TData = Awaited<ReturnType<typeof adminListSeason>>,
+  TError = unknown,
+>(
+  params?: AdminListSeasonParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof adminListSeason>>, TError, TData>>;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getAdminListSeasonQueryOptions(params, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+export const adminUpdateSeason = (
+  adminUpdateSeasonRequest: AdminUpdateSeasonRequest,
+  options?: SecondParameter<typeof CustomAxiosInstance>
+) => {
+  return CustomAxiosInstance<AdminUpdateSeasonResponseApiResponse>(
+    {
+      url: `https://rsp-server-test.up.railway.app/api/v1/seasons/admin/update`,
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      data: adminUpdateSeasonRequest,
+    },
+    options
+  );
+};
+
+export const getAdminUpdateSeasonMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof adminUpdateSeason>>,
+    TError,
+    { data: AdminUpdateSeasonRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof adminUpdateSeason>>,
+  TError,
+  { data: AdminUpdateSeasonRequest },
+  TContext
+> => {
+  const { mutation: mutationOptions, request: requestOptions } = options ?? {};
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof adminUpdateSeason>>,
+    { data: AdminUpdateSeasonRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return adminUpdateSeason(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type AdminUpdateSeasonMutationResult = NonNullable<
+  Awaited<ReturnType<typeof adminUpdateSeason>>
+>;
+export type AdminUpdateSeasonMutationBody = AdminUpdateSeasonRequest;
+export type AdminUpdateSeasonMutationError = unknown;
+
+export const useAdminUpdateSeason = <TError = unknown, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof adminUpdateSeason>>,
+    TError,
+    { data: AdminUpdateSeasonRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof adminUpdateSeason>>,
+  TError,
+  { data: AdminUpdateSeasonRequest },
+  TContext
+> => {
+  const mutationOptions = getAdminUpdateSeasonMutationOptions(options);
+
+  return useMutation(mutationOptions);
+};
+
+export const adminCreateSeasonWeek = (
+  adminCreateSeasonWeekRequest: AdminCreateSeasonWeekRequest,
+  options?: SecondParameter<typeof CustomAxiosInstance>
+) => {
+  return CustomAxiosInstance<AdminCreateSeasonWeekResponseApiResponse>(
+    {
+      url: `https://rsp-server-test.up.railway.app/api/v1/season-weeks/admin/create`,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      data: adminCreateSeasonWeekRequest,
+    },
+    options
+  );
+};
+
+export const getAdminCreateSeasonWeekMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof adminCreateSeasonWeek>>,
+    TError,
+    { data: AdminCreateSeasonWeekRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof adminCreateSeasonWeek>>,
+  TError,
+  { data: AdminCreateSeasonWeekRequest },
+  TContext
+> => {
+  const { mutation: mutationOptions, request: requestOptions } = options ?? {};
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof adminCreateSeasonWeek>>,
+    { data: AdminCreateSeasonWeekRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return adminCreateSeasonWeek(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type AdminCreateSeasonWeekMutationResult = NonNullable<
+  Awaited<ReturnType<typeof adminCreateSeasonWeek>>
+>;
+export type AdminCreateSeasonWeekMutationBody = AdminCreateSeasonWeekRequest;
+export type AdminCreateSeasonWeekMutationError = unknown;
+
+export const useAdminCreateSeasonWeek = <TError = unknown, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof adminCreateSeasonWeek>>,
+    TError,
+    { data: AdminCreateSeasonWeekRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof adminCreateSeasonWeek>>,
+  TError,
+  { data: AdminCreateSeasonWeekRequest },
+  TContext
+> => {
+  const mutationOptions = getAdminCreateSeasonWeekMutationOptions(options);
+
+  return useMutation(mutationOptions);
+};
+
+export const adminDeleteSeasonWeek = (
+  adminDeleteSeasonWeekRequest: AdminDeleteSeasonWeekRequest,
+  options?: SecondParameter<typeof CustomAxiosInstance>
+) => {
+  return CustomAxiosInstance<AdminDeleteSeasonWeekResponseApiResponse>(
+    {
+      url: `https://rsp-server-test.up.railway.app/api/v1/season-weeks/admin/delete`,
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      data: adminDeleteSeasonWeekRequest,
+    },
+    options
+  );
+};
+
+export const getAdminDeleteSeasonWeekMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof adminDeleteSeasonWeek>>,
+    TError,
+    { data: AdminDeleteSeasonWeekRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof adminDeleteSeasonWeek>>,
+  TError,
+  { data: AdminDeleteSeasonWeekRequest },
+  TContext
+> => {
+  const { mutation: mutationOptions, request: requestOptions } = options ?? {};
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof adminDeleteSeasonWeek>>,
+    { data: AdminDeleteSeasonWeekRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return adminDeleteSeasonWeek(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type AdminDeleteSeasonWeekMutationResult = NonNullable<
+  Awaited<ReturnType<typeof adminDeleteSeasonWeek>>
+>;
+export type AdminDeleteSeasonWeekMutationBody = AdminDeleteSeasonWeekRequest;
+export type AdminDeleteSeasonWeekMutationError = unknown;
+
+export const useAdminDeleteSeasonWeek = <TError = unknown, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof adminDeleteSeasonWeek>>,
+    TError,
+    { data: AdminDeleteSeasonWeekRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof adminDeleteSeasonWeek>>,
+  TError,
+  { data: AdminDeleteSeasonWeekRequest },
+  TContext
+> => {
+  const mutationOptions = getAdminDeleteSeasonWeekMutationOptions(options);
+
+  return useMutation(mutationOptions);
+};
+
+export const adminListSeasonWeek = (
+  params: AdminListSeasonWeekParams,
+  options?: SecondParameter<typeof CustomAxiosInstance>,
+  signal?: AbortSignal
+) => {
+  return CustomAxiosInstance<AdminListSeasonWeekResponseApiResponse>(
+    {
+      url: `https://rsp-server-test.up.railway.app/api/v1/season-weeks/admin/get`,
+      method: 'GET',
+      params,
+      signal,
+    },
+    options
+  );
+};
+
+export const getAdminListSeasonWeekQueryKey = (params: AdminListSeasonWeekParams) => {
+  return [
+    `https://rsp-server-test.up.railway.app/api/v1/season-weeks/admin/get`,
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getAdminListSeasonWeekQueryOptions = <
+  TData = Awaited<ReturnType<typeof adminListSeasonWeek>>,
+  TError = unknown,
+>(
+  params: AdminListSeasonWeekParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof adminListSeasonWeek>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getAdminListSeasonWeekQueryKey(params);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof adminListSeasonWeek>>> = ({ signal }) =>
+    adminListSeasonWeek(params, requestOptions, signal);
+
+  return { queryKey, queryFn, staleTime: Infinity, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof adminListSeasonWeek>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type AdminListSeasonWeekQueryResult = NonNullable<
+  Awaited<ReturnType<typeof adminListSeasonWeek>>
+>;
+export type AdminListSeasonWeekQueryError = unknown;
+
+export function useAdminListSeasonWeek<
+  TData = Awaited<ReturnType<typeof adminListSeasonWeek>>,
+  TError = unknown,
+>(
+  params: AdminListSeasonWeekParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof adminListSeasonWeek>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<Awaited<ReturnType<typeof adminListSeasonWeek>>, TError, TData>,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): DefinedUseQueryResult<TData, TError> & { queryKey: QueryKey };
+export function useAdminListSeasonWeek<
+  TData = Awaited<ReturnType<typeof adminListSeasonWeek>>,
+  TError = unknown,
+>(
+  params: AdminListSeasonWeekParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof adminListSeasonWeek>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<Awaited<ReturnType<typeof adminListSeasonWeek>>, TError, TData>,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): UseQueryResult<TData, TError> & { queryKey: QueryKey };
+export function useAdminListSeasonWeek<
+  TData = Awaited<ReturnType<typeof adminListSeasonWeek>>,
+  TError = unknown,
+>(
+  params: AdminListSeasonWeekParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof adminListSeasonWeek>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+export function useAdminListSeasonWeek<
+  TData = Awaited<ReturnType<typeof adminListSeasonWeek>>,
+  TError = unknown,
+>(
+  params: AdminListSeasonWeekParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof adminListSeasonWeek>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getAdminListSeasonWeekQueryOptions(params, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+export const adminUpdateSeasonWeek = (
+  adminUpdateSeasonWeekRequest: AdminUpdateSeasonWeekRequest,
+  options?: SecondParameter<typeof CustomAxiosInstance>
+) => {
+  return CustomAxiosInstance<AdminUpdateSeasonWeekResponseApiResponse>(
+    {
+      url: `https://rsp-server-test.up.railway.app/api/v1/season-weeks/admin/update`,
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      data: adminUpdateSeasonWeekRequest,
+    },
+    options
+  );
+};
+
+export const getAdminUpdateSeasonWeekMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof adminUpdateSeasonWeek>>,
+    TError,
+    { data: AdminUpdateSeasonWeekRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof adminUpdateSeasonWeek>>,
+  TError,
+  { data: AdminUpdateSeasonWeekRequest },
+  TContext
+> => {
+  const { mutation: mutationOptions, request: requestOptions } = options ?? {};
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof adminUpdateSeasonWeek>>,
+    { data: AdminUpdateSeasonWeekRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return adminUpdateSeasonWeek(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type AdminUpdateSeasonWeekMutationResult = NonNullable<
+  Awaited<ReturnType<typeof adminUpdateSeasonWeek>>
+>;
+export type AdminUpdateSeasonWeekMutationBody = AdminUpdateSeasonWeekRequest;
+export type AdminUpdateSeasonWeekMutationError = unknown;
+
+export const useAdminUpdateSeasonWeek = <TError = unknown, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof adminUpdateSeasonWeek>>,
+    TError,
+    { data: AdminUpdateSeasonWeekRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof adminUpdateSeasonWeek>>,
+  TError,
+  { data: AdminUpdateSeasonWeekRequest },
+  TContext
+> => {
+  const mutationOptions = getAdminUpdateSeasonWeekMutationOptions(options);
+
+  return useMutation(mutationOptions);
+};
+
+export const adminCreateUser = (
+  adminCreateUserRequest: AdminCreateUserRequest,
+  options?: SecondParameter<typeof CustomAxiosInstance>
+) => {
+  return CustomAxiosInstance<AdminCreateUserResponseApiResponse>(
+    {
+      url: `https://rsp-server-test.up.railway.app/api/v1/users/admin/create`,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      data: adminCreateUserRequest,
+    },
+    options
+  );
+};
+
+export const getAdminCreateUserMutationOptions = <TError = unknown, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof adminCreateUser>>,
+    TError,
+    { data: AdminCreateUserRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof adminCreateUser>>,
+  TError,
+  { data: AdminCreateUserRequest },
+  TContext
+> => {
+  const { mutation: mutationOptions, request: requestOptions } = options ?? {};
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof adminCreateUser>>,
+    { data: AdminCreateUserRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return adminCreateUser(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type AdminCreateUserMutationResult = NonNullable<
+  Awaited<ReturnType<typeof adminCreateUser>>
+>;
+export type AdminCreateUserMutationBody = AdminCreateUserRequest;
+export type AdminCreateUserMutationError = unknown;
+
+export const useAdminCreateUser = <TError = unknown, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof adminCreateUser>>,
+    TError,
+    { data: AdminCreateUserRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof adminCreateUser>>,
+  TError,
+  { data: AdminCreateUserRequest },
+  TContext
+> => {
+  const mutationOptions = getAdminCreateUserMutationOptions(options);
+
+  return useMutation(mutationOptions);
+};
+
+export const adminDeleteUser = (
+  adminDeleteUserRequest: AdminDeleteUserRequest,
+  options?: SecondParameter<typeof CustomAxiosInstance>
+) => {
+  return CustomAxiosInstance<AdminDeleteUserResponseApiResponse>(
+    {
+      url: `https://rsp-server-test.up.railway.app/api/v1/users/admin/delete`,
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      data: adminDeleteUserRequest,
+    },
+    options
+  );
+};
+
+export const getAdminDeleteUserMutationOptions = <TError = unknown, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof adminDeleteUser>>,
+    TError,
+    { data: AdminDeleteUserRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof adminDeleteUser>>,
+  TError,
+  { data: AdminDeleteUserRequest },
+  TContext
+> => {
+  const { mutation: mutationOptions, request: requestOptions } = options ?? {};
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof adminDeleteUser>>,
+    { data: AdminDeleteUserRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return adminDeleteUser(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type AdminDeleteUserMutationResult = NonNullable<
+  Awaited<ReturnType<typeof adminDeleteUser>>
+>;
+export type AdminDeleteUserMutationBody = AdminDeleteUserRequest;
+export type AdminDeleteUserMutationError = unknown;
+
+export const useAdminDeleteUser = <TError = unknown, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof adminDeleteUser>>,
+    TError,
+    { data: AdminDeleteUserRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof adminDeleteUser>>,
+  TError,
+  { data: AdminDeleteUserRequest },
+  TContext
+> => {
+  const mutationOptions = getAdminDeleteUserMutationOptions(options);
+
+  return useMutation(mutationOptions);
+};
+
+export const adminListUser = (
+  params?: AdminListUserParams,
+  options?: SecondParameter<typeof CustomAxiosInstance>,
+  signal?: AbortSignal
+) => {
+  return CustomAxiosInstance<AdminListUserResponseApiResponse>(
+    {
+      url: `https://rsp-server-test.up.railway.app/api/v1/users/admin/get`,
+      method: 'GET',
+      params,
+      signal,
+    },
+    options
+  );
+};
+
+export const getAdminListUserQueryKey = (params?: AdminListUserParams) => {
+  return [
+    `https://rsp-server-test.up.railway.app/api/v1/users/admin/get`,
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getAdminListUserQueryOptions = <
+  TData = Awaited<ReturnType<typeof adminListUser>>,
+  TError = unknown,
+>(
+  params?: AdminListUserParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof adminListUser>>, TError, TData>>;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getAdminListUserQueryKey(params);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof adminListUser>>> = ({ signal }) =>
+    adminListUser(params, requestOptions, signal);
+
+  return { queryKey, queryFn, staleTime: Infinity, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof adminListUser>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type AdminListUserQueryResult = NonNullable<Awaited<ReturnType<typeof adminListUser>>>;
+export type AdminListUserQueryError = unknown;
+
+export function useAdminListUser<
+  TData = Awaited<ReturnType<typeof adminListUser>>,
+  TError = unknown,
+>(
+  params: undefined | AdminListUserParams,
+  options: {
+    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof adminListUser>>, TError, TData>> &
+      Pick<
+        DefinedInitialDataOptions<Awaited<ReturnType<typeof adminListUser>>, TError, TData>,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): DefinedUseQueryResult<TData, TError> & { queryKey: QueryKey };
+export function useAdminListUser<
+  TData = Awaited<ReturnType<typeof adminListUser>>,
+  TError = unknown,
+>(
+  params?: AdminListUserParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof adminListUser>>, TError, TData>> &
+      Pick<
+        UndefinedInitialDataOptions<Awaited<ReturnType<typeof adminListUser>>, TError, TData>,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): UseQueryResult<TData, TError> & { queryKey: QueryKey };
+export function useAdminListUser<
+  TData = Awaited<ReturnType<typeof adminListUser>>,
+  TError = unknown,
+>(
+  params?: AdminListUserParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof adminListUser>>, TError, TData>>;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+export function useAdminListUser<
+  TData = Awaited<ReturnType<typeof adminListUser>>,
+  TError = unknown,
+>(
+  params?: AdminListUserParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof adminListUser>>, TError, TData>>;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getAdminListUserQueryOptions(params, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+export const adminUpdateUser = (
+  adminUpdateUserRequest: AdminUpdateUserRequest,
+  options?: SecondParameter<typeof CustomAxiosInstance>
+) => {
+  return CustomAxiosInstance<AdminUpdateUserResponseApiResponse>(
+    {
+      url: `https://rsp-server-test.up.railway.app/api/v1/users/admin/update`,
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      data: adminUpdateUserRequest,
+    },
+    options
+  );
+};
+
+export const getAdminUpdateUserMutationOptions = <TError = unknown, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof adminUpdateUser>>,
+    TError,
+    { data: AdminUpdateUserRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof adminUpdateUser>>,
+  TError,
+  { data: AdminUpdateUserRequest },
+  TContext
+> => {
+  const { mutation: mutationOptions, request: requestOptions } = options ?? {};
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof adminUpdateUser>>,
+    { data: AdminUpdateUserRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return adminUpdateUser(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type AdminUpdateUserMutationResult = NonNullable<
+  Awaited<ReturnType<typeof adminUpdateUser>>
+>;
+export type AdminUpdateUserMutationBody = AdminUpdateUserRequest;
+export type AdminUpdateUserMutationError = unknown;
+
+export const useAdminUpdateUser = <TError = unknown, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof adminUpdateUser>>,
+    TError,
+    { data: AdminUpdateUserRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof adminUpdateUser>>,
+  TError,
+  { data: AdminUpdateUserRequest },
+  TContext
+> => {
+  const mutationOptions = getAdminUpdateUserMutationOptions(options);
+
+  return useMutation(mutationOptions);
+};
+
+export const createUserIfNotExists = (
+  createUserIfNotExistsRequest: CreateUserIfNotExistsRequest,
+  options?: SecondParameter<typeof CustomAxiosInstance>
+) => {
+  return CustomAxiosInstance<CreateUserIfNotExistsResponseApiResponse>(
+    {
+      url: `https://rsp-server-test.up.railway.app/api/v1/users/create-user-if-not-exists`,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      data: createUserIfNotExistsRequest,
+    },
+    options
+  );
+};
+
+export const getCreateUserIfNotExistsMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createUserIfNotExists>>,
+    TError,
+    { data: CreateUserIfNotExistsRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof createUserIfNotExists>>,
+  TError,
+  { data: CreateUserIfNotExistsRequest },
+  TContext
+> => {
+  const { mutation: mutationOptions, request: requestOptions } = options ?? {};
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof createUserIfNotExists>>,
+    { data: CreateUserIfNotExistsRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return createUserIfNotExists(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CreateUserIfNotExistsMutationResult = NonNullable<
+  Awaited<ReturnType<typeof createUserIfNotExists>>
+>;
+export type CreateUserIfNotExistsMutationBody = CreateUserIfNotExistsRequest;
+export type CreateUserIfNotExistsMutationError = unknown;
+
+export const useCreateUserIfNotExists = <TError = unknown, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createUserIfNotExists>>,
+    TError,
+    { data: CreateUserIfNotExistsRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof createUserIfNotExists>>,
+  TError,
+  { data: CreateUserIfNotExistsRequest },
+  TContext
+> => {
+  const mutationOptions = getCreateUserIfNotExistsMutationOptions(options);
+
+  return useMutation(mutationOptions);
+};
+
+export const getCurrentUser = (
+  params?: GetCurrentUserParams,
+  options?: SecondParameter<typeof CustomAxiosInstance>,
+  signal?: AbortSignal
+) => {
+  return CustomAxiosInstance<GetCurrentUserResponseApiResponse>(
+    {
+      url: `https://rsp-server-test.up.railway.app/api/v1/users/get-current-user`,
+      method: 'GET',
+      params,
+      signal,
+    },
+    options
+  );
+};
+
+export const getGetCurrentUserQueryKey = (params?: GetCurrentUserParams) => {
+  return [
+    `https://rsp-server-test.up.railway.app/api/v1/users/get-current-user`,
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getGetCurrentUserQueryOptions = <
+  TData = Awaited<ReturnType<typeof getCurrentUser>>,
+  TError = unknown,
+>(
+  params?: GetCurrentUserParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getCurrentUser>>, TError, TData>>;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetCurrentUserQueryKey(params);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getCurrentUser>>> = ({ signal }) =>
+    getCurrentUser(params, requestOptions, signal);
+
+  return { queryKey, queryFn, staleTime: Infinity, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getCurrentUser>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetCurrentUserQueryResult = NonNullable<Awaited<ReturnType<typeof getCurrentUser>>>;
+export type GetCurrentUserQueryError = unknown;
+
+export function useGetCurrentUser<
+  TData = Awaited<ReturnType<typeof getCurrentUser>>,
+  TError = unknown,
+>(
+  params: undefined | GetCurrentUserParams,
+  options: {
+    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getCurrentUser>>, TError, TData>> &
+      Pick<
+        DefinedInitialDataOptions<Awaited<ReturnType<typeof getCurrentUser>>, TError, TData>,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): DefinedUseQueryResult<TData, TError> & { queryKey: QueryKey };
+export function useGetCurrentUser<
+  TData = Awaited<ReturnType<typeof getCurrentUser>>,
+  TError = unknown,
+>(
+  params?: GetCurrentUserParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getCurrentUser>>, TError, TData>> &
+      Pick<
+        UndefinedInitialDataOptions<Awaited<ReturnType<typeof getCurrentUser>>, TError, TData>,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): UseQueryResult<TData, TError> & { queryKey: QueryKey };
+export function useGetCurrentUser<
+  TData = Awaited<ReturnType<typeof getCurrentUser>>,
+  TError = unknown,
+>(
+  params?: GetCurrentUserParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getCurrentUser>>, TError, TData>>;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+export function useGetCurrentUser<
+  TData = Awaited<ReturnType<typeof getCurrentUser>>,
+  TError = unknown,
+>(
+  params?: GetCurrentUserParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getCurrentUser>>, TError, TData>>;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetCurrentUserQueryOptions(params, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+export const getUser = (
+  params: GetUserParams,
+  options?: SecondParameter<typeof CustomAxiosInstance>,
+  signal?: AbortSignal
+) => {
+  return CustomAxiosInstance<GetUserResponseApiResponse>(
+    {
+      url: `https://rsp-server-test.up.railway.app/api/v1/users/get-user`,
+      method: 'GET',
+      params,
+      signal,
+    },
+    options
+  );
+};
+
+export const getGetUserQueryKey = (params: GetUserParams) => {
+  return [
+    `https://rsp-server-test.up.railway.app/api/v1/users/get-user`,
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getGetUserQueryOptions = <
+  TData = Awaited<ReturnType<typeof getUser>>,
+  TError = unknown,
+>(
+  params: GetUserParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUser>>, TError, TData>>;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetUserQueryKey(params);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getUser>>> = ({ signal }) =>
+    getUser(params, requestOptions, signal);
+
+  return { queryKey, queryFn, staleTime: Infinity, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getUser>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetUserQueryResult = NonNullable<Awaited<ReturnType<typeof getUser>>>;
+export type GetUserQueryError = unknown;
+
+export function useGetUser<TData = Awaited<ReturnType<typeof getUser>>, TError = unknown>(
+  params: GetUserParams,
+  options: {
+    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUser>>, TError, TData>> &
+      Pick<
+        DefinedInitialDataOptions<Awaited<ReturnType<typeof getUser>>, TError, TData>,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): DefinedUseQueryResult<TData, TError> & { queryKey: QueryKey };
+export function useGetUser<TData = Awaited<ReturnType<typeof getUser>>, TError = unknown>(
+  params: GetUserParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUser>>, TError, TData>> &
+      Pick<
+        UndefinedInitialDataOptions<Awaited<ReturnType<typeof getUser>>, TError, TData>,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): UseQueryResult<TData, TError> & { queryKey: QueryKey };
+export function useGetUser<TData = Awaited<ReturnType<typeof getUser>>, TError = unknown>(
+  params: GetUserParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUser>>, TError, TData>>;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+export function useGetUser<TData = Awaited<ReturnType<typeof getUser>>, TError = unknown>(
+  params: GetUserParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUser>>, TError, TData>>;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetUserQueryOptions(params, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+export const getGraduates = (
+  params?: GetGraduatesParams,
+  options?: SecondParameter<typeof CustomAxiosInstance>,
+  signal?: AbortSignal
+) => {
+  return CustomAxiosInstance<GetGraduatesResponseApiResponse>(
+    {
+      url: `https://rsp-server-test.up.railway.app/api/v1/users/get-graduates`,
+      method: 'GET',
+      params,
+      signal,
+    },
+    options
+  );
+};
+
+export const getGetGraduatesQueryKey = (params?: GetGraduatesParams) => {
+  return [
+    `https://rsp-server-test.up.railway.app/api/v1/users/get-graduates`,
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getGetGraduatesQueryOptions = <
+  TData = Awaited<ReturnType<typeof getGraduates>>,
+  TError = unknown,
+>(
+  params?: GetGraduatesParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getGraduates>>, TError, TData>>;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetGraduatesQueryKey(params);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getGraduates>>> = ({ signal }) =>
+    getGraduates(params, requestOptions, signal);
+
+  return { queryKey, queryFn, staleTime: Infinity, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getGraduates>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetGraduatesQueryResult = NonNullable<Awaited<ReturnType<typeof getGraduates>>>;
+export type GetGraduatesQueryError = unknown;
+
+export function useGetGraduates<TData = Awaited<ReturnType<typeof getGraduates>>, TError = unknown>(
+  params: undefined | GetGraduatesParams,
+  options: {
+    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getGraduates>>, TError, TData>> &
+      Pick<
+        DefinedInitialDataOptions<Awaited<ReturnType<typeof getGraduates>>, TError, TData>,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): DefinedUseQueryResult<TData, TError> & { queryKey: QueryKey };
+export function useGetGraduates<TData = Awaited<ReturnType<typeof getGraduates>>, TError = unknown>(
+  params?: GetGraduatesParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getGraduates>>, TError, TData>> &
+      Pick<
+        UndefinedInitialDataOptions<Awaited<ReturnType<typeof getGraduates>>, TError, TData>,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): UseQueryResult<TData, TError> & { queryKey: QueryKey };
+export function useGetGraduates<TData = Awaited<ReturnType<typeof getGraduates>>, TError = unknown>(
+  params?: GetGraduatesParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getGraduates>>, TError, TData>>;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+export function useGetGraduates<TData = Awaited<ReturnType<typeof getGraduates>>, TError = unknown>(
+  params?: GetGraduatesParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getGraduates>>, TError, TData>>;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetGraduatesQueryOptions(params, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}

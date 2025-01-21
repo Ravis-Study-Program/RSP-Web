@@ -4,7 +4,7 @@ import SeasonRoleViewRouter from './SeasonRoleViewRouter';
 
 const mocks = vi.hoisted(() => ({
   useParams: vi.fn(),
-  useGetIsUserEnrolled: vi.fn(),
+  useGetIsCurrentUserEnrolled: vi.fn(),
 }));
 
 vi.mock('react-router-dom', () => ({
@@ -12,7 +12,7 @@ vi.mock('react-router-dom', () => ({
 }));
 
 vi.mock('@/generated/api/client', () => ({
-  useGetIsUserEnrolled: mocks.useGetIsUserEnrolled,
+  useGetIsCurrentUserEnrolled: mocks.useGetIsCurrentUserEnrolled,
   SeasonRole: {
     Student: 'Student',
     Mentor: 'Mentor',
@@ -31,7 +31,7 @@ describe('SeasonRoleViewRouter', () => {
 
   it('renders NotFoundPage if seasonSlug is not present', () => {
     mocks.useParams.mockReturnValue({ seasonSlug: undefined });
-    mocks.useGetIsUserEnrolled.mockReturnValue({
+    mocks.useGetIsCurrentUserEnrolled.mockReturnValue({
       isLoading: false,
       isFetching: false,
       isError: false,
@@ -45,7 +45,7 @@ describe('SeasonRoleViewRouter', () => {
 
   it('renders null while loading or fetching', () => {
     mocks.useParams.mockReturnValue({ seasonSlug: 'test-season-slug' });
-    mocks.useGetIsUserEnrolled.mockReturnValue({
+    mocks.useGetIsCurrentUserEnrolled.mockReturnValue({
       isLoading: true,
       isFetching: true,
       isError: false,
@@ -58,7 +58,7 @@ describe('SeasonRoleViewRouter', () => {
 
   it('renders NotFoundPage if the user is not enrolled', () => {
     mocks.useParams.mockReturnValue({ seasonSlug: 'test-season-slug' });
-    mocks.useGetIsUserEnrolled.mockReturnValue({
+    mocks.useGetIsCurrentUserEnrolled.mockReturnValue({
       isLoading: false,
       isFetching: false,
       isError: false,
@@ -74,7 +74,7 @@ describe('SeasonRoleViewRouter', () => {
 
   it('renders studentView for Student role', () => {
     mocks.useParams.mockReturnValue({ seasonSlug: 'test-season-slug' });
-    mocks.useGetIsUserEnrolled.mockReturnValue({
+    mocks.useGetIsCurrentUserEnrolled.mockReturnValue({
       isLoading: false,
       isFetching: false,
       isError: false,
@@ -93,7 +93,7 @@ describe('SeasonRoleViewRouter', () => {
 
   it('renders mentorView for Mentor role', () => {
     mocks.useParams.mockReturnValue({ seasonSlug: 'test-season-slug' });
-    mocks.useGetIsUserEnrolled.mockReturnValue({
+    mocks.useGetIsCurrentUserEnrolled.mockReturnValue({
       isLoading: false,
       isFetching: false,
       isError: false,
@@ -110,7 +110,7 @@ describe('SeasonRoleViewRouter', () => {
 
   it('renders coordinatorView for Coordinator role', () => {
     mocks.useParams.mockReturnValue({ seasonSlug: 'test-season-slug' });
-    mocks.useGetIsUserEnrolled.mockReturnValue({
+    mocks.useGetIsCurrentUserEnrolled.mockReturnValue({
       isLoading: false,
       isFetching: false,
       isError: false,
@@ -131,7 +131,7 @@ describe('SeasonRoleViewRouter', () => {
 
   it('renders NotFoundPage if the role is invalid or no view is provided', () => {
     mocks.useParams.mockReturnValue({ seasonSlug: 'test-season-slug' });
-    mocks.useGetIsUserEnrolled.mockReturnValue({
+    mocks.useGetIsCurrentUserEnrolled.mockReturnValue({
       isLoading: false,
       isFetching: false,
       isError: false,

@@ -8,8 +8,8 @@ import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import {
   AdminCreateSeasonRequest,
-  AdminCreateSeasonResponseApiResult,
-  AdminListSeasonResponseApiResult,
+  AdminCreateSeasonResponseApiResponse,
+  AdminListSeasonResponseApiResponse,
   SeasonEntity,
 } from '@/generated/api/client';
 
@@ -82,7 +82,7 @@ export const AdminSeasonsCreateModal = ({
         message: 'Season created successfully.',
       });
     } catch (err) {
-      const response = (err as any)?.response.data as AdminCreateSeasonResponseApiResult;
+      const response = (err as any)?.response.data as AdminCreateSeasonResponseApiResponse;
       notifications.show({
         color: 'red',
         title: 'Error',
@@ -177,8 +177,8 @@ export const AdminSeasonsCreateModal = ({
 type AdminSeasonsCreateModalProps = {
   table: MRT_TableInstance<SeasonEntity>;
   createSeason: UseMutateAsyncFunction<
-    AdminCreateSeasonResponseApiResult,
-    AdminCreateSeasonResponseApiResult,
+    AdminCreateSeasonResponseApiResponse,
+    unknown,
     {
       data: AdminCreateSeasonRequest;
     },
@@ -186,7 +186,5 @@ type AdminSeasonsCreateModalProps = {
   >;
   refetchSeasons: (
     options?: RefetchOptions
-  ) => Promise<
-    QueryObserverResult<AdminListSeasonResponseApiResult, AdminListSeasonResponseApiResult>
-  >;
+  ) => Promise<QueryObserverResult<AdminListSeasonResponseApiResponse, unknown>>;
 };

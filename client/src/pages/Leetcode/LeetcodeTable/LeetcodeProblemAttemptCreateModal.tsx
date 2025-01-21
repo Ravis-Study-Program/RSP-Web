@@ -8,10 +8,11 @@ import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import {
   CreateProblemAttemptRequest,
-  CreateProblemAttemptResponseApiResult,
-  GetProblemAttemptsResponseApiResult,
+  CreateProblemAttemptResponseApiResponse,
   LeetcodeProblemDto,
+  ListProblemAttemptResponseApiResponse,
   ProblemAttemptEntity,
+  useGetCurrentUser,
 } from '@/generated/api/client';
 
 const schema = z.object({
@@ -35,6 +36,9 @@ export const LeetcodeProblemAttemptCreateModal = ({
   leetcodeProblems,
   enrollmentId,
 }: LeetcodeProblemAttemptCreateModalProps) => {
+  const { data: userResponse } = useGetCurrentUser();
+  const email = userResponse?.responseBody?.user.email ?? '';
+
   const form = useForm({
     mode: 'uncontrolled',
     initialValues: {
@@ -55,6 +59,7 @@ export const LeetcodeProblemAttemptCreateModal = ({
     try {
       const requestData: CreateProblemAttemptRequest = {
         ...values,
+        email,
         attemptStartDateUtc: values.attemptStartDateUtc.toISOString(),
       };
       if (enrollmentId !== '') {
@@ -70,7 +75,7 @@ export const LeetcodeProblemAttemptCreateModal = ({
         message: 'Problem attempt created successfully.',
       });
     } catch (err) {
-      const response = (err as any)?.response.data as CreateProblemAttemptResponseApiResult;
+      const response = (err as any)?.response.data as CreateProblemAttemptResponseApiResponse;
       notifications.show({
         color: 'red',
         title: 'Error',
@@ -153,8 +158,8 @@ export const LeetcodeProblemAttemptCreateModal = ({
 type LeetcodeProblemAttemptCreateModalProps = {
   table: MRT_TableInstance<ProblemAttemptEntity>;
   createProblemAttempt: UseMutateAsyncFunction<
-    CreateProblemAttemptResponseApiResult,
-    CreateProblemAttemptResponseApiResult,
+    CreateProblemAttemptResponseApiResponse,
+    unknown,
     {
       data: CreateProblemAttemptRequest;
     },
@@ -162,9 +167,7 @@ type LeetcodeProblemAttemptCreateModalProps = {
   >;
   refetchProblemAttempts: (
     options?: RefetchOptions
-  ) => Promise<
-    QueryObserverResult<GetProblemAttemptsResponseApiResult, GetProblemAttemptsResponseApiResult>
-  >;
+  ) => Promise<QueryObserverResult<ListProblemAttemptResponseApiResponse, unknown>>;
   leetcodeProblems: LeetcodeProblemDto[] | null | undefined;
   enrollmentId: string;
 };

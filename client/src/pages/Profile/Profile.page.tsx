@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Avatar, Card, Grid, Group, SegmentedControl, Text } from '@mantine/core';
 import { Layout } from '@/components/Layout/Layout';
-import { useGetMockInterviews, useGetProblemAttempts } from '@/generated/api/client';
+import { useListMockInterview, useListProblemAttempt } from '@/generated/api/client';
 import { SeasonRoleReverseIndex } from '@/shared/entities/reverseIndex';
 import { useSeasonSlug } from '@/shared/hooks/useSeasonSlug';
 import { useUserAndEnrollment } from '@/shared/hooks/useUserAndEnrollment';
@@ -18,19 +18,19 @@ export default function ProfilePage() {
   const { enrollmentId, user, role } = useUserAndEnrollment(seasonSlug, email);
   const [section, setSection] = useState<'Leetcode' | 'Mock Interviews'>('Leetcode');
 
-  const { data: problemAttemptsResponse, refetch: refetchProblemAttempts } = useGetProblemAttempts({
-    enrollmentId: enrollmentId || undefined,
-    includeCustom: false,
-    includeLeetcode: true,
-    email,
+  const { data: problemAttemptsResponse, refetch: refetchProblemAttempts } = useListProblemAttempt({
+    EnrollmentId: enrollmentId || undefined,
+    IncludeCustom: false,
+    IncludeLeetcode: true,
+    Email: email,
   });
 
-  const { data: mockInterviewsResponse, refetch: refetchMockInterviews } = useGetMockInterviews({
-    enrollmentId,
-    includeCustom: true,
-    includeLeetcode: true,
-    includeBehavioural: true,
-    email,
+  const { data: mockInterviewsResponse, refetch: refetchMockInterviews } = useListMockInterview({
+    EnrollmentId: enrollmentId || undefined,
+    IncludeCustom: true,
+    IncludeLeetcode: true,
+    IncludeBehavioural: true,
+    Email: email,
   });
 
   const MockInterviewComponent = useMemo(() => {
