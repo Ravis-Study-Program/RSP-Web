@@ -138,6 +138,7 @@ namespace RSPWebAPI.Tests.Tests
       var seasonWeekId = await _seeder.SeedSeasonWeekAsync(seasonId, 1);
       var updateRequest = new AdminUpdateSeasonWeekRequest
       {
+        SeasonId = seasonId,
         SeasonWeekId = seasonWeekId,
         WeekNumber = 5,
         StartDate = DateTime.UtcNow.AddDays(1),

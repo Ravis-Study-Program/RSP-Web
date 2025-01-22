@@ -37,7 +37,7 @@ export type AdminListUserParams = {
 };
 
 export type AdminListSeasonWeekParams = {
-  SeasonId: string;
+  request?: AdminListSeasonWeekRequest;
 };
 
 export type AdminListSeasonParams = {
@@ -187,6 +187,19 @@ export interface UpdateMockInterviewRequest {
   timeTakenInMinutes: number;
 }
 
+export interface SeasonWeekEntity {
+  /** @nullable */
+  deletedAtUtc?: string | null;
+  endDate: string;
+  season?: SeasonEntity;
+  /** @minLength 1 */
+  seasonId: string;
+  /** @minLength 1 */
+  seasonWeekId: string;
+  startDate: string;
+  weekNumber: number;
+}
+
 export type SeasonStudentRolePromotion =
   (typeof SeasonStudentRolePromotion)[keyof typeof SeasonStudentRolePromotion];
 
@@ -223,19 +236,6 @@ export interface SeasonEntity {
   /** @minLength 1 */
   slug: string;
   startDateInclusiveUtc: string;
-}
-
-export interface SeasonWeekEntity {
-  /** @nullable */
-  deletedAtUtc?: string | null;
-  endDate: string;
-  season?: SeasonEntity;
-  /** @minLength 1 */
-  seasonId: string;
-  /** @minLength 1 */
-  seasonWeekId: string;
-  startDate: string;
-  weekNumber: number;
 }
 
 export interface ProblemEntity {
@@ -530,6 +530,10 @@ export interface GetGraduatesRequest {
   [key: string]: unknown;
 }
 
+export interface GetEnrollmentUsersResponse {
+  enrollmentUsers: EnrollmentUserDto[];
+}
+
 export interface GetEnrollmentUsersResponseApiResponse {
   error?: ApiError;
   responseBody?: GetEnrollmentUsersResponse;
@@ -559,6 +563,17 @@ export interface GetCurrentUserMenteesListResponse {
 export interface GetCurrentUserMenteesListResponseApiResponse {
   error?: ApiError;
   responseBody?: GetCurrentUserMenteesListResponse;
+  /** @nullable */
+  successMessage?: string | null;
+}
+
+export interface GetCurrentUserEnrollmentsResponse {
+  enrollments: EnrollmentResponseDto[];
+}
+
+export interface GetCurrentUserEnrollmentsResponseApiResponse {
+  error?: ApiError;
+  responseBody?: GetCurrentUserEnrollmentsResponse;
   /** @nullable */
   successMessage?: string | null;
 }
@@ -593,10 +608,6 @@ export interface EnrollmentUserDto {
   studentRolePromotion: SeasonStudentRolePromotion;
 }
 
-export interface GetEnrollmentUsersResponse {
-  enrollmentUsers: EnrollmentUserDto[];
-}
-
 export interface EnrollmentResponseDto {
   /** @minLength 1 */
   enrollmentId: string;
@@ -614,17 +625,6 @@ export interface EnrollmentResponseDto {
   userId: string;
   /** @minLength 1 */
   userName: string;
-}
-
-export interface GetCurrentUserEnrollmentsResponse {
-  enrollments: EnrollmentResponseDto[];
-}
-
-export interface GetCurrentUserEnrollmentsResponseApiResponse {
-  error?: ApiError;
-  responseBody?: GetCurrentUserEnrollmentsResponse;
-  /** @nullable */
-  successMessage?: string | null;
 }
 
 export interface EnrollmentEntity {
@@ -842,6 +842,8 @@ export interface AdminUpdateSeasonWeekResponseApiResponse {
 export interface AdminUpdateSeasonWeekRequest {
   endDate: string;
   /** @minLength 1 */
+  seasonId: string;
+  /** @minLength 1 */
   seasonWeekId: string;
   startDate: string;
   weekNumber: number;
@@ -955,6 +957,10 @@ export interface AdminListSeasonWeekResponseApiResponse {
   responseBody?: AdminListSeasonWeekResponse;
   /** @nullable */
   successMessage?: string | null;
+}
+
+export interface AdminListSeasonWeekRequest {
+  [key: string]: unknown;
 }
 
 export interface AdminListSeasonResponse {
@@ -3914,7 +3920,7 @@ export const useAdminDeleteSeasonWeek = <TError = unknown, TContext = unknown>(o
 };
 
 export const adminListSeasonWeek = (
-  params: AdminListSeasonWeekParams,
+  params?: AdminListSeasonWeekParams,
   options?: SecondParameter<typeof CustomAxiosInstance>,
   signal?: AbortSignal
 ) => {
@@ -3929,7 +3935,7 @@ export const adminListSeasonWeek = (
   );
 };
 
-export const getAdminListSeasonWeekQueryKey = (params: AdminListSeasonWeekParams) => {
+export const getAdminListSeasonWeekQueryKey = (params?: AdminListSeasonWeekParams) => {
   return [
     `https://rsp-server-test.up.railway.app/api/v1/season-weeks/admin/get`,
     ...(params ? [params] : []),
@@ -3940,7 +3946,7 @@ export const getAdminListSeasonWeekQueryOptions = <
   TData = Awaited<ReturnType<typeof adminListSeasonWeek>>,
   TError = unknown,
 >(
-  params: AdminListSeasonWeekParams,
+  params?: AdminListSeasonWeekParams,
   options?: {
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof adminListSeasonWeek>>, TError, TData>
@@ -3971,7 +3977,7 @@ export function useAdminListSeasonWeek<
   TData = Awaited<ReturnType<typeof adminListSeasonWeek>>,
   TError = unknown,
 >(
-  params: AdminListSeasonWeekParams,
+  params: undefined | AdminListSeasonWeekParams,
   options: {
     query: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof adminListSeasonWeek>>, TError, TData>
@@ -3987,7 +3993,7 @@ export function useAdminListSeasonWeek<
   TData = Awaited<ReturnType<typeof adminListSeasonWeek>>,
   TError = unknown,
 >(
-  params: AdminListSeasonWeekParams,
+  params?: AdminListSeasonWeekParams,
   options?: {
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof adminListSeasonWeek>>, TError, TData>
@@ -4003,7 +4009,7 @@ export function useAdminListSeasonWeek<
   TData = Awaited<ReturnType<typeof adminListSeasonWeek>>,
   TError = unknown,
 >(
-  params: AdminListSeasonWeekParams,
+  params?: AdminListSeasonWeekParams,
   options?: {
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof adminListSeasonWeek>>, TError, TData>
@@ -4016,7 +4022,7 @@ export function useAdminListSeasonWeek<
   TData = Awaited<ReturnType<typeof adminListSeasonWeek>>,
   TError = unknown,
 >(
-  params: AdminListSeasonWeekParams,
+  params?: AdminListSeasonWeekParams,
   options?: {
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof adminListSeasonWeek>>, TError, TData>
