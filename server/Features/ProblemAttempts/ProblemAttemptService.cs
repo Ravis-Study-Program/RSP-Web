@@ -211,7 +211,7 @@ public class ProblemAttemptService : IProblemAttemptService
       query = query.Include(p => p.CustomProblem).ThenInclude(c => c.Problem);
     }
 
-    query = query.Include(e => e.User);
+    query = query.Include(e => e.User).Include(e => e.Enrollment).Include(e => e.SeasonWeek);
 
     var problemAttempts = await _problemAttemptRepository.GetAllAsync(
       p => p.User.Email == request.Email,

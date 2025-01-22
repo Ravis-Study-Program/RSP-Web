@@ -109,6 +109,14 @@ export const LeetcodeTable = ({
         }
       : null;
 
+  const seasonWeekColumn: MRT_ColumnDef<ProblemAttemptEntity> | null =
+    enrollmentId != null && enrollmentId !== ''
+      ? {
+          header: 'Season Week',
+          accessorFn: (row) => row.seasonWeek?.weekNumber || 'No Season week',
+        }
+      : null;
+
   const columns = useMemo<MRT_ColumnDef<ProblemAttemptEntity>[]>(
     () => [
       {
@@ -121,6 +129,7 @@ export const LeetcodeTable = ({
         },
       },
       ...(enrollmentColumn ? [enrollmentColumn] : []),
+      ...(seasonWeekColumn ? [seasonWeekColumn] : []),
       {
         header: 'Time Taken (mins)',
         accessorFn: (row) => row.timeTakenInMinutes,

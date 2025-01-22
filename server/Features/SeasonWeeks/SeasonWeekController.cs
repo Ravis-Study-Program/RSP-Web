@@ -71,5 +71,20 @@ public class SeasonWeekController : BaseController
     return HandleResponse(response);
   }
 
+  [HttpGet]
+  [ServiceFilter(typeof(AuthAttribute))]
+  [Route("get")]
+  [ActionName("GetSeasonWeeksBySeasonSlug")]
+  public async Task<
+    ActionResult<ApiResponse<GetSeasonWeeksBySeasonSlugResponse>>
+  > GetSeasonWeeksBySeasonSlug(
+    [FromQuery] GetSeasonWeeksBySeasonSlugRequest request,
+    CancellationToken cancellationToken = default
+  )
+  {
+    var response = await _seasonWeekService.GetSeasonWeeksBySeasonSlug(request, cancellationToken);
+    return HandleResponse(response);
+  }
+
   #endregion
 }
