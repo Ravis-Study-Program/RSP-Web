@@ -1,9 +1,11 @@
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using RSPWebAPI.Common;
 using RSPWebAPI.Common.Interfaces;
 using RSPWebAPI.Entities;
 using RSPWebAPI.Features.Constants;
+using RSPWebAPI.Features.ProblemAttempts.Dtos;
 using RSPWebAPI.Features.Seasons.Interfaces;
 using RSPWebAPI.Features.SeasonWeeks.Dtos;
 using RSPWebAPI.Features.SeasonWeeks.Interfaces;
@@ -214,6 +216,35 @@ public class SeasonWeekService : ISeasonWeekService
       _logger.LogError(ex, Message.SeasonWeekUpdateUnexpectedError);
       return new ErrorServiceResponse<AdminUpdateSeasonWeekResponse>(
         Message.SeasonWeekUpdateUnexpectedError
+      );
+    }
+  }
+
+  public async Task<
+    IServiceResponse<GetSeasonWeeksBySeasonSlugResponse>
+  > GetSeasonWeeksBySeasonSlug(
+    GetSeasonWeeksBySeasonSlugRequest request,
+    CancellationToken cancellationToken = default
+  )
+  {
+    var seasonWeeks = await GetAllSeasonWeeksAsync(
+      q => q.Season.Slug == request.SeasonSlug,
+      cancellationToken,
+      q => q.Include(s => s.Season)
+    );
+
+    try
+    {
+      return new SuccessServiceResponse<GetSeasonWeeksBySeasonSlugResponse>(
+        Message.SeasonWeekListSuccessfully,
+        new GetSeasonWeeksBySeasonSlugResponse() { SeasonWeeks = seasonWeeks.ToList() }
+      );
+    }
+    catch (Exception ex)
+    {
+      _logger.LogError(ex, Message.SeasonWeekListUnexpectedError);
+      return new ErrorServiceResponse<GetSeasonWeeksBySeasonSlugResponse>(
+        Message.SeasonWeekListUnexpectedError
       );
     }
   }

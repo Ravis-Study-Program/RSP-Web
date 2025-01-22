@@ -1,6 +1,7 @@
 using System.Linq.Expressions;
 using RSPWebAPI.Common.Interfaces;
 using RSPWebAPI.Entities;
+using RSPWebAPI.Features.ProblemAttempts.Dtos;
 using RSPWebAPI.Features.SeasonWeeks.Dtos;
 
 namespace RSPWebAPI.Features.SeasonWeeks.Interfaces;
@@ -55,6 +56,11 @@ public interface ISeasonWeekService
 
   Task<IServiceResponse<AdminUpdateSeasonWeekResponse>> UpdateAdminSeasonWeek(
     AdminUpdateSeasonWeekRequest request,
+    CancellationToken cancellationToken = default
+  );
+
+  Task<IServiceResponse<GetSeasonWeeksBySeasonSlugResponse>> GetSeasonWeeksBySeasonSlug(
+    GetSeasonWeeksBySeasonSlugRequest request,
     CancellationToken cancellationToken = default
   );
 

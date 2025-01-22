@@ -36,6 +36,10 @@ export type AdminListUserParams = {
   request?: AdminListUserRequest;
 };
 
+export type GetSeasonWeeksBySeasonSlugParams = {
+  SeasonSlug: string;
+};
+
 export type AdminListSeasonWeekParams = {
   request?: AdminListSeasonWeekRequest;
 };
@@ -187,19 +191,6 @@ export interface UpdateMockInterviewRequest {
   timeTakenInMinutes: number;
 }
 
-export interface SeasonWeekEntity {
-  /** @nullable */
-  deletedAtUtc?: string | null;
-  endDate: string;
-  season?: SeasonEntity;
-  /** @minLength 1 */
-  seasonId: string;
-  /** @minLength 1 */
-  seasonWeekId: string;
-  startDate: string;
-  weekNumber: number;
-}
-
 export type SeasonStudentRolePromotion =
   (typeof SeasonStudentRolePromotion)[keyof typeof SeasonStudentRolePromotion];
 
@@ -236,6 +227,19 @@ export interface SeasonEntity {
   /** @minLength 1 */
   slug: string;
   startDateInclusiveUtc: string;
+}
+
+export interface SeasonWeekEntity {
+  /** @nullable */
+  deletedAtUtc?: string | null;
+  endDate: string;
+  season?: SeasonEntity;
+  /** @minLength 1 */
+  seasonId: string;
+  /** @minLength 1 */
+  seasonWeekId: string;
+  startDate: string;
+  weekNumber: number;
 }
 
 export interface ProblemEntity {
@@ -498,6 +502,17 @@ export interface GetUserResponseApiResponse {
   successMessage?: string | null;
 }
 
+export interface GetSeasonWeeksBySeasonSlugResponse {
+  seasonWeeks: SeasonWeekEntity[];
+}
+
+export interface GetSeasonWeeksBySeasonSlugResponseApiResponse {
+  error?: ApiError;
+  responseBody?: GetSeasonWeeksBySeasonSlugResponse;
+  /** @nullable */
+  successMessage?: string | null;
+}
+
 export interface GetIsUserEnrolledResponse {
   /** @minLength 1 */
   email: string;
@@ -567,10 +582,6 @@ export interface GetCurrentUserMenteesListResponseApiResponse {
   successMessage?: string | null;
 }
 
-export interface GetCurrentUserEnrollmentsResponse {
-  enrollments: EnrollmentResponseDto[];
-}
-
 export interface GetCurrentUserEnrollmentsResponseApiResponse {
   error?: ApiError;
   responseBody?: GetCurrentUserEnrollmentsResponse;
@@ -625,6 +636,10 @@ export interface EnrollmentResponseDto {
   userId: string;
   /** @minLength 1 */
   userName: string;
+}
+
+export interface GetCurrentUserEnrollmentsResponse {
+  enrollments: EnrollmentResponseDto[];
 }
 
 export interface EnrollmentEntity {
@@ -4109,6 +4124,135 @@ export const useAdminUpdateSeasonWeek = <TError = unknown, TContext = unknown>(o
 
   return useMutation(mutationOptions);
 };
+
+export const getSeasonWeeksBySeasonSlug = (
+  params: GetSeasonWeeksBySeasonSlugParams,
+  options?: SecondParameter<typeof CustomAxiosInstance>,
+  signal?: AbortSignal
+) => {
+  return CustomAxiosInstance<GetSeasonWeeksBySeasonSlugResponseApiResponse>(
+    {
+      url: `https://rsp-server-test.up.railway.app/api/v1/season-weeks/get`,
+      method: 'GET',
+      params,
+      signal,
+    },
+    options
+  );
+};
+
+export const getGetSeasonWeeksBySeasonSlugQueryKey = (params: GetSeasonWeeksBySeasonSlugParams) => {
+  return [
+    `https://rsp-server-test.up.railway.app/api/v1/season-weeks/get`,
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getGetSeasonWeeksBySeasonSlugQueryOptions = <
+  TData = Awaited<ReturnType<typeof getSeasonWeeksBySeasonSlug>>,
+  TError = unknown,
+>(
+  params: GetSeasonWeeksBySeasonSlugParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getSeasonWeeksBySeasonSlug>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetSeasonWeeksBySeasonSlugQueryKey(params);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getSeasonWeeksBySeasonSlug>>> = ({
+    signal,
+  }) => getSeasonWeeksBySeasonSlug(params, requestOptions, signal);
+
+  return { queryKey, queryFn, staleTime: Infinity, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getSeasonWeeksBySeasonSlug>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetSeasonWeeksBySeasonSlugQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getSeasonWeeksBySeasonSlug>>
+>;
+export type GetSeasonWeeksBySeasonSlugQueryError = unknown;
+
+export function useGetSeasonWeeksBySeasonSlug<
+  TData = Awaited<ReturnType<typeof getSeasonWeeksBySeasonSlug>>,
+  TError = unknown,
+>(
+  params: GetSeasonWeeksBySeasonSlugParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getSeasonWeeksBySeasonSlug>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getSeasonWeeksBySeasonSlug>>,
+          TError,
+          TData
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): DefinedUseQueryResult<TData, TError> & { queryKey: QueryKey };
+export function useGetSeasonWeeksBySeasonSlug<
+  TData = Awaited<ReturnType<typeof getSeasonWeeksBySeasonSlug>>,
+  TError = unknown,
+>(
+  params: GetSeasonWeeksBySeasonSlugParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getSeasonWeeksBySeasonSlug>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getSeasonWeeksBySeasonSlug>>,
+          TError,
+          TData
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): UseQueryResult<TData, TError> & { queryKey: QueryKey };
+export function useGetSeasonWeeksBySeasonSlug<
+  TData = Awaited<ReturnType<typeof getSeasonWeeksBySeasonSlug>>,
+  TError = unknown,
+>(
+  params: GetSeasonWeeksBySeasonSlugParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getSeasonWeeksBySeasonSlug>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+export function useGetSeasonWeeksBySeasonSlug<
+  TData = Awaited<ReturnType<typeof getSeasonWeeksBySeasonSlug>>,
+  TError = unknown,
+>(
+  params: GetSeasonWeeksBySeasonSlugParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getSeasonWeeksBySeasonSlug>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetSeasonWeeksBySeasonSlugQueryOptions(params, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
 
 export const adminCreateUser = (
   adminCreateUserRequest: AdminCreateUserRequest,
