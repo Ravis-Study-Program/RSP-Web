@@ -1,5 +1,6 @@
 import {
   IconCalendarMonth,
+  IconCalendarWeek,
   IconChalkboard,
   IconChessKnight,
   IconCode,
@@ -42,6 +43,7 @@ const noSeasonSelectedTabs: Tabs = {
 const adminNoSeasonSelectedTabs: Tabs = {
   general: [
     { label: 'Seasons', icon: IconCalendarMonth, link: '/admin/seasons', hidden: false },
+    { label: 'Season Weeks', icon: IconCalendarWeek, link: '/admin/season-weeks', hidden: false },
     { label: 'Users', icon: IconUsersGroup, link: '/admin/users', hidden: false },
     { label: 'Enrollments', icon: IconSchool, link: '/admin/enrollments', hidden: false },
     { label: 'Mentorships', icon: IconChessKnight, link: '/admin/mentorships', hidden: false },

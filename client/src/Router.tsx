@@ -1,5 +1,6 @@
 import React, { lazy, Suspense } from 'react';
 import { Route, Routes } from 'react-router-dom';
+import AdminSeasonWeeksPage from './pages/Admin/SeasonWeeks/AdminSeasonWeeks.page';
 import ProfilePage from './pages/Profile/Profile.page';
 import ResourcesPage from './pages/Resources/Resources.page';
 import SeasonUsersPage from './pages/SeasonUsers/SeasonUsers.page';
@@ -30,6 +31,7 @@ const routes = (
       {/* Admin Routes */}
       <Route path="admin" element={<AdminRouteGuard />}>
         <Route path="seasons" element={<AdminSeasonsPage />} />
+        <Route path="season-weeks" element={<AdminSeasonWeeksPage />} />
         <Route path="users" element={<AdminUsersPage />} />
         <Route path="enrollments" element={<AdminEnrollmentsPage />} />
         <Route path="mentorships" element={<AdminMentorshipsPage />} />

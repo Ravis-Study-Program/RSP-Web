@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using Microsoft.EntityFrameworkCore;
 using RSPWebAPI.Common;
 using RSPWebAPI.Common.Interfaces;
 using RSPWebAPI.Entities;
@@ -130,7 +131,11 @@ public class SeasonWeekService : ISeasonWeekService
   {
     try
     {
-      var seasonWeeks = await GetAllSeasonWeeksAsync(null, cancellationToken);
+      var seasonWeeks = await GetAllSeasonWeeksAsync(
+        null,
+        cancellationToken,
+        q => q.Include(s => s.Season)
+      );
       await _unitOfWork.SaveChangesAsync(cancellationToken);
       return new SuccessServiceResponse<AdminListSeasonWeekResponse>(
         Message.SeasonWeekListSuccessfully,
@@ -159,6 +164,39 @@ public class SeasonWeekService : ISeasonWeekService
       );
     }
 
+    var existingSeason = await _seasonService.GetSeasonByIdAsync(
+      request.SeasonId,
+      cancellationToken
+    );
+    if (existingSeason == null)
+    {
+      return new ErrorServiceResponse<AdminUpdateSeasonWeekResponse>(Message.SeasonDoesNotExists);
+    }
+
+    var existingWeek = await GetSeasonWeekBySeasonId(
+      request.SeasonId,
+      request.WeekNumber,
+      cancellationToken
+    );
+    if (existingWeek != null)
+    {
+      return new ErrorServiceResponse<AdminUpdateSeasonWeekResponse>(Message.SeasonWeekExists);
+    }
+
+    if (
+      !IsSeasonWeekDateRangeValid(
+        request.StartDate,
+        request.EndDate,
+        existingSeason.StartDateInclusiveUtc,
+        existingSeason.EndDateInclusiveUtc,
+        out var errorMessage
+      )
+    )
+    {
+      return new ErrorServiceResponse<AdminUpdateSeasonWeekResponse>(errorMessage);
+    }
+
+    existingSeasonWeek.SeasonId = request.SeasonId;
     existingSeasonWeek.WeekNumber = request.WeekNumber;
     existingSeasonWeek.StartDate = request.StartDate;
     existingSeasonWeek.EndDate = request.EndDate;

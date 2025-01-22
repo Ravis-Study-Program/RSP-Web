@@ -7,6 +7,9 @@ namespace RSPWebAPI.Features.SeasonWeeks.Dtos;
 public record AdminUpdateSeasonWeekRequest
 {
   [Required]
+  public string SeasonId { get; set; } = string.Empty;
+
+  [Required]
   public string SeasonWeekId { get; set; } = string.Empty;
 
   [Required]
