@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Group, MultiSelect } from '@mantine/core';
+import { Flex, Group, MultiSelect, Select } from '@mantine/core';
 import { Layout } from '@/components/Layout/Layout';
 import {
   useGetCurrentUser,
@@ -15,8 +15,15 @@ import {
   optionsFilter,
 } from '@/shared/table/globalFilters';
 import { LeetcodeTable } from './LeetcodeTable/LeetcodeTable';
-import { ProblemAttemptsGraph } from './ProblemAttemptsGraph/ProblemAttemptsGraph';
+import { ProblemAttemptsGraphContainer } from './ProblemAttemptsGraph/ProblemAttemptsGraphContainer';
 import classes from './Leetcode.module.css';
+
+export enum LeetcodeGraphPreset {
+  None = 'None',
+  LineChart = 'Line Graph',
+  BarChart = 'Bar Chart',
+  ScatterChart = 'Scatter Chart',
+}
 
 export default function LeetcodePage() {
   const [isLeetcode, _] = useState(true);
@@ -24,6 +31,9 @@ export default function LeetcodePage() {
   const [selectedSeasonWeeks, setSelectedSeasonWeeks] = useState<string[]>([]);
   const [selectedLeetcodeDifficulties, setSelectedLeetcodeDifficulties] = useState<string[]>([]);
   const [selectedLeetcodeCategories, setSelectedLeetcodeCategories] = useState<string[]>([]);
+  const [selectedGraphPreset, setSelectedGraphPreset] = useState<LeetcodeGraphPreset>(
+    LeetcodeGraphPreset.ScatterChart
+  );
 
   const { data: currentUserResponse } = useGetCurrentUser();
   const email = currentUserResponse?.responseBody?.user.email ?? '';
@@ -87,54 +97,76 @@ export default function LeetcodePage() {
     selectedLeetcodeCategories,
   ]);
 
+  const graphPresetOptions = Object.values(LeetcodeGraphPreset).map((value) => ({
+    value,
+    label: value,
+  }));
+
   return (
     <Layout>
-      <Group mb="lg" justify="flex-end">
-        <MultiSelect
-          classNames={{ inputField: classes.inputField }}
-          label="Season Week"
-          placeholder="Pick value(s)"
-          data={seasonWeeksOptions}
-          filter={optionsFilter}
-          searchable
-          clearable
-          nothingFoundMessage="Nothing found..."
-          value={selectedSeasonWeeks}
-          onChange={(values) => {
-            setSelectedSeasonWeeks(values as string[]);
-          }}
-        />
-        <MultiSelect
-          label="Difficulty"
-          classNames={{ inputField: classes.inputField }}
-          placeholder="Pick value(s)"
-          data={leetcodeDifficultyOptions}
-          filter={optionsFilter}
-          searchable
-          clearable
-          nothingFoundMessage="Nothing found..."
-          value={selectedLeetcodeDifficulties}
-          onChange={(values) => {
-            setSelectedLeetcodeDifficulties(values as string[]);
-          }}
-        />
-        <MultiSelect
-          label="Categories"
-          classNames={{ inputField: classes.inputField }}
-          placeholder="Pick value(s)"
-          data={leetcodeCategoryOptions}
-          filter={optionsFilter}
-          searchable
-          clearable
-          nothingFoundMessage="Nothing found..."
-          value={selectedLeetcodeCategories}
-          onChange={(values) => {
-            setSelectedLeetcodeCategories(values as string[]);
-          }}
-        />
-      </Group>
-
-      <ProblemAttemptsGraph problemAttempts={filteredProblemAttempts} />
+      <Flex justify="space-between">
+        <Group mb="lg" justify="flex-start">
+          <Select
+            label="Graph Preset"
+            data={graphPresetOptions}
+            filter={optionsFilter}
+            miw={400}
+            nothingFoundMessage="Nothing found..."
+            value={selectedGraphPreset}
+            onChange={(value) => {
+              setSelectedGraphPreset(value as LeetcodeGraphPreset);
+            }}
+          />
+        </Group>
+        <Group mb="lg" justify="flex-end">
+          <MultiSelect
+            classNames={{ inputField: classes.inputField }}
+            label="Season Week"
+            placeholder="Pick value(s)"
+            data={seasonWeeksOptions}
+            filter={optionsFilter}
+            miw={150}
+            searchable
+            nothingFoundMessage="Nothing found..."
+            value={selectedSeasonWeeks}
+            onChange={(values) => {
+              setSelectedSeasonWeeks(values as string[]);
+            }}
+          />
+          <MultiSelect
+            label="Difficulty"
+            classNames={{ inputField: classes.inputField }}
+            placeholder="Pick value(s)"
+            data={leetcodeDifficultyOptions}
+            filter={optionsFilter}
+            miw={150}
+            searchable
+            nothingFoundMessage="Nothing found..."
+            value={selectedLeetcodeDifficulties}
+            onChange={(values) => {
+              setSelectedLeetcodeDifficulties(values as string[]);
+            }}
+          />
+          <MultiSelect
+            label="Categories"
+            classNames={{ inputField: classes.inputField }}
+            placeholder="Pick value(s)"
+            data={leetcodeCategoryOptions}
+            filter={optionsFilter}
+            miw={150}
+            searchable
+            nothingFoundMessage="Nothing found..."
+            value={selectedLeetcodeCategories}
+            onChange={(values) => {
+              setSelectedLeetcodeCategories(values as string[]);
+            }}
+          />
+        </Group>
+      </Flex>
+      <ProblemAttemptsGraphContainer
+        problemAttempts={filteredProblemAttempts}
+        graphPreset={selectedGraphPreset}
+      />
       <LeetcodeTable
         refetchProblemAttempts={refetchProblemAttempts}
         problemAttempts={filteredProblemAttempts}
