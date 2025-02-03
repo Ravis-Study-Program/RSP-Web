@@ -142,7 +142,7 @@ export const LeetcodeTable = ({
             href={row.original.leetcodeProblem?.problem?.link}
             target="_blank"
             inherit
-            c={computedColorScheme === 'light' ? 'dark' : 'white'}
+            c={computedColorScheme === 'light' ? 'dark' : 'dark.0'}
             underline="always"
           >
             {row.original.leetcodeProblem?.problem?.title}
