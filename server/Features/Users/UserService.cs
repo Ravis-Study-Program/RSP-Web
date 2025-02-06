@@ -177,7 +177,7 @@ public class UserService : IUserService
     CancellationToken cancellationToken = default
   )
   {
-    await _unitOfWork.BeginTransactionAsync();
+    await _unitOfWork.BeginTransactionAsync(cancellationToken);
     try
     {
       var existingUserResponse = await GetCurrentUser(email, cancellationToken);
@@ -200,7 +200,7 @@ public class UserService : IUserService
 
       await AddUserAsync(user, cancellationToken);
       await _unitOfWork.SaveChangesAsync(cancellationToken);
-      await _unitOfWork.CommitTransactionAsync();
+      await _unitOfWork.CommitTransactionAsync(cancellationToken);
       return new SuccessServiceResponse<CreateUserIfNotExistsResponse>(
         Message.UserCreatedSuccessfully,
         new CreateUserIfNotExistsResponse { UserId = user.UserId }
@@ -209,7 +209,7 @@ public class UserService : IUserService
     catch (Exception ex)
     {
       _logger.LogError(ex, Message.UserCreationUnexpectedError);
-      await _unitOfWork.RollbackTransactionAsync();
+      await _unitOfWork.RollbackTransactionAsync(cancellationToken);
       return new ErrorServiceResponse<CreateUserIfNotExistsResponse>(
         Message.UserCreationUnexpectedError
       );

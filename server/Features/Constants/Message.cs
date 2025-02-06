@@ -12,6 +12,10 @@ public static class Message
   public const string UserIsNotCoordinatorInSeason =
     "This user is not registered as a coordinator for the specified season.";
 
+  public const string DummyDataGeneratedSuccessfully =
+    "Dummy data were all generated successfully.";
+  public const string DummyDataUnexpectedError = "An error occurred while generating dummy data.";
+
   public const string UnexpectedError = "An unexpected error occurred.";
 
   public const string LeetcodeProblemRecommenderCreatedSuccessfully =
