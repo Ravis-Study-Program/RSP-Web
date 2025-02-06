@@ -35,17 +35,17 @@ public class UnitOfWork : IUnitOfWork
     return await _context.SaveChangesAsync(cancellationToken);
   }
 
-  public async Task BeginTransactionAsync()
+  public async Task BeginTransactionAsync(CancellationToken cancellationToken = default)
   {
     if (_currentTransaction != null)
     {
       throw new InvalidOperationException("A transaction is already in progress.");
     }
 
-    _currentTransaction = await _context.Database.BeginTransactionAsync();
+    _currentTransaction = await _context.Database.BeginTransactionAsync(cancellationToken);
   }
 
-  public async Task CommitTransactionAsync()
+  public async Task CommitTransactionAsync(CancellationToken cancellationToken = default)
   {
     if (_currentTransaction == null)
     {
@@ -54,8 +54,8 @@ public class UnitOfWork : IUnitOfWork
 
     try
     {
-      await _context.SaveChangesAsync();
-      await _currentTransaction.CommitAsync();
+      await _context.SaveChangesAsync(cancellationToken);
+      await _currentTransaction.CommitAsync(cancellationToken);
     }
     finally
     {
@@ -63,7 +63,7 @@ public class UnitOfWork : IUnitOfWork
     }
   }
 
-  public async Task RollbackTransactionAsync()
+  public async Task RollbackTransactionAsync(CancellationToken cancellationToken = default)
   {
     if (_currentTransaction == null)
     {
@@ -72,7 +72,7 @@ public class UnitOfWork : IUnitOfWork
 
     try
     {
-      await _currentTransaction.RollbackAsync();
+      await _currentTransaction.RollbackAsync(cancellationToken);
     }
     finally
     {

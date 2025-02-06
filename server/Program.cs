@@ -14,6 +14,8 @@ using RSPWebAPI.Common.Interfaces;
 using RSPWebAPI.Common.Middlewares;
 using RSPWebAPI.Database;
 using RSPWebAPI.Database.Interceptors;
+using RSPWebAPI.Features.DummyData;
+using RSPWebAPI.Features.DummyData.Interfaces;
 using RSPWebAPI.Features.Enrollments;
 using RSPWebAPI.Features.Enrollments.Interfaces;
 using RSPWebAPI.Features.LeetcodeProblemRecommendations;
@@ -156,6 +158,7 @@ builder.Services.AddScoped<IProblemAttemptService, ProblemAttemptService>();
 builder.Services.AddScoped<ISeasonService, SeasonService>();
 builder.Services.AddScoped<ISeasonWeekService, SeasonWeekService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IDummyDataService, DummyDataService>();
 
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();

@@ -101,7 +101,7 @@ public class LeetcodeService : ILeetcodeService
       );
     }
 
-    await _unitOfWork.BeginTransactionAsync();
+    await _unitOfWork.BeginTransactionAsync(cancellationToken);
     try
     {
       // Gather all unique values
@@ -185,12 +185,12 @@ public class LeetcodeService : ILeetcodeService
       }
 
       await _unitOfWork.SaveChangesAsync(cancellationToken);
-      await _unitOfWork.CommitTransactionAsync();
+      await _unitOfWork.CommitTransactionAsync(cancellationToken);
     }
     catch (Exception ex)
     {
       _logger.LogError(ex, "Error occurred during transaction.");
-      await _unitOfWork.RollbackTransactionAsync();
+      await _unitOfWork.RollbackTransactionAsync(cancellationToken);
       return new ErrorServiceResponse<AdminPopulateLeetcodeQuestionsResponse>(
         Message.UnexpectedError
       );

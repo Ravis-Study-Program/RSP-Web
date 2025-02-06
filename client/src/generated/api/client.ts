@@ -545,10 +545,6 @@ export interface GetGraduatesRequest {
   [key: string]: unknown;
 }
 
-export interface GetEnrollmentUsersResponse {
-  enrollmentUsers: EnrollmentUserDto[];
-}
-
 export interface GetEnrollmentUsersResponseApiResponse {
   error?: ApiError;
   responseBody?: GetEnrollmentUsersResponse;
@@ -578,13 +574,6 @@ export interface GetCurrentUserMenteesListResponse {
 export interface GetCurrentUserMenteesListResponseApiResponse {
   error?: ApiError;
   responseBody?: GetCurrentUserMenteesListResponse;
-  /** @nullable */
-  successMessage?: string | null;
-}
-
-export interface GetCurrentUserEnrollmentsResponseApiResponse {
-  error?: ApiError;
-  responseBody?: GetCurrentUserEnrollmentsResponse;
   /** @nullable */
   successMessage?: string | null;
 }
@@ -619,6 +608,10 @@ export interface EnrollmentUserDto {
   studentRolePromotion: SeasonStudentRolePromotion;
 }
 
+export interface GetEnrollmentUsersResponse {
+  enrollmentUsers: EnrollmentUserDto[];
+}
+
 export interface EnrollmentResponseDto {
   /** @minLength 1 */
   enrollmentId: string;
@@ -640,6 +633,13 @@ export interface EnrollmentResponseDto {
 
 export interface GetCurrentUserEnrollmentsResponse {
   enrollments: EnrollmentResponseDto[];
+}
+
+export interface GetCurrentUserEnrollmentsResponseApiResponse {
+  error?: ApiError;
+  responseBody?: GetCurrentUserEnrollmentsResponse;
+  /** @nullable */
+  successMessage?: string | null;
 }
 
 export interface EnrollmentEntity {
@@ -753,6 +753,13 @@ export interface CreateProblemAttemptResponse {
   problemAttemptId: string;
 }
 
+export interface CreateProblemAttemptResponseApiResponse {
+  error?: ApiError;
+  responseBody?: CreateProblemAttemptResponse;
+  /** @nullable */
+  successMessage?: string | null;
+}
+
 export interface CreateProblemAttemptRequest {
   attemptStartDateUtc: string;
   /** @nullable */
@@ -809,13 +816,6 @@ export interface ApiError {
   message?: string | null;
   /** @nullable */
   validationErrors?: ValidationError[] | null;
-}
-
-export interface CreateProblemAttemptResponseApiResponse {
-  error?: ApiError;
-  responseBody?: CreateProblemAttemptResponse;
-  /** @nullable */
-  successMessage?: string | null;
 }
 
 export interface AdminUpdateUserResponse {
@@ -1023,6 +1023,22 @@ export interface AdminListEnrollmentRequest {
   [key: string]: unknown;
 }
 
+export interface AdminGenerateDummyDataResponse {
+  [key: string]: unknown;
+}
+
+export interface AdminGenerateDummyDataResponseApiResponse {
+  error?: ApiError;
+  responseBody?: AdminGenerateDummyDataResponse;
+  /** @nullable */
+  successMessage?: string | null;
+}
+
+export interface AdminGenerateDummyDataRequest {
+  numberOfSeasons: number;
+  numberOfUsers: number;
+}
+
 export interface AdminDeleteUserResponse {
   [key: string]: unknown;
 }
@@ -1213,6 +1229,77 @@ export interface AdminCreateEnrollmentRequest {
 }
 
 type SecondParameter<T extends (...args: any) => any> = Parameters<T>[1];
+
+export const adminGenerateDummyData = (
+  adminGenerateDummyDataRequest: AdminGenerateDummyDataRequest,
+  options?: SecondParameter<typeof CustomAxiosInstance>
+) => {
+  return CustomAxiosInstance<AdminGenerateDummyDataResponseApiResponse>(
+    {
+      url: `https://rsp-server-test.up.railway.app/api/v1/dummy-data/admin/generate`,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      data: adminGenerateDummyDataRequest,
+    },
+    options
+  );
+};
+
+export const getAdminGenerateDummyDataMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof adminGenerateDummyData>>,
+    TError,
+    { data: AdminGenerateDummyDataRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof adminGenerateDummyData>>,
+  TError,
+  { data: AdminGenerateDummyDataRequest },
+  TContext
+> => {
+  const { mutation: mutationOptions, request: requestOptions } = options ?? {};
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof adminGenerateDummyData>>,
+    { data: AdminGenerateDummyDataRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return adminGenerateDummyData(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type AdminGenerateDummyDataMutationResult = NonNullable<
+  Awaited<ReturnType<typeof adminGenerateDummyData>>
+>;
+export type AdminGenerateDummyDataMutationBody = AdminGenerateDummyDataRequest;
+export type AdminGenerateDummyDataMutationError = unknown;
+
+export const useAdminGenerateDummyData = <TError = unknown, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof adminGenerateDummyData>>,
+    TError,
+    { data: AdminGenerateDummyDataRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof adminGenerateDummyData>>,
+  TError,
+  { data: AdminGenerateDummyDataRequest },
+  TContext
+> => {
+  const mutationOptions = getAdminGenerateDummyDataMutationOptions(options);
+
+  return useMutation(mutationOptions);
+};
 
 export const adminCreateEnrollment = (
   adminCreateEnrollmentRequest: AdminCreateEnrollmentRequest,
