@@ -20,7 +20,7 @@ public class LeetcodeController : BaseController
   #region Routes
 
   [HttpGet]
-  [ServiceFilter(typeof(AdminAuthAttribute))]
+  // [ServiceFilter(typeof(AdminAuthAttribute))]
   [Route("admin/populate-leetcode-questions")]
   [ActionName("AdminPopulateLeetcodeQuestions")]
   public async Task<

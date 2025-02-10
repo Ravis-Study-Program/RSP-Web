@@ -28,7 +28,7 @@ const schema = z.object({
     .number()
     .min(1, { message: 'The minimum amount is 1 minute' })
     .max(120, { message: 'The maximum amount is 120 minute.' }),
-  interviewer: z.string().min(1),
+  interviewee: z.string().min(1),
   behaviouralScore: scoreSchema,
   leetcodeProblem1: z.string().min(1),
   confirmQuestion1: scoreSchema,
@@ -49,7 +49,7 @@ export const MockInterviewCreateModal = ({
   createMockInterview,
   refetchMockInterviews,
   leetcodeProblems,
-  enrollmentId,
+  seasonId,
   users,
 }: MockInterviewCreateModalProps) => {
   const { data: currentUserResponse } = useGetCurrentUser();
@@ -60,7 +60,7 @@ export const MockInterviewCreateModal = ({
     initialValues: {
       startDate: new Date(),
       timeTakenInMinutes: 0,
-      interviewer: '',
+      interviewee: '',
       behaviouralScore: 0,
       leetcodeProblem1: '',
       confirmQuestion1: 0,
@@ -81,7 +81,7 @@ export const MockInterviewCreateModal = ({
   const handleSubmit = async (values: {
     startDate: Date;
     timeTakenInMinutes: number;
-    interviewer: string;
+    interviewee: string;
     behaviouralScore: number;
     leetcodeProblem1: string;
     confirmQuestion1: number;
@@ -130,12 +130,12 @@ export const MockInterviewCreateModal = ({
       const requestData: CreateMockInterviewRequest = {
         startDate: values.startDate.toISOString(),
         timeTakenInMinutes: values.timeTakenInMinutes,
-        interviewerUserId: values.interviewer,
+        intervieweeUserId: values.interviewee,
         mockInterviewRounds,
-        intervieweeEmail: email,
+        interviewerEmail: email,
       };
-      if (enrollmentId !== '') {
-        requestData.enrollmentId = enrollmentId;
+      if (seasonId !== '') {
+        requestData.seasonId = seasonId;
       }
 
       await createMockInterview({ data: requestData });
@@ -204,15 +204,15 @@ export const MockInterviewCreateModal = ({
           error={form.errors.timeTakenInMinutes}
         />
         <Select
-          {...form.getInputProps('interviewer')}
+          {...form.getInputProps('interviewee')}
           mt="sm"
-          label="Interviewer"
-          placeholder="Enter interviewer name"
+          label="Interviewee"
+          placeholder="Enter interviewee name"
           data={usersOptions}
           limit={5}
           withAsterisk
           searchable
-          error={form.errors.interviewer}
+          error={form.errors.interviewee}
         />
         <NumberInput
           {...form.getInputProps('behaviouralScore')}
@@ -355,5 +355,5 @@ type MockInterviewCreateModalProps = {
   ) => Promise<QueryObserverResult<ListMockInterviewResponseApiResponse, unknown>>;
   leetcodeProblems: LeetcodeProblemDto[] | null | undefined;
   users: GraduateDto[] | null | undefined;
-  enrollmentId: string;
+  seasonId: string;
 };

@@ -62,19 +62,24 @@ public class MockInterviewService : IMockInterviewService
   )
   {
     SeasonWeekEntity? seasonWeek = null;
-    if (request.EnrollmentId != null)
+    string? seasonId = null;
+    if (request.SeasonId != null)
     {
-      var existingEnrollment = await _enrollmentService.GetEnrollmentByIdAsync(
-        request.EnrollmentId,
+      var existingEnrollment = await _enrollmentService.GetEnrollmentBySeasonId(
+        request.SeasonId,
+        request.IntervieweeUserId,
+        null,
         cancellationToken,
         q => q.Include(e => e.User)
       );
-      if (existingEnrollment == null || existingEnrollment.User.Email != request.IntervieweeEmail)
+      if (existingEnrollment == null || existingEnrollment.User.UserId != request.IntervieweeUserId)
       {
         return new ErrorServiceResponse<CreateMockInterviewResponse>(
           Message.EnrollmentDoesNotExists
         );
       }
+
+      seasonId = existingEnrollment.SeasonId;
 
       var currentDate = request.StartDate;
       var seasonWeeks = await _seasonWeekService.GetAllSeasonWeeksAsync(
@@ -93,12 +98,12 @@ public class MockInterviewService : IMockInterviewService
       }
     }
 
-    var interviewer = await _userService.GetUserByIdAsync(
-      request.InterviewerUserId,
+    var interviewer = await _userService.GetUserByEmailAsync(
+      request.InterviewerEmail,
       cancellationToken
     );
-    var interviewee = await _userService.GetUserByEmailAsync(
-      request.IntervieweeEmail,
+    var interviewee = await _userService.GetUserByIdAsync(
+      request.IntervieweeUserId,
       cancellationToken
     );
     if (interviewee == null || interviewer == null)
@@ -118,7 +123,7 @@ public class MockInterviewService : IMockInterviewService
       IsPass = IsAllScoresAboveThreshold(request.MockInterviewRounds),
       InterviewerUserId = interviewer.UserId,
       IntervieweeUserId = interviewee.UserId,
-      EnrollmentId = request.EnrollmentId,
+      SeasonId = seasonId,
       MockInterviewRounds = mockInterviewRounds,
       StartDate = request.StartDate,
       TimeTakenInMinutes = request.TimeTakenInMinutes,
@@ -153,10 +158,16 @@ public class MockInterviewService : IMockInterviewService
       cancellationToken,
       q => q.Include(m => m.Interviewer)
     );
-    if (existingMockInterview == null || existingMockInterview.Interviewer.Email != request.Email)
+    if (existingMockInterview == null)
     {
       return new ErrorServiceResponse<DeleteMockInterviewResponse>(
         Message.MockInterviewDoesNotExists
+      );
+    }
+    if (existingMockInterview.Interviewer.Email != request.Email)
+    {
+      return new ErrorServiceResponse<DeleteMockInterviewResponse>(
+        Message.MockInterviewDeletionOnlyInterviewerAllowed
       );
     }
 
@@ -183,19 +194,27 @@ public class MockInterviewService : IMockInterviewService
   )
   {
     var query = _mockInterviewRepository.Table;
-    if (request.EnrollmentId != null)
+    if (request.SeasonId != null)
     {
-      var existingEnrollment = await _enrollmentService.GetEnrollmentByIdAsync(
-        request.EnrollmentId,
+      var existingUser = await _userService.GetUserByEmailAsync(request.Email, cancellationToken);
+      if (existingUser == null)
+      {
+        return new ErrorServiceResponse<ListMockInterviewResponse>(Message.UserIdDoesNotExists);
+      }
+
+      var existingEnrollment = await _enrollmentService.GetEnrollmentBySeasonId(
+        request.SeasonId,
+        existingUser.UserId,
+        null,
         cancellationToken,
         q => q.Include(e => e.User)
       );
       if (existingEnrollment == null || existingEnrollment.User.Email != request.Email)
       {
-        return new ErrorServiceResponse<ListMockInterviewResponse>(Message.EnrollmentDoesNotExists);
+        return new ErrorServiceResponse<ListMockInterviewResponse>(Message.SeasonDoesNotExists);
       }
 
-      query = query.Where(m => m.EnrollmentId == request.EnrollmentId);
+      query = query.Where(m => m.SeasonId == existingEnrollment.SeasonId);
     }
 
     if (request.IncludeBehavioural)
@@ -225,10 +244,10 @@ public class MockInterviewService : IMockInterviewService
       .Include(e => e.Interviewer)
       .Include(e => e.Interviewee)
       .Include(e => e.SeasonWeek)
-      .Include(e => e.Enrollment);
+      .Include(e => e.Season);
 
     var mockInterviews = await _mockInterviewRepository.GetAllAsync(
-      m => m.Interviewee.Email == request.Email,
+      m => m.Interviewer.Email == request.Email || m.Interviewee.Email == request.Email,
       cancellationToken,
       _ => query
     );
@@ -258,7 +277,8 @@ public class MockInterviewService : IMockInterviewService
       request.MockInterviewId,
       cancellationToken,
       q =>
-        q.Include(m => m.Enrollment)
+        q.Include(m => m.Season)
+          .Include(m => m.Interviewer)
           .Include(m => m.MockInterviewRounds)
           .ThenInclude(r => r.BehaviouralMockInterviewRound)
           .Include(m => m.MockInterviewRounds)
@@ -266,22 +286,29 @@ public class MockInterviewService : IMockInterviewService
           .Include(m => m.MockInterviewRounds)
           .ThenInclude(r => r.LeetcodeMockInterviewRound)
     );
-    if (existingMockInterview == null || request.EnrollmentId != existingMockInterview.EnrollmentId)
+    if (existingMockInterview == null || request.SeasonId != existingMockInterview.SeasonId)
     {
       return new ErrorServiceResponse<UpdateMockInterviewResponse>(
         Message.MockInterviewDoesNotExists
       );
     }
 
+    if (request.InterviewerEmail != existingMockInterview.Interviewer.Email)
+    {
+      return new ErrorServiceResponse<UpdateMockInterviewResponse>(
+        Message.MockInterviewUpdateOnlyInterviewerAllowed
+      );
+    }
+
     SeasonWeekEntity? seasonWeek = null;
-    if (request.EnrollmentId != null)
+    if (request.SeasonId != null)
     {
       var currentDate = request.StartDate;
       var seasonWeeks = await _seasonWeekService.GetAllSeasonWeeksAsync(
         q =>
           q.StartDate <= currentDate
           && q.EndDate >= currentDate
-          && q.SeasonId == existingMockInterview.Enrollment.SeasonId,
+          && q.SeasonId == existingMockInterview.SeasonId,
         cancellationToken
       );
       seasonWeek = seasonWeeks.FirstOrDefault();
@@ -293,12 +320,12 @@ public class MockInterviewService : IMockInterviewService
       }
     }
 
-    var interviewer = await _userService.GetUserByIdAsync(
-      request.InterviewerUserId,
+    var interviewer = await _userService.GetUserByEmailAsync(
+      request.InterviewerEmail,
       cancellationToken
     );
-    var interviewee = await _userService.GetUserByEmailAsync(
-      request.IntervieweeEmail,
+    var interviewee = await _userService.GetUserByIdAsync(
+      request.IntervieweeUserId,
       cancellationToken
     );
     if (interviewee == null || interviewer == null)
@@ -316,7 +343,7 @@ public class MockInterviewService : IMockInterviewService
     existingMockInterview.IsPass = IsAllScoresAboveThreshold(request.MockInterviewRounds);
     existingMockInterview.InterviewerUserId = interviewer.UserId;
     existingMockInterview.IntervieweeUserId = interviewee.UserId;
-    existingMockInterview.EnrollmentId = request.EnrollmentId;
+    existingMockInterview.SeasonId = request.SeasonId;
     existingMockInterview.StartDate = request.StartDate;
     existingMockInterview.TimeTakenInMinutes = request.TimeTakenInMinutes;
     existingMockInterview.SeasonWeekId = seasonWeek?.SeasonWeekId;

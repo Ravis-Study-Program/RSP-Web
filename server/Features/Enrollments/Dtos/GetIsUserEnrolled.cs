@@ -24,6 +24,9 @@ public record GetIsUserEnrolledResponse
   public string? EnrollmentId { get; set; }
 
   [Required]
+  public string? SeasonId { get; set; }
+
+  [Required]
   public string Email { get; set; } = string.Empty;
 
   [Required]

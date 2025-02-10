@@ -28,7 +28,7 @@ const schema = z.object({
     .number()
     .min(1, { message: 'The minimum amount is 1 minute' })
     .max(120, { message: 'The maximum amount is 120 minute.' }),
-  interviewer: z.string().min(1),
+  interviewee: z.string().min(1),
   behaviouralScore: scoreSchema,
   leetcodeProblem1: z.string().min(1),
   confirmQuestion1: scoreSchema,
@@ -50,7 +50,7 @@ export const MockInterviewUpdateModal = ({
   updateMockInterview,
   refetchMockInterviews,
   leetcodeProblems,
-  enrollmentId,
+  seasonId,
   users,
 }: MockInterviewUpdateModalProps) => {
   const { data: currentUserResponse } = useGetCurrentUser();
@@ -70,7 +70,7 @@ export const MockInterviewUpdateModal = ({
       mockInterviewId: mockInterview.mockInterviewId,
       startDate: new Date(mockInterview.startDate),
       timeTakenInMinutes: mockInterview.timeTakenInMinutes,
-      interviewer: mockInterview.interviewerUserId ?? '',
+      interviewee: mockInterview.intervieweeUserId ?? '',
       behaviouralScore: behaviouralRound?.behavioralScore ?? 0,
       leetcodeProblem1: leetcodeRound1?.leetcodeProblemId ?? '',
       confirmQuestion1: leetcodeRound1?.confirmQuestionScore ?? 0,
@@ -92,7 +92,7 @@ export const MockInterviewUpdateModal = ({
     mockInterviewId: string;
     startDate: Date;
     timeTakenInMinutes: number;
-    interviewer: string;
+    interviewee: string;
     behaviouralScore: number;
     leetcodeProblem1: string;
     confirmQuestion1: number;
@@ -145,12 +145,12 @@ export const MockInterviewUpdateModal = ({
         mockInterviewId: values.mockInterviewId,
         startDate: values.startDate.toISOString(),
         timeTakenInMinutes: values.timeTakenInMinutes,
-        interviewerUserId: values.interviewer,
+        intervieweeUserId: values.interviewee,
         mockInterviewRounds,
-        intervieweeEmail: email,
+        interviewerEmail: email,
       };
-      if (enrollmentId !== '') {
-        requestData.enrollmentId = enrollmentId;
+      if (seasonId !== '') {
+        requestData.seasonId = seasonId;
       }
 
       await updateMockInterview({ data: requestData });
@@ -219,15 +219,15 @@ export const MockInterviewUpdateModal = ({
           error={form.errors.timeTakenInMinutes}
         />
         <Select
-          {...form.getInputProps('interviewer')}
+          {...form.getInputProps('interviewee')}
           mt="sm"
-          label="Interviewer"
-          placeholder="Enter interviewer name"
+          label="Interviewee"
+          placeholder="Enter interviewee name"
           data={usersOptions}
           limit={5}
           withAsterisk
           searchable
-          error={form.errors.interviewer}
+          error={form.errors.interviewee}
         />
         <NumberInput
           {...form.getInputProps('behaviouralScore')}
@@ -371,5 +371,5 @@ type MockInterviewUpdateModalProps = {
   row: MRT_Row<MockInterviewEntity>;
   leetcodeProblems: LeetcodeProblemDto[] | null | undefined;
   users: GraduateDto[] | null | undefined;
-  enrollmentId: string;
+  seasonId: string;
 };

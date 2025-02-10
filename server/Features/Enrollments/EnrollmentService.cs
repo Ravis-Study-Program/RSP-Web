@@ -289,6 +289,7 @@ public class EnrollmentService : IEnrollmentService
           IsEnrolled = false,
           Role = null,
           EnrollmentId = null,
+          SeasonId = null,
           StudentRolePromotion = SeasonStudentRolePromotion.NotApplicable,
           Email = request.Email,
         }
@@ -302,6 +303,7 @@ public class EnrollmentService : IEnrollmentService
         IsEnrolled = true,
         Role = existingEnrollment.Role,
         EnrollmentId = existingEnrollment.EnrollmentId,
+        SeasonId = existingEnrollment.SeasonId,
         StudentRolePromotion = existingEnrollment.StudentRolePromotion,
         Email = request.Email,
       }

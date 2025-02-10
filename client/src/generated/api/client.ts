@@ -60,7 +60,7 @@ export type ListMockInterviewParams = {
   IncludeLeetcode: boolean;
   IncludeBehavioural: boolean;
   IncludeCustom: boolean;
-  EnrollmentId?: string;
+  SeasonId?: string;
 };
 
 export type GetCurrentUserMenteesParams = {
@@ -178,15 +178,15 @@ export interface UpdateMockInterviewResponseApiResponse {
 }
 
 export interface UpdateMockInterviewRequest {
-  /** @nullable */
-  enrollmentId?: string | null;
   /** @minLength 1 */
-  intervieweeEmail: string;
+  intervieweeUserId: string;
   /** @minLength 1 */
-  interviewerUserId: string;
+  interviewerEmail: string;
   /** @minLength 1 */
   mockInterviewId: string;
   mockInterviewRounds: MockInterviewRoundDto[];
+  /** @nullable */
+  seasonId?: string | null;
   startDate: string;
   timeTakenInMinutes: number;
 }
@@ -311,9 +311,6 @@ export interface MockInterviewRoundDto {
 export interface MockInterviewEntity {
   /** @nullable */
   deletedAtUtc?: string | null;
-  enrollment?: EnrollmentEntity;
-  /** @nullable */
-  enrollmentId?: string | null;
   interviewee?: UserEntity;
   /** @minLength 1 */
   intervieweeUserId: string;
@@ -325,6 +322,9 @@ export interface MockInterviewEntity {
   mockInterviewId: string;
   /** @nullable */
   mockInterviewRounds?: MockInterviewRoundEntity[] | null;
+  season?: SeasonEntity;
+  /** @nullable */
+  seasonId?: string | null;
   seasonWeek?: SeasonWeekEntity;
   /** @nullable */
   seasonWeekId?: string | null;
@@ -520,6 +520,8 @@ export interface GetIsUserEnrolledResponse {
   enrollmentId: string;
   isEnrolled: boolean;
   role: SeasonRole;
+  /** @minLength 1 */
+  seasonId: string;
   studentRolePromotion: SeasonStudentRolePromotion;
 }
 
@@ -788,13 +790,13 @@ export interface CreateMockInterviewResponseApiResponse {
 }
 
 export interface CreateMockInterviewRequest {
-  /** @nullable */
-  enrollmentId?: string | null;
   /** @minLength 1 */
-  intervieweeEmail: string;
+  intervieweeUserId: string;
   /** @minLength 1 */
-  interviewerUserId: string;
+  interviewerEmail: string;
   mockInterviewRounds: MockInterviewRoundDto[];
+  /** @nullable */
+  seasonId?: string | null;
   startDate: string;
   timeTakenInMinutes: number;
 }

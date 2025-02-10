@@ -9,10 +9,10 @@ public record UpdateMockInterviewRequest
   public string MockInterviewId { get; set; } = string.Empty;
 
   [Required]
-  public string IntervieweeEmail { get; set; } = string.Empty;
+  public string InterviewerEmail { get; set; } = string.Empty;
 
   [Required]
-  public string InterviewerUserId { get; set; } = string.Empty;
+  public string IntervieweeUserId { get; set; } = string.Empty;
 
   [Required]
   public DateTime StartDate { get; set; }
@@ -23,7 +23,7 @@ public record UpdateMockInterviewRequest
   [Required]
   public List<MockInterviewRoundDto> MockInterviewRounds { get; set; } = new();
 
-  public string? EnrollmentId { get; set; }
+  public string? SeasonId { get; set; }
 }
 
 public record UpdateMockInterviewResponse { }
@@ -33,8 +33,8 @@ public class UpdateMockInterviewRequestValidator : AbstractValidator<UpdateMockI
   public UpdateMockInterviewRequestValidator()
   {
     RuleFor(c => c.MockInterviewId).NotEmpty();
-    RuleFor(c => c.InterviewerUserId).NotEmpty();
-    RuleFor(c => c.IntervieweeEmail).NotEmpty().EmailAddress();
+    RuleFor(c => c.IntervieweeUserId).NotEmpty();
+    RuleFor(c => c.InterviewerEmail).NotEmpty().EmailAddress();
     RuleFor(c => c.StartDate).NotEmpty();
     RuleFor(c => c.TimeTakenInMinutes).NotEmpty().GreaterThan(0);
     RuleFor(c => c.MockInterviewRounds).NotEmpty();

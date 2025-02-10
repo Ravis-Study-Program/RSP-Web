@@ -139,6 +139,10 @@ public static class Message
   public const string MockInterviewUpdatedSuccessfully = "Mock interview updated successfully.";
   public const string MockInterviewCreationUnexpectedError =
     "An error occurred while creating the mock interview.";
+  public const string MockInterviewUpdateOnlyInterviewerAllowed =
+    "Only interviewers are allowed to update the mock interview.";
+  public const string MockInterviewDeletionOnlyInterviewerAllowed =
+    "Only interviewers are allowed to delete the mock interview.";
   public const string MockInterviewDeletionUnexpectedError =
     "An error occurred while deleting the mock interview.";
   public const string MockInterviewUpdateUnexpectedError =

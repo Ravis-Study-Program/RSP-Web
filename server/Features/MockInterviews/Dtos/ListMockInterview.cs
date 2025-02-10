@@ -18,7 +18,7 @@ public record ListMockInterviewRequest
   [Required]
   public bool IncludeCustom { get; set; }
 
-  public string? EnrollmentId { get; set; }
+  public string? SeasonId { get; set; }
 }
 
 public record ListMockInterviewResponse

@@ -293,39 +293,39 @@ public class TestDataSeeder
   }
 
   public async Task<string> SeedMockInterviewAsync(
-    string intervieweeEmail,
+    string interviewerEmail,
     string? enrollmentId = null,
-    string? interviewerUserId = null,
+    string? intervieweeUserId = null,
     DateTime? startDate = null,
     int? timeTakenInMinutes = null,
     List<MockInterviewRoundDto>? rounds = null
   )
   {
-    var user = await _userService.GetUserByEmailAsync(intervieweeEmail);
-    Assert.NotNull(user);
+    var interviewer = await _userService.GetUserByEmailAsync(interviewerEmail);
+    var seasonId = await SeedSeasonAsync(null, DateTime.UtcNow, DateTime.UtcNow.AddDays(4 * 7));
+    Assert.NotNull(interviewer);
+
+    if (string.IsNullOrWhiteSpace(intervieweeUserId))
+    {
+      // Create a new user for the interviewer
+      intervieweeUserId = await SeedUserAsync();
+    }
 
     if (string.IsNullOrWhiteSpace(enrollmentId))
     {
       // If none provided, create an enrollment that matches the user
-      var seasonId = await SeedSeasonAsync(null, DateTime.UtcNow, DateTime.UtcNow.AddDays(4 * 7));
-      enrollmentId = await SeedEnrollmentAsync(seasonId, user.UserId);
+      await SeedEnrollmentAsync(seasonId, intervieweeUserId);
       for (var i = 0; i <= 2; i++)
       {
         await SeedSeasonWeekAsync(seasonId, i);
       }
     }
 
-    if (string.IsNullOrWhiteSpace(interviewerUserId))
-    {
-      // Create a new user for the interviewer
-      interviewerUserId = await SeedUserAsync();
-    }
-
     var request = new CreateMockInterviewRequest
     {
-      IntervieweeEmail = intervieweeEmail,
-      InterviewerUserId = interviewerUserId,
-      EnrollmentId = enrollmentId,
+      InterviewerEmail = interviewerEmail,
+      IntervieweeUserId = intervieweeUserId,
+      SeasonId = seasonId,
       StartDate = startDate ?? DateTime.UtcNow,
       TimeTakenInMinutes = timeTakenInMinutes ?? _faker.Random.Int(10, 60),
       MockInterviewRounds = rounds ?? new List<MockInterviewRoundDto>(),
