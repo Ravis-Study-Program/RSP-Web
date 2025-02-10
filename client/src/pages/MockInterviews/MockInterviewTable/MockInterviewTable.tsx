@@ -136,8 +136,7 @@ export const MockInterviewTable = ({
       },
       {
         header: 'Interviewee',
-        accessorFn: (row) =>
-          row.interviewee?.name ? `${row.interviewee.name}` : 'Error',
+        accessorFn: (row) => (row.interviewee?.name ? `${row.interviewee.name}` : 'Error'),
       },
       {
         header: 'Result',

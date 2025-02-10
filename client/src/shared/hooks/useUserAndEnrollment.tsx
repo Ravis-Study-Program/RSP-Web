@@ -35,6 +35,7 @@ export const useUserAndEnrollment = (seasonSlug: string, email: string | null = 
 
   const role = enrollmentsResponse?.responseBody?.role ?? null;
   const enrollmentId = enrollmentsResponse?.responseBody?.enrollmentId;
+  const seasonId = enrollmentsResponse?.responseBody?.seasonId;
   const isLoading =
     isCurrentUserLoading ||
     isUserLoading ||
@@ -46,6 +47,7 @@ export const useUserAndEnrollment = (seasonSlug: string, email: string | null = 
   return {
     user,
     isAdmin,
+    seasonId,
     role,
     enrollmentId,
     isLoading,

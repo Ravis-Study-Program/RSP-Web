@@ -15,7 +15,7 @@ export default function ProfilePage() {
   const email = searchParams.get('email') || '';
 
   const { seasonSlug } = useSeasonSlug();
-  const { enrollmentId, user, role } = useUserAndEnrollment(seasonSlug, email);
+  const { enrollmentId, seasonId, user, role } = useUserAndEnrollment(seasonSlug, email);
   const [section, setSection] = useState<'Leetcode' | 'Mock Interviews'>('Leetcode');
 
   const { data: problemAttemptsResponse, refetch: refetchProblemAttempts } = useListProblemAttempt({
@@ -26,7 +26,7 @@ export default function ProfilePage() {
   });
 
   const { data: mockInterviewsResponse, refetch: refetchMockInterviews } = useListMockInterview({
-    EnrollmentId: enrollmentId || undefined,
+    SeasonId: seasonId,
     IncludeCustom: true,
     IncludeLeetcode: true,
     IncludeBehavioural: true,
@@ -38,11 +38,11 @@ export default function ProfilePage() {
       <MockInterviewTable
         refetchMockInterviews={refetchMockInterviews}
         mockInterviews={mockInterviewsResponse?.responseBody?.mockInterviews}
-        enrollmentId={enrollmentId || ''}
+        seasonId={seasonId || ''}
         enableEditing={false}
       />
     );
-  }, [refetchMockInterviews, mockInterviewsResponse, enrollmentId]);
+  }, [refetchMockInterviews, mockInterviewsResponse, seasonId]);
 
   const LeetcodeComponent = useMemo(() => {
     return (

@@ -1,9 +1,9 @@
+import { useMemo, useState } from 'react';
+import { Flex, Group, MultiSelect, Select } from '@mantine/core';
 import { Layout } from '@/components/Layout/Layout';
 import { useGetIsCurrentUserEnrolled, useListMockInterview } from '@/generated/api/client';
 import { useSeasonSlug } from '@/shared/hooks/useSeasonSlug';
 import { optionsFilter } from '@/shared/table/globalFilters';
-import { Flex, Group, MultiSelect, Select } from '@mantine/core';
-import { useMemo, useState } from 'react';
 import { MockInterviewTable } from './MockInterviewTable/MockInterviewTable';
 import classes from './MockInterview.module.css';
 
@@ -27,62 +27,54 @@ export default function MockInterviewPage() {
   );
 
   const displayMockOptions = [
-    { label: "Received Mocks", value: 'false' },
-    { label: "Given Mocks", value: 'true' }
+    { label: 'Received Mocks', value: 'false' },
+    { label: 'Given Mocks', value: 'true' },
   ];
 
   const resultOptions = [
-    { label: "Pass", value: 'true' },
-    { label: "Fail", value: 'false' }
+    { label: 'Pass', value: 'true' },
+    { label: 'Fail', value: 'false' },
   ];
 
   const interviewersOptions = [
-    ...((mockInterviewsResponse?.responseBody?.mockInterviews || []).map(mockInterview => {
+    ...(mockInterviewsResponse?.responseBody?.mockInterviews || []).map((mockInterview) => {
       return {
-        label: mockInterview.interviewer?.name ?? "",
-        value: mockInterview.interviewer?.email ?? "",
+        label: mockInterview.interviewer?.name ?? '',
+        value: mockInterview.interviewer?.email ?? '',
       };
-    })),
-    ...((mockInterviewsResponse?.responseBody?.mockInterviews || []).map(mockInterview => {
+    }),
+    ...(mockInterviewsResponse?.responseBody?.mockInterviews || []).map((mockInterview) => {
       return {
-        label: mockInterview.interviewee?.name
-          ? `${mockInterview.interviewee.name}`
-          : "",
-        value: mockInterview.interviewee?.email ?? "",
+        label: mockInterview.interviewee?.name ? `${mockInterview.interviewee.name}` : '',
+        value: mockInterview.interviewee?.email ?? '',
       };
-    })),
+    }),
   ];
   const distinctInterviewersOptions = Array.from(
-    new Map(interviewersOptions.map(option => [option.value, option])).values()
+    new Map(interviewersOptions.map((option) => [option.value, option])).values()
   );
 
   const filteredMockInterviews = useMemo(() => {
     const mocks = mockInterviewsResponse?.responseBody?.mockInterviews || [];
-    return mocks.filter((mock) =>
-      (selectedIsPassResult === null && selectedIsGivenMocks === null && selectedInterviewers.length === 0) ||
-      (
-        (selectedIsPassResult === null ||
+    return mocks.filter(
+      (mock) =>
+        (selectedIsPassResult === null &&
+          selectedIsGivenMocks === null &&
+          selectedInterviewers.length === 0) ||
+        ((selectedIsPassResult === null ||
           (mock.isPass !== null &&
-           (typeof mock.isPass === 'boolean'
-              ? mock.isPass
-              : mock.isPass === 'true') === selectedIsPassResult)
-        ) &&
-        (selectedIsGivenMocks === null ||
-          (
+            (typeof mock.isPass === 'boolean' ? mock.isPass : mock.isPass === 'true') ===
+              selectedIsPassResult)) &&
+          (selectedIsGivenMocks === null ||
             (selectedIsGivenMocks === false &&
-             mock.interviewee?.email !== null &&
-             email === mock.interviewee?.email) ||
+              mock.interviewee?.email !== null &&
+              email === mock.interviewee?.email) ||
             (selectedIsGivenMocks === true &&
-             mock.interviewee?.email !== null &&
-             email !== mock.interviewee?.email)
-          )
-        ) &&
-        (selectedInterviewers.length === 0 ||
-          (mock.interviewer?.email != null &&
-            selectedInterviewers.includes(
-              mock.interviewer?.email.toString()
-            )))
-      )
+              mock.interviewee?.email !== null &&
+              email !== mock.interviewee?.email)) &&
+          (selectedInterviewers.length === 0 ||
+            (mock.interviewer?.email != null &&
+              selectedInterviewers.includes(mock.interviewer?.email.toString()))))
     );
   }, [
     email,
@@ -96,7 +88,7 @@ export default function MockInterviewPage() {
     <Layout>
       <Flex justify="space-between">
         <Group mb="lg" justify="flex-start">
-        <Select
+          <Select
             label="Mock Options"
             data={displayMockOptions}
             placeholder="Pick value"
@@ -115,7 +107,7 @@ export default function MockInterviewPage() {
           />
         </Group>
         <Group mb="lg" justify="flex-end">
-        <MultiSelect
+          <MultiSelect
             classNames={{ inputField: classes.inputField }}
             label="Interviewer"
             placeholder="Pick value(s)"
@@ -129,7 +121,7 @@ export default function MockInterviewPage() {
               setSelectedInterviewers(values as string[]);
             }}
           />
-        <Select
+          <Select
             label="Result"
             data={resultOptions}
             placeholder="Pick value"
