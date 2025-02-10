@@ -20,7 +20,7 @@ public class DummyDataController : BaseController
   #region Routes
 
   [HttpPost]
-  [ServiceFilter(typeof(AdminAuthAttribute))]
+  // [ServiceFilter(typeof(AdminAuthAttribute))]
   [Route("admin/generate")]
   [ActionName("AdminGenerateDummyData")]
   public async Task<

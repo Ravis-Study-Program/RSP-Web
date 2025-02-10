@@ -94,14 +94,15 @@ namespace RSPWebAPI.Tests.Tests
       var email1 = _faker.Internet.Email().ToLower();
       var email2 = _faker.Internet.Email().ToLower();
       var user1Id = await _seeder.SeedUserAsync(email1);
+      var seasonId = await _seeder.SeedSeasonAsync();
       await _seeder.SeedUserAsync(email2);
-      var enrollmentId = await _seeder.SeedEnrollmentAsync(userId: user1Id);
+      await _seeder.SeedEnrollmentAsync(userId: user1Id);
 
       var request = new CreateMockInterviewRequest
       {
-        IntervieweeEmail = email2,
-        InterviewerUserId = user1Id,
-        EnrollmentId = enrollmentId,
+        InterviewerEmail = email2,
+        IntervieweeUserId = user1Id,
+        SeasonId = seasonId,
         StartDate = DateTime.UtcNow,
       };
       var response = await MockInterviewService.CreateMockInterview(request);
@@ -124,35 +125,35 @@ namespace RSPWebAPI.Tests.Tests
       var updateRequest = new UpdateMockInterviewRequest
       {
         MockInterviewId = mockInterviewId,
-        EnrollmentId = existing.EnrollmentId,
-        InterviewerUserId = newUserId,
-        IntervieweeEmail = newUserEmail,
+        SeasonId = existing.SeasonId,
+        IntervieweeUserId = newUserId,
+        InterviewerEmail = email,
         StartDate = DateTime.UtcNow.AddDays(2),
         TimeTakenInMinutes = 90,
         MockInterviewRounds = new(),
       };
 
       var updateResp = await MockInterviewService.UpdateMockInterview(updateRequest);
-      Assert.True(updateResp.IsSuccess);
       Assert.Equal(Message.MockInterviewUpdatedSuccessfully, updateResp.Message);
+      Assert.True(updateResp.IsSuccess);
 
       var afterUpdate = await MockInterviewService.GetMockInterviewByIdAsync(mockInterviewId);
       Assert.NotNull(afterUpdate);
-      Assert.Equal(newUserId, afterUpdate!.InterviewerUserId);
+      Assert.Equal(newUserId, afterUpdate.IntervieweeUserId);
       Assert.Equal(90, afterUpdate.TimeTakenInMinutes);
     }
 
     [Fact]
     public async Task Delete_MockInterview_Removes_It()
     {
-      var interviewerEmail = _faker.Internet.Email().ToLower();
-      var interviewerId = await _seeder.SeedUserAsync(interviewerEmail);
       var intervieweeEmail = _faker.Internet.Email().ToLower();
-      await _seeder.SeedUserAsync(intervieweeEmail);
+      var intervieweeUserId = await _seeder.SeedUserAsync(intervieweeEmail);
+      var interviewerEmail = _faker.Internet.Email().ToLower();
+      await _seeder.SeedUserAsync(interviewerEmail);
 
       var mockInterviewId = await _seeder.SeedMockInterviewAsync(
-        intervieweeEmail,
-        interviewerUserId: interviewerId
+        interviewerEmail: interviewerEmail,
+        intervieweeUserId: intervieweeUserId
       );
 
       var request = new DeleteMockInterviewRequest
@@ -172,13 +173,13 @@ namespace RSPWebAPI.Tests.Tests
     public async Task Delete_MockInterview_Fails_If_Wrong_Email()
     {
       var email1 = _faker.Internet.Email().ToLower();
-      var interviewerId = await _seeder.SeedUserAsync(email1);
+      var intervieweeUserId = await _seeder.SeedUserAsync(email1);
       var email2 = _faker.Internet.Email().ToLower();
       await _seeder.SeedUserAsync(email2);
 
       var mockInterviewId = await _seeder.SeedMockInterviewAsync(
-        email2,
-        interviewerUserId: interviewerId
+        interviewerEmail: email2,
+        intervieweeUserId: intervieweeUserId
       );
 
       var request = new DeleteMockInterviewRequest
@@ -188,7 +189,7 @@ namespace RSPWebAPI.Tests.Tests
       };
       var deleteResp = await MockInterviewService.DeleteMockInterview(request);
       Assert.False(deleteResp.IsSuccess);
-      Assert.Equal(Message.MockInterviewDoesNotExists, deleteResp.Message);
+      Assert.Equal(Message.MockInterviewDeletionOnlyInterviewerAllowed, deleteResp.Message);
     }
 
     [Fact]

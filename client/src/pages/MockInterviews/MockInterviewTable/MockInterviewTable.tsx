@@ -29,7 +29,7 @@ import classes from './MockInterviewTable.module.css';
 
 export const MockInterviewTable = ({
   refetchMockInterviews,
-  enrollmentId,
+  seasonId,
   mockInterviews,
   enableEditing,
 }: MockInterviewTableProps) => {
@@ -98,10 +98,18 @@ export const MockInterviewTable = ({
   };
 
   const enrollmentColumn: MRT_ColumnDef<MockInterviewEntity> | null =
-    enrollmentId === null || enrollmentId === ''
+    seasonId === null || seasonId === ''
       ? {
           header: 'Season',
-          accessorFn: (row) => row.enrollment?.season?.slug || 'No Season',
+          accessorFn: (row) => row.season?.slug || 'No Season',
+        }
+      : null;
+
+  const seasonWeekColumn: MRT_ColumnDef<MockInterviewEntity> | null =
+    seasonId != null && seasonId !== ''
+      ? {
+          header: 'Season Week',
+          accessorFn: (row) => row.seasonWeek?.weekNumber || 'No Season week',
         }
       : null;
 
@@ -117,6 +125,7 @@ export const MockInterviewTable = ({
         },
       },
       ...(enrollmentColumn ? [enrollmentColumn] : []),
+      ...(seasonWeekColumn ? [seasonWeekColumn] : []),
       {
         header: 'Time Taken (mins)',
         accessorFn: (row) => row.timeTakenInMinutes,
@@ -124,6 +133,11 @@ export const MockInterviewTable = ({
       {
         header: 'Interviewer',
         accessorFn: (row) => row.interviewer?.name || 'Error',
+      },
+      {
+        header: 'Interviewee',
+        accessorFn: (row) =>
+          row.interviewee?.name ? `${row.interviewee.name}` : 'Error',
       },
       {
         header: 'Result',
@@ -185,7 +199,6 @@ export const MockInterviewTable = ({
           desc: true,
         },
       ],
-      expanded: true,
     },
     positionActionsColumn: 'last',
     getRowId: (row) => row.mockInterviewId?.toString(),
@@ -197,7 +210,7 @@ export const MockInterviewTable = ({
           table={table}
           users={users}
           leetcodeProblems={leetcodeProblemsResponse?.responseBody?.leetcodeProblems}
-          enrollmentId={enrollmentId || ''}
+          seasonId={seasonId || ''}
           createMockInterview={createMockInterview}
           refetchMockInterviews={refetchMockInterviews}
         />
@@ -209,7 +222,7 @@ export const MockInterviewTable = ({
           row={row}
           users={users}
           leetcodeProblems={leetcodeProblemsResponse?.responseBody?.leetcodeProblems}
-          enrollmentId={enrollmentId || ''}
+          seasonId={seasonId || ''}
           updateMockInterview={updateMockInterview}
           refetchMockInterviews={refetchMockInterviews}
         />
@@ -270,7 +283,7 @@ type MockInterviewTableProps = {
     options?: RefetchOptions
   ) => Promise<QueryObserverResult<ListMockInterviewResponseApiResponse, unknown>>;
   mockInterviews: MockInterviewEntity[] | null | undefined;
-  enrollmentId: string;
+  seasonId: string;
   enableEditing: boolean;
 };
 

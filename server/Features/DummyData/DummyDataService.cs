@@ -298,36 +298,40 @@ public class DummyDataService : IDummyDataService
     var seasonWeeksQueryable = await _unitOfWork.GetRepository<SeasonWeekEntity>().GetAllAsync();
     var seasonWeeks = seasonWeeksQueryable.ToList();
 
-    var interviewers = enrollments.Where(e => e.Role == SeasonRole.Mentor).ToList();
+    var interviewers = enrollments.Where(e => e.Role == SeasonRole.Student).ToList();
     var interviewees = enrollments.Where(e => e.Role == SeasonRole.Student).ToList();
 
     foreach (var interviewee in interviewees)
     {
-      var interviewer = faker.PickRandom(interviewers);
-      var currentSeasonWeeks = seasonWeeks.Where(s => s.SeasonId == interviewer.SeasonId);
-      var seasonWeek = faker.PickRandom(currentSeasonWeeks);
-
-      var mockInterview = new MockInterviewEntity
+      for (int i = 0; i < 10; i++)
       {
-        MockInterviewId = Database.Constants.GeneratePrimaryKeyId(),
-        IsPass = faker.Random.Bool(),
-        StartDate = faker.Date.Recent().ToUniversalTime(),
-        TimeTakenInMinutes = faker.Random.Int(30, 120),
-        InterviewerUserId = interviewer.UserId,
-        IntervieweeUserId = interviewee.UserId,
-        EnrollmentId = interviewee.EnrollmentId,
-        Interviewer = interviewer.User,
-        Interviewee = interviewee.User,
-        Enrollment = interviewee,
-        SeasonWeekId = seasonWeek.SeasonWeekId,
-        DeletedAtUtc = null,
-      };
+        var filteredInterviewers = interviewers.Where(i => i.UserId != interviewee.UserId);
+        var interviewer = faker.PickRandom(filteredInterviewers);
+        var currentSeasonWeeks = seasonWeeks.Where(s => s.SeasonId == interviewer.SeasonId);
+        var seasonWeek = faker.PickRandom(currentSeasonWeeks);
 
-      mockInterview.MockInterviewRounds = await GenerateMockInterviewRounds(
-        faker,
-        mockInterview.MockInterviewId
-      );
-      mockInterviews.Add(mockInterview);
+        var mockInterview = new MockInterviewEntity
+        {
+          MockInterviewId = Database.Constants.GeneratePrimaryKeyId(),
+          IsPass = faker.Random.Bool(),
+          StartDate = faker.Date.Recent().ToUniversalTime(),
+          TimeTakenInMinutes = faker.Random.Int(30, 120),
+          InterviewerUserId = interviewer.UserId,
+          IntervieweeUserId = interviewee.UserId,
+          SeasonId = interviewee.EnrollmentId,
+          Interviewer = interviewer.User,
+          Interviewee = interviewee.User,
+          Season = interviewee.Season,
+          SeasonWeekId = seasonWeek.SeasonWeekId,
+          DeletedAtUtc = null,
+        };
+
+        mockInterview.MockInterviewRounds = await GenerateMockInterviewRounds(
+          faker,
+          mockInterview.MockInterviewId
+        );
+        mockInterviews.Add(mockInterview);
+      }
     }
 
     return mockInterviews;
@@ -339,9 +343,33 @@ public class DummyDataService : IDummyDataService
   )
   {
     var rounds = new List<MockInterviewRoundEntity>();
-    var roundCount = faker.Random.Int(1, 3);
 
-    for (var i = 0; i < roundCount; i++)
+    var behaviouralRound = new BehaviouralMockInterviewRoundEntity()
+    {
+      BehaviouralMockInterviewRoundId = Database.Constants.GeneratePrimaryKeyId(),
+      BehavioralScore = faker.Random.Int(0, 10),
+      DeletedAtUtc = null,
+    };
+    await _unitOfWork
+      .GetRepository<BehaviouralMockInterviewRoundEntity>()
+      .AddAsync(behaviouralRound);
+    await _unitOfWork.SaveChangesAsync();
+    rounds.Add(
+      new MockInterviewRoundEntity
+      {
+        MockInterviewRoundId = Database.Constants.GeneratePrimaryKeyId(),
+        MockInterviewId = mockInterviewId,
+        IsReviewedByInterviewee = faker.Random.Bool(),
+        IntervieweeComment = faker.Lorem.Sentence(),
+        BehaviouralMockInterviewRoundId = behaviouralRound.BehaviouralMockInterviewRoundId,
+        LeetcodeMockInterviewRoundId = null,
+        CustomMockInterviewRoundId = null,
+        DeletedAtUtc = null,
+      }
+    );
+
+    // 2 is intentionally chosen here, because there is an assumption that we always have 2 rounds
+    for (var i = 0; i < 2; i++)
     {
       var leetcodeRound = await GenerateLeetcodeMockInterviewRound(faker);
       await _unitOfWork.GetRepository<LeetcodeMockInterviewRoundEntity>().AddAsync(leetcodeRound);
