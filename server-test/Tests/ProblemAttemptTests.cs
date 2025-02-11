@@ -65,7 +65,7 @@ namespace RSPWebAPI.Tests.Tests
 
       var listRequest = new ListProblemAttemptRequest
       {
-        Email = email,
+        Emails = new List<string> { email },
         IncludeLeetcode = false,
         IncludeCustom = false,
       };
@@ -246,7 +246,7 @@ namespace RSPWebAPI.Tests.Tests
 
       var listRequest = new ListProblemAttemptRequest
       {
-        Email = email,
+        Emails = new List<string> { email },
         IncludeLeetcode = true,
         IncludeCustom = true,
       };

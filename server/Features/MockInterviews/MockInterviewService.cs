@@ -196,25 +196,29 @@ public class MockInterviewService : IMockInterviewService
     var query = _mockInterviewRepository.Table;
     if (request.SeasonId != null)
     {
-      var existingUser = await _userService.GetUserByEmailAsync(request.Email, cancellationToken);
-      if (existingUser == null)
+      // TODO: Parallelize to speed things up
+      foreach (var email in request.Emails)
       {
-        return new ErrorServiceResponse<ListMockInterviewResponse>(Message.UserIdDoesNotExists);
+        var existingUser = await _userService.GetUserByEmailAsync(email, cancellationToken);
+        if (existingUser == null)
+        {
+          return new ErrorServiceResponse<ListMockInterviewResponse>(Message.UserIdDoesNotExists);
+        }
+
+        var existingEnrollment = await _enrollmentService.GetEnrollmentBySeasonId(
+          request.SeasonId,
+          existingUser.UserId,
+          null,
+          cancellationToken,
+          q => q.Include(e => e.User)
+        );
+        if (existingEnrollment == null || existingEnrollment.User.Email != email)
+        {
+          return new ErrorServiceResponse<ListMockInterviewResponse>(Message.SeasonDoesNotExists);
+        }
       }
 
-      var existingEnrollment = await _enrollmentService.GetEnrollmentBySeasonId(
-        request.SeasonId,
-        existingUser.UserId,
-        null,
-        cancellationToken,
-        q => q.Include(e => e.User)
-      );
-      if (existingEnrollment == null || existingEnrollment.User.Email != request.Email)
-      {
-        return new ErrorServiceResponse<ListMockInterviewResponse>(Message.SeasonDoesNotExists);
-      }
-
-      query = query.Where(m => m.SeasonId == existingEnrollment.SeasonId);
+      query = query.Where(m => m.SeasonId == request.SeasonId);
     }
 
     if (request.IncludeBehavioural)
@@ -247,7 +251,9 @@ public class MockInterviewService : IMockInterviewService
       .Include(e => e.Season);
 
     var mockInterviews = await _mockInterviewRepository.GetAllAsync(
-      m => m.Interviewer.Email == request.Email || m.Interviewee.Email == request.Email,
+      m =>
+        request.Emails.Contains(m.Interviewer.Email)
+        || request.Emails.Contains(m.Interviewee.Email),
       cancellationToken,
       _ => query
     );

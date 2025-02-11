@@ -1,4 +1,5 @@
 import Axios, { AxiosRequestConfig } from 'axios';
+import qs from 'qs';
 import { auth0Client } from '../auth/Auth0Client';
 
 export const CustomAxiosInstance = async <T>(
@@ -14,12 +15,16 @@ export const CustomAxiosInstance = async <T>(
       Authorization: token ? `Bearer ${token}` : undefined,
     };
 
-    const promise = Axios({
+    // Merge the configurations and add the paramsSerializer option.
+    const mergedConfig: AxiosRequestConfig = {
       ...config,
       ...options,
       headers,
       cancelToken: source.token,
-    }).then(({ data }) => data);
+      paramsSerializer: (params) => qs.stringify(params, { arrayFormat: 'repeat' }),
+    };
+
+    const promise = Axios(mergedConfig).then(({ data }) => data);
 
     return promise;
   } catch (err) {

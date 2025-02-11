@@ -1,0 +1,7 @@
+.control {
+  background-color: white;
+}
+
+.inputField:not(:only-child) {
+  display: none;
+}

@@ -24,7 +24,7 @@ export const StudentRolePromotionUpdateModal = ({
   table,
   row: { original: mentee },
   updateStudentRolePromotion,
-  refetchMentees,
+  refetchMentorships,
   seasonSlug,
 }: studentRolePromotionUpdateModalProps) => {
   const { data: userResponse } = useGetCurrentUser();
@@ -51,7 +51,7 @@ export const StudentRolePromotionUpdateModal = ({
           ],
       };
       await updateStudentRolePromotion({ data: requestData });
-      await refetchMentees();
+      await refetchMentorships();
       table.setEditingRow(null);
       notifications.show({
         color: 'green',
@@ -113,7 +113,7 @@ type studentRolePromotionUpdateModalProps = {
     unknown
   >;
   row: MRT_Row<MentorshipResponse>;
-  refetchMentees: (
+  refetchMentorships: (
     options?: RefetchOptions
   ) => Promise<QueryObserverResult<GetCurrentUserMenteesListResponseApiResponse, unknown>>;
   seasonSlug: string;

@@ -65,7 +65,7 @@ namespace RSPWebAPI.Tests.Tests
 
       var listRequest = new ListMockInterviewRequest
       {
-        Email = email,
+        Emails = new List<string> { email },
         IncludeBehavioural = false,
         IncludeLeetcode = false,
         IncludeCustom = false,
@@ -201,7 +201,7 @@ namespace RSPWebAPI.Tests.Tests
 
       var listRequest = new ListMockInterviewRequest
       {
-        Email = email,
+        Emails = new List<string> { email },
         IncludeBehavioural = true,
         IncludeLeetcode = true,
         IncludeCustom = true,

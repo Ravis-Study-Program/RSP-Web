@@ -180,21 +180,32 @@ public class ProblemAttemptService : IProblemAttemptService
   )
   {
     var query = _problemAttemptRepository.Table;
-    if (request.EnrollmentId != null)
+
+    if (request.SeasonId != null)
     {
-      var existingEnrollment = await _enrollmentService.GetEnrollmentByIdAsync(
-        request.EnrollmentId,
-        cancellationToken,
-        q => q.Include(e => e.User)
-      );
-      if (existingEnrollment == null || existingEnrollment.User.Email != request.Email)
+      // TODO: Parallelize to speed things up
+      foreach (var email in request.Emails)
       {
-        return new ErrorServiceResponse<ListProblemAttemptResponse>(
-          Message.EnrollmentDoesNotExists
+        var existingUser = await _userService.GetUserByEmailAsync(email, cancellationToken);
+        if (existingUser == null)
+        {
+          return new ErrorServiceResponse<ListProblemAttemptResponse>(Message.UserIdDoesNotExists);
+        }
+
+        var existingEnrollment = await _enrollmentService.GetEnrollmentBySeasonId(
+          request.SeasonId,
+          existingUser.UserId,
+          null,
+          cancellationToken,
+          q => q.Include(e => e.User)
         );
+        if (existingEnrollment == null || existingEnrollment.User.Email != email)
+        {
+          return new ErrorServiceResponse<ListProblemAttemptResponse>(Message.SeasonDoesNotExists);
+        }
       }
 
-      query = query.Where(p => p.EnrollmentId == request.EnrollmentId);
+      query = query.Where(p => p.Enrollment.SeasonId == request.SeasonId);
     }
 
     if (request.IncludeLeetcode)
@@ -214,7 +225,7 @@ public class ProblemAttemptService : IProblemAttemptService
     query = query.Include(e => e.User).Include(e => e.Enrollment).Include(e => e.SeasonWeek);
 
     var problemAttempts = await _problemAttemptRepository.GetAllAsync(
-      p => p.User.Email == request.Email,
+      p => request.Emails.Contains(p.User.Email),
       cancellationToken,
       _ => query
     );
