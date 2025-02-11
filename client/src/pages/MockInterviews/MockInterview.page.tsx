@@ -21,7 +21,7 @@ export default function MockInterviewPage() {
       IncludeCustom: true,
       IncludeLeetcode: true,
       IncludeBehavioural: true,
-      Email: email,
+      Emails: [email],
     },
     { query: { enabled: email !== '' } }
   );

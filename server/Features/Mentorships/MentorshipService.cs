@@ -341,9 +341,11 @@ public class MentorshipService : IMentorshipService
         SeasonSlug = m.MentorEnrollment.Season.Slug,
         MentorEnrollmentId = m.MentorEnrollmentId,
         MentorName = m.MentorEnrollment.User.Name,
+        MentorEmail = m.MentorEnrollment.User.Email,
         MenteeEnrollmentId = m.MenteeEnrollmentId,
         MenteeName = m.MenteeEnrollment.User.Name,
         StudentRolePromotion = m.MenteeEnrollment.StudentRolePromotion,
+        MenteeEmail = m.MenteeEnrollment.User.Email,
       })
       .ToList();
     try

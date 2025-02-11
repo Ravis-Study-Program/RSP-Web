@@ -74,7 +74,7 @@ public class LeetcodeProblemRecommendationService : ILeetcodeProblemRecommendati
     var problemAttemptsResponse = await _problemAttemptService.ListProblemAttempt(
       new ListProblemAttemptRequest
       {
-        Email = user.Email,
+        Emails = new List<string> { user.Email },
         IncludeLeetcode = true,
         IncludeCustom = false,
       },

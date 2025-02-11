@@ -44,10 +44,10 @@ export default function LeetcodePage() {
 
   const { data: problemAttemptsResponse, refetch: refetchProblemAttempts } = useListProblemAttempt(
     {
-      EnrollmentId: userResponse?.responseBody?.enrollmentId || undefined,
+      SeasonId: userResponse?.responseBody?.seasonId || undefined,
       IncludeCustom: !isLeetcode,
       IncludeLeetcode: isLeetcode,
-      Email: email,
+      Emails: [email],
     },
     { query: { enabled: email !== '' } }
   );
@@ -172,6 +172,7 @@ export default function LeetcodePage() {
         problemAttempts={filteredProblemAttempts}
         enrollmentId={userResponse?.responseBody?.enrollmentId || ''}
         enableEditing
+        showAuthor={false}
       />
     </Layout>
   );

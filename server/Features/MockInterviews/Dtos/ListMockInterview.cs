@@ -7,7 +7,7 @@ namespace RSPWebAPI.Features.MockInterviews.Dtos;
 public record ListMockInterviewRequest
 {
   [Required]
-  public string Email { get; set; } = string.Empty;
+  public IList<string> Emails { get; set; } = new List<string>();
 
   [Required]
   public bool IncludeLeetcode { get; set; }
@@ -31,6 +31,7 @@ public class ListMockInterviewRequestValidator : AbstractValidator<ListMockInter
 {
   public ListMockInterviewRequestValidator()
   {
-    RuleFor(c => c.Email).NotEmpty().EmailAddress();
+    RuleFor(c => c.Emails).NotEmpty().WithMessage("At least one email address must be provided.");
+    RuleForEach(c => c.Emails).EmailAddress();
   }
 }

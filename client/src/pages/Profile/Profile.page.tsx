@@ -18,20 +18,26 @@ export default function ProfilePage() {
   const { enrollmentId, seasonId, user, role } = useUserAndEnrollment(seasonSlug, email);
   const [section, setSection] = useState<'Leetcode' | 'Mock Interviews'>('Leetcode');
 
-  const { data: problemAttemptsResponse, refetch: refetchProblemAttempts } = useListProblemAttempt({
-    EnrollmentId: enrollmentId || undefined,
-    IncludeCustom: false,
-    IncludeLeetcode: true,
-    Email: email,
-  });
+  const { data: problemAttemptsResponse, refetch: refetchProblemAttempts } = useListProblemAttempt(
+    {
+      SeasonId: seasonId || undefined,
+      IncludeCustom: false,
+      IncludeLeetcode: true,
+      Emails: [email],
+    },
+    { query: { enabled: email !== '' } }
+  );
 
-  const { data: mockInterviewsResponse, refetch: refetchMockInterviews } = useListMockInterview({
-    SeasonId: seasonId,
-    IncludeCustom: true,
-    IncludeLeetcode: true,
-    IncludeBehavioural: true,
-    Email: email,
-  });
+  const { data: mockInterviewsResponse, refetch: refetchMockInterviews } = useListMockInterview(
+    {
+      SeasonId: seasonId,
+      IncludeCustom: true,
+      IncludeLeetcode: true,
+      IncludeBehavioural: true,
+      Emails: [email],
+    },
+    { query: { enabled: email !== '' } }
+  );
 
   const MockInterviewComponent = useMemo(() => {
     return (
@@ -51,6 +57,7 @@ export default function ProfilePage() {
         problemAttempts={problemAttemptsResponse?.responseBody?.problemAttempts}
         enrollmentId={enrollmentId || ''}
         enableEditing={false}
+        showAuthor={false}
       />
     );
   }, [refetchProblemAttempts, problemAttemptsResponse, enrollmentId]);

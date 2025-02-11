@@ -49,14 +49,14 @@ export type AdminListSeasonParams = {
 };
 
 export type ListProblemAttemptParams = {
-  Email: string;
+  Emails: string[];
   IncludeLeetcode: boolean;
   IncludeCustom: boolean;
-  EnrollmentId?: string;
+  SeasonId?: string;
 };
 
 export type ListMockInterviewParams = {
-  Email: string;
+  Emails: string[];
   IncludeLeetcode: boolean;
   IncludeBehavioural: boolean;
   IncludeCustom: boolean;
@@ -334,9 +334,13 @@ export interface MockInterviewEntity {
 
 export interface MentorshipResponse {
   /** @minLength 1 */
+  menteeEmail: string;
+  /** @minLength 1 */
   menteeEnrollmentId: string;
   /** @minLength 1 */
   menteeName: string;
+  /** @minLength 1 */
+  mentorEmail: string;
   /** @minLength 1 */
   mentorEnrollmentId: string;
   /** @minLength 1 */

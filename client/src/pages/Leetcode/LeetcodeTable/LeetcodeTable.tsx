@@ -42,6 +42,7 @@ export const LeetcodeTable = ({
   enrollmentId,
   problemAttempts,
   enableEditing,
+  showAuthor,
 }: LeetcodeTableProps) => {
   const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
 
@@ -117,6 +118,13 @@ export const LeetcodeTable = ({
         }
       : null;
 
+  const authorColumn: MRT_ColumnDef<ProblemAttemptEntity> | null = showAuthor
+    ? {
+        header: 'Author',
+        accessorFn: (row) => row.enrollment?.user?.name || 'No User',
+      }
+    : null;
+
   const columns = useMemo<MRT_ColumnDef<ProblemAttemptEntity>[]>(
     () => [
       {
@@ -130,6 +138,7 @@ export const LeetcodeTable = ({
       },
       ...(enrollmentColumn ? [enrollmentColumn] : []),
       ...(seasonWeekColumn ? [seasonWeekColumn] : []),
+      ...(authorColumn ? [authorColumn] : []),
       {
         header: 'Time Taken (mins)',
         accessorFn: (row) => row.timeTakenInMinutes,
@@ -304,4 +313,5 @@ type LeetcodeTableProps = {
   problemAttempts: ProblemAttemptEntity[] | null | undefined;
   enrollmentId: string;
   enableEditing: boolean;
+  showAuthor: boolean;
 };

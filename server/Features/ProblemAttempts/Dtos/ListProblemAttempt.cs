@@ -7,7 +7,7 @@ namespace RSPWebAPI.Features.ProblemAttempts.Dtos;
 public record ListProblemAttemptRequest
 {
   [Required]
-  public string Email { get; set; } = string.Empty;
+  public IList<string> Emails { get; set; } = new List<string>();
 
   [Required]
   public bool IncludeLeetcode { get; set; }
@@ -15,7 +15,7 @@ public record ListProblemAttemptRequest
   [Required]
   public bool IncludeCustom { get; set; }
 
-  public string? EnrollmentId { get; set; }
+  public string? SeasonId { get; set; }
 }
 
 public record ListProblemAttemptResponse
@@ -29,6 +29,7 @@ public class ListProblemAttemptRequestValidator : AbstractValidator<ListProblemA
 {
   public ListProblemAttemptRequestValidator()
   {
-    RuleFor(c => c.Email).NotEmpty().EmailAddress();
+    RuleFor(c => c.Emails).NotEmpty().WithMessage("At least one email address must be provided.");
+    RuleForEach(c => c.Emails).EmailAddress();
   }
 }

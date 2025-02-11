@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { IconEdit, IconTrash } from '@tabler/icons-react';
+import { QueryObserverResult, RefetchOptions } from '@tanstack/react-query';
 import {
   MantineReactTable,
   MRT_ColumnDef,
@@ -10,11 +11,11 @@ import { ActionIcon, Flex, Text, Title, Tooltip } from '@mantine/core';
 import { modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
 import {
+  GetCurrentUserMenteesListResponseApiResponse,
   KickStudentResponseApiResponse,
   MentorshipResponse,
   SeasonStudentRolePromotion,
   useGetCurrentUser,
-  useGetCurrentUserMentees,
   useKickStudent,
   useUpdateStudentRolePromotion,
 } from '@/generated/api/client';
@@ -22,17 +23,10 @@ import { useSeasonSlug } from '@/shared/hooks/useSeasonSlug';
 import { StudentRolePromotionUpdateModal } from './StudentRolePromotionUpdateModal';
 import classes from './MenteesTable.module.css';
 
-export const MenteesTable = () => {
+export const MenteesTable = ({ refetchMentorships, mentorships }: MenteesTableProps) => {
   const { seasonSlug } = useSeasonSlug();
   const { data: userResponse } = useGetCurrentUser();
   const email = userResponse?.responseBody?.user.email ?? '';
-  const {
-    data: menteeResponse,
-    isError: isLoadingMenteesError,
-    isFetching: isFetchingMentees,
-    isLoading: isLoadingMentees,
-    refetch: refetchMentees,
-  } = useGetCurrentUserMentees({ SeasonSlug: seasonSlug, Email: email });
   const { mutateAsync: kickStudent, status: isKickingStudentStatus } = useKickStudent();
   const { mutateAsync: updateStudentRolePromotion, status: isUpdatingStudentRolePromotionStatus } =
     useUpdateStudentRolePromotion();
@@ -60,7 +54,7 @@ export const MenteesTable = () => {
               email,
             },
           });
-          await refetchMentees();
+          await refetchMentorships();
           modals.closeAll();
           notifications.show({
             color: 'green',
@@ -87,6 +81,7 @@ export const MenteesTable = () => {
         header: 'Name',
       },
       {
+        accessorKey: 'studentRolePromotion',
         header: 'Student Role Promotion',
         accessorFn: (row) => {
           const roleKey = Object.keys(SeasonStudentRolePromotion).find(
@@ -104,7 +99,7 @@ export const MenteesTable = () => {
 
   const table = useMantineReactTable({
     columns,
-    data: menteeResponse?.responseBody?.mentorships ?? [],
+    data: mentorships || [],
     createDisplayMode: 'modal',
     mantineEditRowModalProps: {
       closeOnClickOutside: false,
@@ -121,26 +116,21 @@ export const MenteesTable = () => {
       density: 'xs',
       sorting: [
         {
-          id: 'menteeName',
+          id: 'studentRolePromotion',
           desc: true,
         },
       ],
     },
     positionActionsColumn: 'last',
     getRowId: (row) => row.menteeEnrollmentId?.toString(),
-    mantineToolbarAlertBannerProps: isLoadingMenteesError
-      ? {
-          color: 'red',
-          children: 'Error loading data',
-        }
-      : undefined,
+    mantineToolbarAlertBannerProps: undefined,
     isMultiSortEvent: () => true,
     renderEditRowModalContent: ({ table, row }) => (
       <StudentRolePromotionUpdateModal
         table={table}
         row={row}
         updateStudentRolePromotion={updateStudentRolePromotion}
-        refetchMentees={refetchMentees}
+        refetchMentorships={refetchMentorships}
         seasonSlug={seasonSlug}
       />
     ),
@@ -159,13 +149,17 @@ export const MenteesTable = () => {
       </Flex>
     ),
     state: {
-      isLoading: isLoadingMentees,
       isSaving:
         isKickingStudentStatus === 'pending' || isUpdatingStudentRolePromotionStatus === 'pending',
-      showAlertBanner: isLoadingMenteesError,
-      showProgressBars: isFetchingMentees,
     },
   });
 
   return <MantineReactTable table={table} />;
+};
+
+type MenteesTableProps = {
+  refetchMentorships: (
+    options?: RefetchOptions
+  ) => Promise<QueryObserverResult<GetCurrentUserMenteesListResponseApiResponse, unknown>>;
+  mentorships: MentorshipResponse[] | null | undefined;
 };
