@@ -2,6 +2,8 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import tsconfigPaths from 'vite-tsconfig-paths';
 
+console.log("VITE_APP_SERVER_URL from vite.config.js:", process.env.VITE_APP_SERVER_URL);
+
 export default defineConfig({
   plugins: [react(), tsconfigPaths()],
   test: {
@@ -11,6 +13,11 @@ export default defineConfig({
   },
   server: {
     port: 3000,
+    host: '0.0.0.0',
+    strictPort: true
+  },
+  preview: {
+    port: 80,
     host: '0.0.0.0',
     strictPort: true
   },

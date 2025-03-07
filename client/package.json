@@ -5,7 +5,7 @@
   "version": "0.0.0",
   "scripts": {
     "dev": "npm run generate:client && vite --host 0.0.0.0",
-    "build": "tsc && vite build",
+    "build": "npm run generate:client && vite build && serve -s dist -l 80",
     "generate:client": "rm -rf ./src/generated && orval",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
@@ -19,8 +19,12 @@
     "final": "npm run typecheck && npm run prettier:write && npm run lint && npm run vitest && npm run build",
     "format-and-test": "npm run generate:client && npm run typecheck && npm run prettier:write && npm run lint && npm run vitest",
     "cicd-format-and-test": "npm run typecheck && npm run prettier:write && npm run lint && npm run vitest",
+    "prepare": "husky",
     "storybook": "storybook dev -p 6006",
     "storybook:build": "storybook build"
+  },
+  "optionalDependencies": {
+    "@rollup/rollup-linux-x64-gnu": "4.6.1"
   },
   "dependencies": {
     "@auth0/auth0-react": "^2.2.4",
@@ -47,6 +51,7 @@
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.26.1",
     "recharts": "2",
+    "serve": "^14.2.4",
     "zod": "^3.23.8"
   },
   "devDependencies": {
@@ -70,6 +75,7 @@
     "eslint-config-mantine": "^4.0.1",
     "eslint-plugin-jsx-a11y": "^6.9.0",
     "eslint-plugin-react": "^7.35.0",
+    "husky": "^9.1.6",
     "identity-obj-proxy": "^3.0.0",
     "jsdom": "^25.0.0",
     "orval": "^7.1.1",
@@ -87,6 +93,5 @@
     "vite": "^5.4.2",
     "vite-tsconfig-paths": "^5.0.1",
     "vitest": "^2.0.5"
-  },
-  "packageManager": "yarn@4.2.2"
+  }
 }
