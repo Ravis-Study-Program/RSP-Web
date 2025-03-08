@@ -40,3 +40,4 @@ riderModule.iml
 
 appsettings.json
 appsettings.*.json
+client/src/generated/api
