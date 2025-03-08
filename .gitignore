@@ -11,6 +11,9 @@ node_modules
 dist
 dist-ssr
 *.local
+postgres-data
+nginx/
+certs/
 
 # Editor directories and files
 .vscode/*
@@ -37,3 +40,4 @@ riderModule.iml
 
 appsettings.json
 appsettings.*.json
+client/src/generated/api

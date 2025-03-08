@@ -14,6 +14,11 @@ export default defineConfig({
     host: '0.0.0.0',
     strictPort: true
   },
+  preview: {
+    port: 80,
+    host: '0.0.0.0',
+    strictPort: true
+  },
   resolve: {
     alias: {
       // /esm/icons/index.mjs only exports the icons statically, so no separate chunks are created

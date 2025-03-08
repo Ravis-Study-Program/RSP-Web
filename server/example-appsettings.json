@@ -16,7 +16,7 @@
   "Kestrel": {
     "Endpoints": {
       "Http": {
-        "Url": "http://localhost:4000"
+        "Url": "http://0.0.0.0:4000"
       }
     }
   }

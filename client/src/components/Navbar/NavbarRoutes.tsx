@@ -8,7 +8,6 @@ import {
   IconFolders,
   IconLink,
   IconSchool,
-  IconSeeding,
   IconSettings,
   IconStar,
   IconUser,
@@ -76,7 +75,7 @@ const getStudentTabs = (seasonSlug: string | null): Tabs => ({
         },
         {
           label: 'Season Users',
-          icon: IconSeeding,
+          icon: IconStar,
           link: `/seasons/${seasonSlug}/users`,
           hidden: false,
         },
@@ -102,7 +101,7 @@ const getMentorTabs = (seasonSlug: string | null): Tabs => ({
         { label: seasonSlug, icon: IconLink, link: `/seasons/${seasonSlug}`, hidden: true },
         {
           label: 'Season Users',
-          icon: IconSeeding,
+          icon: IconStar,
           link: `/seasons/${seasonSlug}/users`,
           hidden: false,
         },
@@ -134,7 +133,7 @@ const getCoordinatorTabs = (seasonSlug: string | null): Tabs => ({
         { label: seasonSlug, icon: IconLink, link: `/seasons/${seasonSlug}`, hidden: true },
         {
           label: 'Season Users',
-          icon: IconSeeding,
+          icon: IconStar,
           link: `/seasons/${seasonSlug}/users`,
           hidden: false,
         },
@@ -161,7 +160,7 @@ const getAdminTabs = (seasonSlug: string | null): Tabs => ({
         { label: seasonSlug, icon: IconLink, link: `/seasons/${seasonSlug}`, hidden: true },
         {
           label: 'Season Users',
-          icon: IconSeeding,
+          icon: IconStar,
           link: `/seasons/${seasonSlug}/users`,
           hidden: false,
         },
