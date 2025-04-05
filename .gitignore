@@ -31,6 +31,7 @@ certs/
 .vite
 .yarn
 .env
+.env.*
 bin/
 obj/
 /packages/

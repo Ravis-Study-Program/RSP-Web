@@ -140,8 +140,8 @@ public class LeetcodeService : ILeetcodeService
       {
         var title = $"{question.QuestionId}. {question.Title}";
         var existingLeetcode =
-          await _problemRepository.TableNoTracking // Avoid tracking errors
-          .FirstOrDefaultAsync(p => p.Title == title, cancellationToken);
+          await _leetcodeProblemRepository.TableNoTracking // Avoid tracking errors
+            .FirstOrDefaultAsync(p => p.LeetcodeNumber == int.Parse(question.QuestionId), cancellationToken);
         if (existingLeetcode != null)
         {
           continue;
@@ -150,6 +150,7 @@ public class LeetcodeService : ILeetcodeService
         var newLeetcodeProblem = new LeetcodeProblemEntity
         {
           LeetcodeProblemId = Database.Constants.GeneratePrimaryKeyId(),
+          LeetcodeNumber = int.Parse(question.QuestionId),
           Problem = new ProblemEntity
           {
             ProblemId = Database.Constants.GeneratePrimaryKeyId(),
@@ -197,7 +198,7 @@ public class LeetcodeService : ILeetcodeService
     }
 
     return new SuccessServiceResponse<AdminPopulateLeetcodeQuestionsResponse>(
-      Message.LeetcodeProblemsListSuccessfully
+      Message.LeetcodeProblemsScrapedSuccessfully
     );
   }
 

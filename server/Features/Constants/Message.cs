@@ -133,6 +133,8 @@ public static class Message
 
   public const string LeetcodeProblemsListSuccessfully =
     "Leetcode problems list retrieved successfully.";
+  public const string LeetcodeProblemsScrapedSuccessfully =
+    "Leetcode problems list scraped successfully.";
 
   public const string MockInterviewCreatedSuccessfully = "Mock interview created successfully.";
   public const string MockInterviewDoesNotExists = "No mock interview was found with the given ID.";

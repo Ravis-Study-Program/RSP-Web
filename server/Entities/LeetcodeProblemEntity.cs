@@ -14,6 +14,9 @@ public class LeetcodeProblemEntity : ISoftDelete
   public string ProblemId { get; set; } = string.Empty;
 
   [Required]
+  public int LeetcodeNumber { get; set; }
+
+  [Required]
   public LeetcodeProblemDifficulty LeetcodeProblemDifficulty { get; set; }
 
   [Required]
@@ -43,6 +46,11 @@ public class LeetcodeProblemEntityConfiguration : IEntityTypeConfiguration<Leetc
       .Property(x => x.ProblemId)
       .HasColumnName("ProblemId")
       .HasColumnType("varchar(16)")
+      .IsRequired();
+    builder
+      .Property(x => x.LeetcodeNumber)
+      .HasColumnName("LeetcodeNumber")
+      .HasColumnType("int")
       .IsRequired();
     builder
       .Property(x => x.LeetcodeProblemDifficulty)

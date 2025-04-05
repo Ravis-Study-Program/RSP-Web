@@ -1,0 +1,12 @@
+services:
+  server:
+    env_file:
+      - .env.prod
+
+  postgres:
+    env_file:
+      - .env.prod
+  
+  client:
+    env_file:
+      - .env.prod

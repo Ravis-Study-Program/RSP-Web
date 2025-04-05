@@ -1,8 +1,16 @@
-version: "3.8"
-
 services:
   server:
     ports:
       - "4000:4000"
-    environment:
-      - NODE_ENV=development
+    env_file:
+      - .env.dev
+
+  postgres:
+    ports:
+      - "5432:5432"
+    env_file:
+      - .env.dev
+  
+  client:
+    env_file:
+      - .env.dev
