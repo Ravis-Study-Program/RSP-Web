@@ -853,6 +853,7 @@ export interface LeetcodeProblemEntity {
   leetcodeProblemId: string;
   /** @minLength 1 */
   problemId: string;
+  leetcodeNumber: number;
   leetcodeProblemDifficulty: LeetcodeProblemDifficulty;
   isPremium: boolean;
   problem?: ProblemEntity;
