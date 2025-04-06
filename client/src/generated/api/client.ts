@@ -479,8 +479,8 @@ export interface CreateProblemAttemptRequest {
   timeTakenInMinutes: number;
   /** @minLength 1 */
   email: string;
-  /** @minLength 1 */
-  notes: string;
+  /** @nullable */
+  notes?: string | null;
   /** @nullable */
   leetcodeProblemId?: string | null;
   /** @nullable */

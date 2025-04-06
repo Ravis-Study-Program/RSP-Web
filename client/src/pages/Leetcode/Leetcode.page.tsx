@@ -20,8 +20,8 @@ import classes from './Leetcode.module.css';
 
 export enum LeetcodeGraphPreset {
   None = 'None',
-  LineChart = 'Line Graph',
-  BarChart = 'Bar Chart',
+  // LineChart = 'Line Graph',
+  // BarChart = 'Bar Chart',
   ScatterChart = 'Scatter Chart',
 }
 
@@ -97,10 +97,12 @@ export default function LeetcodePage() {
     selectedLeetcodeCategories,
   ]);
 
-  const graphPresetOptions = Object.values(LeetcodeGraphPreset).map((value) => ({
-    value,
-    label: value,
-  }));
+  const graphPresetOptions = Object.values(LeetcodeGraphPreset)
+    .map((value) => ({
+      value,
+      label: value,
+    }))
+    .sort((a, b) => a.label.localeCompare(b.label));
 
   return (
     <Layout>

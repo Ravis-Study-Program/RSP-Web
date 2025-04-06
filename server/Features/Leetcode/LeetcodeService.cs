@@ -141,7 +141,10 @@ public class LeetcodeService : ILeetcodeService
         var title = $"{question.QuestionId}. {question.Title}";
         var existingLeetcode =
           await _leetcodeProblemRepository.TableNoTracking // Avoid tracking errors
-            .FirstOrDefaultAsync(p => p.LeetcodeNumber == int.Parse(question.QuestionId), cancellationToken);
+          .FirstOrDefaultAsync(
+            p => p.LeetcodeNumber == int.Parse(question.QuestionId),
+            cancellationToken
+          );
         if (existingLeetcode != null)
         {
           continue;
@@ -213,6 +216,7 @@ public class LeetcodeService : ILeetcodeService
       q => q.Include(l => l.Problem).Include(l => l.LeetcodeProblemCategories)
     );
     var formattedLeetcodeProblems = leetcodeProblems
+      .OrderBy(x => x.LeetcodeNumber)
       .Select(l => new LeetcodeProblemDto
       {
         LeetcodeProblemId = l.LeetcodeProblemId,

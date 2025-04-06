@@ -14,7 +14,6 @@ public record CreateProblemAttemptRequest
   [Required]
   public string Email { get; set; } = string.Empty;
 
-  [Required]
   public string Notes { get; set; } = string.Empty;
   public string? LeetcodeProblemId { get; set; }
   public string? CustomProblemId { get; set; }
