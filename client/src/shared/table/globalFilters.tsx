@@ -47,25 +47,31 @@ export const getLeetcodeCategories = (problemAttempts: ProblemAttemptEntity[]) =
   }
 
   return (
-    uniqueLeetcodeCategories.map((category) => ({
-      value: category.leetcodeProblemCategoryId,
-      label: category.name,
-    })) || []
+    uniqueLeetcodeCategories
+      .map((category) => ({
+        value: category.leetcodeProblemCategoryId,
+        label: category.name,
+      }))
+      .sort((a, b) => a.label.localeCompare(b.label)) || []
   );
 };
 
 export const getLeetcodeDifficulties = () => {
-  return Object.entries(LeetcodeProblemDifficulty).map(([label, value]) => ({
-    label,
-    value: value.toString(),
-  }));
+  return Object.entries(LeetcodeProblemDifficulty)
+    .map(([label, value]) => ({
+      label,
+      value: value.toString(),
+    }))
+    .sort((a, b) => a.label.localeCompare(b.label));
 };
 
 export const getSeasonWeeks = (seasonWeeks: SeasonWeekEntity[]) => {
   return (
-    seasonWeeks?.map((seasonWeek) => ({
-      value: seasonWeek.seasonWeekId,
-      label: seasonWeek.weekNumber.toString(),
-    })) || []
+    seasonWeeks
+      ?.map((seasonWeek) => ({
+        value: seasonWeek.seasonWeekId,
+        label: seasonWeek.weekNumber.toString(),
+      }))
+      .sort((a, b) => Number(a.label) - Number(b.label)) || []
   );
 };

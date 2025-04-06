@@ -1,5 +1,8 @@
-import { BarChart, LineChart, ScatterChart, ScatterChartSeries } from '@mantine/charts';
-import { useComputedColorScheme } from '@mantine/core';
+import dayjs from 'dayjs';
+import { useRef } from 'react';
+import { Coordinate } from 'recharts/types/util/types';
+import { BarChart, LineChart, ScatterChart } from '@mantine/charts';
+import { Paper, Text, useComputedColorScheme } from '@mantine/core';
 import { LeetcodeProblemDifficulty, ProblemAttemptEntity } from '@/generated/api/client';
 
 function formatDate(date: Date): string {
@@ -67,87 +70,143 @@ export const LeetcodeLineChart = ({ problemAttempts }: ProblemAttemptsGraphProps
 };
 
 // Time taken for each problem by difficulty (Scatter Chart)
-export const LeetcodeScatterChart = ({ problemAttempts }: ProblemAttemptsGraphProps) => {
+export const LeetcodeScatterChart = ({
+  problemAttempts,
+  displayReferenceLines,
+}: ProblemAttemptsGraphProps) => {
   const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
   const bgColor = computedColorScheme === 'light' ? 'white' : 'dark';
 
-  const transform = (problemAttempts: ProblemAttemptEntity[]): ScatterChartSeries[] => {
+  // Refs to hold metadata maps per difficulty
+  const metadataRef = useRef<{
+    Metadata: Map<number, { title: string; date: Date }>;
+  }>({
+    Metadata: new Map(),
+  });
+
+  const transform = (problemAttempts: ProblemAttemptEntity[]) => {
     const easy: Record<string, number>[] = [];
     const medium: Record<string, number>[] = [];
     const hard: Record<string, number>[] = [];
 
-    const sortedProblemAttempts = problemAttempts
+    let counter = 0;
+
+    const sortedProblemAttempts = (problemAttempts || [])
       .map((attempt) => ({
         ...attempt,
         attemptStartDate: new Date(attempt.attemptStartDateUtc),
       }))
       .sort((a, b) => a.attemptStartDate.getTime() - b.attemptStartDate.getTime());
 
-    sortedProblemAttempts.forEach((problemAttempt) => {
-      switch (problemAttempt.leetcodeProblem?.leetcodeProblemDifficulty) {
+    sortedProblemAttempts.forEach((attempt) => {
+      const date = new Date(attempt.attemptStartDateUtc);
+      const minutes = attempt.timeTakenInMinutes;
+      const title = attempt.leetcodeProblem?.problem?.title || 'Untitled';
+
+      const entry = { index: counter, timeTakenInMinutes: minutes };
+
+      switch (attempt.leetcodeProblem?.leetcodeProblemDifficulty) {
         case LeetcodeProblemDifficulty.Easy:
-          easy.push({
-            date: problemAttempt.attemptStartDate.getTime(),
-            minutes: problemAttempt.timeTakenInMinutes,
-          });
+          easy.push(entry);
           break;
         case LeetcodeProblemDifficulty.Medium:
-          medium.push({
-            date: problemAttempt.attemptStartDate.getTime(),
-            minutes: problemAttempt.timeTakenInMinutes,
-          });
+          medium.push(entry);
           break;
         case LeetcodeProblemDifficulty.Hard:
-          hard.push({
-            date: problemAttempt.attemptStartDate.getTime(),
-            minutes: problemAttempt.timeTakenInMinutes,
-          });
+          hard.push(entry);
+          break;
+        default:
           break;
       }
+
+      metadataRef.current.Metadata.set(counter, { title, date });
+      counter++;
     });
 
-    const groups: ScatterChartSeries[] = [
-      {
-        color: 'red.5',
-        name: 'Hard',
-        data: hard,
-      },
-      {
-        color: 'yellow.5',
-        name: 'Medium',
-        data: medium,
-      },
-      {
-        color: 'green.5',
-        name: 'Easy',
-        data: easy,
-      },
+    return [
+      { name: 'Hard', color: 'red.5', data: hard },
+      { name: 'Medium', color: 'yellow.5', data: medium },
+      { name: 'Easy', color: 'green.5', data: easy },
     ];
-
-    return groups;
   };
+
+  let referenceLines = [
+    { y: 45, label: 'Hard Goal (45)', color: 'red.7' },
+    { y: 25, label: 'Medium Goal (25)', color: 'yellow.7' },
+    { y: 10, label: 'Easy Goal (10)', color: 'green.7' },
+  ];
+  if (!displayReferenceLines) {
+    referenceLines = [];
+  }
+
+  interface ChartTooltipProps {
+    payload?: any[];
+    coordinate?: Partial<Coordinate>;
+    active?: boolean;
+  }
+
+  function ChartTooltip({ payload, coordinate }: ChartTooltipProps) {
+    if (!payload || payload.length === 0 || !coordinate) {
+      return null;
+    }
+
+    const item = payload[0];
+    const { payload: data } = item;
+    const meta = metadataRef.current.Metadata?.get(data.index);
+
+    return (
+      <Paper
+        px="md"
+        py="sm"
+        shadow="md"
+        radius="md"
+        withBorder
+        style={{
+          position: 'absolute',
+          left: (coordinate?.x ?? 0) + 12,
+          top: (coordinate?.y ?? 0) - 30,
+          pointerEvents: 'none',
+          minWidth: 200,
+        }}
+      >
+        <Text fz="sm">
+          <strong>Problem:</strong> {meta?.title}
+        </Text>
+        <Text fz="sm">
+          <strong>Time Taken:</strong> {data.timeTakenInMinutes} mins
+        </Text>
+        <Text fz="sm">
+          <strong>Date:</strong> {meta ? dayjs(meta.date).format('YYYY-MM-DD HH:mm') : ''}
+        </Text>
+      </Paper>
+    );
+  }
 
   return (
     <ScatterChart
-      h={300}
+      h={400}
       bg={bgColor}
       data={transform(problemAttempts || [])}
-      dataKey={{ x: 'date', y: 'minutes' }}
+      dataKey={{ x: 'index', y: 'timeTakenInMinutes' }}
       xAxisLabel="Date"
-      yAxisLabel="Minutes"
-      valueFormatter={{
-        x: (value) => formatDate(new Date(value)),
-        y: (value) => value.toString(),
+      yAxisLabel="Time Taken (mins)"
+      tooltipProps={{
+        content: (props) => <ChartTooltip {...props} />,
       }}
       tickLine="xy"
-      yAxisProps={{ domain: [0, 120] }}
-      xAxisProps={{ interval: 0, domain: ['auto', 'auto'] }}
+      xAxisProps={{
+        type: 'number',
+        domain: ['dataMin - 1', 'dataMax + 1'],
+        tick: false,
+      }}
+      yAxisProps={{
+        axisLine: false,
+        tickLine: false,
+        domain: [0, 120],
+      }}
       withLegend
-      referenceLines={[
-        { y: 45, label: 'Hard Goal', color: 'red.7' },
-        { y: 25, label: 'Medium Goal', color: 'yellow.7' },
-        { y: 10, label: 'Easy Goal', color: 'green.7' },
-      ]}
+      referenceLines={referenceLines}
+      scatterProps={{ shape: <circle r={6} /> }}
     />
   );
 };
@@ -210,4 +269,5 @@ export const LeetcodeBarChart = ({ problemAttempts }: ProblemAttemptsGraphProps)
 
 type ProblemAttemptsGraphProps = {
   problemAttempts: ProblemAttemptEntity[] | null | undefined;
+  displayReferenceLines: boolean;
 };

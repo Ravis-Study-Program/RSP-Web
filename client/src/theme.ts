@@ -9,6 +9,7 @@ export const theme = createTheme({
     lg: '74em',
     xl: '90em',
   },
+  cursorType: 'pointer',
   components: {
     Modal: {
       styles: {
