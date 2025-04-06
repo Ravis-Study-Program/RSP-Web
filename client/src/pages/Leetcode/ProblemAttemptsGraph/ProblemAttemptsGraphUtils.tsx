@@ -108,14 +108,19 @@ export const LeetcodeScatterChart = ({
       switch (attempt.leetcodeProblem?.leetcodeProblemDifficulty) {
         case LeetcodeProblemDifficulty.Easy:
           easy.push(entry);
+          break;
         case LeetcodeProblemDifficulty.Medium:
           medium.push(entry);
+          break;
         case LeetcodeProblemDifficulty.Hard:
           hard.push(entry);
+          break;
         default:
-          metadataRef.current.Metadata.set(counter, { title, date });
-          counter++;
+          break;
       }
+
+      metadataRef.current.Metadata.set(counter, { title, date });
+      counter++;
     });
 
     return [
@@ -141,10 +146,12 @@ export const LeetcodeScatterChart = ({
   }
 
   function ChartTooltip({ payload, coordinate }: ChartTooltipProps) {
-    if (!payload || payload.length === 0 || !coordinate) return null;
+    if (!payload || payload.length === 0 || !coordinate) {
+      return null;
+    }
 
     const item = payload[0];
-    const { name, payload: data } = item;
+    const { payload: data } = item;
     const meta = metadataRef.current.Metadata?.get(data.index);
 
     return (
