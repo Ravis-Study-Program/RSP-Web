@@ -12,5 +12,9 @@ RUN yarn install
 # Copy the rest of the application
 COPY . .
 
-CMD [ "yarn", "run", "build" ]
+# Copy the entrypoint script
+COPY entrypoint.sh .
+
+# Set the script as the default command
+CMD ["sh", "./entrypoint.sh"]
 
