@@ -12,7 +12,7 @@ dist
 dist-ssr
 *.local
 postgres-data
-nginx/
+nginx/ssl
 certs/
 
 # Editor directories and files

@@ -10,7 +10,12 @@ services:
       - "5432:5432"
     env_file:
       - .env.dev
-  
+
   client:
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./client:/app
+      - /app/node_modules
     env_file:
       - .env.dev
