@@ -10,7 +10,7 @@ export default function SeasonsOverviewPage() {
   const { seasonSlug } = useSeasonSlug();
   const { isAdmin, role, isLoading } = useUserAndEnrollment(seasonSlug);
   const tabs = getTabs(seasonSlug, isAdmin, role);
-  const tabItems = tabs.season?.filter((item) => !item.hidden) || [];
+  const tabItems = tabs.season?.[0]?.links?.filter((item) => !item.hidden) ?? [];
 
   if (isLoading) {
     return null;

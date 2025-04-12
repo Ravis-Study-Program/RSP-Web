@@ -1260,12 +1260,35 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@mantine/spotlight@npm:^7.17.4":
+  version: 7.17.4
+  resolution: "@mantine/spotlight@npm:7.17.4"
+  dependencies:
+    "@mantine/store": "npm:7.17.4"
+  peerDependencies:
+    "@mantine/core": 7.17.4
+    "@mantine/hooks": 7.17.4
+    react: ^18.x || ^19.x
+    react-dom: ^18.x || ^19.x
+  checksum: 10c0/17465b96895e19b64c659f117b5ac3cc504ee6b44dd6003ccbd459eabe11ab7c49a80b9df38130801011dd2b7d6d2b5b15ac35d9bd6033e84bef79806ebe7456
+  languageName: node
+  linkType: hard
+
 "@mantine/store@npm:7.17.1":
   version: 7.17.1
   resolution: "@mantine/store@npm:7.17.1"
   peerDependencies:
     react: ^18.x || ^19.x
   checksum: 10c0/c7500a042a27f894f8aabe4cd8d9a0bbf277e198c01b897c5d9d0acbfc6e69afead312e16cca2dd12dc4844853143d5172119340f75467dcd4bf1b851910731a
+  languageName: node
+  linkType: hard
+
+"@mantine/store@npm:7.17.4":
+  version: 7.17.4
+  resolution: "@mantine/store@npm:7.17.4"
+  peerDependencies:
+    react: ^18.x || ^19.x
+  checksum: 10c0/41b8a4075109924a64704234e4d47503b09b2cd40c0e8164f44c58ce6cee1a20963eb85458e0fd5c45e6382275bec81ec7bc82a6de6ffa001d899956e21c5701
   languageName: node
   linkType: hard
 
@@ -8273,6 +8296,7 @@ __metadata:
     "@mantine/hooks": "npm:^7.12.2"
     "@mantine/modals": "npm:^7.12.2"
     "@mantine/notifications": "npm:^7.14.0"
+    "@mantine/spotlight": "npm:^7.17.4"
     "@rollup/rollup-linux-x64-gnu": "npm:4.6.1"
     "@storybook/addon-essentials": "npm:^8.2.9"
     "@storybook/addon-interactions": "npm:^8.2.9"

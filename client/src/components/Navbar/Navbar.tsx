@@ -1,46 +1,93 @@
-import { useState } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import {
   IconChevronRight,
   IconLogout,
   IconMoon,
+  IconSearch,
   IconSettings,
   IconSun,
+  IconTrophy,
   IconUser,
 } from '@tabler/icons-react';
+import { useNavigate } from 'react-router-dom';
 import {
   Anchor,
   Avatar,
   Badge,
   Box,
+  Code,
   Flex,
   Group,
   Menu,
   rem,
   ScrollArea,
-  SegmentedControl,
   Skeleton,
   Text,
+  TextInput,
   Title,
   UnstyledButton,
   useComputedColorScheme,
   useMantineColorScheme,
 } from '@mantine/core';
-import { UserEntity } from '@/generated/api/client';
+import { spotlight, Spotlight } from '@mantine/spotlight';
+import { EnrollmentResponseDto, UserEntity } from '@/generated/api/client';
 import { LinksGroup } from '../NavbarLinksGroup/NavbarLinksGroup';
-import { Tabs } from './NavbarRoutes';
+import { createAdminSpotlightActions, createNonAdminSpotlightActions, Tabs } from './NavbarRoutes';
 import classes from './Navbar.module.css';
 
-export function Navbar({ isLoading, user, tabs, isSeasonUrl }: NavbarProps) {
+export function Navbar({ isLoading, user, tabs, isSeasonUrl, enrollments = [] }: NavbarProps) {
   const { setColorScheme } = useMantineColorScheme();
-  const [section, setSection] = useState<'general' | 'season'>(isSeasonUrl ? 'season' : 'general');
   const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
   const { logout } = useAuth0();
+  const navigate = useNavigate();
+  const pathname = typeof window !== 'undefined' ? window.location.pathname : '';
 
-  const links =
-    tabs?.[section]
+  const generalLinks =
+    tabs?.general
       ?.filter((item) => !item.hidden)
-      ?.map((item) => <LinksGroup {...item} key={item.label} />) ?? [];
+      ?.map((item) => {
+        // Inject the enrolled seasons as links
+        if (item.label === 'Seasons' && !user?.isAdmin) {
+          item.links = enrollments.map((e) => ({
+            label: e.seasonName,
+            icon: IconTrophy,
+            link: `/seasons/${e.seasonSlug}/overview`,
+            links: [],
+            hidden: false,
+          }));
+
+          // Add view all seasons
+          item.links.push({
+            label: 'All Seasons',
+            icon: IconTrophy,
+            link: '/seasons',
+            links: [],
+            hidden: false,
+          });
+
+          // Explicitly make the season group tab unreachable via navigation
+          item.link = undefined;
+
+          // Explicitly disable active link
+          return (
+            <LinksGroup initiallyOpened={false} activeLink={pathname} {...item} key={item.label} />
+          );
+        }
+
+        return (
+          <LinksGroup initiallyOpened={false} activeLink={pathname} {...item} key={item.label} />
+        );
+      }) ?? [];
+
+  const seasonLinks =
+    tabs?.season
+      ?.filter((item) => !item.hidden)
+      ?.map((item) => (
+        <LinksGroup initiallyOpened activeLink={pathname} {...item} key={item.label} />
+      )) ?? [];
+
+  const adminSpotlightActions = createAdminSpotlightActions(navigate);
+  const nonAdminSpotlightActions = createNonAdminSpotlightActions(navigate);
 
   if (isLoading) {
     return <NavbarSkeleton />;
@@ -48,6 +95,15 @@ export function Navbar({ isLoading, user, tabs, isSeasonUrl }: NavbarProps) {
 
   return (
     <nav className={classes.navbar}>
+      <Spotlight
+        actions={user?.isAdmin ? adminSpotlightActions : nonAdminSpotlightActions}
+        nothingFound="Nothing found..."
+        highlightQuery
+        searchProps={{
+          leftSection: <IconSearch size={20} stroke={1.5} />,
+          placeholder: 'Search...',
+        }}
+      />
       <div className={classes.header}>
         <Flex justify="center" align="center">
           <Anchor
@@ -67,21 +123,48 @@ export function Navbar({ isLoading, user, tabs, isSeasonUrl }: NavbarProps) {
         </Flex>
       </div>
 
-      {tabs?.season != null && tabs.season.length > 0 ? (
-        <SegmentedControl
-          value={section}
-          onChange={(value: any) => setSection(value)}
-          transitionTimingFunction="ease"
-          fullWidth
-          data={[
-            { label: 'General', value: 'general' },
-            { label: 'Season', value: 'season' },
-          ]}
-        />
-      ) : null}
+      <TextInput
+        placeholder="Search"
+        onClick={spotlight.open}
+        size="sm"
+        leftSection={<IconSearch onClick={spotlight.open} size={12} stroke={1.5} />}
+        rightSectionWidth={80}
+        rightSection={
+          <Flex
+            onClick={spotlight.open}
+            align="center"
+            mr="xs"
+            className={classes.searchCodeContainer}
+          >
+            <Code className={classes.searchCode}>Ctrl + K</Code>
+          </Flex>
+        }
+        className={classes.searchBox}
+      />
 
       <ScrollArea className={classes.links}>
-        <div className={classes.linksInner}>{links}</div>
+        <div className={classes.linksInner}>{generalLinks}</div>
+        {isSeasonUrl ? (
+          <>
+            <Group className={classes.collectionsHeader} justify="space-between">
+              <Text
+                size="sm"
+                fw={600}
+                c="dimmed"
+                px="lg"
+                pt="md"
+                style={{
+                  paddingLeft: 'calc(var(--mantine-spacing-lg) + 5px)',
+                }}
+              >
+                Active Season
+              </Text>
+            </Group>
+            <Box className={classes.linksInner} pt="xs">
+              {seasonLinks}
+            </Box>
+          </>
+        ) : null}
       </ScrollArea>
 
       <div className={classes.footer}>
@@ -154,6 +237,7 @@ type NavbarProps = {
   user: UserEntity | undefined;
   tabs: Tabs | null;
   isSeasonUrl: boolean;
+  enrollments: EnrollmentResponseDto[];
 };
 
 const NavbarSkeleton = () => {

@@ -1,5 +1,5 @@
 import React, { lazy, Suspense } from 'react';
-import { Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes } from 'react-router-dom';
 import AdminSeasonWeeksPage from './pages/Admin/SeasonWeeks/AdminSeasonWeeks.page';
 import ProfilePage from './pages/Profile/Profile.page';
 import ResourcesPage from './pages/Resources/Resources.page';
@@ -46,7 +46,8 @@ const routes = (
 
       {/* Season Routes */}
       <Route path="seasons/:seasonSlug" element={<SeasonRouteGuard />}>
-        <Route index element={<SeasonsOverviewPage />} />
+        <Route index element={<Navigate to="overview" replace />} />
+        <Route path="overview" element={<SeasonsOverviewPage />} />
         <Route path="users" element={<SeasonUsersPage />} />
         <Route path="mentees" element={<SeasonRoleViewRouter mentorView={<MenteesPage />} />} />
         <Route path="mentors" element={<MenteesPage />} />
