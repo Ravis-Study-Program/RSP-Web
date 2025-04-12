@@ -12,6 +12,7 @@ import {
   useComputedColorScheme,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
+import { useGetCurrentUserEnrollments } from '@/generated/api/client';
 import { SeasonRoleReverseIndex } from '@/shared/entities/reverseIndex';
 import { useSeasonSlug } from '@/shared/hooks/useSeasonSlug';
 import { useUserAndEnrollment } from '@/shared/hooks/useUserAndEnrollment';
@@ -29,9 +30,14 @@ export function Layout({ children }: LayoutProps) {
   const { seasonSlug, pathSegments } = useSeasonSlug();
   const { user, isAdmin, role, isLoading } = useUserAndEnrollment(seasonSlug);
   const tabs = getTabs(seasonSlug, isAdmin, role);
+  const {
+    data: enrollmentsResponse,
+    isFetching: isFetchingEnrollments,
+    isLoading: isLoadingEnrollments,
+  } = useGetCurrentUserEnrollments();
 
   const getBreadcrumbLinks = () => {
-    if (isLoading) {
+    if (isLoading || isLoadingEnrollments || isFetchingEnrollments) {
       return null;
     }
 
@@ -46,10 +52,17 @@ export function Layout({ children }: LayoutProps) {
     }
 
     const breadcrumbLinks = breadcrumbs.map((item, index) => (
-      <Anchor underline="never" href={item.link} key={index} className={classes.breadcrumb_links}>
+      <Anchor
+        underline="never"
+        href={
+          item.link === `/seasons/${seasonSlug}` ? `/seasons/${seasonSlug}/overview` : item.link
+        }
+        key={index}
+        className={classes.breadcrumb_links}
+      >
         <Flex justify="center" align="center" gap={8}>
           {item.label}
-          {item.link === `/seasons/${seasonSlug}` && role ? (
+          {item.link === `/seasons/${seasonSlug}` && role != null ? (
             <Badge autoContrast color="yellow.5" className={classes.roleBadge}>
               {SeasonRoleReverseIndex[role]}
             </Badge>
@@ -60,6 +73,10 @@ export function Layout({ children }: LayoutProps) {
 
     return breadcrumbLinks;
   };
+
+  if (isLoadingEnrollments || isFetchingEnrollments) {
+    return null;
+  }
 
   return (
     <AppShell
@@ -91,7 +108,13 @@ export function Layout({ children }: LayoutProps) {
             </Title>
           </Anchor>
         </Group>
-        <Navbar isLoading={isLoading} user={user} tabs={tabs} isSeasonUrl={seasonSlug !== ''} />
+        <Navbar
+          isLoading={isLoading}
+          user={user}
+          tabs={tabs}
+          enrollments={enrollmentsResponse?.responseBody?.enrollments || []}
+          isSeasonUrl={seasonSlug !== ''}
+        />
       </AppShell.Navbar>
       <AppShell.Main className={classes.main}>{children}</AppShell.Main>
     </AppShell>

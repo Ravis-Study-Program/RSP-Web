@@ -135,6 +135,7 @@ public class EnrollmentService : IEnrollmentService
           UserName = e.User.Name,
           StudentRolePromotion = e.StudentRolePromotion,
         })
+        .OrderBy(e => e.SeasonName)
         .ToList();
       return new SuccessServiceResponse<AdminListEnrollmentResponse>(
         Message.EnrollmentListSuccessfully,
@@ -218,6 +219,7 @@ public class EnrollmentService : IEnrollmentService
           StudentRolePromotion = e.StudentRolePromotion,
         })
         .AsNoTracking()
+        .OrderBy(e => e.SeasonName)
         .ToListAsync(cancellationToken);
       await _unitOfWork.SaveChangesAsync(cancellationToken);
       return new SuccessServiceResponse<GetCurrentUserEnrollmentsResponse>(
