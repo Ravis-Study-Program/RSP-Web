@@ -224,7 +224,8 @@ public class UserService : IUserService
     try
     {
       var graduates = await _userRepository
-        .Table.Select(u => new GraduateDto
+        .Table.Where(u => u.IsAdmin == false)
+        .Select(u => new GraduateDto
         {
           Name = u.Name,
           DiscordId = u.DiscordId,
@@ -233,6 +234,7 @@ public class UserService : IUserService
           UserId = u.UserId,
         })
         .AsNoTracking()
+        .OrderBy(u => u.Name)
         .ToListAsync(cancellationToken);
 
       return new SuccessServiceResponse<GetGraduatesResponse>(

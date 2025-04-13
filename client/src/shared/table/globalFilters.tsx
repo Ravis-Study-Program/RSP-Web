@@ -1,6 +1,7 @@
 import Fuse from 'fuse.js';
 import { ComboboxItem, OptionsFilter } from '@mantine/core';
 import {
+  GraduateDto,
   LeetcodeProblemDifficulty,
   ProblemAttemptEntity,
   SeasonWeekEntity,
@@ -102,4 +103,13 @@ export const getSeasonWeeks = (seasonWeeks: SeasonWeekEntity[]) => {
       }))
       .sort((a, b) => Number(a.label) - Number(b.label)) || []
   );
+};
+
+export const getGraduates = (graduates: GraduateDto[]) => {
+  return graduates
+    ?.map((graduate) => ({
+      value: graduate.name,
+      label: graduate.name,
+    }))
+    .sort((a, b) => a.label.localeCompare(b.label));
 };
