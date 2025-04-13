@@ -12,7 +12,7 @@ import {
   useComputedColorScheme,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { useGetCurrentUserEnrollments } from '@/generated/api/client';
+import { useGetUserEnrollments } from '@/generated/api/client';
 import { SeasonRoleReverseIndex } from '@/shared/entities/reverseIndex';
 import { useSeasonSlug } from '@/shared/hooks/useSeasonSlug';
 import { useUserAndEnrollment } from '@/shared/hooks/useUserAndEnrollment';
@@ -34,7 +34,7 @@ export function Layout({ children }: LayoutProps) {
     data: enrollmentsResponse,
     isFetching: isFetchingEnrollments,
     isLoading: isLoadingEnrollments,
-  } = useGetCurrentUserEnrollments();
+  } = useGetUserEnrollments();
 
   const getBreadcrumbLinks = () => {
     if (isLoading || isLoadingEnrollments || isFetchingEnrollments) {

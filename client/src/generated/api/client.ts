@@ -613,6 +613,8 @@ export interface EnrollmentResponseDto {
   role: SeasonRole;
   /** @minLength 1 */
   seasonId: string;
+  seasonStartDate: string;
+  seasonEndDate: string;
   /** @minLength 1 */
   seasonName: string;
   /** @minLength 1 */
@@ -624,6 +626,9 @@ export interface EnrollmentResponseDto {
   /** @minLength 1 */
   userName: string;
   studentRolePromotion: SeasonStudentRolePromotion;
+  numStudentsInSeason?: number;
+  numMentorsInSeason?: number;
+  numMenteesInSeason?: number;
 }
 
 export interface EnrollmentUserDto {
@@ -654,17 +659,6 @@ export interface GenerateLeetcodeProblemRecommendationResponseApiResponse {
   /** @nullable */
   successMessage?: string | null;
   responseBody?: GenerateLeetcodeProblemRecommendationResponse;
-}
-
-export interface GetCurrentUserEnrollmentsResponse {
-  enrollments: EnrollmentResponseDto[];
-}
-
-export interface GetCurrentUserEnrollmentsResponseApiResponse {
-  error?: ApiError;
-  /** @nullable */
-  successMessage?: string | null;
-  responseBody?: GetCurrentUserEnrollmentsResponse;
 }
 
 export interface GetCurrentUserMenteesListResponse {
@@ -747,6 +741,17 @@ export interface GetSeasonWeeksBySeasonSlugResponseApiResponse {
   /** @nullable */
   successMessage?: string | null;
   responseBody?: GetSeasonWeeksBySeasonSlugResponse;
+}
+
+export interface GetUserEnrollmentsResponse {
+  enrollments: EnrollmentResponseDto[];
+}
+
+export interface GetUserEnrollmentsResponseApiResponse {
+  error?: ApiError;
+  /** @nullable */
+  successMessage?: string | null;
+  responseBody?: GetUserEnrollmentsResponse;
 }
 
 export interface GetUserResponse {
@@ -1166,6 +1171,10 @@ export interface ValidationError {
 
 export type AdminListEnrollmentParams = {
   request?: AdminListEnrollmentRequest;
+};
+
+export type GetUserEnrollmentsParams = {
+  email?: string;
 };
 
 export type GetIsCurrentUserEnrolledParams = {
@@ -1668,107 +1677,118 @@ export const useAdminUpdateEnrollment = <TError = unknown, TContext = unknown>(o
   return useMutation(mutationOptions);
 };
 
-export const getCurrentUserEnrollments = (
+export const getUserEnrollments = (
+  params?: GetUserEnrollmentsParams,
   options?: SecondParameter<typeof CustomAxiosInstance>,
   signal?: AbortSignal
 ) => {
-  return CustomAxiosInstance<GetCurrentUserEnrollmentsResponseApiResponse>(
+  return CustomAxiosInstance<GetUserEnrollmentsResponseApiResponse>(
     {
-      url: `http://localhost/api/v1/enrollments/get-current-user-enrollments`,
+      url: `http://localhost/api/v1/enrollments/get-user-enrollments`,
       method: 'GET',
+      params,
       signal,
     },
     options
   );
 };
 
-export const getGetCurrentUserEnrollmentsQueryKey = () => {
-  return [`http://localhost/api/v1/enrollments/get-current-user-enrollments`] as const;
+export const getGetUserEnrollmentsQueryKey = (params?: GetUserEnrollmentsParams) => {
+  return [
+    `http://localhost/api/v1/enrollments/get-user-enrollments`,
+    ...(params ? [params] : []),
+  ] as const;
 };
 
-export const getGetCurrentUserEnrollmentsQueryOptions = <
-  TData = Awaited<ReturnType<typeof getCurrentUserEnrollments>>,
+export const getGetUserEnrollmentsQueryOptions = <
+  TData = Awaited<ReturnType<typeof getUserEnrollments>>,
   TError = unknown,
->(options?: {
-  query?: Partial<
-    UseQueryOptions<Awaited<ReturnType<typeof getCurrentUserEnrollments>>, TError, TData>
-  >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}) => {
+>(
+  params?: GetUserEnrollmentsParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserEnrollments>>, TError, TData>>;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+) => {
   const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey = queryOptions?.queryKey ?? getGetCurrentUserEnrollmentsQueryKey();
+  const queryKey = queryOptions?.queryKey ?? getGetUserEnrollmentsQueryKey(params);
 
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof getCurrentUserEnrollments>>> = ({
-    signal,
-  }) => getCurrentUserEnrollments(requestOptions, signal);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getUserEnrollments>>> = ({ signal }) =>
+    getUserEnrollments(params, requestOptions, signal);
 
   return { queryKey, queryFn, staleTime: Infinity, ...queryOptions } as UseQueryOptions<
-    Awaited<ReturnType<typeof getCurrentUserEnrollments>>,
+    Awaited<ReturnType<typeof getUserEnrollments>>,
     TError,
     TData
   > & { queryKey: DataTag<QueryKey, TData> };
 };
 
-export type GetCurrentUserEnrollmentsQueryResult = NonNullable<
-  Awaited<ReturnType<typeof getCurrentUserEnrollments>>
+export type GetUserEnrollmentsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getUserEnrollments>>
 >;
-export type GetCurrentUserEnrollmentsQueryError = unknown;
+export type GetUserEnrollmentsQueryError = unknown;
 
-export function useGetCurrentUserEnrollments<
-  TData = Awaited<ReturnType<typeof getCurrentUserEnrollments>>,
+export function useGetUserEnrollments<
+  TData = Awaited<ReturnType<typeof getUserEnrollments>>,
   TError = unknown,
->(options: {
-  query: Partial<
-    UseQueryOptions<Awaited<ReturnType<typeof getCurrentUserEnrollments>>, TError, TData>
-  > &
-    Pick<
-      DefinedInitialDataOptions<
-        Awaited<ReturnType<typeof getCurrentUserEnrollments>>,
-        TError,
-        Awaited<ReturnType<typeof getCurrentUserEnrollments>>
-      >,
-      'initialData'
-    >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
-export function useGetCurrentUserEnrollments<
-  TData = Awaited<ReturnType<typeof getCurrentUserEnrollments>>,
+>(
+  params: undefined | GetUserEnrollmentsParams,
+  options: {
+    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserEnrollments>>, TError, TData>> &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getUserEnrollments>>,
+          TError,
+          Awaited<ReturnType<typeof getUserEnrollments>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+export function useGetUserEnrollments<
+  TData = Awaited<ReturnType<typeof getUserEnrollments>>,
   TError = unknown,
->(options?: {
-  query?: Partial<
-    UseQueryOptions<Awaited<ReturnType<typeof getCurrentUserEnrollments>>, TError, TData>
-  > &
-    Pick<
-      UndefinedInitialDataOptions<
-        Awaited<ReturnType<typeof getCurrentUserEnrollments>>,
-        TError,
-        Awaited<ReturnType<typeof getCurrentUserEnrollments>>
-      >,
-      'initialData'
-    >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
-export function useGetCurrentUserEnrollments<
-  TData = Awaited<ReturnType<typeof getCurrentUserEnrollments>>,
+>(
+  params?: GetUserEnrollmentsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getUserEnrollments>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getUserEnrollments>>,
+          TError,
+          Awaited<ReturnType<typeof getUserEnrollments>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+export function useGetUserEnrollments<
+  TData = Awaited<ReturnType<typeof getUserEnrollments>>,
   TError = unknown,
->(options?: {
-  query?: Partial<
-    UseQueryOptions<Awaited<ReturnType<typeof getCurrentUserEnrollments>>, TError, TData>
-  >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+>(
+  params?: GetUserEnrollmentsParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserEnrollments>>, TError, TData>>;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
 
-export function useGetCurrentUserEnrollments<
-  TData = Awaited<ReturnType<typeof getCurrentUserEnrollments>>,
+export function useGetUserEnrollments<
+  TData = Awaited<ReturnType<typeof getUserEnrollments>>,
   TError = unknown,
->(options?: {
-  query?: Partial<
-    UseQueryOptions<Awaited<ReturnType<typeof getCurrentUserEnrollments>>, TError, TData>
-  >;
-  request?: SecondParameter<typeof CustomAxiosInstance>;
-}): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
-  const queryOptions = getGetCurrentUserEnrollmentsQueryOptions(options);
+>(
+  params?: GetUserEnrollmentsParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserEnrollments>>, TError, TData>>;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
+  const queryOptions = getGetUserEnrollmentsQueryOptions(params, options);
 
   const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
     queryKey: DataTag<QueryKey, TData>;

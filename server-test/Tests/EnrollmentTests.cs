@@ -158,15 +158,15 @@ namespace RSPWebAPI.Tests.Tests
     }
 
     [Fact]
-    public async Task GetCurrentUserEnrollments_ReturnsData()
+    public async Task GetUserEnrollments_ReturnsData()
     {
       var email = _faker.Internet.Email().ToLower();
       var userId = await _seeder.SeedUserAsync(email);
       var seasonId = await _seeder.SeedSeasonAsync();
       await _seeder.SeedEnrollmentAsync(seasonId, userId);
 
-      var request = new GetCurrentUserEnrollmentsRequest { Email = email };
-      var enrollResp = await EnrollmentService.GetCurrentUserEnrollments(request);
+      var request = new GetUserEnrollmentsRequest { Email = email };
+      var enrollResp = await EnrollmentService.GetUserEnrollments(request);
       Assert.True(enrollResp.IsSuccess);
       Assert.Equal(Message.EnrollmentUsersListSuccessfully, enrollResp.Message);
       Assert.NotEmpty(enrollResp.Data!.Enrollments);

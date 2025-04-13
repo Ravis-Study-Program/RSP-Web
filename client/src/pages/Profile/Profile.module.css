@@ -4,9 +4,9 @@
 
 .avatar {
     border: rem(2px) solid var(--mantine-color-body);
-    background-color: white;
+    background-color: light-dark(var(--mantine-color-gray-2), var(--mantine-color-dark-6));
 }
 
 .control {
-    background-color: white;
+    background-color: light-dark(var(--mantine-color-gray-2), var(--mantine-color-dark-6));
 }

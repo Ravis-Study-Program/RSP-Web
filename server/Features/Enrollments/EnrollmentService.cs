@@ -6,6 +6,8 @@ using RSPWebAPI.Entities;
 using RSPWebAPI.Features.Constants;
 using RSPWebAPI.Features.Enrollments.Dtos;
 using RSPWebAPI.Features.Enrollments.Interfaces;
+using RSPWebAPI.Features.Mentorships.Dtos;
+using RSPWebAPI.Features.Mentorships.Interfaces;
 
 namespace RSPWebAPI.Features.Enrollments;
 
@@ -14,16 +16,19 @@ public class EnrollmentService : IEnrollmentService
   private readonly IRepository<EnrollmentEntity> _enrollmentRepository;
   private readonly ILogger<EnrollmentService> _logger;
   private readonly IUnitOfWork _unitOfWork;
+  private readonly Lazy<IMentorshipService> _mentorshipService;
 
   public EnrollmentService(
     IRepository<EnrollmentEntity> seasonRepository,
     IUnitOfWork unitOfWork,
-    ILogger<EnrollmentService> logger
+    ILogger<EnrollmentService> logger,
+    Lazy<IMentorshipService> mentorshipService
   )
   {
     _enrollmentRepository = seasonRepository;
     _unitOfWork = unitOfWork;
     _logger = logger;
+    _mentorshipService = mentorshipService;
   }
 
   public async Task<IServiceResponse<AdminCreateEnrollmentResponse>> CreateAdminEnrollment(
@@ -197,40 +202,95 @@ public class EnrollmentService : IEnrollmentService
     }
   }
 
-  public async Task<IServiceResponse<GetCurrentUserEnrollmentsResponse>> GetCurrentUserEnrollments(
-    GetCurrentUserEnrollmentsRequest request,
+  public async Task<IServiceResponse<GetUserEnrollmentsResponse>> GetUserEnrollments(
+    GetUserEnrollmentsRequest request,
     CancellationToken cancellationToken = default
   )
   {
     try
     {
-      var enrollments = await _enrollmentRepository
+      var rawEnrollments = await _enrollmentRepository
         .Table.Where(e => e.User.Email == request.Email)
-        .Select(e => new EnrollmentResponseDto
-        {
-          EnrollmentId = e.EnrollmentId,
-          SeasonId = e.SeasonId,
-          SeasonSlug = e.Season.Slug,
-          SeasonName = e.Season.Name,
-          SeasonImageUrl = e.Season.ImageUrl,
-          UserId = e.User.UserId,
-          UserName = e.User.Name,
-          Role = e.Role,
-          StudentRolePromotion = e.StudentRolePromotion,
-        })
+        .Include(e => e.Season)
+        .Include(e => e.User)
         .AsNoTracking()
-        .OrderBy(e => e.SeasonName)
         .ToListAsync(cancellationToken);
+
+      Console.WriteLine(rawEnrollments);
+
+      var seasonIds = rawEnrollments.Select(e => e.SeasonId).Distinct().ToList();
+
+      var usersInSeason = await _enrollmentRepository
+        .Table.Where(e => seasonIds.Contains(e.SeasonId))
+        .GroupBy(e => e.SeasonId)
+        .Select(g => new
+        {
+          SeasonId = g.Key,
+          NumStudents = g.Count(e => e.Role == SeasonRole.Student),
+          NumMentors = g.Count(e => e.Role == SeasonRole.Mentor),
+        })
+        .ToListAsync(cancellationToken);
+
+      var menteesBySeason = new Dictionary<string, int>(); // SeasonId -> MenteeCount
+      foreach (var enrollment in rawEnrollments.Where(e => e.Role == SeasonRole.Mentor))
+      {
+        var menteesRequest = new GetCurrentUserMenteesListRequest
+        {
+          Email = request.Email,
+          SeasonSlug = enrollment.Season.Slug,
+        };
+
+        var menteesResponse = await _mentorshipService.Value.GetCurrentUserMenteesList(
+          menteesRequest,
+          cancellationToken
+        );
+        if (menteesResponse.IsSuccess)
+        {
+          menteesBySeason[enrollment.SeasonId] = menteesResponse.Data?.Mentorships.Count ?? 0;
+        }
+      }
+
+      var enrollments = rawEnrollments
+        .Select(e =>
+        {
+          var userCount =
+            usersInSeason.FirstOrDefault(x => x.SeasonId == e.SeasonId)?.NumStudents ?? 0;
+          var mentorsCount =
+            usersInSeason.FirstOrDefault(x => x.SeasonId == e.SeasonId)?.NumMentors ?? 0;
+          var menteeCount = menteesBySeason.TryGetValue(e.SeasonId, out var count) ? count : 0;
+
+          return new EnrollmentResponseDto
+          {
+            EnrollmentId = e.EnrollmentId,
+            SeasonStartDate = e.Season.StartDateInclusiveUtc,
+            SeasonEndDate = e.Season.EndDateInclusiveUtc,
+            SeasonId = e.SeasonId,
+            SeasonSlug = e.Season.Slug,
+            SeasonName = e.Season.Name,
+            SeasonImageUrl = e.Season.ImageUrl,
+            UserId = e.User.UserId,
+            UserName = e.User.Name,
+            Role = e.Role,
+            StudentRolePromotion = e.StudentRolePromotion,
+            NumStudentsInSeason = userCount,
+            NumMentorsInSeason = mentorsCount,
+            NumMenteesInSeason = e.Role == SeasonRole.Mentor ? menteeCount : 0,
+          };
+        })
+        .OrderBy(e => e.SeasonName)
+        .ToList();
+
       await _unitOfWork.SaveChangesAsync(cancellationToken);
-      return new SuccessServiceResponse<GetCurrentUserEnrollmentsResponse>(
+
+      return new SuccessServiceResponse<GetUserEnrollmentsResponse>(
         Message.EnrollmentUsersListSuccessfully,
-        new GetCurrentUserEnrollmentsResponse { Enrollments = enrollments }
+        new GetUserEnrollmentsResponse { Enrollments = enrollments }
       );
     }
     catch (Exception ex)
     {
       _logger.LogError(ex, Message.EnrollmentUsersListUnexpectedError);
-      return new ErrorServiceResponse<GetCurrentUserEnrollmentsResponse>(
+      return new ErrorServiceResponse<GetUserEnrollmentsResponse>(
         Message.EnrollmentUsersListUnexpectedError
       );
     }

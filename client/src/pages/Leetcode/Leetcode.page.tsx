@@ -175,6 +175,7 @@ export default function LeetcodePage() {
         enrollmentId={userResponse?.responseBody?.enrollmentId || ''}
         enableEditing
         showAuthor={false}
+        showCategory
       />
     </Layout>
   );

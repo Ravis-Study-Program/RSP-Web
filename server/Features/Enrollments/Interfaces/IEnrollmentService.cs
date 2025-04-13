@@ -67,8 +67,8 @@ public interface IEnrollmentService
     CancellationToken cancellationToken = default
   );
 
-  Task<IServiceResponse<GetCurrentUserEnrollmentsResponse>> GetCurrentUserEnrollments(
-    GetCurrentUserEnrollmentsRequest request,
+  Task<IServiceResponse<GetUserEnrollmentsResponse>> GetUserEnrollments(
+    GetUserEnrollmentsRequest request,
     CancellationToken cancellationToken = default
   );
 

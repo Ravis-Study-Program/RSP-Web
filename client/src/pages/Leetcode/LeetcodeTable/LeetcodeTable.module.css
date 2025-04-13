@@ -21,3 +21,7 @@
 .table {
     padding: var(--mantine-spacing-md);
 }
+
+.title{
+    color: light-dark(var(--mantine-color-black), var(--mantine-color-white));
+}
