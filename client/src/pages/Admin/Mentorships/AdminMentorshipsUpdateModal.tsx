@@ -15,6 +15,7 @@ import {
   SeasonEntity,
   SeasonRole,
 } from '@/generated/api/client';
+import { createOptionsFilter } from '@/shared/table/globalFilters';
 
 const schema = z.object({
   seasonId: z.string(),
@@ -148,6 +149,7 @@ export const AdminMentorshipsUpdateModal = ({
           label="Select Season"
           placeholder="Pick a season"
           data={seasonOptions}
+          filter={createOptionsFilter()}
           withAsterisk
           searchable
         />
@@ -156,6 +158,7 @@ export const AdminMentorshipsUpdateModal = ({
           label="Select Mentor"
           placeholder={mentorOptions.length === 0 ? 'No mentors found' : 'Pick a mentor'}
           data={mentorOptions}
+          filter={createOptionsFilter()}
           withAsterisk
           mt="sm"
           searchable
@@ -166,6 +169,7 @@ export const AdminMentorshipsUpdateModal = ({
           label="Select Mentee"
           placeholder={menteeOptions.length === 0 ? 'No mentees found' : 'Pick a mentee'}
           data={menteeOptions}
+          filter={createOptionsFilter()}
           withAsterisk
           mt="sm"
           searchable

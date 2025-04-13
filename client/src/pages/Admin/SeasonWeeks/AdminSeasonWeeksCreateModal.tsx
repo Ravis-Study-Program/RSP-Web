@@ -13,6 +13,7 @@ import {
   SeasonEntity,
   SeasonWeekEntity,
 } from '@/generated/api/client';
+import { createOptionsFilter } from '@/shared/table/globalFilters';
 
 const schema = z
   .object({
@@ -94,6 +95,7 @@ export const AdminSeasonWeeksCreateModal = ({
           label="Select Season"
           placeholder="Pick a season"
           data={seasonOptions}
+          filter={createOptionsFilter()}
           limit={5}
           withAsterisk
           searchable

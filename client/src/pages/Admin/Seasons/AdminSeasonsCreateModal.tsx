@@ -12,6 +12,7 @@ import {
   AdminListSeasonResponseApiResponse,
   SeasonEntity,
 } from '@/generated/api/client';
+import { createOptionsFilter } from '@/shared/table/globalFilters';
 
 const locationImages: { [key: string]: string } = {
   'Adelaide, Australia':
@@ -152,6 +153,7 @@ export const AdminSeasonsCreateModal = ({
           placeholder="Pick location"
           withAsterisk
           data={Object.keys(locationImages)}
+          filter={createOptionsFilter()}
           onChange={handleLocationChange}
         />
         <TextInput

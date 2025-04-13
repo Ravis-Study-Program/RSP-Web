@@ -19,6 +19,7 @@ import {
   SeasonRoleReverseIndex,
   SeasonStudentRolePromotionReverseIndex,
 } from '@/shared/entities/reverseIndex';
+import { createOptionsFilter } from '@/shared/table/globalFilters';
 
 const schema = z.object({
   seasonId: z.string(),
@@ -116,6 +117,7 @@ export const AdminEnrollmentsUpdateModal = ({
           label="Select Season"
           placeholder="Pick a season"
           data={seasonOptions}
+          filter={createOptionsFilter()}
           withAsterisk
           searchable
         />
@@ -124,6 +126,7 @@ export const AdminEnrollmentsUpdateModal = ({
           label="Select User"
           placeholder="Pick a user"
           data={userOptions}
+          filter={createOptionsFilter()}
           withAsterisk
           mt="sm"
           searchable
@@ -133,6 +136,7 @@ export const AdminEnrollmentsUpdateModal = ({
           label="Select Role"
           placeholder="Pick a role"
           data={roleOptions}
+          filter={createOptionsFilter()}
           withAsterisk
           mt="sm"
           searchable
@@ -142,6 +146,7 @@ export const AdminEnrollmentsUpdateModal = ({
           label="Select Student Role Promotion"
           placeholder="Pick a student role promotion"
           data={studentRolePromotionOptions}
+          filter={createOptionsFilter()}
           withAsterisk
           mt="sm"
           searchable
