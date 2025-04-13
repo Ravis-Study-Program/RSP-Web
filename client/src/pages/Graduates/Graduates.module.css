@@ -27,3 +27,7 @@
   padding: var(--mantine-spacing-xs) var(--mantine-spacing-lg);
   margin-top: var(--mantine-spacing-md);
 }
+
+.inputField:not(:only-child) {
+  display: none;
+}
