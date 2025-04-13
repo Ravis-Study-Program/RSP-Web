@@ -30,7 +30,7 @@ dayjs.extend(localizedFormat);
 export default function ProfilePage() {
   const [searchParams] = useSearchParams();
   const { user: Auth0User } = useAuth0();
-  const email = searchParams.get('email') || Auth0User?.email;
+  const email = searchParams.get('email') || Auth0User?.email || '';
 
   const { seasonSlug } = useSeasonSlug();
   const { enrollmentId, seasonId, user, role } = useUserAndEnrollment(seasonSlug, email);
