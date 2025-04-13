@@ -1,3 +1,4 @@
+import Fuse from 'fuse.js';
 import { ComboboxItem, OptionsFilter } from '@mantine/core';
 import {
   LeetcodeProblemDifficulty,
@@ -5,29 +6,56 @@ import {
   SeasonWeekEntity,
 } from '@/generated/api/client';
 
-export const optionsFilter: OptionsFilter = ({ options, search }) => {
-  const filtered = (options as ComboboxItem[]).filter((option) =>
-    option.label.toLowerCase().trim().includes(search.toLowerCase().trim())
-  );
+type CreateOptionsFilterParams = {
+  fuzzy?: boolean;
+  sort?: boolean;
+};
 
-  filtered.sort((a, b) => {
-    const numA = Number(a.label);
-    const numB = Number(b.label);
+export const createOptionsFilter = ({
+  fuzzy = true,
+  sort = true,
+}: CreateOptionsFilterParams = {}): OptionsFilter => {
+  return ({ options, search }) => {
+    const typedOptions = options as ComboboxItem[];
 
-    const isNumA = !isNaN(numA);
-    const isNumB = !isNaN(numB);
+    let filtered: ComboboxItem[];
 
-    if (isNumA && isNumB) {
-      return numA - numB;
-    } else if (isNumA) {
-      return -1;
-    } else if (isNumB) {
-      return 1;
+    if (fuzzy && search.trim()) {
+      const fuse = new Fuse(typedOptions, {
+        keys: ['label'],
+        threshold: 0.45,
+      });
+
+      filtered = fuse.search(search.trim()).map((r) => r.item);
+    } else {
+      filtered = typedOptions.filter((option) =>
+        option.label.toLowerCase().includes(search.toLowerCase())
+      );
     }
 
-    return a.label.localeCompare(b.label);
-  });
-  return filtered;
+    if (sort) {
+      filtered.sort((a, b) => {
+        const numA = Number(a.label);
+        const numB = Number(b.label);
+        const isNumA = !isNaN(numA);
+        const isNumB = !isNaN(numB);
+
+        if (isNumA && isNumB) {
+          return numA - numB;
+        }
+        if (isNumA) {
+          return -1;
+        }
+        if (isNumB) {
+          return 1;
+        }
+
+        return a.label.localeCompare(b.label);
+      });
+    }
+
+    return filtered;
+  };
 };
 
 export const getLeetcodeCategories = (problemAttempts: ProblemAttemptEntity[]) => {

@@ -14,6 +14,7 @@ import {
   UpdateProblemAttemptResponseApiResponse,
   useGetCurrentUser,
 } from '@/generated/api/client';
+import { createOptionsFilter } from '@/shared/table/globalFilters';
 
 const schema = z.object({
   leetcodeProblemId: z.string(),
@@ -111,6 +112,7 @@ export const LeetcodeProblemAttemptUpdateModal = ({
           label="Select Leetcode Problem"
           placeholder="Pick a leetcode problem"
           data={leetcodeProblemOptions}
+          filter={createOptionsFilter()}
           limit={5}
           withAsterisk
           searchable

@@ -9,10 +9,10 @@ import {
 } from '@/generated/api/client';
 import { useSeasonSlug } from '@/shared/hooks/useSeasonSlug';
 import {
+  createOptionsFilter,
   getLeetcodeCategories,
   getLeetcodeDifficulties,
   getSeasonWeeks,
-  optionsFilter,
 } from '@/shared/table/globalFilters';
 import { LeetcodeTable } from './LeetcodeTable/LeetcodeTable';
 import { ProblemAttemptsGraphContainer } from './ProblemAttemptsGraph/ProblemAttemptsGraphContainer';
@@ -111,7 +111,7 @@ export default function LeetcodePage() {
           <Select
             label="Graph Preset"
             data={graphPresetOptions}
-            filter={optionsFilter}
+            filter={createOptionsFilter()}
             miw={400}
             nothingFoundMessage="Nothing found..."
             value={selectedGraphPreset}
@@ -126,7 +126,7 @@ export default function LeetcodePage() {
             label="Season Week"
             placeholder="Pick value(s)"
             data={seasonWeeksOptions}
-            filter={optionsFilter}
+            filter={createOptionsFilter()}
             miw={150}
             searchable
             nothingFoundMessage="Nothing found..."
@@ -140,7 +140,7 @@ export default function LeetcodePage() {
             classNames={{ inputField: classes.inputField }}
             placeholder="Pick value(s)"
             data={leetcodeDifficultyOptions}
-            filter={optionsFilter}
+            filter={createOptionsFilter()}
             miw={150}
             searchable
             nothingFoundMessage="Nothing found..."
@@ -154,7 +154,7 @@ export default function LeetcodePage() {
             classNames={{ inputField: classes.inputField }}
             placeholder="Pick value(s)"
             data={leetcodeCategoryOptions}
-            filter={optionsFilter}
+            filter={createOptionsFilter()}
             miw={150}
             searchable
             nothingFoundMessage="Nothing found..."

@@ -9,7 +9,7 @@ import {
 } from '@/generated/api/client';
 import { useSeasonSlug } from '@/shared/hooks/useSeasonSlug';
 import { useUserAndEnrollment } from '@/shared/hooks/useUserAndEnrollment';
-import { optionsFilter } from '@/shared/table/globalFilters';
+import { createOptionsFilter } from '@/shared/table/globalFilters';
 import { LeetcodeTable } from '../Leetcode/LeetcodeTable/LeetcodeTable';
 import { MockInterviewTable } from '../MockInterviews/MockInterviewTable/MockInterviewTable';
 import { MenteesTable } from './MenteesTable';
@@ -146,7 +146,7 @@ export default function MenteesPage() {
             label="Mentees"
             placeholder="Pick value(s)"
             data={mentees}
-            filter={optionsFilter}
+            filter={createOptionsFilter()}
             miw={150}
             searchable
             nothingFoundMessage="Nothing found..."

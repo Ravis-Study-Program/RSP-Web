@@ -3,7 +3,7 @@ import { Flex, Group, MultiSelect, Select } from '@mantine/core';
 import { Layout } from '@/components/Layout/Layout';
 import { useGetIsCurrentUserEnrolled, useListMockInterview } from '@/generated/api/client';
 import { useSeasonSlug } from '@/shared/hooks/useSeasonSlug';
-import { optionsFilter } from '@/shared/table/globalFilters';
+import { createOptionsFilter } from '@/shared/table/globalFilters';
 import { MockInterviewTable } from './MockInterviewTable/MockInterviewTable';
 import classes from './MockInterview.module.css';
 
@@ -92,7 +92,7 @@ export default function MockInterviewPage() {
             label="Mock Options"
             data={displayMockOptions}
             placeholder="Pick value"
-            filter={optionsFilter}
+            filter={createOptionsFilter()}
             miw={200}
             nothingFoundMessage="Nothing found..."
             value={selectedIsGivenMocks === null ? null : selectedIsGivenMocks.toString()}
@@ -112,7 +112,7 @@ export default function MockInterviewPage() {
             label="Interviewer"
             placeholder="Pick value(s)"
             data={distinctInterviewersOptions}
-            filter={optionsFilter}
+            filter={createOptionsFilter()}
             miw={150}
             searchable
             nothingFoundMessage="Nothing found..."
@@ -125,7 +125,7 @@ export default function MockInterviewPage() {
             label="Result"
             data={resultOptions}
             placeholder="Pick value"
-            filter={optionsFilter}
+            filter={createOptionsFilter()}
             miw={150}
             nothingFoundMessage="Nothing found..."
             value={selectedIsPassResult === null ? null : selectedIsPassResult.toString()}

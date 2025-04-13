@@ -16,6 +16,7 @@ import {
   UpdateMockInterviewResponseApiResponse,
   useGetCurrentUser,
 } from '@/generated/api/client';
+import { createOptionsFilter } from '@/shared/table/globalFilters';
 
 const scoreSchema = z
   .number()
@@ -224,6 +225,7 @@ export const MockInterviewUpdateModal = ({
           label="Interviewee"
           placeholder="Enter interviewee name"
           data={usersOptions}
+          filter={createOptionsFilter()}
           limit={5}
           withAsterisk
           searchable
@@ -244,6 +246,7 @@ export const MockInterviewUpdateModal = ({
             label="Leetcode Problem"
             placeholder="Pick a leetcode problem"
             data={leetcodeProblemOptions}
+            filter={createOptionsFilter()}
             limit={5}
             withAsterisk
             searchable
@@ -298,6 +301,7 @@ export const MockInterviewUpdateModal = ({
             label="Leetcode Problem"
             placeholder="Pick a leetcode problem"
             data={leetcodeProblemOptions}
+            filter={createOptionsFilter()}
             limit={5}
             withAsterisk
             searchable
