@@ -14,6 +14,7 @@ using RSPWebAPI.Common.Interfaces;
 using RSPWebAPI.Common.Middlewares;
 using RSPWebAPI.Database;
 using RSPWebAPI.Database.Interceptors;
+using RSPWebAPI.Extensions;
 using RSPWebAPI.Features.DummyData;
 using RSPWebAPI.Features.DummyData.Interfaces;
 using RSPWebAPI.Features.Enrollments;
@@ -165,6 +166,7 @@ builder.Services.AddScoped<ISeasonService, SeasonService>();
 builder.Services.AddScoped<ISeasonWeekService, SeasonWeekService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IDummyDataService, DummyDataService>();
+builder.Services.AddLazyResolution();
 
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();

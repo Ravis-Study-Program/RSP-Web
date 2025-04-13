@@ -4,10 +4,9 @@ using RSPWebAPI.Entities;
 
 namespace RSPWebAPI.Features.Enrollments.Dtos;
 
-public record GetCurrentUserEnrollmentsRequest
+public record GetUserEnrollmentsRequest
 {
-  [Required]
-  public string? Email { get; set; } = string.Empty;
+  public string Email { get; set; } = string.Empty;
 }
 
 public record EnrollmentResponseDto
@@ -20,6 +19,12 @@ public record EnrollmentResponseDto
 
   [Required]
   public string SeasonId { get; set; } = string.Empty;
+
+  [Required]
+  public DateTime SeasonStartDate { get; set; }
+
+  [Required]
+  public DateTime SeasonEndDate { get; set; }
 
   [Required]
   public string SeasonName { get; set; } = string.Empty;
@@ -38,19 +43,16 @@ public record EnrollmentResponseDto
 
   [Required]
   public SeasonStudentRolePromotion StudentRolePromotion { get; set; }
+
+  public int NumStudentsInSeason { get; set; }
+
+  public int NumMentorsInSeason { get; set; }
+
+  public int NumMenteesInSeason { get; set; }
 }
 
-public record GetCurrentUserEnrollmentsResponse
+public record GetUserEnrollmentsResponse
 {
   [Required]
   public IList<EnrollmentResponseDto> Enrollments { get; set; } = new List<EnrollmentResponseDto>();
-}
-
-public class GetCurrentUserEnrollmentsRequestValidator
-  : AbstractValidator<GetCurrentUserEnrollmentsRequest>
-{
-  public GetCurrentUserEnrollmentsRequestValidator()
-  {
-    RuleFor(c => c.Email).NotEmpty().EmailAddress();
-  }
 }

@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using RSPWebAPI.Common;
+using RSPWebAPI.Features.Constants;
 using RSPWebAPI.Features.Enrollments.Dtos;
 using RSPWebAPI.Features.Enrollments.Interfaces;
 using RSPWebAPI.Shared;
@@ -73,15 +75,27 @@ public class EnrollmentController : BaseController
 
   [HttpGet]
   [ServiceFilter(typeof(AuthAttribute))]
-  [Route("get-current-user-enrollments")]
-  [ActionName("GetCurrentUserEnrollments")]
-  public async Task<
-    ActionResult<ApiResponse<GetCurrentUserEnrollmentsResponse>>
-  > GetCurrentUserEnrollments(CancellationToken cancellationToken = default)
+  [Route("get-user-enrollments")]
+  [ActionName("GetUserEnrollments")]
+  public async Task<ActionResult<ApiResponse<GetUserEnrollmentsResponse>>> GetUserEnrollments(
+    string? email,
+    CancellationToken cancellationToken = default
+  )
   {
-    var email = GetCurrentUserEmail() ?? "";
-    var request = new GetCurrentUserEnrollmentsRequest { Email = email };
-    var response = await _enrollmentService.GetCurrentUserEnrollments(request, cancellationToken);
+    if (email.IsNullOrEmpty())
+    {
+      email = GetCurrentUserEmail();
+    }
+    if (email == null)
+    {
+      return HandleResponse(
+        new ErrorServiceResponse<GetUserEnrollmentsResponse>(
+          Message.EnrollmentUsersListUnexpectedError
+        )
+      );
+    }
+    var request = new GetUserEnrollmentsRequest { Email = email };
+    var response = await _enrollmentService.GetUserEnrollments(request, cancellationToken);
     return HandleResponse(response);
   }
 

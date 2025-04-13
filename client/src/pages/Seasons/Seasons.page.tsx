@@ -4,7 +4,7 @@ import { Layout } from '@/components/Layout/Layout';
 import {
   EnrollmentResponseDto,
   useGetCurrentUser,
-  useGetCurrentUserEnrollments,
+  useGetUserEnrollments,
 } from '@/generated/api/client';
 import { SeasonRoleReverseIndex } from '@/shared/entities/reverseIndex';
 import classes from './Seasons.module.css';
@@ -17,7 +17,7 @@ export default function SeasonsPage() {
     isError: isLoadingEnrollmentsError,
     isFetching: isFetchingEnrollments,
     isLoading: isLoadingEnrollments,
-  } = useGetCurrentUserEnrollments();
+  } = useGetUserEnrollments();
 
   if (isLoading) {
     return null;

@@ -8,17 +8,7 @@ import {
   MRT_Row,
   useMantineReactTable,
 } from 'mantine-react-table';
-import {
-  ActionIcon,
-  Anchor,
-  Button,
-  Flex,
-  Pill,
-  Text,
-  Title,
-  Tooltip,
-  useComputedColorScheme,
-} from '@mantine/core';
+import { ActionIcon, Anchor, Button, Flex, Pill, Text, Title, Tooltip } from '@mantine/core';
 import { modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
 import {
@@ -43,9 +33,8 @@ export const LeetcodeTable = ({
   problemAttempts,
   enableEditing,
   showAuthor,
+  showCategory = true,
 }: LeetcodeTableProps) => {
-  const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
-
   const { data: userResponse } = useGetCurrentUser();
   const email = userResponse?.responseBody?.user.email ?? '';
 
@@ -125,6 +114,27 @@ export const LeetcodeTable = ({
       }
     : null;
 
+  const categoryColumn: MRT_ColumnDef<ProblemAttemptEntity> | null = showCategory
+    ? {
+        header: 'Category',
+        accessorFn: (row) =>
+          row.leetcodeProblem?.leetcodeProblemCategories
+            ?.map((category) => category.name)
+            .join(' ') || '',
+        Cell: ({ row }) => {
+          return (
+            <Flex className={classes.categoryContainer}>
+              {row.original.leetcodeProblem?.leetcodeProblemCategories?.map((category, index) => (
+                <Pill size="sm" key={index} className={classes.category}>
+                  {category.name}
+                </Pill>
+              ))}
+            </Flex>
+          );
+        },
+      }
+    : null;
+
   const columns = useMemo<MRT_ColumnDef<ProblemAttemptEntity>[]>(
     () => [
       {
@@ -151,7 +161,7 @@ export const LeetcodeTable = ({
             href={row.original.leetcodeProblem?.problem?.link}
             target="_blank"
             inherit
-            c={computedColorScheme === 'light' ? 'dark' : 'dark.0'}
+            className={classes.title}
             underline="always"
           >
             {row.original.leetcodeProblem?.problem?.title}
@@ -188,24 +198,7 @@ export const LeetcodeTable = ({
           );
         },
       },
-      {
-        header: 'Category',
-        accessorFn: (row) =>
-          row.leetcodeProblem?.leetcodeProblemCategories
-            ?.map((category) => category.name)
-            .join(' ') || '',
-        Cell: ({ row }) => {
-          return (
-            <Flex className={classes.categoryContainer}>
-              {row.original.leetcodeProblem?.leetcodeProblemCategories?.map((category, index) => (
-                <Pill size="sm" key={index} className={classes.category}>
-                  {category.name}
-                </Pill>
-              ))}
-            </Flex>
-          );
-        },
-      },
+      ...(categoryColumn ? [categoryColumn] : []),
     ],
     []
   );
@@ -314,4 +307,5 @@ type LeetcodeTableProps = {
   enrollmentId: string;
   enableEditing: boolean;
   showAuthor: boolean;
+  showCategory: boolean;
 };

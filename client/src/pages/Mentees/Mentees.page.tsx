@@ -87,6 +87,7 @@ export default function MenteesPage() {
         enrollmentId={enrollmentId || ''}
         enableEditing={false}
         showAuthor
+        showCategory
       />
     );
   }, [refetchProblemAttempts, problemAttemptsResponse, selectedMentees, enrollmentId]);
