@@ -63,7 +63,7 @@ export function Layout({ children }: LayoutProps) {
         <Flex justify="center" align="center" gap={8}>
           {item.label}
           {item.link === `/seasons/${seasonSlug}` && role != null ? (
-            <Badge autoContrast color="yellow.5" className={classes.roleBadge}>
+            <Badge autoContrast color="gray" variant="light" className={classes.roleBadge}>
               {SeasonRoleReverseIndex[role]}
             </Badge>
           ) : null}

@@ -243,40 +243,6 @@ public class UserService : IUserService
     }
   }
 
-  public async Task<IServiceResponse<GetGraduatesResponse>> GetGraduates(
-    GetGraduatesRequest request,
-    CancellationToken cancellationToken = default
-  )
-  {
-    try
-    {
-      var graduates = await _userRepository
-        .Table.Where(u => u.IsAdmin == false)
-        .Select(u => new GraduateDto
-        {
-          Name = u.Name,
-          DiscordId = u.DiscordId,
-          ProfileImage = u.ProfileImage,
-          Email = u.Email,
-          UserId = u.UserId,
-          Slug = u.Slug,
-        })
-        .AsNoTracking()
-        .OrderBy(u => u.Name)
-        .ToListAsync(cancellationToken);
-
-      return new SuccessServiceResponse<GetGraduatesResponse>(
-        Message.GraduatesListSuccessfully,
-        new GetGraduatesResponse { Graduates = graduates }
-      );
-    }
-    catch (Exception ex)
-    {
-      _logger.LogError(ex, Message.GraduatesListUnexpectedError);
-      return new ErrorServiceResponse<GetGraduatesResponse>(Message.GraduatesListUnexpectedError);
-    }
-  }
-
   #region CRUD Operations
 
   public async Task AddUserAsync(UserEntity user, CancellationToken cancellationToken = default)

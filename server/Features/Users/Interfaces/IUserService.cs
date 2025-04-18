@@ -64,9 +64,4 @@ public interface IUserService
     string? email,
     CancellationToken cancellationToken = default
   );
-
-  Task<IServiceResponse<GetGraduatesResponse>> GetGraduates(
-    GetGraduatesRequest request,
-    CancellationToken cancellationToken = default
-  );
 }

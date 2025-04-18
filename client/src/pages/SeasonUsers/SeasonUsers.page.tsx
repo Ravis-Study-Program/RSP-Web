@@ -1,113 +1,55 @@
-import { IconBrandDiscordFilled } from '@tabler/icons-react';
-import {
-  ActionIcon,
-  Anchor,
-  Avatar,
-  Badge,
-  Button,
-  Card,
-  Grid,
-  Group,
-  rem,
-  Skeleton,
-  Text,
-} from '@mantine/core';
+import { Grid } from '@mantine/core';
 import { Layout } from '@/components/Layout/Layout';
-import { EnrollmentUserDto, useGetEnrollmentUsers } from '@/generated/api/client';
-import { SeasonRoleReverseIndex } from '@/shared/entities/reverseIndex';
+import {
+  useFilterUsers,
+  UserCards,
+  UserFilterPanel,
+  UserSkeletonCards,
+} from '@/components/UserCards/UserCards';
+import { useGetEnrollmentUsers } from '@/generated/api/client';
 import { useSeasonSlug } from '@/shared/hooks/useSeasonSlug';
-import classes from './SeasonUsers.module.css';
 
 export default function SeasonUsersPage() {
   const { seasonSlug } = useSeasonSlug();
   const {
-    data: seasonUsersResponse,
-    isError: isLoadingSeasonUsersError,
-    isFetching: isFetchingSeasonUsers,
-    isLoading: isLoadingSeasonUsers,
+    data: enrollmentUsersResponse,
+    isError: isLoadingEnrollmentUsersError,
+    isFetching: isFetchingEnrollmentUsers,
+    isLoading: isLoadingEnrollmentUsers,
   } = useGetEnrollmentUsers({ SeasonSlug: seasonSlug });
 
+  const users = enrollmentUsersResponse?.responseBody?.enrollmentUsers || [];
+  const {
+    selectedNames,
+    setSelectedNames,
+    selectedRoles,
+    setSelectedRoles,
+    selectedPromotions,
+    setSelectedPromotions,
+    filtered: filteredUsers,
+  } = useFilterUsers(users);
   return (
     <Layout>
-      <Grid gutter={{ base: 'md', xs: 'md', md: 'xl', xl: 50 }}>
-        {!isLoadingSeasonUsers && !isFetchingSeasonUsers && !isLoadingSeasonUsersError ? (
-          <SeasonUserCards
-            seasonUsers={seasonUsersResponse?.responseBody?.enrollmentUsers}
-            seasonSlug={seasonSlug}
-          />
+      <UserFilterPanel
+        allUsers={users}
+        selectedNames={selectedNames}
+        onChangeName={setSelectedNames}
+        selectedRoles={selectedRoles}
+        onChangeRole={setSelectedRoles}
+        selectedPromotions={selectedPromotions}
+        onChangePromotion={setSelectedPromotions}
+        filteredCount={filteredUsers.length}
+      />
+
+      <Grid mt="lg" gutter={{ base: 'md', xs: 'md', md: 'xl', xl: 50 }}>
+        {!isLoadingEnrollmentUsers &&
+        !isFetchingEnrollmentUsers &&
+        !isLoadingEnrollmentUsersError ? (
+          <UserCards users={filteredUsers} />
         ) : (
-          <SeasonUserSkeletonCards />
+          <UserSkeletonCards />
         )}
       </Grid>
     </Layout>
-  );
-}
-
-const SeasonUserSkeletonCards = () => {
-  const numCards = 8;
-
-  return (
-    <>
-      {Array.from({ length: numCards }).map((_, index) => (
-        <Grid.Col key={index} span={{ base: 12, sm: 6, md: 6, lg: 2 }}>
-          <Card withBorder shadow="xs" radius="md">
-            <Skeleton height={80} mb="xl" />
-            <Skeleton height={10} radius="xl" />
-            <Skeleton height={8} mt={8} radius="xl" />
-            <Skeleton height={8} mt={8} radius="xl" />
-            <Skeleton height={8} mt={8} width="70%" radius="xl" />
-            <Skeleton height={40} mt={50} radius="xl" />
-          </Card>
-        </Grid.Col>
-      ))}
-    </>
-  );
-};
-
-type SeasonUserCardsProps = {
-  seasonUsers: EnrollmentUserDto[] | undefined;
-  seasonSlug: string;
-};
-
-export function SeasonUserCards({ seasonUsers, seasonSlug }: SeasonUserCardsProps) {
-  return (
-    <>
-      {seasonUsers?.map((seasonUser, key) => (
-        <Grid.Col key={key} span={{ base: 12, sm: 6, md: 6, lg: 2 }}>
-          <Card key={key} withBorder shadow="sm" radius="md" className={classes.card}>
-            <Avatar src={seasonUser.profileImage} size={70} radius={70} mx="auto" />
-            <Text ta="center" fz="lg" fw={600} mt="md">
-              {seasonUser.name}
-            </Text>
-            <Badge mt={10} autoContrast color="yellow.5">
-              {SeasonRoleReverseIndex[seasonUser.role]}
-            </Badge>
-
-            <Button
-              component="a"
-              href={`/seasons/${seasonSlug}/profile?user=${seasonUser.slug}`}
-              radius="md"
-              mt="sm"
-              size="sm"
-              variant="primary"
-            >
-              View Profile
-            </Button>
-
-            <Group gap={0} mt="md">
-              <Anchor c="gray" target="_blank" href="https://www.discord.com">
-                <ActionIcon variant="subtle" color="gray">
-                  <IconBrandDiscordFilled
-                    style={{ width: rem(20), height: rem(20) }}
-                    color="gray"
-                    stroke={1.5}
-                  />
-                </ActionIcon>
-              </Anchor>
-            </Group>
-          </Card>
-        </Grid.Col>
-      ))}
-    </>
   );
 }

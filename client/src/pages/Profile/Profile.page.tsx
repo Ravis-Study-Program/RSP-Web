@@ -19,6 +19,7 @@ import {
 } from '@/shared/entities/reverseIndex';
 import { useSeasonSlug } from '@/shared/hooks/useSeasonSlug';
 import { useUserAndEnrollment } from '@/shared/hooks/useUserAndEnrollment';
+import { SeasonStudentRolePromotionColors } from '@/shared/utils/colorMappings';
 import { LeetcodeGraphPreset } from '../Leetcode/Leetcode.page';
 import { LeetcodeTable } from '../Leetcode/LeetcodeTable/LeetcodeTable';
 import { ProblemAttemptsGraphContainer } from '../Leetcode/ProblemAttemptsGraph/ProblemAttemptsGraphContainer';
@@ -144,8 +145,6 @@ type ProfileTimelineProps = {
 };
 
 export function ProfileTimeline({ enrollments }: ProfileTimelineProps) {
-  const colors = ['#a3a7b1', '#a3a7b1', '#27922b', '#498cff', '#e44ffd'];
-
   const timelineItems = enrollments.map((e) => {
     const formattedDates = `${dayjs(e.seasonStartDate).format('D MMM YYYY')} - ${dayjs(e.seasonEndDate).format('D MMM YYYY')}`;
 
@@ -156,7 +155,7 @@ export function ProfileTimeline({ enrollments }: ProfileTimelineProps) {
         description = (
           <>
             Achieved{' '}
-            <Text span fw={600} c={colors[e.studentRolePromotion]}>
+            <Text span fw={600} c={SeasonStudentRolePromotionColors[e.studentRolePromotion]}>
               {SeasonStudentRolePromotionReverseIndex[e.studentRolePromotion]}
             </Text>{' '}
             status.

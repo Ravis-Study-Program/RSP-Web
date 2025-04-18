@@ -9,7 +9,7 @@ import { notifications } from '@mantine/notifications';
 import {
   CreateMockInterviewRequest,
   CreateMockInterviewResponseApiResponse,
-  GraduateDto,
+  EnrollmentUserDto,
   LeetcodeProblemDto,
   ListMockInterviewResponseApiResponse,
   MockInterviewEntity,
@@ -358,6 +358,6 @@ type MockInterviewCreateModalProps = {
     options?: RefetchOptions
   ) => Promise<QueryObserverResult<ListMockInterviewResponseApiResponse, unknown>>;
   leetcodeProblems: LeetcodeProblemDto[] | null | undefined;
-  users: GraduateDto[] | null | undefined;
+  users: EnrollmentUserDto[] | null | undefined;
   seasonId: string;
 };

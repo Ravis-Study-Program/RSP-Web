@@ -19,10 +19,11 @@ import {
   useCreateMockInterview,
   useDeleteMockInterview,
   useGetCurrentUser,
-  useGetGraduates,
+  useGetEnrollmentUsers,
   useListLeetcodeProblems,
   useUpdateMockInterview,
 } from '@/generated/api/client';
+import { MockInterviewScoreColors } from '@/shared/utils/colorMappings';
 import { MockInterviewCreateModal } from './MockInterviewCreateModal';
 import { MockInterviewUpdateModal } from './MockInterviewUpdateModal';
 import classes from './MockInterviewTable.module.css';
@@ -45,10 +46,12 @@ export const MockInterviewTable = ({
     isError: isLoadingUsersError,
     isFetching: isFetchingUsers,
     isLoading: isLoadingUsers,
-  } = useGetGraduates();
+  } = useGetEnrollmentUsers();
   const { data: currentUserResponse } = useGetCurrentUser();
   const currentUserEmail = currentUserResponse?.responseBody?.user.email ?? '';
-  const users = usersResponse?.responseBody?.graduates.filter((u) => u.email !== currentUserEmail);
+  const users = usersResponse?.responseBody?.enrollmentUsers.filter(
+    (u) => u.email !== currentUserEmail
+  );
 
   const { mutateAsync: createMockInterview, status: isCreatingMockInterviewStatus } =
     useCreateMockInterview();
@@ -381,23 +384,9 @@ type InnerMockInterviewTableProps = {
 };
 
 const ScoreText = ({ score }: ScoreTextProps) => {
-  const colors = [
-    '#E27168',
-    '#E88366',
-    '#EE9663',
-    '#F3A961',
-    '#F9BC5E',
-    '#FFD05B',
-    '#D9CB62',
-    '#B4C569',
-    '#90BF70',
-    '#6EB977',
-    '#4DB37F',
-  ];
-
   return (
     <Flex align="center" gap={6}>
-      <Box bg={colors[score]} w={12} h={12} className={classes.scoreTextCircle} />
+      <Box bg={MockInterviewScoreColors[score]} w={12} h={12} className={classes.scoreTextCircle} />
       <Text size="sm">{score}</Text>
     </Flex>
   );
