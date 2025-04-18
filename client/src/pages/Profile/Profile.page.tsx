@@ -30,10 +30,14 @@ dayjs.extend(localizedFormat);
 export default function ProfilePage() {
   const [searchParams] = useSearchParams();
   const { user: Auth0User } = useAuth0();
-  const email = searchParams.get('email') || Auth0User?.email || '';
+  const slug = searchParams.get('user') || '';
 
   const { seasonSlug } = useSeasonSlug();
-  const { enrollmentId, seasonId, user, role } = useUserAndEnrollment(seasonSlug, email);
+  const { enrollmentId, seasonId, user, role, email } = useUserAndEnrollment(
+    seasonSlug,
+    Auth0User?.email || '',
+    slug
+  );
   const [section, setSection] = useState<'Leetcode' | 'Mock Interviews'>('Leetcode');
   const {
     data: enrollmentsResponse,

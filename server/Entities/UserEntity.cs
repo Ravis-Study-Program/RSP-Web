@@ -23,6 +23,9 @@ public class UserEntity : ISoftDelete
   public string Name { get; set; } = string.Empty;
 
   [Required]
+  public string Slug { get; set; } = string.Empty;
+
+  [Required]
   public string ProfileImage { get; set; } = string.Empty;
   public DateTime? DeletedAtUtc { get; set; }
 }
@@ -36,6 +39,7 @@ public class UserEntityConfiguration : IEntityTypeConfiguration<UserEntity>
 
     // Indexes
     builder.HasIndex(x => x.Email);
+    builder.HasIndex(x => x.Slug);
 
     // Fields
     builder
@@ -56,6 +60,7 @@ public class UserEntityConfiguration : IEntityTypeConfiguration<UserEntity>
       .IsRequired();
     builder.Property(x => x.IsAdmin).HasColumnName("IsAdmin").IsRequired();
     builder.Property(x => x.Name).HasColumnName("Name").HasColumnType("varchar(100)").IsRequired();
+    builder.Property(x => x.Slug).HasColumnName("Slug").HasColumnType("varchar(100)").IsRequired();
     builder
       .Property(x => x.ProfileImage)
       .HasColumnName("ProfileImage")

@@ -5,8 +5,9 @@ namespace RSPWebAPI.Features.Users.Dtos;
 
 public record GetUserRequest
 {
-  [Required]
-  public string Email { get; set; } = string.Empty;
+  public string? Email { get; set; }
+
+  public string? Slug { get; set; }
 };
 
 public record GetUserResponse

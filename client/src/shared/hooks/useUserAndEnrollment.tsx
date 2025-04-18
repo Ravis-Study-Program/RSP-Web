@@ -1,6 +1,15 @@
-import { useGetCurrentUser, useGetIsCurrentUserEnrolled, useGetUser } from '@/generated/api/client';
+import {
+  GetUserParams,
+  useGetCurrentUser,
+  useGetIsCurrentUserEnrolled,
+  useGetUser,
+} from '@/generated/api/client';
 
-export const useUserAndEnrollment = (seasonSlug: string, email: string | null = null) => {
+export const useUserAndEnrollment = (
+  seasonSlug: string,
+  email: string | null = null,
+  slug: string | null = null
+) => {
   const {
     data: currentUserResponse,
     isLoading: isCurrentUserLoading,
@@ -9,6 +18,14 @@ export const useUserAndEnrollment = (seasonSlug: string, email: string | null = 
 
   const currentUserEmail = currentUserResponse?.responseBody?.user?.email ?? null;
   const userEmail = email ?? currentUserEmail;
+
+  // Prioritize slug if available
+  const params: GetUserParams = {};
+  if (slug != null) {
+    params.Slug = slug;
+  } else if (userEmail != null) {
+    params.Email = userEmail;
+  }
 
   // When an email is provided explicitly, enable fetching the user.
   // Otherwise, rely on the current user query.
@@ -19,7 +36,7 @@ export const useUserAndEnrollment = (seasonSlug: string, email: string | null = 
     isError: isUserError,
     isFetching: isUserFetching,
     isLoading: isUserLoading,
-  } = useGetUser({ Email: userEmail || '' }, { query: { enabled: isUserQueryEnabled } });
+  } = useGetUser(params, { query: { enabled: isUserQueryEnabled } });
 
   // Prioritize the fetched user if available (when querying with an email);
   // Otherwise, fall back to the current user data.
@@ -52,5 +69,6 @@ export const useUserAndEnrollment = (seasonSlug: string, email: string | null = 
     enrollmentId,
     isLoading,
     isError,
+    email: user?.email || '',
   };
 };

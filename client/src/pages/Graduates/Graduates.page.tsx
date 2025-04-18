@@ -102,7 +102,7 @@ export function GraduateCards({ graduates }: GraduateCardsProps) {
 
             <Button
               component="a"
-              href={`/profile?email=${graduate.email}`}
+              href={`/profile?user=${graduate.slug}`}
               radius="md"
               mt="sm"
               size="xs"

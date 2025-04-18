@@ -637,6 +637,8 @@ export interface EnrollmentUserDto {
   /** @minLength 1 */
   name: string;
   /** @minLength 1 */
+  slug: string;
+  /** @minLength 1 */
   email: string;
   role: SeasonRole;
   /** @minLength 1 */
@@ -772,6 +774,8 @@ export interface GraduateDto {
   discordId: string;
   /** @minLength 1 */
   name: string;
+  /** @minLength 1 */
+  slug: string;
   /** @minLength 1 */
   email: string;
   /** @minLength 1 */
@@ -1155,6 +1159,8 @@ export interface UserEntity {
   /** @minLength 1 */
   name: string;
   /** @minLength 1 */
+  slug: string;
+  /** @minLength 1 */
   profileImage: string;
   /** @nullable */
   deletedAtUtc?: string | null;
@@ -1238,7 +1244,8 @@ export type GetCurrentUserParams = {
 };
 
 export type GetUserParams = {
-  Email: string;
+  Email?: string;
+  Slug?: string;
 };
 
 export type GetGraduatesParams = {
@@ -5051,7 +5058,7 @@ export function useGetCurrentUser<
 }
 
 export const getUser = (
-  params: GetUserParams,
+  params?: GetUserParams,
   options?: SecondParameter<typeof CustomAxiosInstance>,
   signal?: AbortSignal
 ) => {
@@ -5061,7 +5068,7 @@ export const getUser = (
   );
 };
 
-export const getGetUserQueryKey = (params: GetUserParams) => {
+export const getGetUserQueryKey = (params?: GetUserParams) => {
   return [`http://localhost/api/v1/users/get-user`, ...(params ? [params] : [])] as const;
 };
 
@@ -5069,7 +5076,7 @@ export const getGetUserQueryOptions = <
   TData = Awaited<ReturnType<typeof getUser>>,
   TError = unknown,
 >(
-  params: GetUserParams,
+  params?: GetUserParams,
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUser>>, TError, TData>>;
     request?: SecondParameter<typeof CustomAxiosInstance>;
@@ -5093,7 +5100,7 @@ export type GetUserQueryResult = NonNullable<Awaited<ReturnType<typeof getUser>>
 export type GetUserQueryError = unknown;
 
 export function useGetUser<TData = Awaited<ReturnType<typeof getUser>>, TError = unknown>(
-  params: GetUserParams,
+  params: undefined | GetUserParams,
   options: {
     query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUser>>, TError, TData>> &
       Pick<
@@ -5108,7 +5115,7 @@ export function useGetUser<TData = Awaited<ReturnType<typeof getUser>>, TError =
   }
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
 export function useGetUser<TData = Awaited<ReturnType<typeof getUser>>, TError = unknown>(
-  params: GetUserParams,
+  params?: GetUserParams,
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUser>>, TError, TData>> &
       Pick<
@@ -5123,7 +5130,7 @@ export function useGetUser<TData = Awaited<ReturnType<typeof getUser>>, TError =
   }
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
 export function useGetUser<TData = Awaited<ReturnType<typeof getUser>>, TError = unknown>(
-  params: GetUserParams,
+  params?: GetUserParams,
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUser>>, TError, TData>>;
     request?: SecondParameter<typeof CustomAxiosInstance>;
@@ -5131,7 +5138,7 @@ export function useGetUser<TData = Awaited<ReturnType<typeof getUser>>, TError =
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
 
 export function useGetUser<TData = Awaited<ReturnType<typeof getUser>>, TError = unknown>(
-  params: GetUserParams,
+  params?: GetUserParams,
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUser>>, TError, TData>>;
     request?: SecondParameter<typeof CustomAxiosInstance>;
