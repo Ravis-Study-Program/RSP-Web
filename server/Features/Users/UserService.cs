@@ -154,12 +154,39 @@ public class UserService : IUserService
     );
   }
 
-  public async Task<IServiceResponse<GetUserResponse>> GetUser(
+  public async Task<IServiceResponse<GetUserResponse>> GetUserBySlug(
     GetUserRequest request,
     CancellationToken cancellationToken = default
   )
   {
     var user = await GetUserByEmailAsync(request.Email, cancellationToken);
+    if (user == null)
+    {
+      return new ErrorServiceResponse<GetUserResponse>(Message.UserEmailDoesNotExists);
+    }
+
+    return new SuccessServiceResponse<GetUserResponse>(
+      Message.GetUserSuccessfully,
+      new GetUserResponse { User = user }
+    );
+  }
+
+  public async Task<IServiceResponse<GetUserResponse>> GetUser(
+    GetUserRequest request,
+    CancellationToken cancellationToken = default
+  )
+  {
+    UserEntity? user = null;
+
+    if (request.Slug != null)
+    {
+      user = await GetUserBySlugAsync(request.Slug, cancellationToken);
+    }
+    else if (request.Email != null)
+    {
+      user = await GetUserByEmailAsync(request.Email, cancellationToken);
+    }
+
     if (user == null)
     {
       return new ErrorServiceResponse<GetUserResponse>(Message.UserEmailDoesNotExists);
@@ -232,6 +259,7 @@ public class UserService : IUserService
           ProfileImage = u.ProfileImage,
           Email = u.Email,
           UserId = u.UserId,
+          Slug = u.Slug,
         })
         .AsNoTracking()
         .OrderBy(u => u.Name)
@@ -309,6 +337,19 @@ public class UserService : IUserService
   {
     return await _userRepository.FirstOrDefaultAsync(
       q => q.Email == email,
+      cancellationToken,
+      include
+    );
+  }
+
+  public async Task<UserEntity?> GetUserBySlugAsync(
+    string? slug,
+    CancellationToken cancellationToken = default,
+    Func<IQueryable<UserEntity>, IQueryable<UserEntity>>? include = null
+  )
+  {
+    return await _userRepository.FirstOrDefaultAsync(
+      q => q.Slug == slug,
       cancellationToken,
       include
     );

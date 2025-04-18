@@ -16,6 +16,9 @@ public record GraduateDto
   public string Name { get; set; } = string.Empty;
 
   [Required]
+  public string Slug { get; set; } = string.Empty;
+
+  [Required]
   public string Email { get; set; } = string.Empty;
 
   [Required]

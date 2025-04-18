@@ -313,6 +313,7 @@ public class EnrollmentService : IEnrollmentService
           ProfileImage = e.User.ProfileImage,
           Email = e.User.Email,
           StudentRolePromotion = e.StudentRolePromotion,
+          Slug = e.User.Slug,
         })
         .AsNoTracking()
         .ToListAsync(cancellationToken);

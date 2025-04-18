@@ -85,7 +85,7 @@ export function SeasonUserCards({ seasonUsers, seasonSlug }: SeasonUserCardsProp
 
             <Button
               component="a"
-              href={`/seasons/${seasonSlug}/profile?email=${seasonUser.email}`}
+              href={`/seasons/${seasonSlug}/profile?user=${seasonUser.slug}`}
               radius="md"
               mt="sm"
               size="sm"
