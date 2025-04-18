@@ -303,24 +303,44 @@ public class EnrollmentService : IEnrollmentService
   {
     try
     {
-      var enrollmentUsers = await _enrollmentRepository
-        .Table.Where(e => e.Season.Slug == request.SeasonSlug)
-        .Select(e => new EnrollmentUserDto
+      var query = _enrollmentRepository
+        .Table.AsNoTracking()
+        .Include(e => e.User)
+        .Include(e => e.Season)
+        .AsQueryable();
+
+      var filterBySeason = !string.IsNullOrEmpty(request.SeasonSlug);
+
+      if (filterBySeason)
+      {
+        query = query.Where(e => e.Season.Slug == request.SeasonSlug);
+      }
+
+      var enrollmentUsers = await query.ToListAsync(cancellationToken);
+
+      var distinctUsers = enrollmentUsers
+        .GroupBy(e => e.User.Slug)
+        .Select(g =>
         {
-          Name = e.User.Name,
-          Role = e.Role,
-          DiscordId = e.User.DiscordId,
-          ProfileImage = e.User.ProfileImage,
-          Email = e.User.Email,
-          StudentRolePromotion = e.StudentRolePromotion,
-          Slug = e.User.Slug,
+          var e = g.First();
+
+          return new EnrollmentUserDto
+          {
+            UserId = e.User.UserId,
+            Name = e.User.Name,
+            Slug = e.User.Slug,
+            Email = e.User.Email,
+            ProfileImage = e.User.ProfileImage,
+            Role = filterBySeason ? e.Role : null,
+            StudentRolePromotion = filterBySeason ? e.StudentRolePromotion : null,
+          };
         })
-        .AsNoTracking()
-        .ToListAsync(cancellationToken);
-      await _unitOfWork.SaveChangesAsync(cancellationToken);
+        .OrderBy(e => e.Name)
+        .ToList();
+
       return new SuccessServiceResponse<GetEnrollmentUsersResponse>(
         Message.EnrollmentUsersListSuccessfully,
-        new GetEnrollmentUsersResponse { EnrollmentUsers = enrollmentUsers }
+        new GetEnrollmentUsersResponse { EnrollmentUsers = distinctUsers }
       );
     }
     catch (Exception ex)

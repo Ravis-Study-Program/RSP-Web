@@ -112,18 +112,5 @@ public class UserController : BaseController
     return HandleResponse(response);
   }
 
-  [HttpGet]
-  [ServiceFilter(typeof(AuthAttribute))]
-  [Route("get-graduates")]
-  [ActionName("GetGraduates")]
-  public async Task<ActionResult<ApiResponse<GetGraduatesResponse>>> GetGraduates(
-    [FromQuery] GetGraduatesRequest request,
-    CancellationToken cancellationToken = default
-  )
-  {
-    var response = await _userService.GetGraduates(request, cancellationToken);
-    return HandleResponse(response);
-  }
-
   #endregion
 }

@@ -7,7 +7,7 @@ import { DateTimePicker } from '@mantine/dates';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import {
-  GraduateDto,
+  EnrollmentUserDto,
   LeetcodeProblemDto,
   ListMockInterviewResponseApiResponse,
   MockInterviewEntity,
@@ -374,6 +374,6 @@ type MockInterviewUpdateModalProps = {
   ) => Promise<QueryObserverResult<ListMockInterviewResponseApiResponse, unknown>>;
   row: MRT_Row<MockInterviewEntity>;
   leetcodeProblems: LeetcodeProblemDto[] | null | undefined;
-  users: GraduateDto[] | null | undefined;
+  users: EnrollmentUserDto[] | null | undefined;
   seasonId: string;
 };

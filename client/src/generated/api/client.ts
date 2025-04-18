@@ -633,17 +633,17 @@ export interface EnrollmentResponseDto {
 
 export interface EnrollmentUserDto {
   /** @minLength 1 */
-  discordId: string;
-  /** @minLength 1 */
   name: string;
+  /** @minLength 1 */
+  email: string;
   /** @minLength 1 */
   slug: string;
   /** @minLength 1 */
-  email: string;
-  role: SeasonRole;
-  /** @minLength 1 */
   profileImage: string;
-  studentRolePromotion: SeasonStudentRolePromotion;
+  role?: SeasonRole;
+  studentRolePromotion?: SeasonStudentRolePromotion;
+  /** @minLength 1 */
+  userId: string;
 }
 
 export interface GenerateLeetcodeProblemRecommendationRequest {
@@ -700,21 +700,6 @@ export interface GetEnrollmentUsersResponseApiResponse {
   responseBody?: GetEnrollmentUsersResponse;
 }
 
-export interface GetGraduatesRequest {
-  [key: string]: unknown;
-}
-
-export interface GetGraduatesResponse {
-  graduates: GraduateDto[];
-}
-
-export interface GetGraduatesResponseApiResponse {
-  error?: ApiError;
-  /** @nullable */
-  successMessage?: string | null;
-  responseBody?: GetGraduatesResponse;
-}
-
 export interface GetIsUserEnrolledResponse {
   isEnrolled: boolean;
   role: SeasonRole;
@@ -765,21 +750,6 @@ export interface GetUserResponseApiResponse {
   /** @nullable */
   successMessage?: string | null;
   responseBody?: GetUserResponse;
-}
-
-export interface GraduateDto {
-  /** @minLength 1 */
-  userId: string;
-  /** @minLength 1 */
-  discordId: string;
-  /** @minLength 1 */
-  name: string;
-  /** @minLength 1 */
-  slug: string;
-  /** @minLength 1 */
-  email: string;
-  /** @minLength 1 */
-  profileImage: string;
 }
 
 export interface KickStudentRequest {
@@ -1188,7 +1158,7 @@ export type GetIsCurrentUserEnrolledParams = {
 };
 
 export type GetEnrollmentUsersParams = {
-  SeasonSlug: string;
+  SeasonSlug?: string;
 };
 
 export type AdminPopulateLeetcodeQuestionsParams = {
@@ -1246,10 +1216,6 @@ export type GetCurrentUserParams = {
 export type GetUserParams = {
   Email?: string;
   Slug?: string;
-};
-
-export type GetGraduatesParams = {
-  request?: GetGraduatesRequest;
 };
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
@@ -1938,7 +1904,7 @@ export function useGetIsCurrentUserEnrolled<
 }
 
 export const getEnrollmentUsers = (
-  params: GetEnrollmentUsersParams,
+  params?: GetEnrollmentUsersParams,
   options?: SecondParameter<typeof CustomAxiosInstance>,
   signal?: AbortSignal
 ) => {
@@ -1953,7 +1919,7 @@ export const getEnrollmentUsers = (
   );
 };
 
-export const getGetEnrollmentUsersQueryKey = (params: GetEnrollmentUsersParams) => {
+export const getGetEnrollmentUsersQueryKey = (params?: GetEnrollmentUsersParams) => {
   return [
     `http://localhost/api/v1/enrollments/get-enrollment-users`,
     ...(params ? [params] : []),
@@ -1964,7 +1930,7 @@ export const getGetEnrollmentUsersQueryOptions = <
   TData = Awaited<ReturnType<typeof getEnrollmentUsers>>,
   TError = unknown,
 >(
-  params: GetEnrollmentUsersParams,
+  params?: GetEnrollmentUsersParams,
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getEnrollmentUsers>>, TError, TData>>;
     request?: SecondParameter<typeof CustomAxiosInstance>;
@@ -1993,7 +1959,7 @@ export function useGetEnrollmentUsers<
   TData = Awaited<ReturnType<typeof getEnrollmentUsers>>,
   TError = unknown,
 >(
-  params: GetEnrollmentUsersParams,
+  params: undefined | GetEnrollmentUsersParams,
   options: {
     query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getEnrollmentUsers>>, TError, TData>> &
       Pick<
@@ -2011,7 +1977,7 @@ export function useGetEnrollmentUsers<
   TData = Awaited<ReturnType<typeof getEnrollmentUsers>>,
   TError = unknown,
 >(
-  params: GetEnrollmentUsersParams,
+  params?: GetEnrollmentUsersParams,
   options?: {
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getEnrollmentUsers>>, TError, TData>
@@ -2031,7 +1997,7 @@ export function useGetEnrollmentUsers<
   TData = Awaited<ReturnType<typeof getEnrollmentUsers>>,
   TError = unknown,
 >(
-  params: GetEnrollmentUsersParams,
+  params?: GetEnrollmentUsersParams,
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getEnrollmentUsers>>, TError, TData>>;
     request?: SecondParameter<typeof CustomAxiosInstance>;
@@ -2042,7 +2008,7 @@ export function useGetEnrollmentUsers<
   TData = Awaited<ReturnType<typeof getEnrollmentUsers>>,
   TError = unknown,
 >(
-  params: GetEnrollmentUsersParams,
+  params?: GetEnrollmentUsersParams,
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getEnrollmentUsers>>, TError, TData>>;
     request?: SecondParameter<typeof CustomAxiosInstance>;
@@ -5145,104 +5111,6 @@ export function useGetUser<TData = Awaited<ReturnType<typeof getUser>>, TError =
   }
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
   const queryOptions = getGetUserQueryOptions(params, options);
-
-  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData>;
-  };
-
-  query.queryKey = queryOptions.queryKey;
-
-  return query;
-}
-
-export const getGraduates = (
-  params?: GetGraduatesParams,
-  options?: SecondParameter<typeof CustomAxiosInstance>,
-  signal?: AbortSignal
-) => {
-  return CustomAxiosInstance<GetGraduatesResponseApiResponse>(
-    { url: `http://localhost/api/v1/users/get-graduates`, method: 'GET', params, signal },
-    options
-  );
-};
-
-export const getGetGraduatesQueryKey = (params?: GetGraduatesParams) => {
-  return [`http://localhost/api/v1/users/get-graduates`, ...(params ? [params] : [])] as const;
-};
-
-export const getGetGraduatesQueryOptions = <
-  TData = Awaited<ReturnType<typeof getGraduates>>,
-  TError = unknown,
->(
-  params?: GetGraduatesParams,
-  options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getGraduates>>, TError, TData>>;
-    request?: SecondParameter<typeof CustomAxiosInstance>;
-  }
-) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {};
-
-  const queryKey = queryOptions?.queryKey ?? getGetGraduatesQueryKey(params);
-
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof getGraduates>>> = ({ signal }) =>
-    getGraduates(params, requestOptions, signal);
-
-  return { queryKey, queryFn, staleTime: Infinity, ...queryOptions } as UseQueryOptions<
-    Awaited<ReturnType<typeof getGraduates>>,
-    TError,
-    TData
-  > & { queryKey: DataTag<QueryKey, TData> };
-};
-
-export type GetGraduatesQueryResult = NonNullable<Awaited<ReturnType<typeof getGraduates>>>;
-export type GetGraduatesQueryError = unknown;
-
-export function useGetGraduates<TData = Awaited<ReturnType<typeof getGraduates>>, TError = unknown>(
-  params: undefined | GetGraduatesParams,
-  options: {
-    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getGraduates>>, TError, TData>> &
-      Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getGraduates>>,
-          TError,
-          Awaited<ReturnType<typeof getGraduates>>
-        >,
-        'initialData'
-      >;
-    request?: SecondParameter<typeof CustomAxiosInstance>;
-  }
-): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
-export function useGetGraduates<TData = Awaited<ReturnType<typeof getGraduates>>, TError = unknown>(
-  params?: GetGraduatesParams,
-  options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getGraduates>>, TError, TData>> &
-      Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getGraduates>>,
-          TError,
-          Awaited<ReturnType<typeof getGraduates>>
-        >,
-        'initialData'
-      >;
-    request?: SecondParameter<typeof CustomAxiosInstance>;
-  }
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
-export function useGetGraduates<TData = Awaited<ReturnType<typeof getGraduates>>, TError = unknown>(
-  params?: GetGraduatesParams,
-  options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getGraduates>>, TError, TData>>;
-    request?: SecondParameter<typeof CustomAxiosInstance>;
-  }
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
-
-export function useGetGraduates<TData = Awaited<ReturnType<typeof getGraduates>>, TError = unknown>(
-  params?: GetGraduatesParams,
-  options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getGraduates>>, TError, TData>>;
-    request?: SecondParameter<typeof CustomAxiosInstance>;
-  }
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
-  const queryOptions = getGetGraduatesQueryOptions(params, options);
 
   const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
     queryKey: DataTag<QueryKey, TData>;

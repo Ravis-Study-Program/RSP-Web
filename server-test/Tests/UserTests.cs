@@ -155,22 +155,4 @@ public class UserTests : BaseIntegrationTest, IAsyncLifetime
     Assert.NotNull(currentUser);
     Assert.Equal(email, currentUser!.Email);
   }
-
-  [Fact]
-  public async Task GetGraduates_Returns_Expected_Count()
-  {
-    const int count = 3;
-    for (var i = 0; i < count; i++)
-    {
-      await _seeder.SeedUserAsync();
-    }
-
-    var gradsResponse = await UserService.GetGraduates(new GetGraduatesRequest());
-    Assert.True(gradsResponse.IsSuccess);
-    Assert.Equal(Message.GraduatesListSuccessfully, gradsResponse.Message);
-
-    var graduates = gradsResponse.Data?.Graduates.ToList();
-    Assert.NotNull(graduates);
-    Assert.Equal(count, graduates!.Count);
-  }
 }
