@@ -633,6 +633,8 @@ export interface EnrollmentResponseDto {
 
 export interface EnrollmentUserDto {
   /** @minLength 1 */
+  userId: string;
+  /** @minLength 1 */
   name: string;
   /** @minLength 1 */
   email: string;
@@ -642,8 +644,6 @@ export interface EnrollmentUserDto {
   profileImage: string;
   role?: SeasonRole;
   studentRolePromotion?: SeasonStudentRolePromotion;
-  /** @minLength 1 */
-  userId: string;
 }
 
 export interface GenerateLeetcodeProblemRecommendationRequest {

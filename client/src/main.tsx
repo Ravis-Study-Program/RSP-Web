@@ -9,6 +9,7 @@ import React from 'react';
 import { Auth0Provider } from '@auth0/auth0-react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import ReactDOM from 'react-dom/client';
+import { HelmetProvider } from 'react-helmet-async';
 import { BrowserRouter } from 'react-router-dom';
 import { MantineProvider } from '@mantine/core';
 import { ModalsProvider } from '@mantine/modals';
@@ -24,19 +25,21 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       <Notifications limit={1} />
       <QueryClientProvider client={queryClient}>
         <ModalsProvider>
-          <Auth0Provider
-            domain={import.meta.env.VITE_APP_AUTH0_DOMAIN as string}
-            clientId={import.meta.env.VITE_APP_AUTH0_CLIENT_ID as string}
-            authorizationParams={{
-              redirect_uri: import.meta.env.VITE_APP_AUTH0_REDIRECT_URI as string,
-              audience: import.meta.env.VITE_APP_AUTH0_AUDIENCE as string,
-            }}
-            cacheLocation="localstorage"
-          >
-            <BrowserRouter>
-              <AppRoutes />
-            </BrowserRouter>
-          </Auth0Provider>
+          <HelmetProvider>
+            <Auth0Provider
+              domain={import.meta.env.VITE_APP_AUTH0_DOMAIN as string}
+              clientId={import.meta.env.VITE_APP_AUTH0_CLIENT_ID as string}
+              authorizationParams={{
+                redirect_uri: import.meta.env.VITE_APP_AUTH0_REDIRECT_URI as string,
+                audience: import.meta.env.VITE_APP_AUTH0_AUDIENCE as string,
+              }}
+              cacheLocation="localstorage"
+            >
+              <BrowserRouter>
+                <AppRoutes />
+              </BrowserRouter>
+            </Auth0Provider>
+          </HelmetProvider>
         </ModalsProvider>
       </QueryClientProvider>
     </MantineProvider>
