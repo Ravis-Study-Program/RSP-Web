@@ -8,8 +8,7 @@ public record AdminUpdateUserRequest
   [Required]
   public string UserId { get; set; } = string.Empty;
 
-  [Required]
-  public string DiscordId { get; set; } = string.Empty;
+  public string? DiscordId { get; set; }
 
   [Required]
   public string Email { get; set; } = string.Empty;
@@ -17,8 +16,7 @@ public record AdminUpdateUserRequest
   [Required]
   public string Name { get; set; } = string.Empty;
 
-  [Required]
-  public string ProfileImage { get; set; } = string.Empty;
+  public string? ProfileImage { get; set; }
 
   [Required]
   public bool IsAdmin { get; set; }

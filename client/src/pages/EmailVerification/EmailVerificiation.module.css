@@ -1,0 +1,22 @@
+.root {
+    padding-top: 80px;
+    padding-bottom: 120px;
+    background-color: var(--mantine-color-blue-9);
+    min-height: 100vh;
+}
+
+.title {
+    text-align: center;
+    font-weight: 900;
+    font-size: 42px;
+    color: var(--mantine-color-white);
+
+    @media (max-width: $mantine-breakpoint-sm) {
+        font-size: 32px;
+    }
+}
+
+.description {
+    max-width: 540px;
+    color: var(--mantine-color-blue-1);
+}

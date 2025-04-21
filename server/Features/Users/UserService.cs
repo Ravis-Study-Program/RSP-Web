@@ -1,4 +1,6 @@
 using System.Linq.Expressions;
+using System.Text.RegularExpressions;
+using Auth0.ManagementApi.Models;
 using Microsoft.EntityFrameworkCore;
 using RSPWebAPI.Common;
 using RSPWebAPI.Common.Interfaces;
@@ -6,6 +8,8 @@ using RSPWebAPI.Entities;
 using RSPWebAPI.Features.Constants;
 using RSPWebAPI.Features.Users.Dtos;
 using RSPWebAPI.Features.Users.Interfaces;
+using server.Clients.Interfaces;
+using server.Shared.Strings;
 
 namespace RSPWebAPI.Features.Users;
 
@@ -14,16 +18,19 @@ public class UserService : IUserService
   private readonly ILogger<UserService> _logger;
   private readonly IUnitOfWork _unitOfWork;
   private readonly IRepository<UserEntity> _userRepository;
+  private readonly IUserIdentityService _userIdentityService;
 
   public UserService(
     IRepository<UserEntity> userRepository,
     IUnitOfWork unitOfWork,
-    ILogger<UserService> logger
+    ILogger<UserService> logger,
+    IUserIdentityService userIdentityService
   )
   {
     _userRepository = userRepository;
     _unitOfWork = unitOfWork;
     _logger = logger;
+    _userIdentityService = userIdentityService;
   }
 
   public async Task<IServiceResponse<AdminCreateUserResponse>> CreateAdminUser(
@@ -37,6 +44,7 @@ public class UserService : IUserService
       return new ErrorServiceResponse<AdminCreateUserResponse>(Message.UserEmailExists);
     }
 
+    var slug = await createSlug(request.Name);
     var user = new UserEntity
     {
       UserId = Database.Constants.GeneratePrimaryKeyId(),
@@ -45,6 +53,7 @@ public class UserService : IUserService
       Name = request.Name,
       ProfileImage = request.ProfileImage,
       IsAdmin = request.IsAdmin,
+      Slug = slug,
     };
 
     try
@@ -205,32 +214,51 @@ public class UserService : IUserService
   )
   {
     await _unitOfWork.BeginTransactionAsync(cancellationToken);
+
     try
     {
+      var auth0User = await _userIdentityService.GetUserByEmailAsync(email!, cancellationToken);
       var existingUserResponse = await GetCurrentUser(email, cancellationToken);
-      if (existingUserResponse.IsSuccess)
+      var dbUser = existingUserResponse.Data?.User;
+
+      var isVerified = auth0User?.EmailVerified == true;
+      var userExists = existingUserResponse.IsSuccess;
+
+      // Do nothing since user exists and verified
+      if (userExists && isVerified)
       {
-        return new ErrorServiceResponse<CreateUserIfNotExistsResponse>(
+        return new SuccessServiceResponse<CreateUserIfNotExistsResponse>(
           existingUserResponse.Message
         );
       }
 
-      var user = new UserEntity
+      // Create user in database if it doesn't exists
+      if (!userExists)
       {
-        UserId = Database.Constants.GeneratePrimaryKeyId(),
-        DiscordId = request.DiscordId,
-        Email = email!, // null email would have been captured earlier in GetCurrentUser
-        Name = request.Name,
-        ProfileImage = request.ProfileImage,
-        IsAdmin = false,
-      };
+        var slug = await createSlug(request.Name);
+        var user = new UserEntity
+        {
+          UserId = Database.Constants.GeneratePrimaryKeyId(),
+          Email = email!, // null email would have been captured earlier in GetCurrentUser
+          Name = request.Name,
+          Slug = slug,
+          IsAdmin = false,
+        };
 
-      await AddUserAsync(user, cancellationToken);
+        await AddUserAsync(user, cancellationToken);
+      }
+
+      if (!isVerified && auth0User?.UserId != null)
+      {
+        await _userIdentityService.SendVerificationEmailAsync(auth0User.UserId);
+      }
+
       await _unitOfWork.SaveChangesAsync(cancellationToken);
       await _unitOfWork.CommitTransactionAsync(cancellationToken);
+
       return new SuccessServiceResponse<CreateUserIfNotExistsResponse>(
         Message.UserCreatedSuccessfully,
-        new CreateUserIfNotExistsResponse { UserId = user.UserId }
+        new CreateUserIfNotExistsResponse { }
       );
     }
     catch (Exception ex)
@@ -241,6 +269,22 @@ public class UserService : IUserService
         Message.UserCreationUnexpectedError
       );
     }
+  }
+
+  private async Task<string> createSlug(string name)
+  {
+    string baseSlug = StringUtils.Slugify(name);
+    string slug = baseSlug;
+    var random = new Random();
+
+    // Keep adding a suffix until it sticks
+    while (await GetUserBySlugAsync(slug) is not null)
+    {
+      int randomNumber = random.Next(1, 10001);
+      slug = $"{baseSlug}-{randomNumber}";
+    }
+
+    return slug;
   }
 
   #region CRUD Operations

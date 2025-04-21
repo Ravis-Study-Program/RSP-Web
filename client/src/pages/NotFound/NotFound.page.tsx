@@ -22,8 +22,8 @@ export default function NotFoundPage() {
             <Button onClick={goBack} size="md" color="gray">
               Go Back
             </Button>
-            <Anchor href="/seasons" size="md">
-              <Button size="md">Seasons List</Button>
+            <Anchor href="/" size="md">
+              <Button size="md">Home Page</Button>
             </Anchor>
           </Group>
         </div>

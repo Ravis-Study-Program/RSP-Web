@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import { Navigate } from 'react-router-dom';
 import { Button, Container, Text, Title } from '@mantine/core';
@@ -12,20 +12,19 @@ export default function LoginPage() {
     isAuthenticated: isAuth0Authenticated,
     user: Auth0User,
   } = useAuth0();
-  const [isUserCreated, setIsUserCreated] = useState(false);
+  const hasCreatedUserRef = useRef(false);
   const [isLoading, setIsLoading] = useState(true);
   const { mutateAsync: createUser } = useCreateUserIfNotExists();
 
   useEffect(() => {
     const initializeUser = async () => {
-      if (!isAuth0Loading && isAuth0Authenticated && Auth0User && !isUserCreated) {
+      if (!isAuth0Loading && isAuth0Authenticated && Auth0User && !hasCreatedUserRef.current) {
         try {
           const request: CreateUserIfNotExistsRequest = {
-            profileImage: Auth0User.picture || '',
-            name: Auth0User.given_name || 'New User',
+            name: Auth0User.nickname || 'New User',
           };
           await createUser({ data: request });
-          setIsUserCreated(true);
+          hasCreatedUserRef.current = true;
         } catch (err) {
           // eslint-disable-next-line no-console
           console.error('User creation error:', err);
@@ -35,7 +34,7 @@ export default function LoginPage() {
     };
 
     initializeUser();
-  }, [isAuth0Loading, isAuth0Authenticated, Auth0User, isUserCreated, createUser]);
+  }, [isAuth0Loading, isAuth0Authenticated, Auth0User, createUser]);
 
   const shouldRedirect = useMemo(() => {
     if (isAuth0Authenticated) {

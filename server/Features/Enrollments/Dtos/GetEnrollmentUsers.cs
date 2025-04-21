@@ -22,8 +22,7 @@ public record EnrollmentUserDto
   [Required]
   public string Slug { get; set; } = string.Empty;
 
-  [Required]
-  public string ProfileImage { get; set; } = string.Empty;
+  public string? ProfileImage { get; set; }
 
   public SeasonRole? Role { get; set; }
 

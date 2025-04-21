@@ -330,7 +330,7 @@ public class EnrollmentService : IEnrollmentService
             Name = e.User.Name,
             Slug = e.User.Slug,
             Email = e.User.Email,
-            ProfileImage = e.User.ProfileImage,
+            ProfileImage = e.User?.ProfileImage,
             Role = filterBySeason ? e.Role : null,
             StudentRolePromotion = filterBySeason ? e.StudentRolePromotion : null,
           };

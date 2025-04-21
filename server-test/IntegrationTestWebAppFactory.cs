@@ -96,6 +96,8 @@ public class IntegrationTestWebAppFactory : WebApplicationFactory<Program>, IAsy
     Environment.SetEnvironmentVariable("PGPASSWORD", "testpassword");
     Environment.SetEnvironmentVariable("AUTH0_DOMAIN", "https://test.auth0.com");
     Environment.SetEnvironmentVariable("AUTH0_AUDIENCE", "https://api.test.com");
+    Environment.SetEnvironmentVariable("AUTH0_CLIENT_ID", "super-secret-auth0-client-id");
+    Environment.SetEnvironmentVariable("AUTH0_CLIENT_SECRET", "super-secret-auth0-client-secret");
     Environment.SetEnvironmentVariable("PORT", "4000");
     Environment.SetEnvironmentVariable("ALLOWED_ORIGINS", "http://localhost:3000");
   }

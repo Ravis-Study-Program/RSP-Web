@@ -121,12 +121,7 @@ public class UserTests : BaseIntegrationTest, IAsyncLifetime
   [Fact]
   public async Task CreateUserIfNotExists_Only_Creates_One_User()
   {
-    var request = new CreateUserIfNotExistsRequest
-    {
-      DiscordId = _faker.Random.AlphaNumeric(8),
-      ProfileImage = _faker.Image.PicsumUrl(),
-      Name = _faker.Name.FullName(),
-    };
+    var request = new CreateUserIfNotExistsRequest { Name = _faker.Name.FullName() };
 
     var email = _faker.Internet.Email();
     var firstResponse = await UserService.CreateUserIfNotExists(request, email);
