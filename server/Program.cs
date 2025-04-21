@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Prometheus;
 using RSPWebAPI.Common;
 using RSPWebAPI.Common.Interfaces;
 using RSPWebAPI.Common.Middlewares;
@@ -189,6 +190,8 @@ app.UseAuthentication();
 app.UseSwagger();
 app.UseSwaggerUI();
 app.ApplyMigrations();
+app.UseHttpMetrics();
+app.MapMetrics();
 
 app.MapCarter();
 
