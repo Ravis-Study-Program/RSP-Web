@@ -16,7 +16,7 @@ const schema = z.object({
   name: z.string().min(1),
   email: z.string().email().min(1),
   isAdmin: z.boolean(),
-  discordId: z.string().min(1),
+  discordId: z.string(),
   profileImage: z.string().url(),
 });
 
@@ -42,8 +42,8 @@ export const AdminUsersUpdateModal = ({
     name: string;
     email: string;
     isAdmin: boolean;
-    discordId: string;
-    profileImage: string;
+    discordId?: string | null;
+    profileImage?: string | null;
   }) => {
     try {
       const requestData: AdminUpdateUserRequest = {

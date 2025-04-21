@@ -2,13 +2,15 @@ import { lazy, Suspense } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { createRouteMeta } from './components/RouteMeta/createRouteMeta';
 import AdminSeasonWeeksPage from './pages/Admin/SeasonWeeks/AdminSeasonWeeks.page';
+import { EmailVerificiationPage } from './pages/EmailVerification/EmailVerification.page';
 import ProfilePage from './pages/Profile/Profile.page';
 import ResourcesPage from './pages/Resources/Resources.page';
 import SeasonUsersPage from './pages/SeasonUsers/SeasonUsers.page';
 import AdminRouteGuard from './shared/auth/AdminRouteGuard';
-import AuthRouteGuard from './shared/auth/AuthRouteGuard';
 import SeasonRoleViewRouter from './shared/auth/SeasonRoleViewRouter';
 import SeasonRouteGuard from './shared/auth/SeasonRouteGuard';
+import UnverifiedUserAuthGuard from './shared/auth/UnverifiedUserAuthGuard';
+import VerifiedUserAuthGuard from './shared/auth/VerifiedUserAuthGuard';
 
 const AdminEnrollmentsPage = lazy(() => import('./pages/Admin/Enrollments/AdminEnrollments.page'));
 const AdminMentorshipsPage = lazy(() => import('./pages/Admin/Mentorships/AdminMentorships.page'));
@@ -26,8 +28,17 @@ const SettingsPage = lazy(() => import('./pages/Settings/Settings.page'));
 
 const routes = (
   <Routes>
-    {/* Authenticated Routes */}
-    <Route element={<AuthRouteGuard />}>
+    {/* Authenticated & Unverified User Routes */}
+    <Route element={<UnverifiedUserAuthGuard />}>
+      {createRouteMeta({
+        path: 'verify-email',
+        title: 'Email Verification | RSP',
+        element: <EmailVerificiationPage />,
+      })}
+    </Route>
+
+    {/* Authenticated & Verified User Routes */}
+    <Route element={<VerifiedUserAuthGuard />}>
       {/* Admin Routes */}
       <Route path="admin" element={<AdminRouteGuard />}>
         {createRouteMeta({

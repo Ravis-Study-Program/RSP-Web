@@ -37,6 +37,8 @@ using RSPWebAPI.Features.Users;
 using RSPWebAPI.Features.Users.Interfaces;
 using RSPWebAPI.Jobs;
 using RSPWebAPI.Shared;
+using server.Clients;
+using server.Clients.Interfaces;
 using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -168,6 +170,9 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IDummyDataService, DummyDataService>();
 builder.Services.AddLazyResolution();
 
+builder.Services.AddSingleton(config);
+builder.Services.AddScoped<IUserIdentityService, UserIdentityService>();
+
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 
@@ -229,6 +234,14 @@ public class AppConfiguration
     Environment.GetEnvironmentVariable("ALLOWED_ORIGINS")?.Split(',').ToList()
     ?? throw new ArgumentNullException("ALLOWED_ORIGINS");
 
+  public string Auth0ClientId =>
+    Environment.GetEnvironmentVariable("AUTH0_CLIENT_ID")
+    ?? throw new ArgumentNullException("AUTH0_CLIENT_ID");
+
+  public string Auth0ClientSecret =>
+    Environment.GetEnvironmentVariable("AUTH0_CLIENT_SECRET")
+    ?? throw new ArgumentNullException("AUTH0_CLIENT_SECRET");
+
   public void ValidateEnvironmentVariables()
   {
     var requiredVars = new[]
@@ -240,6 +253,8 @@ public class AppConfiguration
       "PGPASSWORD",
       "AUTH0_DOMAIN",
       "AUTH0_AUDIENCE",
+      "AUTH0_CLIENT_ID",
+      "AUTH0_CLIENT_SECRET",
     };
     foreach (var varName in requiredVars)
     {

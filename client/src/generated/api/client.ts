@@ -409,14 +409,14 @@ export interface AdminUpdateSeasonWeekResponseApiResponse {
 export interface AdminUpdateUserRequest {
   /** @minLength 1 */
   userId: string;
-  /** @minLength 1 */
-  discordId: string;
+  /** @nullable */
+  discordId?: string | null;
   /** @minLength 1 */
   email: string;
   /** @minLength 1 */
   name: string;
-  /** @minLength 1 */
-  profileImage: string;
+  /** @nullable */
+  profileImage?: string | null;
   isAdmin: boolean;
 }
 
@@ -503,11 +503,7 @@ export interface CreateProblemAttemptResponseApiResponse {
 
 export interface CreateUserIfNotExistsRequest {
   /** @nullable */
-  discordId?: string | null;
-  /** @nullable */
   name?: string | null;
-  /** @nullable */
-  profileImage?: string | null;
 }
 
 export interface CreateUserIfNotExistsResponse {
@@ -640,8 +636,8 @@ export interface EnrollmentUserDto {
   email: string;
   /** @minLength 1 */
   slug: string;
-  /** @minLength 1 */
-  profileImage: string;
+  /** @nullable */
+  profileImage?: string | null;
   role?: SeasonRole;
   studentRolePromotion?: SeasonStudentRolePromotion;
 }
@@ -1121,8 +1117,8 @@ export interface UpdateStudentRolePromotionResponseApiResponse {
 export interface UserEntity {
   /** @minLength 1 */
   userId: string;
-  /** @minLength 1 */
-  discordId: string;
+  /** @nullable */
+  discordId?: string | null;
   /** @minLength 1 */
   email: string;
   isAdmin: boolean;
@@ -1130,8 +1126,8 @@ export interface UserEntity {
   name: string;
   /** @minLength 1 */
   slug: string;
-  /** @minLength 1 */
-  profileImage: string;
+  /** @nullable */
+  profileImage?: string | null;
   /** @nullable */
   deletedAtUtc?: string | null;
 }

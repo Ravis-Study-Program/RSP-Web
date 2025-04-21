@@ -10,8 +10,7 @@ public class UserEntity : ISoftDelete
   [Required]
   public string UserId { get; set; } = string.Empty;
 
-  [Required]
-  public string DiscordId { get; set; } = string.Empty;
+  public string? DiscordId { get; set; }
 
   [Required]
   public string Email { get; set; } = string.Empty;
@@ -25,8 +24,7 @@ public class UserEntity : ISoftDelete
   [Required]
   public string Slug { get; set; } = string.Empty;
 
-  [Required]
-  public string ProfileImage { get; set; } = string.Empty;
+  public string? ProfileImage { get; set; }
   public DateTime? DeletedAtUtc { get; set; }
 }
 
@@ -38,8 +36,8 @@ public class UserEntityConfiguration : IEntityTypeConfiguration<UserEntity>
     builder.HasKey(x => x.UserId);
 
     // Indexes
-    builder.HasIndex(x => x.Email);
-    builder.HasIndex(x => x.Slug);
+    builder.HasIndex(x => x.Email).IsUnique();
+    builder.HasIndex(x => x.Slug).IsUnique();
 
     // Fields
     builder
@@ -48,11 +46,7 @@ public class UserEntityConfiguration : IEntityTypeConfiguration<UserEntity>
       .HasColumnType("varchar(16)")
       .ValueGeneratedNever()
       .IsRequired();
-    builder
-      .Property(x => x.DiscordId)
-      .HasColumnName("DiscordId")
-      .HasColumnType("varchar(16)")
-      .IsRequired();
+    builder.Property(x => x.DiscordId).HasColumnName("DiscordId").HasColumnType("varchar(16)");
     builder
       .Property(x => x.Email)
       .HasColumnName("Email")
@@ -64,8 +58,7 @@ public class UserEntityConfiguration : IEntityTypeConfiguration<UserEntity>
     builder
       .Property(x => x.ProfileImage)
       .HasColumnName("ProfileImage")
-      .HasColumnType("varchar(255)")
-      .IsRequired();
+      .HasColumnType("varchar(255)");
     builder
       .Property(x => x.DeletedAtUtc)
       .HasColumnName("DeletedAtUtc")
