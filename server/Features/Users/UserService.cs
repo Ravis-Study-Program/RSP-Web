@@ -219,7 +219,6 @@ public class UserService : IUserService
     {
       var auth0User = await _userIdentityService.GetUserByEmailAsync(email!, cancellationToken);
       var existingUserResponse = await GetCurrentUser(email, cancellationToken);
-      var dbUser = existingUserResponse.Data?.User;
 
       var isVerified = auth0User?.EmailVerified == true;
       var userExists = existingUserResponse.IsSuccess;
@@ -258,7 +257,7 @@ public class UserService : IUserService
 
       return new SuccessServiceResponse<CreateUserIfNotExistsResponse>(
         Message.UserCreatedSuccessfully,
-        new CreateUserIfNotExistsResponse { }
+        new CreateUserIfNotExistsResponse()
       );
     }
     catch (Exception ex)

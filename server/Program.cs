@@ -178,7 +178,7 @@ builder.Logging.AddConsole();
 
 var app = builder.Build();
 
-// app.UseMiddleware<RequestLoggingMiddleware>();
+app.UseMiddleware<RequestLoggingMiddleware>();
 
 app.UseRouting();
 app.MapControllers();

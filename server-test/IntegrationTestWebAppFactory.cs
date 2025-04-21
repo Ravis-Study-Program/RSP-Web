@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.DependencyInjection;
+using Moq;
 using Npgsql;
 using Respawn;
 using RSPWebAPI.Database;
@@ -27,6 +28,7 @@ using RSPWebAPI.Features.SeasonWeeks;
 using RSPWebAPI.Features.SeasonWeeks.Interfaces;
 using RSPWebAPI.Features.Users;
 using RSPWebAPI.Features.Users.Interfaces;
+using server.Clients.Interfaces;
 using Testcontainers.PostgreSql;
 using Xunit;
 
@@ -49,6 +51,8 @@ public class IntegrationTestWebAppFactory : WebApplicationFactory<Program>, IAsy
   public ApplicationDbContext Db { get; private set; } = null!;
   private Respawner _respawner = null!;
   private DbConnection _connection = null!;
+
+  public Mock<IUserIdentityService> MockUserIdentityService { get; } = new();
 
   public async Task ResetDatabase()
   {
@@ -86,6 +90,14 @@ public class IntegrationTestWebAppFactory : WebApplicationFactory<Program>, IAsy
       {
         options.UseNpgsql(_container.GetConnectionString());
       });
+
+      // Mocks
+      var descriptor = services.SingleOrDefault(d => d.ServiceType == typeof(IUserIdentityService));
+      if (descriptor is not null)
+      {
+        services.Remove(descriptor);
+      }
+      services.AddSingleton(MockUserIdentityService.Object);
     });
 
     // Set any necessary environment variables.

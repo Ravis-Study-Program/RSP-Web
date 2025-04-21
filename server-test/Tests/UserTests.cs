@@ -1,7 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Auth0.ManagementApi.Models;
 using Bogus;
+using Moq;
 using RSPWebAPI.Common.Interfaces;
 using RSPWebAPI.Entities;
 using RSPWebAPI.Features.Constants;
@@ -121,19 +123,47 @@ public class UserTests : BaseIntegrationTest, IAsyncLifetime
   [Fact]
   public async Task CreateUserIfNotExists_Only_Creates_One_User()
   {
+    var mock = _factory.MockUserIdentityService;
     var request = new CreateUserIfNotExistsRequest { Name = _faker.Name.FullName() };
-
     var email = _faker.Internet.Email();
+
+    mock.Setup(x => x.GetUserByEmailAsync(email, It.IsAny<CancellationToken>()))
+      .ReturnsAsync(new User { EmailVerified = false, UserId = "auth0|123" });
+
+    mock.Setup(x => x.SendVerificationEmailAsync("auth0|123"))
+      .Returns(Task.CompletedTask)
+      .Verifiable();
+
     var firstResponse = await UserService.CreateUserIfNotExists(request, email);
-    Assert.True(firstResponse.IsSuccess);
     Assert.Equal(Message.UserCreatedSuccessfully, firstResponse.Message);
+    Assert.True(firstResponse.IsSuccess);
 
     var secondResponse = await UserService.CreateUserIfNotExists(request, email);
-    Assert.False(secondResponse.IsSuccess);
-    Assert.Equal(Message.UserEmailExists, secondResponse.Message);
+    Assert.True(secondResponse.IsSuccess);
+    Assert.Equal(Message.UserCreatedSuccessfully, secondResponse.Message);
 
     var users = await _seeder.GetAllUsersAsync();
     Assert.Single(users.Where(u => u.Email == email));
+  }
+
+  [Fact]
+  public async Task CreateUserIfNotExists_Sends_Verification_If_Not_Verified()
+  {
+    var mock = _factory.MockUserIdentityService;
+    var email = _faker.Internet.Email();
+    var request = new CreateUserIfNotExistsRequest { Name = _faker.Name.FullName() };
+
+    mock.Setup(x => x.GetUserByEmailAsync(email, It.IsAny<CancellationToken>()))
+      .ReturnsAsync(new User { EmailVerified = false, UserId = "auth0|123" });
+
+    mock.Setup(x => x.SendVerificationEmailAsync("auth0|123"))
+      .Returns(Task.CompletedTask)
+      .Verifiable();
+
+    var result = await UserService.CreateUserIfNotExists(request, email);
+
+    mock.Verify();
+    Assert.True(result.IsSuccess);
   }
 
   [Fact]
