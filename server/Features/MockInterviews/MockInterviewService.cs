@@ -1,6 +1,8 @@
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using RSPWebAPI.Common;
+using RSPWEBAPI.Common.Cache;
+using RSPWebAPI.Common.Cache;
 using RSPWebAPI.Common.Interfaces;
 using RSPWebAPI.Entities;
 using RSPWebAPI.Features.Constants;
@@ -18,6 +20,7 @@ public class MockInterviewService : IMockInterviewService
   private readonly ILogger<MockInterviewService> _logger;
   private readonly IRepository<MockInterviewEntity> _mockInterviewRepository;
   private readonly ISeasonWeekService _seasonWeekService;
+  private readonly IRequestCache _cache;
   private readonly IUnitOfWork _unitOfWork;
   private readonly IUserService _userService;
 
@@ -26,6 +29,7 @@ public class MockInterviewService : IMockInterviewService
     ISeasonWeekService seasonWeekService,
     IUserService userService,
     IEnrollmentService enrollmentService,
+    IRequestCache cache,
     IUnitOfWork unitOfWork,
     ILogger<MockInterviewService> logger
   )
@@ -34,6 +38,7 @@ public class MockInterviewService : IMockInterviewService
     _seasonWeekService = seasonWeekService;
     _userService = userService;
     _enrollmentService = enrollmentService;
+    _cache = cache;
     _unitOfWork = unitOfWork;
     _logger = logger;
   }
@@ -134,6 +139,8 @@ public class MockInterviewService : IMockInterviewService
     {
       await AddMockInterviewAsync(mockInterview, cancellationToken);
       await _unitOfWork.SaveChangesAsync(cancellationToken);
+      _cache.Remove(RouteCacheKeys.ListMockInterviews, interviewee.Email);
+      _cache.Remove(RouteCacheKeys.ListMockInterviews, interviewer.Email);
       return new SuccessServiceResponse<CreateMockInterviewResponse>(
         Message.MockInterviewCreatedSuccessfully,
         new CreateMockInterviewResponse { MockInterviewId = mockInterview.MockInterviewId }
@@ -156,7 +163,7 @@ public class MockInterviewService : IMockInterviewService
     var existingMockInterview = await GetMockInterviewByIdAsync(
       request.MockInterviewId,
       cancellationToken,
-      q => q.Include(m => m.Interviewer)
+      q => q.Include(m => m.Interviewer).Include(m => m.Interviewee)
     );
     if (existingMockInterview == null)
     {
@@ -175,6 +182,8 @@ public class MockInterviewService : IMockInterviewService
     {
       await DeleteMockInterviewAsync(existingMockInterview.MockInterviewId, cancellationToken);
       await _unitOfWork.SaveChangesAsync(cancellationToken);
+      _cache.Remove(RouteCacheKeys.ListMockInterviews, existingMockInterview.Interviewer.Email);
+      _cache.Remove(RouteCacheKeys.ListMockInterviews, existingMockInterview.Interviewee.Email);
       return new SuccessServiceResponse<DeleteMockInterviewResponse>(
         Message.MockInterviewDeletedSuccessfully
       );
@@ -189,6 +198,46 @@ public class MockInterviewService : IMockInterviewService
   }
 
   public async Task<IServiceResponse<ListMockInterviewResponse>> ListMockInterview(
+    ListMockInterviewRequest request,
+    CancellationToken cancellationToken = default
+  )
+  {
+    var allMockInterviews = new List<MockInterviewEntity>();
+
+    foreach (var email in request.Emails.Distinct())
+    {
+      var modifiedRequest = new ListMockInterviewRequest
+      {
+        Emails = new List<string> { email },
+        SeasonId = request.SeasonId,
+        IncludeLeetcode = request.IncludeLeetcode,
+        IncludeCustom = request.IncludeCustom,
+        IncludeBehavioural = request.IncludeBehavioural,
+      };
+
+      var response = await _cache.GetOrCreateAsync(
+        routeKey: RouteCacheKeys.ListMockInterviews,
+        primaryKey: email,
+        factory: () => _listMockInterview(modifiedRequest, cancellationToken),
+        ttl: TimeSpan.FromHours(1)
+      );
+
+      // Early return if any failure occurs
+      if (!response.IsSuccess || response.Data == null)
+      {
+        return response;
+      }
+
+      allMockInterviews.AddRange(response.Data.MockInterviews);
+    }
+
+    return new SuccessServiceResponse<ListMockInterviewResponse>(
+      Message.MockInterviewListSuccessfully,
+      new ListMockInterviewResponse { MockInterviews = allMockInterviews }
+    );
+  }
+
+  private async Task<IServiceResponse<ListMockInterviewResponse>> _listMockInterview(
     ListMockInterviewRequest request,
     CancellationToken cancellationToken = default
   )
@@ -358,6 +407,8 @@ public class MockInterviewService : IMockInterviewService
     {
       await UpdateMockInterviewAsync(existingMockInterview, cancellationToken);
       await _unitOfWork.SaveChangesAsync(cancellationToken);
+      _cache.Remove(RouteCacheKeys.ListMockInterviews, interviewee.Email);
+      _cache.Remove(RouteCacheKeys.ListMockInterviews, interviewer.Email);
       return new SuccessServiceResponse<UpdateMockInterviewResponse>(
         Message.MockInterviewUpdatedSuccessfully
       );

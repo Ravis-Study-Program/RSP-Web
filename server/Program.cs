@@ -10,7 +10,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Prometheus;
+using RSPWebAPI.Clients.Interfaces;
 using RSPWebAPI.Common;
+using RSPWebAPI.Common.Cache;
 using RSPWebAPI.Common.Interfaces;
 using RSPWebAPI.Common.Middlewares;
 using RSPWebAPI.Database;
@@ -38,8 +40,6 @@ using RSPWebAPI.Features.Users;
 using RSPWebAPI.Features.Users.Interfaces;
 using RSPWebAPI.Jobs;
 using RSPWebAPI.Shared;
-using server.Clients;
-using server.Clients.Interfaces;
 using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -68,6 +68,7 @@ builder
       }
     );
   })
+  .AddMemoryCache()
   .AddEndpointsApiExplorer()
   .AddSwaggerGen(options =>
   {
@@ -172,6 +173,7 @@ builder.Services.AddScoped<IDummyDataService, DummyDataService>();
 builder.Services.AddLazyResolution();
 
 builder.Services.AddSingleton(config);
+builder.Services.AddScoped<IRequestCache, MemoryRequestCache>();
 builder.Services.AddScoped<IUserIdentityService, UserIdentityService>();
 
 builder.Logging.ClearProviders();
@@ -179,7 +181,7 @@ builder.Logging.AddConsole();
 
 var app = builder.Build();
 
-app.UseMiddleware<RequestLoggingMiddleware>();
+// app.UseMiddleware<RequestLoggingMiddleware>();
 
 app.UseRouting();
 app.MapControllers();

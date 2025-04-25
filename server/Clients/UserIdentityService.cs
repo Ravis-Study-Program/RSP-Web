@@ -4,7 +4,7 @@ using Auth0.ManagementApi;
 using Auth0.ManagementApi.Models;
 using Auth0.ManagementApi.Paging;
 using Newtonsoft.Json;
-using server.Clients.Interfaces;
+using RSPWebAPI.Clients.Interfaces;
 
 public class UserIdentityService : IUserIdentityService
 {

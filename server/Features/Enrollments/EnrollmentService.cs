@@ -216,8 +216,6 @@ public class EnrollmentService : IEnrollmentService
         .AsNoTracking()
         .ToListAsync(cancellationToken);
 
-      Console.WriteLine(rawEnrollments);
-
       var seasonIds = rawEnrollments.Select(e => e.SeasonId).Distinct().ToList();
 
       var usersInSeason = await _enrollmentRepository

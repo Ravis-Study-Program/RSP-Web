@@ -8,6 +8,7 @@ namespace RSPWebAPI.Extensions
     }
 
     private class LazilyResolved<T> : Lazy<T>
+      where T : notnull
     {
       public LazilyResolved(IServiceProvider serviceProvider)
         : base(serviceProvider.GetRequiredService<T>) { }
