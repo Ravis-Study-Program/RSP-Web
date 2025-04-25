@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
 
-namespace server.Shared.Strings
+namespace RSPWebAPI.Shared.Strings
 {
   public static class StringUtils
   {

@@ -1,6 +1,6 @@
 using Auth0.ManagementApi.Models;
 
-namespace server.Clients.Interfaces
+namespace RSPWebAPI.Clients.Interfaces
 {
   public interface IUserIdentityService
   {

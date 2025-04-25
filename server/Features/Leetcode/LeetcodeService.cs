@@ -2,6 +2,8 @@ using System.Linq.Expressions;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using RSPWebAPI.Common;
+using RSPWebAPI.Common.Cache;
+using RSPWEBAPI.Common.Cache;
 using RSPWebAPI.Common.Interfaces;
 using RSPWebAPI.Entities;
 using RSPWebAPI.Features.Constants;
@@ -22,6 +24,7 @@ public class LeetcodeService : ILeetcodeService
   private readonly ILogger<LeetcodeService> _logger;
   private readonly IProblemAttemptService _problemAttemptService;
   private readonly IRepository<ProblemEntity> _problemRepository;
+  private readonly IRequestCache _cache;
   private readonly IUnitOfWork _unitOfWork;
   private readonly IUserService _userService;
 
@@ -33,6 +36,7 @@ public class LeetcodeService : ILeetcodeService
     IProblemAttemptService problemAttemptService,
     IUserService userService,
     IEnrollmentService enrollmentService,
+    IRequestCache cache,
     IUnitOfWork unitOfWork,
     ILogger<LeetcodeService> logger
   )
@@ -44,6 +48,7 @@ public class LeetcodeService : ILeetcodeService
     _problemAttemptService = problemAttemptService;
     _userService = userService;
     _enrollmentService = enrollmentService;
+    _cache = cache;
     _unitOfWork = unitOfWork;
     _logger = logger;
   }
@@ -190,6 +195,8 @@ public class LeetcodeService : ILeetcodeService
 
       await _unitOfWork.SaveChangesAsync(cancellationToken);
       await _unitOfWork.CommitTransactionAsync(cancellationToken);
+
+      _cache.Remove(RouteCacheKeys.ListLeetcodeProblems);
     }
     catch (Exception ex)
     {
@@ -206,6 +213,19 @@ public class LeetcodeService : ILeetcodeService
   }
 
   public async Task<IServiceResponse<ListLeetcodeProblemsResponse>> ListLeetcodeProblems(
+    ListLeetcodeProblemsRequest request,
+    CancellationToken cancellationToken = default
+  )
+  {
+    return await _cache.GetOrCreateAsync(
+      routeKey: RouteCacheKeys.ListLeetcodeProblems,
+      primaryKey: null,
+      factory: () => _listLeetcodeProblems(request, cancellationToken),
+      ttl: TimeSpan.FromDays(1)
+    );
+  }
+
+  private async Task<IServiceResponse<ListLeetcodeProblemsResponse>> _listLeetcodeProblems(
     ListLeetcodeProblemsRequest request,
     CancellationToken cancellationToken = default
   )

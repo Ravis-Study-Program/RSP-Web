@@ -5,10 +5,13 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Npgsql;
 using Respawn;
+using RSPWebAPI.Clients.Interfaces;
+using RSPWebAPI.Common.Cache;
 using RSPWebAPI.Database;
 using RSPWebAPI.Features.Enrollments;
 using RSPWebAPI.Features.Enrollments.Interfaces;
@@ -28,7 +31,7 @@ using RSPWebAPI.Features.SeasonWeeks;
 using RSPWebAPI.Features.SeasonWeeks.Interfaces;
 using RSPWebAPI.Features.Users;
 using RSPWebAPI.Features.Users.Interfaces;
-using server.Clients.Interfaces;
+using RSPWebAPI.Tests.Shared;
 using Testcontainers.PostgreSql;
 using Xunit;
 
@@ -98,6 +101,15 @@ public class IntegrationTestWebAppFactory : WebApplicationFactory<Program>, IAsy
         services.Remove(descriptor);
       }
       services.AddSingleton(MockUserIdentityService.Object);
+
+      var memCacheDescriptor = services.SingleOrDefault(d =>
+        d.ServiceType == typeof(IRequestCache)
+      );
+      if (memCacheDescriptor != null)
+        services.Remove(memCacheDescriptor);
+
+      // 2) Add your no-op cache
+      services.AddSingleton<IRequestCache, DummyRequestCache>();
     });
 
     // Set any necessary environment variables.

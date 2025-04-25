@@ -1,6 +1,8 @@
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using RSPWebAPI.Common;
+using RSPWebAPI.Common.Cache;
+using RSPWEBAPI.Common.Cache;
 using RSPWebAPI.Common.Interfaces;
 using RSPWebAPI.Entities;
 using RSPWebAPI.Features.Constants;
@@ -18,6 +20,7 @@ public class ProblemAttemptService : IProblemAttemptService
   private readonly ILogger<ProblemAttemptService> _logger;
   private readonly IRepository<ProblemAttemptEntity> _problemAttemptRepository;
   private readonly ISeasonWeekService _seasonWeekService;
+  private readonly IRequestCache _cache;
   private readonly IUnitOfWork _unitOfWork;
   private readonly IUserService _userService;
 
@@ -26,6 +29,7 @@ public class ProblemAttemptService : IProblemAttemptService
     ISeasonWeekService seasonWeekService,
     IUserService userService,
     IEnrollmentService enrollmentService,
+    IRequestCache cache,
     IUnitOfWork unitOfWork,
     ILogger<ProblemAttemptService> logger
   )
@@ -34,6 +38,7 @@ public class ProblemAttemptService : IProblemAttemptService
     _seasonWeekService = seasonWeekService;
     _userService = userService;
     _enrollmentService = enrollmentService;
+    _cache = cache;
     _unitOfWork = unitOfWork;
     _logger = logger;
   }
@@ -126,6 +131,7 @@ public class ProblemAttemptService : IProblemAttemptService
     {
       await AddProblemAttemptAsync(problemAttempt, cancellationToken);
       await _unitOfWork.SaveChangesAsync(cancellationToken);
+      _cache.Remove(RouteCacheKeys.ListProblemAttempts, request.Email);
       return new SuccessServiceResponse<CreateProblemAttemptResponse>(
         Message.ProblemAttemptCreatedSuccessfully,
         new CreateProblemAttemptResponse { ProblemAttemptId = problemAttempt.ProblemAttemptId }
@@ -161,6 +167,7 @@ public class ProblemAttemptService : IProblemAttemptService
     {
       await DeleteProblemAttemptAsync(existingProblemAttempt.ProblemAttemptId, cancellationToken);
       await _unitOfWork.SaveChangesAsync(cancellationToken);
+      _cache.Remove(RouteCacheKeys.ListProblemAttempts, request.Email);
       return new SuccessServiceResponse<DeleteProblemAttemptResponse>(
         Message.ProblemAttemptDeletedSuccessfully
       );
@@ -175,6 +182,45 @@ public class ProblemAttemptService : IProblemAttemptService
   }
 
   public async Task<IServiceResponse<ListProblemAttemptResponse>> ListProblemAttempt(
+    ListProblemAttemptRequest request,
+    CancellationToken cancellationToken = default
+  )
+  {
+    var allProblemAttempts = new List<ProblemAttemptEntity>();
+
+    foreach (var email in request.Emails.Distinct())
+    {
+      var modifiedRequest = new ListProblemAttemptRequest
+      {
+        Emails = new List<string> { email },
+        SeasonId = request.SeasonId,
+        IncludeLeetcode = request.IncludeLeetcode,
+        IncludeCustom = request.IncludeCustom,
+      };
+
+      var response = await _cache.GetOrCreateAsync(
+        routeKey: RouteCacheKeys.ListProblemAttempts,
+        primaryKey: email,
+        factory: () => _listProblemAttempt(modifiedRequest, cancellationToken),
+        ttl: TimeSpan.FromHours(1)
+      );
+
+      // Early return if any failure occurs
+      if (!response.IsSuccess || response.Data == null)
+      {
+        return response;
+      }
+
+      allProblemAttempts.AddRange(response.Data.ProblemAttempts);
+    }
+
+    return new SuccessServiceResponse<ListProblemAttemptResponse>(
+      Message.ProblemAttemptListSuccessfully,
+      new ListProblemAttemptResponse { ProblemAttempts = allProblemAttempts }
+    );
+  }
+
+  private async Task<IServiceResponse<ListProblemAttemptResponse>> _listProblemAttempt(
     ListProblemAttemptRequest request,
     CancellationToken cancellationToken = default
   )
@@ -307,6 +353,7 @@ public class ProblemAttemptService : IProblemAttemptService
     {
       await UpdateProblemAttemptAsync(existingProblemAttempt, cancellationToken);
       await _unitOfWork.SaveChangesAsync(cancellationToken);
+      _cache.Remove(RouteCacheKeys.ListProblemAttempts, request.Email);
       return new SuccessServiceResponse<UpdateProblemAttemptResponse>(
         Message.ProblemAttemptUpdatedSuccessfully
       );

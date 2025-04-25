@@ -2,14 +2,16 @@ using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 using Auth0.ManagementApi.Models;
 using Microsoft.EntityFrameworkCore;
+using RSPWebAPI.Clients.Interfaces;
 using RSPWebAPI.Common;
+using RSPWebAPI.Common.Cache;
+using RSPWEBAPI.Common.Cache;
 using RSPWebAPI.Common.Interfaces;
 using RSPWebAPI.Entities;
 using RSPWebAPI.Features.Constants;
 using RSPWebAPI.Features.Users.Dtos;
 using RSPWebAPI.Features.Users.Interfaces;
-using server.Clients.Interfaces;
-using server.Shared.Strings;
+using RSPWebAPI.Shared.Strings;
 
 namespace RSPWebAPI.Features.Users;
 
@@ -19,18 +21,21 @@ public class UserService : IUserService
   private readonly IUnitOfWork _unitOfWork;
   private readonly IRepository<UserEntity> _userRepository;
   private readonly IUserIdentityService _userIdentityService;
+  private readonly IRequestCache _cache;
 
   public UserService(
     IRepository<UserEntity> userRepository,
     IUnitOfWork unitOfWork,
     ILogger<UserService> logger,
-    IUserIdentityService userIdentityService
+    IUserIdentityService userIdentityService,
+    IRequestCache cache
   )
   {
     _userRepository = userRepository;
     _unitOfWork = unitOfWork;
     _logger = logger;
     _userIdentityService = userIdentityService;
+    _cache = cache;
   }
 
   public async Task<IServiceResponse<AdminCreateUserResponse>> CreateAdminUser(
@@ -344,10 +349,18 @@ public class UserService : IUserService
     Func<IQueryable<UserEntity>, IQueryable<UserEntity>>? include = null
   )
   {
-    return await _userRepository.FirstOrDefaultAsync(
-      q => q.Email == email,
-      cancellationToken,
-      include
+    return await _cache.GetOrCreateAsync(
+      routeKey: RouteCacheKeys.GetUserByEmail,
+      primaryKey: email,
+      factory: async () =>
+      {
+        return await _userRepository.FirstOrDefaultAsync(
+          q => q.Email == email,
+          cancellationToken,
+          include
+        );
+      },
+      ttl: TimeSpan.FromHours(1)
     );
   }
 
@@ -357,10 +370,18 @@ public class UserService : IUserService
     Func<IQueryable<UserEntity>, IQueryable<UserEntity>>? include = null
   )
   {
-    return await _userRepository.FirstOrDefaultAsync(
-      q => q.Slug == slug,
-      cancellationToken,
-      include
+    return await _cache.GetOrCreateAsync(
+      routeKey: RouteCacheKeys.GetUserBySlug,
+      primaryKey: slug,
+      factory: async () =>
+      {
+        return await _userRepository.FirstOrDefaultAsync(
+          q => q.Slug == slug,
+          cancellationToken,
+          include
+        );
+      },
+      ttl: TimeSpan.FromHours(1)
     );
   }
 
