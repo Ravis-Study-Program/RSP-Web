@@ -47,14 +47,17 @@ public class UserIdentityService : IUserIdentityService
     return _accessToken;
   }
 
-  public async Task<User?> GetUserByEmailAsync(string email, CancellationToken cancellationToken)
+  public async Task<IList<User>?> GetUserByEmailAsync(
+    string email,
+    CancellationToken cancellationToken
+  )
   {
     var client = await GetClientAsync();
     var users = await client.Users.GetUsersByEmailAsync(
       email,
       cancellationToken: cancellationToken
     );
-    return users.FirstOrDefault();
+    return users;
   }
 
   public async Task SendVerificationEmailAsync(string userId)
@@ -67,5 +70,18 @@ public class UserIdentityService : IUserIdentityService
     var client = await GetClientAsync();
     var request = new VerifyEmailJobRequest { UserId = userId };
     await client.Jobs.SendVerificationEmailAsync(request);
+  }
+
+  public async Task LinkAccountAsync(string userId, User user)
+  {
+    var client = await GetClientAsync();
+    await client.Users.LinkAccountAsync(
+      userId,
+      new UserAccountLinkRequest
+      {
+        Provider = user.Identities.First().Provider,
+        UserId = user.Identities.First().UserId,
+      }
+    );
   }
 }

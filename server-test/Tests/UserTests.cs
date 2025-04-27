@@ -121,14 +121,19 @@ public class UserTests : BaseIntegrationTest, IAsyncLifetime
   }
 
   [Fact]
-  public async Task CreateUserIfNotExists_Only_Creates_One_User()
+  public async Task CreateUserIfNotExists_Only_Creates_One_User_And_Sends_Verification_Email()
   {
     var mock = _factory.MockUserIdentityService;
     var request = new CreateUserIfNotExistsRequest { Name = _faker.Name.FullName() };
     var email = _faker.Internet.Email();
 
     mock.Setup(x => x.GetUserByEmailAsync(email, It.IsAny<CancellationToken>()))
-      .ReturnsAsync(new User { EmailVerified = false, UserId = "auth0|123" });
+      .ReturnsAsync(
+        new List<User>
+        {
+          new User { EmailVerified = false, UserId = "auth0|123" },
+        }
+      );
 
     mock.Setup(x => x.SendVerificationEmailAsync("auth0|123"))
       .Returns(Task.CompletedTask)
@@ -144,25 +149,71 @@ public class UserTests : BaseIntegrationTest, IAsyncLifetime
 
     var users = await _seeder.GetAllUsersAsync();
     Assert.Single(users.Where(u => u.Email == email));
+
+    mock.Verify(x => x.SendVerificationEmailAsync("auth0|123"), Times.Exactly(2));
   }
 
   [Fact]
-  public async Task CreateUserIfNotExists_Sends_Verification_If_Not_Verified()
+  public async Task CreateUserIfNotExists_Dont_Send_Verification_Email_If_Verified()
   {
     var mock = _factory.MockUserIdentityService;
     var email = _faker.Internet.Email();
     var request = new CreateUserIfNotExistsRequest { Name = _faker.Name.FullName() };
 
     mock.Setup(x => x.GetUserByEmailAsync(email, It.IsAny<CancellationToken>()))
-      .ReturnsAsync(new User { EmailVerified = false, UserId = "auth0|123" });
+      .ReturnsAsync(
+        new List<User>
+        {
+          new User { EmailVerified = true, UserId = "auth0|123" },
+        }
+      );
 
-    mock.Setup(x => x.SendVerificationEmailAsync("auth0|123"))
-      .Returns(Task.CompletedTask)
-      .Verifiable();
+    mock.Verify(x => x.SendVerificationEmailAsync("auth0|123"), Times.Never());
 
     var result = await UserService.CreateUserIfNotExists(request, email);
 
-    mock.Verify();
+    mock.Verify(x => x.SendVerificationEmailAsync("auth0|123"), Times.Never());
+    Assert.True(result.IsSuccess);
+  }
+
+  [Fact]
+  public async Task CreateUserIfNotExists_Link_Account_If_Other_Login_Method_Exists()
+  {
+    var mock = _factory.MockUserIdentityService;
+    var email = "test@gmail.com";
+    var request = new CreateUserIfNotExistsRequest { Name = _faker.Name.FullName() };
+    await _seeder.SeedUserAsync(email);
+
+    var user1 = new User
+    {
+      EmailVerified = true,
+      Email = email,
+      UserId = "auth0|123",
+      LoginsCount = "1",
+      Identities = new[]
+      {
+        new Identity { Provider = "auth0", UserId = "auth0|123" },
+      },
+    };
+
+    var user2 = new User
+    {
+      EmailVerified = true,
+      Email = email,
+      UserId = "google|123",
+      LoginsCount = "2",
+      Identities = new[]
+      {
+        new Identity { Provider = "google", UserId = "google|123" },
+      },
+    };
+
+    mock.Setup(x => x.GetUserByEmailAsync(email, It.IsAny<CancellationToken>()))
+      .ReturnsAsync(new List<User> { user1, user2 });
+
+    var result = await UserService.CreateUserIfNotExists(request, email);
+
+    mock.Verify(x => x.LinkAccountAsync(user1.UserId, user2), Times.Once());
     Assert.True(result.IsSuccess);
   }
 
