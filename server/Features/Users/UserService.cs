@@ -222,15 +222,36 @@ public class UserService : IUserService
 
     try
     {
-      var auth0User = await _userIdentityService.GetUserByEmailAsync(email!, cancellationToken);
-      var existingUserResponse = await GetCurrentUser(email, cancellationToken);
+      var auth0Users =
+        (await _userIdentityService.GetUserByEmailAsync(email!, cancellationToken)) ?? [];
+      var auth0User = auth0Users.First();
+      if (auth0User == null)
+      {
+        throw new Exception("Couldn't find auth0 user");
+      }
 
       var isVerified = auth0User?.EmailVerified == true;
+      var existingUserResponse = await GetCurrentUser(email, cancellationToken);
       var userExists = existingUserResponse.IsSuccess;
 
-      // Do nothing since user exists and verified
       if (userExists && isVerified)
       {
+        // Perform linking if it's another synonymous account
+        if (auth0Users.Count >= 2)
+        {
+          var primaryUser = auth0Users
+            .OrderBy(u => int.TryParse(u.LoginsCount, out var count) ? count : 0)
+            .First();
+
+          foreach (var user in auth0Users)
+          {
+            if (user.UserId != primaryUser.UserId)
+            {
+              await _userIdentityService.LinkAccountAsync(primaryUser.UserId, user);
+            }
+          }
+        }
+
         return new SuccessServiceResponse<CreateUserIfNotExistsResponse>(
           existingUserResponse.Message
         );
@@ -252,6 +273,7 @@ public class UserService : IUserService
         await AddUserAsync(user, cancellationToken);
       }
 
+      // Send verification email if user is not verified
       if (!isVerified && auth0User?.UserId != null)
       {
         await _userIdentityService.SendVerificationEmailAsync(auth0User.UserId);
