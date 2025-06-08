@@ -112,7 +112,7 @@ export function Navbar({ isLoading, user, tabs, isSeasonUrl, enrollments = [] }:
             c={computedColorScheme === 'light' ? 'dark' : 'white'}
           >
             <Title order={1} size="h3" ta="center">
-              Ravi Study Program
+              Ravi's Study Program
             </Title>
           </Anchor>
           {user?.isAdmin ? (

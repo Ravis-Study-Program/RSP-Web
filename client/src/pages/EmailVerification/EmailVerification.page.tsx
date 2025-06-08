@@ -91,7 +91,7 @@ export function EmailVerificiationPage() {
         </Group>
       </Container>
       <Text c="gray.3" size="sm" pos="absolute" bottom={20}>
-        Ravi Study Program
+        Ravi's Study Program
       </Text>
     </Flex>
   );

@@ -104,7 +104,7 @@ export function Layout({ children }: LayoutProps) {
             c={computedColorScheme === 'light' ? 'dark' : 'white'}
           >
             <Title className={classes.navbar_header_text} order={1} size="h3">
-              Ravi Study Program
+              Ravi's Study Program
             </Title>
           </Anchor>
         </Group>
