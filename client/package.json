@@ -5,7 +5,7 @@
   "version": "1.0.0",
   "scripts": {
     "dev": "npm run generate:client && vite --host 0.0.0.0",
-    "build": "npm run generate:client && vite build && serve -s dist -l 80",
+    "build": "npm run generate:client && vite build && serve -s dist -l 3000",
     "generate:client": "orval",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",

@@ -11,9 +11,9 @@
     depends_on:
       - client
       - server
-      - grafana
     networks:
       - client-server
+    restart: always
 
   client:
     container_name: client
@@ -26,6 +26,7 @@
       - server
     networks:
       - client-server
+    restart: always
 
   server:
     container_name: server
@@ -36,6 +37,7 @@
       - postgres
     networks:
       - client-server
+    restart: always
 
   postgres:
     container_name: postgres
@@ -44,6 +46,7 @@
       - postgres_data:/var/lib/postgresql/data
     networks:
       - client-server
+    restart: always
 
   prometheus:
     image: prom/prometheus:latest
@@ -58,6 +61,7 @@
       - server
     networks:
       - client-server
+    restart: always
 
   grafana:
     image: grafana/grafana:latest
@@ -68,6 +72,7 @@
       - grafana_data:/var/lib/grafana
     networks:
       - client-server
+    restart: always
 
 networks:
   client-server:
