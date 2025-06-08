@@ -38,6 +38,8 @@ services:
   grafana:
     ports:
       - "8000:3000"
+    env_file:
+      - .env.dev
     depends_on:
       server:
         condition: service_healthy

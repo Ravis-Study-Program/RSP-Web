@@ -115,27 +115,57 @@ public class LeetcodeService : ILeetcodeService
       {
         foreach (var category in question.TopicTags)
         {
-          categorySet.Add(category.Name);
+          categorySet.Add(category.Name.Trim());
         }
       }
 
-      // Retrieve existing categories without tracking to avoid duplicate tracking errors
-      var existingCategories = _leetcodeProblemCategoryRepository
-        .Table.AsNoTracking()
-        .ToDictionary(c => c.Name, c => c);
+      var existingCategories = _leetcodeProblemCategoryRepository.Table.ToDictionary(
+        c => c.Name.Trim(),
+        c => c
+      );
 
-      foreach (var category in categorySet)
+      var existingIds = _leetcodeProblemCategoryRepository
+        .Table.Select(c => c.LeetcodeProblemCategoryId)
+        .ToHashSet();
+
+      var pendingNewCategories = new List<LeetcodeProblemCategoryEntity>();
+
+      foreach (var categoryName in categorySet)
       {
-        if (!existingCategories.ContainsKey(category))
+        if (existingCategories.ContainsKey(categoryName))
+          continue;
+
+        const int maxRetries = 5;
+        string newId = null!;
+        int retryCount = 0;
+
+        do
         {
-          var newCategory = new LeetcodeProblemCategoryEntity
-          {
-            LeetcodeProblemCategoryId = Database.Constants.GeneratePrimaryKeyId(),
-            Name = category,
-          };
-          await _leetcodeProblemCategoryRepository.AddAsync(newCategory, cancellationToken);
-          existingCategories[category] = newCategory; // Track the new category in-memory
+          newId = Database.Constants.GeneratePrimaryKeyId();
+          retryCount++;
+        } while (existingIds.Contains(newId) && retryCount < maxRetries);
+
+        if (existingIds.Contains(newId))
+        {
+          throw new Exception(
+            $"Failed to generate unique ID for category '{categoryName}' after {maxRetries} attempts."
+          );
         }
+
+        var newCategory = new LeetcodeProblemCategoryEntity
+        {
+          LeetcodeProblemCategoryId = newId,
+          Name = categoryName,
+        };
+
+        pendingNewCategories.Add(newCategory);
+        existingIds.Add(newId);
+        existingCategories[categoryName] = newCategory;
+      }
+
+      foreach (var newCategory in pendingNewCategories)
+      {
+        await _leetcodeProblemCategoryRepository.AddAsync(newCategory, cancellationToken);
       }
 
       await _unitOfWork.SaveChangesAsync(cancellationToken);
@@ -184,7 +214,7 @@ public class LeetcodeService : ILeetcodeService
 
         foreach (var category in question.TopicTags)
         {
-          if (existingCategories.TryGetValue(category.Name, out var existingCategory))
+          if (existingCategories.TryGetValue(category.Name.Trim(), out var existingCategory))
           {
             newLeetcodeProblem.LeetcodeProblemCategories.Add(existingCategory);
           }
