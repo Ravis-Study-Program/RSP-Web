@@ -220,7 +220,7 @@ export function Navbar({ isLoading, user, tabs, isSeasonUrl, enrollments = [] }:
 
             <Menu.Label>Authentication</Menu.Label>
             <Menu.Item
-              onClick={() => logout()}
+              onClick={() => logout({ logoutParams: { returnTo: window.location.origin } })}
               leftSection={<IconLogout style={{ width: rem(14), height: rem(14) }} />}
             >
               Sign Out
