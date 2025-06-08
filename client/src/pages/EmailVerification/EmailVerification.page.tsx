@@ -67,7 +67,13 @@ export function EmailVerificiationPage() {
           >
             I Have Verified My Email
           </Button>
-          <Button onClick={() => logout()} mt="xl" autoContrast color="gray.4" size="md">
+          <Button
+            onClick={() => logout({ logoutParams: { returnTo: window.location.origin } })}
+            mt="xl"
+            autoContrast
+            color="gray.4"
+            size="md"
+          >
             Back To Home
           </Button>
         </Group>
