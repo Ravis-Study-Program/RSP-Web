@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
-docker compose -f docker-compose.yml -f docker-compose.prod.yml --env-file .env.prod down
-docker compose -f docker-compose.yml -f docker-compose.prod.yml --env-file .env.prod up -d --build
+mkdir -p logs/{nginx,postgres,prometheus,grafana}
 
-echo "(Prod) Services started using docker-compose.yml only."
+docker compose -f docker-compose.yml -f docker-compose.prod.yml --env-file .env.prod down
+
+docker compose -f docker-compose.yml -f docker-compose.prod.yml --env-file .env.prod up -d
+
