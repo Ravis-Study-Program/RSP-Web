@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import { QueryObserverResult, RefetchOptions, UseMutateAsyncFunction } from '@tanstack/react-query';
 import { zodResolver } from 'mantine-form-zod-resolver';
 import { MRT_TableInstance } from 'mantine-react-table';
@@ -24,7 +25,7 @@ const scoreSchema = z
   .max(10, { message: 'The maximum score is 10' });
 
 const schema = z.object({
-  startDate: z.date(),
+  startDate: z.string().min(1),
   timeTakenInMinutes: z
     .number()
     .min(1, { message: 'The minimum amount is 1 minute' })
@@ -59,7 +60,7 @@ export const MockInterviewCreateModal = ({
   const form = useForm({
     mode: 'uncontrolled',
     initialValues: {
-      startDate: new Date(),
+      startDate: dayjs().format('YYYY-MM-DD'),
       timeTakenInMinutes: 0,
       interviewee: '',
       behaviouralScore: 0,
@@ -80,7 +81,7 @@ export const MockInterviewCreateModal = ({
   });
 
   const handleSubmit = async (values: {
-    startDate: Date;
+    startDate: string;
     timeTakenInMinutes: number;
     interviewee: string;
     behaviouralScore: number;
@@ -129,7 +130,7 @@ export const MockInterviewCreateModal = ({
       });
 
       const requestData: CreateMockInterviewRequest = {
-        startDate: values.startDate.toISOString(),
+        startDate: dayjs(values.startDate).toISOString(),
         timeTakenInMinutes: values.timeTakenInMinutes,
         intervieweeUserId: values.interviewee,
         mockInterviewRounds,
@@ -174,7 +175,7 @@ export const MockInterviewCreateModal = ({
     const today = new Date();
     const resultDate = new Date();
     resultDate.setDate(today.getDate() - days);
-    return resultDate;
+    return dayjs(resultDate).format('YYYY-MM-DD');
   };
 
   return (

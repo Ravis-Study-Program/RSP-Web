@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import { QueryObserverResult, RefetchOptions, UseMutateAsyncFunction } from '@tanstack/react-query';
 import { zodResolver } from 'mantine-form-zod-resolver';
 import { MRT_TableInstance } from 'mantine-react-table';
@@ -19,27 +20,34 @@ const schema = z
   .object({
     seasonId: z.string(),
     weekNumber: z.number().min(1),
-    startDate: z.date(),
-    endDate: z.date(),
+    startDate: z.string().min(1),
+    endDate: z.string().min(1),
   })
-  .refine((data) => data.endDate > data.startDate, {
-    message: 'End date must be at least one day greater than start date',
-    path: ['endDate'],
-  });
+  .refine(
+    (data) => {
+      const startDate = dayjs(data.startDate).toDate();
+      const endDate = dayjs(data.endDate).toDate();
+      return endDate > startDate;
+    },
+    {
+      message: 'End date must be at least one day greater than start date',
+      path: ['endDate'],
+    }
+  );
 
 export const AdminSeasonWeeksCreateModal = ({
   table,
-  seasons,
   createSeasonWeek,
   refetchSeasonWeeks,
+  seasons,
 }: AdminSeasonWeeksCreateModalProps) => {
   const form = useForm({
     mode: 'uncontrolled',
     initialValues: {
       seasonId: '',
       weekNumber: 1,
-      startDate: new Date(),
-      endDate: new Date(),
+      startDate: dayjs().format('YYYY-MM-DD'),
+      endDate: dayjs().format('YYYY-MM-DD'),
     },
     validate: zodResolver(schema),
   });
@@ -47,16 +55,14 @@ export const AdminSeasonWeeksCreateModal = ({
   const handleSubmit = async (values: {
     seasonId: string;
     weekNumber: number;
-    startDate: Date;
-    endDate: Date;
+    startDate: string;
+    endDate: string;
   }) => {
     try {
       const requestData: AdminCreateSeasonWeekRequest = {
         ...values,
-        seasonId: values.seasonId,
-        weekNumber: values.weekNumber,
-        startDate: values.startDate.toISOString(),
-        endDate: values.endDate.toISOString(),
+        startDate: dayjs(values.startDate).toISOString(),
+        endDate: dayjs(values.endDate).toISOString(),
       };
 
       await createSeasonWeek({ data: requestData });
