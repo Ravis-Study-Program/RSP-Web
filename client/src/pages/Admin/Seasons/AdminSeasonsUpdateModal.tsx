@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import { QueryObserverResult, RefetchOptions, UseMutateAsyncFunction } from '@tanstack/react-query';
 import { zodResolver } from 'mantine-form-zod-resolver';
 import { MRT_Row, MRT_TableInstance } from 'mantine-react-table';
@@ -31,15 +32,23 @@ const schema = z
         message:
           'Invalid format, expected XXX-YYYY-YYYY where X is letters and Y is numbers. Eg ADL-2023-2024.',
       }),
-    startDateInclusiveUtc: z.date(),
-    endDateInclusiveUtc: z.date(),
+    startDateInclusiveUtc: z.string().min(1),
+    endDateInclusiveUtc: z.string().min(1),
     location: z.string().min(1),
     imageUrl: z.string().min(1),
   })
-  .refine((data) => data.endDateInclusiveUtc > data.startDateInclusiveUtc, {
-    message: 'End date must be at least one day greater than start date',
-    path: ['endDateInclusiveUtc'],
-  });
+  .refine(
+    (data) => {
+      // Convert strings to Date objects for comparison
+      const startDate = dayjs(data.startDateInclusiveUtc).toDate();
+      const endDate = dayjs(data.endDateInclusiveUtc).toDate();
+      return endDate > startDate;
+    },
+    {
+      message: 'End date must be at least one day greater than start date',
+      path: ['endDateInclusiveUtc'],
+    }
+  );
 
 export const AdminSeasonsUpdateModal = ({
   table,
@@ -52,8 +61,8 @@ export const AdminSeasonsUpdateModal = ({
     initialValues: {
       name: season.name,
       slug: season.slug,
-      startDateInclusiveUtc: new Date(season.startDateInclusiveUtc),
-      endDateInclusiveUtc: new Date(season.endDateInclusiveUtc),
+      startDateInclusiveUtc: dayjs(season.startDateInclusiveUtc).format('YYYY-MM-DD'),
+      endDateInclusiveUtc: dayjs(season.endDateInclusiveUtc).format('YYYY-MM-DD'),
       location: season.location,
       imageUrl: season.imageUrl,
     },
@@ -63,16 +72,16 @@ export const AdminSeasonsUpdateModal = ({
   const handleSubmit = async (values: {
     name: string;
     slug: string;
-    startDateInclusiveUtc: Date;
-    endDateInclusiveUtc: Date;
+    startDateInclusiveUtc: string;
+    endDateInclusiveUtc: string;
     location: string;
     imageUrl: string;
   }) => {
     try {
       const requestData: AdminUpdateSeasonRequest = {
         ...values,
-        startDateInclusiveUtc: values.startDateInclusiveUtc.toISOString(),
-        endDateInclusiveUtc: values.endDateInclusiveUtc.toISOString(),
+        startDateInclusiveUtc: dayjs(values.startDateInclusiveUtc).toISOString(),
+        endDateInclusiveUtc: dayjs(values.endDateInclusiveUtc).toISOString(),
         seasonId: season.seasonId,
       };
 

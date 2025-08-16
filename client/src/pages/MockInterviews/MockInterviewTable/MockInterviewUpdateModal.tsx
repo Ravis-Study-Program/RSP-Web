@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import { QueryObserverResult, RefetchOptions, UseMutateAsyncFunction } from '@tanstack/react-query';
 import { zodResolver } from 'mantine-form-zod-resolver';
 import { MRT_Row, MRT_TableInstance } from 'mantine-react-table';
@@ -24,7 +25,7 @@ const scoreSchema = z
   .max(10, { message: 'The maximum score is 10' });
 
 const schema = z.object({
-  startDate: z.date(),
+  startDate: z.string().min(1),
   timeTakenInMinutes: z
     .number()
     .min(1, { message: 'The minimum amount is 1 minute' })
@@ -69,7 +70,7 @@ export const MockInterviewUpdateModal = ({
     mode: 'uncontrolled',
     initialValues: {
       mockInterviewId: mockInterview.mockInterviewId,
-      startDate: new Date(mockInterview.startDate),
+      startDate: dayjs(mockInterview.startDate).format('YYYY-MM-DD'),
       timeTakenInMinutes: mockInterview.timeTakenInMinutes,
       interviewee: mockInterview.intervieweeUserId ?? '',
       behaviouralScore: behaviouralRound?.behavioralScore ?? 0,
@@ -91,7 +92,7 @@ export const MockInterviewUpdateModal = ({
 
   const handleSubmit = async (values: {
     mockInterviewId: string;
-    startDate: Date;
+    startDate: string;
     timeTakenInMinutes: number;
     interviewee: string;
     behaviouralScore: number;
@@ -110,14 +111,12 @@ export const MockInterviewUpdateModal = ({
   }) => {
     try {
       const mockInterviewRounds: MockInterviewRoundDto[] = [];
-      // Behavioural
       mockInterviewRounds.push({
         mockInterviewRoundId: behavioural[0]?.mockInterviewRoundId,
         behaviouralMockInterviewRound: {
           behavioralScore: values.behaviouralScore,
         },
       });
-      // Leetcode Problem 1
       mockInterviewRounds.push({
         mockInterviewRoundId: leetcodeRounds[0]?.mockInterviewRoundId,
         leetcodeMockInterviewRound: {
@@ -129,7 +128,6 @@ export const MockInterviewUpdateModal = ({
           testingScore: values.test1,
         },
       });
-      // Leetcode Problem 2
       mockInterviewRounds.push({
         mockInterviewRoundId: leetcodeRounds[1]?.mockInterviewRoundId,
         leetcodeMockInterviewRound: {
@@ -144,7 +142,7 @@ export const MockInterviewUpdateModal = ({
 
       const requestData: UpdateMockInterviewRequest = {
         mockInterviewId: values.mockInterviewId,
-        startDate: values.startDate.toISOString(),
+        startDate: dayjs(values.startDate).toISOString(),
         timeTakenInMinutes: values.timeTakenInMinutes,
         intervieweeUserId: values.interviewee,
         mockInterviewRounds,
@@ -189,7 +187,7 @@ export const MockInterviewUpdateModal = ({
     const today = new Date();
     const resultDate = new Date();
     resultDate.setDate(today.getDate() - days);
-    return resultDate;
+    return dayjs(resultDate).format('YYYY-MM-DD');
   };
 
   return (

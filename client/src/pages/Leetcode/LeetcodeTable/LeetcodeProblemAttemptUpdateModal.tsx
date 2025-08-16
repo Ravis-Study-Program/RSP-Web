@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import { QueryObserverResult, RefetchOptions, UseMutateAsyncFunction } from '@tanstack/react-query';
 import { zodResolver } from 'mantine-form-zod-resolver';
 import { MRT_Row, MRT_TableInstance } from 'mantine-react-table';
@@ -18,7 +19,7 @@ import { createOptionsFilter } from '@/shared/table/globalFilters';
 
 const schema = z.object({
   leetcodeProblemId: z.string(),
-  attemptStartDateUtc: z.date(),
+  attemptStartDateUtc: z.string().min(1),
   timeTakenInMinutes: z
     .number()
     .min(1, {
@@ -45,7 +46,7 @@ export const LeetcodeProblemAttemptUpdateModal = ({
     mode: 'uncontrolled',
     initialValues: {
       leetcodeProblemId: problemAttempt.leetcodeProblemId,
-      attemptStartDateUtc: new Date(problemAttempt.attemptStartDateUtc),
+      attemptStartDateUtc: dayjs(problemAttempt.attemptStartDateUtc).format('YYYY-MM-DD'),
       timeTakenInMinutes: problemAttempt.timeTakenInMinutes,
       notes: problemAttempt.notes,
     },
@@ -54,7 +55,7 @@ export const LeetcodeProblemAttemptUpdateModal = ({
 
   const handleSubmit = async (values: {
     leetcodeProblemId: string | null | undefined;
-    attemptStartDateUtc: Date;
+    attemptStartDateUtc: string;
     timeTakenInMinutes: number;
     notes: string;
   }) => {
@@ -62,7 +63,7 @@ export const LeetcodeProblemAttemptUpdateModal = ({
       const requestData: UpdateProblemAttemptRequest = {
         ...values,
         email,
-        attemptStartDateUtc: values.attemptStartDateUtc.toISOString(),
+        attemptStartDateUtc: dayjs(values.attemptStartDateUtc).toISOString(),
         problemAttemptId: problemAttempt.problemAttemptId,
       };
       if (enrollmentId !== '') {
@@ -98,7 +99,7 @@ export const LeetcodeProblemAttemptUpdateModal = ({
     const today = new Date();
     const resultDate = new Date();
     resultDate.setDate(today.getDate() - days);
-    return resultDate;
+    return dayjs(resultDate).format('YYYY-MM-DD');
   };
 
   return (

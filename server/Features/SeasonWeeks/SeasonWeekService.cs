@@ -180,7 +180,7 @@ public class SeasonWeekService : ISeasonWeekService
       request.WeekNumber,
       cancellationToken
     );
-    if (existingWeek != null)
+    if (existingWeek != null && existingWeek.SeasonWeekId != request.SeasonWeekId)
     {
       return new ErrorServiceResponse<AdminUpdateSeasonWeekResponse>(Message.SeasonWeekExists);
     }
