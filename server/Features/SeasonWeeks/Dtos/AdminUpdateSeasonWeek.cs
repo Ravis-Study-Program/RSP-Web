@@ -34,6 +34,6 @@ public class AdminUpdateSeasonWeekRequestValidator : AbstractValidator<AdminUpda
     RuleFor(c => c.EndDate)
       .NotEmpty()
       .GreaterThan(c => c.StartDate)
-      .WithMessage(Message.EndDateMustBeGreaterThanStartDate);
+      .WithMessage(Messages.Common.EndDateMustBeGreaterThanStartDate);
   }
 }

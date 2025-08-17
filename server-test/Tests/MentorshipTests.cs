@@ -66,7 +66,7 @@ namespace RSPWebAPI.Tests.Tests
       var listRequest = new AdminListMentorshipRequest();
       var listResponse = await MentorshipService.ListAdminMentorship(listRequest);
       Assert.True(listResponse.IsSuccess);
-      Assert.Equal(Message.MentorshipListSuccessfully, listResponse.Message);
+      Assert.Equal(Messages.Mentorship.Listed, listResponse.Message);
       Assert.NotNull(listResponse.Data?.Mentorships);
 
       var all = await _seeder.GetAllMentorshipsAsync();
@@ -95,7 +95,7 @@ namespace RSPWebAPI.Tests.Tests
 
       var response = await MentorshipService.CreateAdminMentorship(request);
       Assert.False(response.IsSuccess);
-      Assert.Equal(Message.EnrollmentDoesNotExists, response.Message);
+      Assert.Equal(Messages.Enrollment.DoesNotExist, response.Message);
     }
 
     [Fact]
@@ -117,7 +117,7 @@ namespace RSPWebAPI.Tests.Tests
 
       var response = await MentorshipService.CreateAdminMentorship(request);
       Assert.False(response.IsSuccess);
-      Assert.Equal(Message.EnrollmentDoesNotExists, response.Message);
+      Assert.Equal(Messages.Enrollment.DoesNotExist, response.Message);
     }
 
     [Fact]
@@ -134,7 +134,7 @@ namespace RSPWebAPI.Tests.Tests
       };
       var response = await MentorshipService.CreateAdminMentorship(request);
       Assert.False(response.IsSuccess);
-      Assert.Equal(Message.MentorshipExists, response.Message);
+      Assert.Equal(Messages.Mentorship.Exists, response.Message);
     }
 
     [Fact]
@@ -163,7 +163,7 @@ namespace RSPWebAPI.Tests.Tests
       };
 
       var updateResp = await MentorshipService.UpdateAdminMentorship(updateRequest);
-      Assert.Equal(Message.MentorshipUpdatedSuccessfully, updateResp.Message);
+      Assert.Equal(Messages.Mentorship.Updated, updateResp.Message);
       Assert.True(updateResp.IsSuccess);
 
       var afterUpdate = await MentorshipService.GetMentorshipByIdAsync(mentorshipId);
@@ -183,7 +183,7 @@ namespace RSPWebAPI.Tests.Tests
       };
       var resp = await MentorshipService.UpdateAdminMentorship(request);
       Assert.False(resp.IsSuccess);
-      Assert.Equal(Message.MentorshipDoesNotExists, resp.Message);
+      Assert.Equal(Messages.Mentorship.DoesNotExist, resp.Message);
     }
 
     [Fact]
@@ -196,7 +196,7 @@ namespace RSPWebAPI.Tests.Tests
       var deleteRequest = new AdminDeleteMentorshipRequest { MentorshipId = mentorshipId };
       var deleteResp = await MentorshipService.DeleteAdminMentorship(deleteRequest);
       Assert.True(deleteResp.IsSuccess);
-      Assert.Equal(Message.MentorshipDeletedSuccessfully, deleteResp.Message);
+      Assert.Equal(Messages.Mentorship.Deleted, deleteResp.Message);
 
       var afterDelete = await MentorshipService.GetMentorshipByIdAsync(mentorshipId);
       Assert.Null(afterDelete);
@@ -211,7 +211,7 @@ namespace RSPWebAPI.Tests.Tests
       };
       var resp = await MentorshipService.DeleteAdminMentorship(request);
       Assert.False(resp.IsSuccess);
-      Assert.Equal(Message.MentorshipDoesNotExists, resp.Message);
+      Assert.Equal(Messages.Mentorship.DoesNotExist, resp.Message);
     }
 
     [Fact]
@@ -220,7 +220,7 @@ namespace RSPWebAPI.Tests.Tests
       var request = new AdminListMentorshipRequest();
       var listResp = await MentorshipService.ListAdminMentorship(request);
       Assert.True(listResp.IsSuccess);
-      Assert.Equal(Message.MentorshipListSuccessfully, listResp.Message);
+      Assert.Equal(Messages.Mentorship.Listed, listResp.Message);
     }
 
     [Fact]
@@ -253,7 +253,7 @@ namespace RSPWebAPI.Tests.Tests
       };
       var menteesResp = await MentorshipService.GetCurrentUserMenteesList(menteesReq);
       Assert.True(menteesResp.IsSuccess);
-      Assert.Equal(Message.MentorshipListSuccessfully, menteesResp.Message);
+      Assert.Equal(Messages.Mentorship.Listed, menteesResp.Message);
       Assert.Single(menteesResp.Data!.Mentorships);
     }
   }

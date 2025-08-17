@@ -43,7 +43,7 @@ public class SeasonWeekService : ISeasonWeekService
     );
     if (existingSeason == null)
     {
-      return new ErrorServiceResponse<AdminCreateSeasonWeekResponse>(Message.SeasonDoesNotExists);
+      return new ErrorServiceResponse<AdminCreateSeasonWeekResponse>(Messages.Season.DoesNotExist);
     }
 
     var existingWeek = await GetSeasonWeekBySeasonId(
@@ -53,7 +53,7 @@ public class SeasonWeekService : ISeasonWeekService
     );
     if (existingWeek != null)
     {
-      return new ErrorServiceResponse<AdminCreateSeasonWeekResponse>(Message.SeasonWeekExists);
+      return new ErrorServiceResponse<AdminCreateSeasonWeekResponse>(Messages.SeasonWeek.Exists);
     }
 
     if (
@@ -83,15 +83,15 @@ public class SeasonWeekService : ISeasonWeekService
       await AddSeasonWeekAsync(seasonWeek, cancellationToken);
       await _unitOfWork.SaveChangesAsync(cancellationToken);
       return new SuccessServiceResponse<AdminCreateSeasonWeekResponse>(
-        Message.SeasonWeekCreatedSuccessfully,
+        Messages.SeasonWeek.Created,
         new AdminCreateSeasonWeekResponse { SeasonWeekId = seasonWeek.SeasonWeekId }
       );
     }
     catch (Exception ex)
     {
-      _logger.LogError(ex, Message.SeasonWeekCreationUnexpectedError);
+      _logger.LogError(ex, Messages.SeasonWeek.CreationError);
       return new ErrorServiceResponse<AdminCreateSeasonWeekResponse>(
-        Message.SeasonWeekCreationUnexpectedError
+        Messages.SeasonWeek.CreationError
       );
     }
   }
@@ -105,7 +105,7 @@ public class SeasonWeekService : ISeasonWeekService
     if (existingSeasonWeek == null)
     {
       return new ErrorServiceResponse<AdminDeleteSeasonWeekResponse>(
-        Message.SeasonWeekDoesNotExists
+        Messages.SeasonWeek.DoesNotExist
       );
     }
 
@@ -113,15 +113,13 @@ public class SeasonWeekService : ISeasonWeekService
     {
       await DeleteSeasonWeekAsync(existingSeasonWeek.SeasonWeekId, cancellationToken);
       await _unitOfWork.SaveChangesAsync(cancellationToken);
-      return new SuccessServiceResponse<AdminDeleteSeasonWeekResponse>(
-        Message.SeasonWeekDeletedSuccessfully
-      );
+      return new SuccessServiceResponse<AdminDeleteSeasonWeekResponse>(Messages.SeasonWeek.Deleted);
     }
     catch (Exception ex)
     {
-      _logger.LogError(ex, Message.SeasonWeekDeletionUnexpectedError);
+      _logger.LogError(ex, Messages.SeasonWeek.DeletionError);
       return new ErrorServiceResponse<AdminDeleteSeasonWeekResponse>(
-        Message.SeasonWeekDeletionUnexpectedError
+        Messages.SeasonWeek.DeletionError
       );
     }
   }
@@ -140,16 +138,14 @@ public class SeasonWeekService : ISeasonWeekService
       );
       await _unitOfWork.SaveChangesAsync(cancellationToken);
       return new SuccessServiceResponse<AdminListSeasonWeekResponse>(
-        Message.SeasonWeekListSuccessfully,
+        Messages.SeasonWeek.Listed,
         new AdminListSeasonWeekResponse { SeasonWeeks = seasonWeeks.ToList() }
       );
     }
     catch (Exception ex)
     {
-      _logger.LogError(ex, Message.SeasonWeekListUnexpectedError);
-      return new ErrorServiceResponse<AdminListSeasonWeekResponse>(
-        Message.SeasonWeekListUnexpectedError
-      );
+      _logger.LogError(ex, Messages.SeasonWeek.ListError);
+      return new ErrorServiceResponse<AdminListSeasonWeekResponse>(Messages.SeasonWeek.ListError);
     }
   }
 
@@ -162,7 +158,7 @@ public class SeasonWeekService : ISeasonWeekService
     if (existingSeasonWeek == null)
     {
       return new ErrorServiceResponse<AdminUpdateSeasonWeekResponse>(
-        Message.SeasonWeekDoesNotExists
+        Messages.SeasonWeek.DoesNotExist
       );
     }
 
@@ -172,7 +168,7 @@ public class SeasonWeekService : ISeasonWeekService
     );
     if (existingSeason == null)
     {
-      return new ErrorServiceResponse<AdminUpdateSeasonWeekResponse>(Message.SeasonDoesNotExists);
+      return new ErrorServiceResponse<AdminUpdateSeasonWeekResponse>(Messages.Season.DoesNotExist);
     }
 
     var existingWeek = await GetSeasonWeekBySeasonId(
@@ -182,7 +178,7 @@ public class SeasonWeekService : ISeasonWeekService
     );
     if (existingWeek != null && existingWeek.SeasonWeekId != request.SeasonWeekId)
     {
-      return new ErrorServiceResponse<AdminUpdateSeasonWeekResponse>(Message.SeasonWeekExists);
+      return new ErrorServiceResponse<AdminUpdateSeasonWeekResponse>(Messages.SeasonWeek.Exists);
     }
 
     if (
@@ -207,15 +203,13 @@ public class SeasonWeekService : ISeasonWeekService
     {
       await UpdateSeasonWeekAsync(existingSeasonWeek, cancellationToken);
       await _unitOfWork.SaveChangesAsync(cancellationToken);
-      return new SuccessServiceResponse<AdminUpdateSeasonWeekResponse>(
-        Message.SeasonWeekUpdateSuccessfully
-      );
+      return new SuccessServiceResponse<AdminUpdateSeasonWeekResponse>(Messages.SeasonWeek.Updated);
     }
     catch (Exception ex)
     {
-      _logger.LogError(ex, Message.SeasonWeekUpdateUnexpectedError);
+      _logger.LogError(ex, Messages.SeasonWeek.UpdateError);
       return new ErrorServiceResponse<AdminUpdateSeasonWeekResponse>(
-        Message.SeasonWeekUpdateUnexpectedError
+        Messages.SeasonWeek.UpdateError
       );
     }
   }
@@ -236,15 +230,15 @@ public class SeasonWeekService : ISeasonWeekService
     try
     {
       return new SuccessServiceResponse<GetSeasonWeeksBySeasonSlugResponse>(
-        Message.SeasonWeekListSuccessfully,
+        Messages.SeasonWeek.Listed,
         new GetSeasonWeeksBySeasonSlugResponse() { SeasonWeeks = seasonWeeks.ToList() }
       );
     }
     catch (Exception ex)
     {
-      _logger.LogError(ex, Message.SeasonWeekListUnexpectedError);
+      _logger.LogError(ex, Messages.SeasonWeek.ListError);
       return new ErrorServiceResponse<GetSeasonWeeksBySeasonSlugResponse>(
-        Message.SeasonWeekListUnexpectedError
+        Messages.SeasonWeek.ListError
       );
     }
   }
@@ -259,7 +253,7 @@ public class SeasonWeekService : ISeasonWeekService
   {
     if (seasonStartDate > seasonWeekStartDate || seasonEndDate < seasonWeekEndDate)
     {
-      errorMessage = Message.SeasonWeekDatesNotWithinSeasonDates;
+      errorMessage = Messages.SeasonWeek.DatesNotWithinSeasonDates;
       return false;
     }
 
@@ -288,7 +282,7 @@ public class SeasonWeekService : ISeasonWeekService
 
     if (seasonWeek == null)
     {
-      throw new KeyNotFoundException(Message.SeasonWeekDoesNotExists);
+      throw new KeyNotFoundException(Messages.SeasonWeek.DoesNotExist);
     }
 
     _seasonWeekRepository.Delete(seasonWeek, cancellationToken);
@@ -307,7 +301,7 @@ public class SeasonWeekService : ISeasonWeekService
     );
     if (existingSeasonWeek == null)
     {
-      throw new KeyNotFoundException(Message.SeasonWeekDoesNotExists);
+      throw new KeyNotFoundException(Messages.SeasonWeek.DoesNotExist);
     }
 
     _seasonWeekRepository.Update(seasonWeek, cancellationToken);

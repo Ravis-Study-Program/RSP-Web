@@ -64,7 +64,7 @@ namespace RSPWebAPI.Tests.Tests
       var listRequest = new AdminListSeasonWeekRequest();
       var listResponse = await SeasonWeekService.ListAdminSeasonWeek(listRequest);
       Assert.True(listResponse.IsSuccess);
-      Assert.Equal(Message.SeasonWeekListSuccessfully, listResponse.Message);
+      Assert.Equal(Messages.SeasonWeek.Listed, listResponse.Message);
       var allWeeks = await _seeder.GetAllSeasonWeeksAsync();
       Assert.Equal(count, allWeeks.Count);
     }
@@ -81,7 +81,7 @@ namespace RSPWebAPI.Tests.Tests
       };
       var response = await SeasonWeekService.CreateAdminSeasonWeek(request);
       Assert.False(response.IsSuccess);
-      Assert.Equal(Message.SeasonDoesNotExists, response.Message);
+      Assert.Equal(Messages.Season.DoesNotExist, response.Message);
     }
 
     [Fact]
@@ -101,7 +101,7 @@ namespace RSPWebAPI.Tests.Tests
       };
       var firstResponse = await SeasonWeekService.CreateAdminSeasonWeek(firstRequest);
       Assert.True(firstResponse.IsSuccess);
-      Assert.Equal(Message.SeasonWeekCreatedSuccessfully, firstResponse.Message);
+      Assert.Equal(Messages.SeasonWeek.Created, firstResponse.Message);
       var secondRequest = new AdminCreateSeasonWeekRequest
       {
         SeasonId = seasonId,
@@ -111,7 +111,7 @@ namespace RSPWebAPI.Tests.Tests
       };
       var secondResponse = await SeasonWeekService.CreateAdminSeasonWeek(secondRequest);
       Assert.False(secondResponse.IsSuccess);
-      Assert.Equal(Message.SeasonWeekExists, secondResponse.Message);
+      Assert.Equal(Messages.SeasonWeek.Exists, secondResponse.Message);
     }
 
     [Fact]
@@ -128,7 +128,7 @@ namespace RSPWebAPI.Tests.Tests
       };
       var response = await SeasonWeekService.CreateAdminSeasonWeek(request);
       Assert.False(response.IsSuccess);
-      Assert.Equal(Message.SeasonWeekDatesNotWithinSeasonDates, response.Message);
+      Assert.Equal(Messages.SeasonWeek.DatesNotWithinSeasonDates, response.Message);
     }
 
     [Fact]
@@ -146,7 +146,7 @@ namespace RSPWebAPI.Tests.Tests
       };
       var updateResponse = await SeasonWeekService.UpdateAdminSeasonWeek(updateRequest);
       Assert.True(updateResponse.IsSuccess);
-      Assert.Equal(Message.SeasonWeekUpdateSuccessfully, updateResponse.Message);
+      Assert.Equal(Messages.SeasonWeek.Updated, updateResponse.Message);
       var updated = await SeasonWeekService.GetSeasonWeekByIdAsync(seasonWeekId);
       Assert.NotNull(updated);
       Assert.Equal(updateRequest.WeekNumber, updated!.WeekNumber);
@@ -162,7 +162,7 @@ namespace RSPWebAPI.Tests.Tests
       var request = new AdminDeleteSeasonWeekRequest { SeasonWeekId = seasonWeekId };
       var deleteResponse = await SeasonWeekService.DeleteAdminSeasonWeek(request);
       Assert.True(deleteResponse.IsSuccess);
-      Assert.Equal(Message.SeasonWeekDeletedSuccessfully, deleteResponse.Message);
+      Assert.Equal(Messages.SeasonWeek.Deleted, deleteResponse.Message);
       var afterDelete = await SeasonWeekService.GetSeasonWeekByIdAsync(seasonWeekId);
       Assert.Null(afterDelete);
     }
@@ -176,7 +176,7 @@ namespace RSPWebAPI.Tests.Tests
       };
       var response = await SeasonWeekService.DeleteAdminSeasonWeek(request);
       Assert.False(response.IsSuccess);
-      Assert.Equal(Message.SeasonWeekDoesNotExists, response.Message);
+      Assert.Equal(Messages.SeasonWeek.DoesNotExist, response.Message);
     }
 
     [Fact]
@@ -185,7 +185,7 @@ namespace RSPWebAPI.Tests.Tests
       var listRequest = new AdminListSeasonWeekRequest();
       var listResponse = await SeasonWeekService.ListAdminSeasonWeek(listRequest);
       Assert.True(listResponse.IsSuccess);
-      Assert.Equal(Message.SeasonWeekListSuccessfully, listResponse.Message);
+      Assert.Equal(Messages.SeasonWeek.Listed, listResponse.Message);
     }
   }
 }

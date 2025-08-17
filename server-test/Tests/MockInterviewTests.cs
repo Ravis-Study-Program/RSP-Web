@@ -71,7 +71,7 @@ namespace RSPWebAPI.Tests.Tests
         IncludeCustom = false,
       };
       var listResponse = await MockInterviewService.ListMockInterview(listRequest);
-      Assert.Equal(Message.MockInterviewListSuccessfully, listResponse.Message);
+      Assert.Equal(Messages.MockInterview.Listed, listResponse.Message);
       Assert.True(listResponse.IsSuccess);
       Assert.NotNull(listResponse.Data?.MockInterviews);
       Assert.Equal(count, listResponse.Data.MockInterviews.Count);
@@ -107,7 +107,7 @@ namespace RSPWebAPI.Tests.Tests
       };
       var response = await MockInterviewService.CreateMockInterview(request);
       Assert.False(response.IsSuccess);
-      Assert.Equal(Message.EnrollmentDoesNotExists, response.Message);
+      Assert.Equal(Messages.Enrollment.DoesNotExist, response.Message);
     }
 
     [Fact]
@@ -134,7 +134,7 @@ namespace RSPWebAPI.Tests.Tests
       };
 
       var updateResp = await MockInterviewService.UpdateMockInterview(updateRequest);
-      Assert.Equal(Message.MockInterviewUpdatedSuccessfully, updateResp.Message);
+      Assert.Equal(Messages.MockInterview.Updated, updateResp.Message);
       Assert.True(updateResp.IsSuccess);
 
       var afterUpdate = await MockInterviewService.GetMockInterviewByIdAsync(mockInterviewId);
@@ -163,7 +163,7 @@ namespace RSPWebAPI.Tests.Tests
       };
       var deleteResp = await MockInterviewService.DeleteMockInterview(request);
       Assert.True(deleteResp.IsSuccess);
-      Assert.Equal(Message.MockInterviewDeletedSuccessfully, deleteResp.Message);
+      Assert.Equal(Messages.MockInterview.Deleted, deleteResp.Message);
 
       var afterDelete = await MockInterviewService.GetMockInterviewByIdAsync(mockInterviewId);
       Assert.Null(afterDelete);
@@ -189,7 +189,7 @@ namespace RSPWebAPI.Tests.Tests
       };
       var deleteResp = await MockInterviewService.DeleteMockInterview(request);
       Assert.False(deleteResp.IsSuccess);
-      Assert.Equal(Message.MockInterviewDeletionOnlyInterviewerAllowed, deleteResp.Message);
+      Assert.Equal(Messages.MockInterview.DeletionOnlyInterviewerAllowed, deleteResp.Message);
     }
 
     [Fact]
@@ -208,7 +208,7 @@ namespace RSPWebAPI.Tests.Tests
       };
       var listResp = await MockInterviewService.ListMockInterview(listRequest);
       Assert.True(listResp.IsSuccess);
-      Assert.Equal(Message.MockInterviewListSuccessfully, listResp.Message);
+      Assert.Equal(Messages.MockInterview.Listed, listResp.Message);
       Assert.NotNull(listResp.Data?.MockInterviews);
       Assert.NotEmpty(listResp.Data.MockInterviews);
     }

@@ -63,7 +63,7 @@ public class MentorshipService : IMentorshipService
     if (mentorEnrollment == null)
     {
       return new ErrorServiceResponse<AdminCreateMentorshipResponse>(
-        Message.EnrollmentDoesNotExists
+        Messages.Enrollment.DoesNotExist
       );
     }
 
@@ -87,7 +87,7 @@ public class MentorshipService : IMentorshipService
     if (menteeEnrollment == null)
     {
       return new ErrorServiceResponse<AdminCreateMentorshipResponse>(
-        Message.EnrollmentDoesNotExists
+        Messages.Enrollment.DoesNotExist
       );
     }
 
@@ -106,7 +106,7 @@ public class MentorshipService : IMentorshipService
     if (mentorEnrollment.SeasonId != menteeEnrollment.SeasonId)
     {
       return new ErrorServiceResponse<AdminCreateMentorshipResponse>(
-        Message.MentorshipNotPermittedDueToDifferentSeason
+        Messages.Mentorship.NotPermittedDueToDifferentSeason
       );
     }
 
@@ -118,7 +118,7 @@ public class MentorshipService : IMentorshipService
     );
     if (existingMentorship != null)
     {
-      return new ErrorServiceResponse<AdminCreateMentorshipResponse>(Message.MentorshipExists);
+      return new ErrorServiceResponse<AdminCreateMentorshipResponse>(Messages.Mentorship.Exists);
     }
 
     var mentorship = new MentorshipEntity
@@ -133,15 +133,15 @@ public class MentorshipService : IMentorshipService
       await AddMentorshipAsync(mentorship, cancellationToken);
       await _unitOfWork.SaveChangesAsync(cancellationToken);
       return new SuccessServiceResponse<AdminCreateMentorshipResponse>(
-        Message.MentorshipCreatedSuccessfully,
+        Messages.Mentorship.Created,
         new AdminCreateMentorshipResponse { MentorshipId = mentorship.MentorshipId }
       );
     }
     catch (Exception ex)
     {
-      _logger.LogError(ex, Message.MentorshipCreationUnexpectedError);
+      _logger.LogError(ex, Messages.Mentorship.CreationError);
       return new ErrorServiceResponse<AdminCreateMentorshipResponse>(
-        Message.MentorshipCreationUnexpectedError
+        Messages.Mentorship.CreationError
       );
     }
   }
@@ -155,7 +155,7 @@ public class MentorshipService : IMentorshipService
     if (existingMentorship == null)
     {
       return new ErrorServiceResponse<AdminDeleteMentorshipResponse>(
-        Message.MentorshipDoesNotExists
+        Messages.Mentorship.DoesNotExist
       );
     }
 
@@ -163,15 +163,13 @@ public class MentorshipService : IMentorshipService
     {
       await DeleteMentorshipAsync(existingMentorship.MentorshipId, cancellationToken);
       await _unitOfWork.SaveChangesAsync(cancellationToken);
-      return new SuccessServiceResponse<AdminDeleteMentorshipResponse>(
-        Message.MentorshipDeletedSuccessfully
-      );
+      return new SuccessServiceResponse<AdminDeleteMentorshipResponse>(Messages.Mentorship.Deleted);
     }
     catch (Exception ex)
     {
-      _logger.LogError(ex, Message.MentorshipDeletionUnexpectedError);
+      _logger.LogError(ex, Messages.Mentorship.DeletionError);
       return new ErrorServiceResponse<AdminDeleteMentorshipResponse>(
-        Message.MentorshipDeletionUnexpectedError
+        Messages.Mentorship.DeletionError
       );
     }
   }
@@ -210,16 +208,14 @@ public class MentorshipService : IMentorshipService
         })
         .ToList();
       return new SuccessServiceResponse<AdminListMentorshipResponse>(
-        Message.MentorshipListSuccessfully,
+        Messages.Mentorship.Listed,
         new AdminListMentorshipResponse { Mentorships = formattedMentorships }
       );
     }
     catch (Exception ex)
     {
-      _logger.LogError(ex, Message.MentorshipListUnexpectedError);
-      return new ErrorServiceResponse<AdminListMentorshipResponse>(
-        Message.MentorshipListUnexpectedError
-      );
+      _logger.LogError(ex, Messages.Mentorship.ListError);
+      return new ErrorServiceResponse<AdminListMentorshipResponse>(Messages.Mentorship.ListError);
     }
   }
 
@@ -232,7 +228,7 @@ public class MentorshipService : IMentorshipService
     if (existingMentorship == null)
     {
       return new ErrorServiceResponse<AdminUpdateMentorshipResponse>(
-        Message.MentorshipDoesNotExists
+        Messages.Mentorship.DoesNotExist
       );
     }
 
@@ -245,7 +241,7 @@ public class MentorshipService : IMentorshipService
     if (mentorEnrollment == null)
     {
       return new ErrorServiceResponse<AdminUpdateMentorshipResponse>(
-        Message.EnrollmentDoesNotExists
+        Messages.Enrollment.DoesNotExist
       );
     }
 
@@ -269,7 +265,7 @@ public class MentorshipService : IMentorshipService
     if (menteeEnrollment == null)
     {
       return new ErrorServiceResponse<AdminUpdateMentorshipResponse>(
-        Message.EnrollmentDoesNotExists
+        Messages.Enrollment.DoesNotExist
       );
     }
 
@@ -288,7 +284,7 @@ public class MentorshipService : IMentorshipService
     if (mentorEnrollment.SeasonId != menteeEnrollment.SeasonId)
     {
       return new ErrorServiceResponse<AdminUpdateMentorshipResponse>(
-        Message.MentorshipNotPermittedDueToDifferentSeason
+        Messages.Mentorship.NotPermittedDueToDifferentSeason
       );
     }
 
@@ -299,15 +295,13 @@ public class MentorshipService : IMentorshipService
     {
       await UpdateMentorshipAsync(existingMentorship, cancellationToken);
       await _unitOfWork.SaveChangesAsync(cancellationToken);
-      return new SuccessServiceResponse<AdminUpdateMentorshipResponse>(
-        Message.MentorshipUpdatedSuccessfully
-      );
+      return new SuccessServiceResponse<AdminUpdateMentorshipResponse>(Messages.Mentorship.Updated);
     }
     catch (Exception ex)
     {
-      _logger.LogError(ex, Message.MentorshipUpdateUnexpectedError);
+      _logger.LogError(ex, Messages.Mentorship.UpdateError);
       return new ErrorServiceResponse<AdminUpdateMentorshipResponse>(
-        Message.MentorshipUpdateUnexpectedError
+        Messages.Mentorship.UpdateError
       );
     }
   }
@@ -351,15 +345,15 @@ public class MentorshipService : IMentorshipService
     try
     {
       return new SuccessServiceResponse<GetCurrentUserMenteesListResponse>(
-        Message.MentorshipListSuccessfully,
+        Messages.Mentorship.Listed,
         new GetCurrentUserMenteesListResponse { Mentorships = formattedMentorships }
       );
     }
     catch (Exception ex)
     {
-      _logger.LogError(ex, Message.MentorshipListUnexpectedError);
+      _logger.LogError(ex, Messages.Mentorship.ListError);
       return new ErrorServiceResponse<GetCurrentUserMenteesListResponse>(
-        Message.MentorshipListUnexpectedError
+        Messages.Mentorship.ListError
       );
     }
   }
@@ -402,7 +396,7 @@ public class MentorshipService : IMentorshipService
 
     if (mentorship == null)
     {
-      throw new KeyNotFoundException(Message.MentorshipDoesNotExists);
+      throw new KeyNotFoundException(Messages.Mentorship.DoesNotExist);
     }
 
     _mentorshipRepository.Delete(mentorship, cancellationToken);
@@ -421,7 +415,7 @@ public class MentorshipService : IMentorshipService
     );
     if (existingMentorship == null)
     {
-      throw new KeyNotFoundException(Message.MentorshipDoesNotExists);
+      throw new KeyNotFoundException(Messages.Mentorship.DoesNotExist);
     }
 
     _mentorshipRepository.Update(mentorship, cancellationToken);

@@ -79,7 +79,7 @@ public class TestDataSeeder
     };
 
     var response = await _userService.CreateAdminUser(request);
-    Assert.Equal(Message.UserCreatedSuccessfully, response.Message);
+    Assert.Equal(Messages.User.Created, response.Message);
     Assert.NotNull(response.Data?.UserId);
 
     return response.Data.UserId;
@@ -105,7 +105,7 @@ public class TestDataSeeder
     };
 
     var response = await _seasonService.CreateAdminSeason(request);
-    Assert.Equal(Message.SeasonCreatedSuccessfully, response.Message);
+    Assert.Equal(Messages.Season.Created, response.Message);
     Assert.NotNull(response.Data?.SeasonId);
 
     return response.Data.SeasonId;
@@ -122,7 +122,7 @@ public class TestDataSeeder
     };
 
     var response = await _seasonWeekService.CreateAdminSeasonWeek(request);
-    Assert.Equal(Message.SeasonWeekCreatedSuccessfully, response.Message);
+    Assert.Equal(Messages.SeasonWeek.Created, response.Message);
     Assert.NotNull(response.Data?.SeasonWeekId);
 
     return response.Data.SeasonWeekId;
@@ -154,7 +154,7 @@ public class TestDataSeeder
     };
 
     var response = await _enrollmentService.CreateAdminEnrollment(request);
-    Assert.Equal(Message.EnrollmentCreatedSuccessfully, response.Message);
+    Assert.Equal(Messages.Enrollment.Created, response.Message);
     Assert.True(response.IsSuccess);
     Assert.NotNull(response.Data?.EnrollmentId);
 
@@ -165,7 +165,7 @@ public class TestDataSeeder
   {
     var response = await _userService.ListAdminUser(new AdminListUserRequest());
     Assert.True(response.IsSuccess);
-    Assert.Equal(Message.UserListSuccessfully, response.Message);
+    Assert.Equal(Messages.User.Listed, response.Message);
 
     return response.Data!.Users.ToList();
   }
@@ -332,7 +332,7 @@ public class TestDataSeeder
     };
 
     var response = await _mockInterviewService.CreateMockInterview(request);
-    Assert.Equal(Message.MockInterviewCreatedSuccessfully, response.Message);
+    Assert.Equal(Messages.MockInterview.Created, response.Message);
     Assert.True(response.IsSuccess);
     Assert.NotNull(response.Data?.MockInterviewId);
 
@@ -396,7 +396,7 @@ public class TestDataSeeder
     };
 
     var response = await _mentorshipService.CreateAdminMentorship(request);
-    Assert.Equal(Message.MentorshipCreatedSuccessfully, response.Message);
+    Assert.Equal(Messages.Mentorship.Created, response.Message);
     Assert.True(response.IsSuccess);
     Assert.NotNull(response.Data?.MentorshipId);
 

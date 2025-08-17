@@ -46,7 +46,7 @@ public class UserService : IUserService
     var existingUser = await GetUserByEmailAsync(request.Email, cancellationToken);
     if (existingUser != null)
     {
-      return new ErrorServiceResponse<AdminCreateUserResponse>(Message.UserEmailExists);
+      return new ErrorServiceResponse<AdminCreateUserResponse>(Messages.User.EmailExists);
     }
 
     var slug = await createSlug(request.Name);
@@ -66,14 +66,14 @@ public class UserService : IUserService
       await AddUserAsync(user, cancellationToken);
       await _unitOfWork.SaveChangesAsync(cancellationToken);
       return new SuccessServiceResponse<AdminCreateUserResponse>(
-        Message.UserCreatedSuccessfully,
+        Messages.User.Created,
         new AdminCreateUserResponse { UserId = user.UserId }
       );
     }
     catch (Exception ex)
     {
-      _logger.LogError(ex, Message.UserCreationUnexpectedError);
-      return new ErrorServiceResponse<AdminCreateUserResponse>(Message.UserCreationUnexpectedError);
+      _logger.LogError(ex, Messages.User.CreationError);
+      return new ErrorServiceResponse<AdminCreateUserResponse>(Messages.User.CreationError);
     }
   }
 
@@ -85,19 +85,19 @@ public class UserService : IUserService
     var existingUser = await GetUserByEmailAsync(request.Email, cancellationToken);
     if (existingUser == null)
     {
-      return new ErrorServiceResponse<AdminDeleteUserResponse>(Message.UserEmailDoesNotExists);
+      return new ErrorServiceResponse<AdminDeleteUserResponse>(Messages.User.EmailDoesNotExist);
     }
 
     try
     {
       await DeleteUserAsync(existingUser.UserId, cancellationToken);
       await _unitOfWork.SaveChangesAsync(cancellationToken);
-      return new SuccessServiceResponse<AdminDeleteUserResponse>(Message.UserDeletedSuccessfully);
+      return new SuccessServiceResponse<AdminDeleteUserResponse>(Messages.User.Deleted);
     }
     catch (Exception ex)
     {
-      _logger.LogError(ex, Message.UserDeletionUnexpectedError);
-      return new ErrorServiceResponse<AdminDeleteUserResponse>(Message.UserDeletionUnexpectedError);
+      _logger.LogError(ex, Messages.User.DeletionError);
+      return new ErrorServiceResponse<AdminDeleteUserResponse>(Messages.User.DeletionError);
     }
   }
 
@@ -111,14 +111,14 @@ public class UserService : IUserService
       var users = await GetAllUsersAsync(null, cancellationToken);
       await _unitOfWork.SaveChangesAsync(cancellationToken);
       return new SuccessServiceResponse<AdminListUserResponse>(
-        Message.UserListSuccessfully,
+        Messages.User.Listed,
         new AdminListUserResponse { Users = users.ToList() }
       );
     }
     catch (Exception ex)
     {
-      _logger.LogError(ex, Message.UserListUnexpectedError);
-      return new ErrorServiceResponse<AdminListUserResponse>(Message.UserListUnexpectedError);
+      _logger.LogError(ex, Messages.User.ListError);
+      return new ErrorServiceResponse<AdminListUserResponse>(Messages.User.ListError);
     }
   }
 
@@ -130,7 +130,7 @@ public class UserService : IUserService
     var existingUser = await GetUserByIdAsync(request.UserId, cancellationToken);
     if (existingUser == null)
     {
-      return new ErrorServiceResponse<AdminUpdateUserResponse>(Message.UserIdDoesNotExists);
+      return new ErrorServiceResponse<AdminUpdateUserResponse>(Messages.User.IdDoesNotExist);
     }
 
     existingUser.DiscordId = request.DiscordId;
@@ -142,12 +142,12 @@ public class UserService : IUserService
     {
       await UpdateUserAsync(existingUser, cancellationToken);
       await _unitOfWork.SaveChangesAsync(cancellationToken);
-      return new SuccessServiceResponse<AdminUpdateUserResponse>(Message.UserUpdatedSuccessfully);
+      return new SuccessServiceResponse<AdminUpdateUserResponse>(Messages.User.Updated);
     }
     catch (Exception ex)
     {
-      _logger.LogError(ex, Message.UserUpdateUnexpectedError);
-      return new ErrorServiceResponse<AdminUpdateUserResponse>(Message.UserUpdateUnexpectedError);
+      _logger.LogError(ex, Messages.User.UpdateError);
+      return new ErrorServiceResponse<AdminUpdateUserResponse>(Messages.User.UpdateError);
     }
   }
 
@@ -159,11 +159,11 @@ public class UserService : IUserService
     var user = await GetUserByEmailAsync(email, cancellationToken);
     if (user == null)
     {
-      return new ErrorServiceResponse<GetCurrentUserResponse>(Message.UserEmailDoesNotExists);
+      return new ErrorServiceResponse<GetCurrentUserResponse>(Messages.User.EmailDoesNotExist);
     }
 
     return new SuccessServiceResponse<GetCurrentUserResponse>(
-      Message.UserEmailExists,
+      Messages.User.EmailExists,
       new GetCurrentUserResponse { User = user }
     );
   }
@@ -176,11 +176,11 @@ public class UserService : IUserService
     var user = await GetUserByEmailAsync(request.Email, cancellationToken);
     if (user == null)
     {
-      return new ErrorServiceResponse<GetUserResponse>(Message.UserEmailDoesNotExists);
+      return new ErrorServiceResponse<GetUserResponse>(Messages.User.EmailDoesNotExist);
     }
 
     return new SuccessServiceResponse<GetUserResponse>(
-      Message.GetUserSuccessfully,
+      Messages.User.Found,
       new GetUserResponse { User = user }
     );
   }
@@ -203,11 +203,11 @@ public class UserService : IUserService
 
     if (user == null)
     {
-      return new ErrorServiceResponse<GetUserResponse>(Message.UserEmailDoesNotExists);
+      return new ErrorServiceResponse<GetUserResponse>(Messages.User.EmailDoesNotExist);
     }
 
     return new SuccessServiceResponse<GetUserResponse>(
-      Message.GetUserSuccessfully,
+      Messages.User.Found,
       new GetUserResponse { User = user }
     );
   }
@@ -283,17 +283,15 @@ public class UserService : IUserService
       await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
       return new SuccessServiceResponse<CreateUserIfNotExistsResponse>(
-        Message.UserCreatedSuccessfully,
+        Messages.User.Created,
         new CreateUserIfNotExistsResponse()
       );
     }
     catch (Exception ex)
     {
-      _logger.LogError(ex, Message.UserCreationUnexpectedError);
+      _logger.LogError(ex, Messages.User.CreationError);
       await _unitOfWork.RollbackTransactionAsync(cancellationToken);
-      return new ErrorServiceResponse<CreateUserIfNotExistsResponse>(
-        Message.UserCreationUnexpectedError
-      );
+      return new ErrorServiceResponse<CreateUserIfNotExistsResponse>(Messages.User.CreationError);
     }
   }
 
@@ -328,7 +326,7 @@ public class UserService : IUserService
 
     if (user == null)
     {
-      throw new KeyNotFoundException(Message.UserIdDoesNotExists);
+      throw new KeyNotFoundException(Messages.User.IdDoesNotExist);
     }
 
     _userRepository.Delete(user, cancellationToken);
@@ -341,7 +339,7 @@ public class UserService : IUserService
     var existingUser = await _userRepository.GetByIdAsync(user.UserId, cancellationToken);
     if (existingUser == null)
     {
-      throw new KeyNotFoundException(Message.UserIdDoesNotExists);
+      throw new KeyNotFoundException(Messages.User.IdDoesNotExist);
     }
 
     _userRepository.Update(user, cancellationToken);

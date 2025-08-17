@@ -59,7 +59,7 @@ public class LeetcodeProblemRecommendationService : ILeetcodeProblemRecommendati
     {
       // Return success even though we didn't generate anything
       return new SuccessServiceResponse<GenerateLeetcodeProblemRecommendationResponse>(
-        Message.LeetcodeProblemRecommenderCreatedSuccessfully
+        Messages.LeetcodeProblemRecommendation.Created
       );
     }
 
@@ -67,7 +67,7 @@ public class LeetcodeProblemRecommendationService : ILeetcodeProblemRecommendati
     if (user == null)
     {
       return new ErrorServiceResponse<GenerateLeetcodeProblemRecommendationResponse>(
-        Message.UserEmailDoesNotExists
+        Messages.User.EmailDoesNotExist
       );
     }
 
@@ -87,7 +87,7 @@ public class LeetcodeProblemRecommendationService : ILeetcodeProblemRecommendati
     if (problemRecommendation == null)
     {
       return new ErrorServiceResponse<GenerateLeetcodeProblemRecommendationResponse>(
-        Message.LeetcodeProblemRecommenderNoLeetcodeProblemLeft
+        Messages.LeetcodeProblemRecommendation.NoProblemsLeft
       );
     }
 
@@ -103,7 +103,7 @@ public class LeetcodeProblemRecommendationService : ILeetcodeProblemRecommendati
       await AddLeetcodeProblemRecommendationAsync(newRecommendation, cancellationToken);
       await _unitOfWork.SaveChangesAsync(cancellationToken);
       return new SuccessServiceResponse<GenerateLeetcodeProblemRecommendationResponse>(
-        Message.LeetcodeProblemRecommenderCreatedSuccessfully,
+        Messages.LeetcodeProblemRecommendation.Created,
         new GenerateLeetcodeProblemRecommendationResponse
         {
           LeetcodeProblemRecommendationId = newRecommendation.LeetcodeProblemRecommendationId,
@@ -112,9 +112,9 @@ public class LeetcodeProblemRecommendationService : ILeetcodeProblemRecommendati
     }
     catch (Exception ex)
     {
-      _logger.LogError(ex, Message.LeetcodeProblemRecommenderUnexpectedError);
+      _logger.LogError(ex, Messages.LeetcodeProblemRecommendation.CreationError);
       return new ErrorServiceResponse<GenerateLeetcodeProblemRecommendationResponse>(
-        Message.LeetcodeProblemRecommenderUnexpectedError
+        Messages.LeetcodeProblemRecommendation.CreationError
       );
     }
   }
