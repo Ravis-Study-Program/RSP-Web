@@ -4,7 +4,7 @@ import { Button, Container, Flex, Group, Text, Title } from '@mantine/core';
 import { CreateUserIfNotExistsRequest, useCreateUserIfNotExists } from '@/generated/api/client';
 import classes from './EmailVerificiation.module.css';
 
-export function EmailVerificiationPage() {
+export default function EmailVerificiationPage() {
   const { logout, user, loginWithRedirect } = useAuth0();
   const { mutateAsync: createUser } = useCreateUserIfNotExists();
 

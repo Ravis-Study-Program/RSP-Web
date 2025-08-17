@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { IconEdit, IconTrash } from '@tabler/icons-react';
 import { QueryObserverResult, RefetchOptions } from '@tanstack/react-query';
 import {
@@ -8,6 +8,7 @@ import {
   useMantineReactTable,
 } from 'mantine-react-table';
 import { ActionIcon, Flex, Text, Title, Tooltip } from '@mantine/core';
+import { useLocalStorage } from '@mantine/hooks';
 import { modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
 import {
@@ -24,6 +25,17 @@ import { StudentRolePromotionUpdateModal } from './StudentRolePromotionUpdateMod
 import classes from './MenteesTable.module.css';
 
 export const MenteesTable = ({ refetchMentorships, mentorships }: MenteesTableProps) => {
+  const [pageSize, setPageSize] = useLocalStorage({
+    key: 'page-size',
+    defaultValue: 10,
+    getInitialValueInEffect: false,
+  });
+
+  const [pagination, setPagination] = useState({
+    pageIndex: 0,
+    pageSize,
+  });
+
   const { seasonSlug } = useSeasonSlug();
   const { data: userResponse } = useGetCurrentUser();
   const email = userResponse?.responseBody?.user.email ?? '';
@@ -111,6 +123,11 @@ export const MenteesTable = ({ refetchMentorships, mentorships }: MenteesTablePr
     mantinePaperProps: {
       className: classes.table,
     },
+    onPaginationChange: (updater) => {
+      const next = typeof updater === 'function' ? updater(pagination) : updater;
+      setPageSize(next.pageSize);
+      setPagination(next);
+    },
     enableEditing: true,
     initialState: {
       density: 'xs',
@@ -149,6 +166,7 @@ export const MenteesTable = ({ refetchMentorships, mentorships }: MenteesTablePr
       </Flex>
     ),
     state: {
+      pagination,
       isSaving:
         isKickingStudentStatus === 'pending' || isUpdatingStudentRolePromotionStatus === 'pending',
     },

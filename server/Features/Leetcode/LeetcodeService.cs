@@ -247,12 +247,19 @@ public class LeetcodeService : ILeetcodeService
     CancellationToken cancellationToken = default
   )
   {
-    return await _cache.GetOrCreateAsync(
+    var response = await _cache.GetOrCreateAsync(
       routeKey: RouteCacheKeys.ListLeetcodeProblems,
       primaryKey: null,
       factory: () => _listLeetcodeProblems(request, cancellationToken),
       ttl: TimeSpan.FromDays(1)
     );
+
+    if (response == null)
+    {
+      throw new Exception("Error listing leetcode problems");
+    }
+
+    return response;
   }
 
   private async Task<IServiceResponse<ListLeetcodeProblemsResponse>> _listLeetcodeProblems(

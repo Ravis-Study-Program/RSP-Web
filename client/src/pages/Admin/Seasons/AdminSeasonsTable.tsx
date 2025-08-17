@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { IconEdit, IconTrash } from '@tabler/icons-react';
 import {
   MantineReactTable,
@@ -7,7 +7,9 @@ import {
   MRT_Row,
   useMantineReactTable,
 } from 'mantine-react-table';
+import { Link } from 'react-router-dom';
 import { ActionIcon, Anchor, Button, Flex, Text, Title, Tooltip } from '@mantine/core';
+import { useLocalStorage } from '@mantine/hooks';
 import { modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
 import {
@@ -23,6 +25,17 @@ import { AdminSeasonsUpdateModal } from './AdminSeasonsUpdateModal';
 import classes from './AdminSeasonsTable.module.css';
 
 export const AdminSeasonsTable = () => {
+  const [pageSize, setPageSize] = useLocalStorage({
+    key: 'page-size',
+    defaultValue: 10,
+    getInitialValueInEffect: false,
+  });
+
+  const [pagination, setPagination] = useState({
+    pageIndex: 0,
+    pageSize,
+  });
+
   const {
     data: seasonResponse,
     isError: isLoadingSeasonsError,
@@ -76,7 +89,11 @@ export const AdminSeasonsTable = () => {
         accessorFn: (row) => row.name,
         header: 'Name',
         Cell: ({ row }) => {
-          return <Anchor href={`/seasons/${row.original.slug}`}>{row.original.name}</Anchor>;
+          return (
+            <Anchor component={Link} to={`/seasons/${row.original.slug}`}>
+              {row.original.name}
+            </Anchor>
+          );
         },
       },
       {
@@ -105,10 +122,6 @@ export const AdminSeasonsTable = () => {
         accessorKey: 'location',
         header: 'Location',
       },
-      {
-        accessorKey: 'imageUrl',
-        header: 'Image Url',
-      },
     ],
     []
   );
@@ -134,14 +147,19 @@ export const AdminSeasonsTable = () => {
         className: classes.modalCloseButton,
       },
     },
+    onPaginationChange: (updater) => {
+      const next = typeof updater === 'function' ? updater(pagination) : updater;
+      setPageSize(next.pageSize);
+      setPagination(next);
+    },
     editDisplayMode: 'modal',
     enableEditing: true,
     initialState: {
       density: 'xs',
       sorting: [
         {
-          id: 'startDateInclusiveUtc',
-          desc: true,
+          id: 'name',
+          desc: false,
         },
       ],
     },
@@ -193,6 +211,7 @@ export const AdminSeasonsTable = () => {
       </Button>
     ),
     state: {
+      pagination,
       isLoading: isLoadingSeasons,
       isSaving:
         isCreatingSeasonStatus === 'pending' ||

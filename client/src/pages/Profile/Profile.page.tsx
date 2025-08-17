@@ -5,7 +5,6 @@ import { useAuth0 } from '@auth0/auth0-react';
 import { IconCheck } from '@tabler/icons-react';
 import { useSearchParams } from 'react-router-dom';
 import { Avatar, Card, Grid, Group, SegmentedControl, Text, Timeline } from '@mantine/core';
-import { Layout } from '@/components/Layout/Layout';
 import {
   EnrollmentResponseDto,
   SeasonRole,
@@ -106,37 +105,35 @@ export default function ProfilePage() {
   }
 
   return (
-    <Layout>
-      <Grid gutter={{ base: 'md', xs: 'md', md: 'xl', xl: 'xl' }}>
-        <Grid.Col span={{ base: 12, sm: 12, md: 12, lg: 3, xl: 2 }}>
-          <ProfileSummary
-            problemsCount={problemAttemptsResponse?.responseBody?.problemAttempts.length || 0}
-            mockInterviewsCount={mockInterviewsResponse?.responseBody?.mockInterviews.length || 0}
-            name={user?.name || ''}
-            seasonRole={seasonRole}
-            studentRole={null}
-          />
-          <ProfileTimeline enrollments={enrollmentsResponse?.responseBody?.enrollments || []} />
-        </Grid.Col>
-        <Grid.Col span={{ base: 12, sm: 12, md: 12, lg: 9, xl: 10 }}>
-          <SegmentedControl
-            onChange={(value: any) =>
-              setTimeout(() => {
-                setSection(value);
-              }, 150)
-            }
-            mb={10}
-            className={classes.control}
-            size="sm"
-            data={['Leetcode', 'Mock Interviews']}
-          />
+    <Grid gutter={{ base: 'md', xs: 'md', md: 'xl', xl: 'xl' }}>
+      <Grid.Col span={{ base: 12, sm: 12, md: 12, lg: 3, xl: 2 }}>
+        <ProfileSummary
+          problemsCount={problemAttemptsResponse?.responseBody?.problemAttempts.length || 0}
+          mockInterviewsCount={mockInterviewsResponse?.responseBody?.mockInterviews.length || 0}
+          name={user?.name || ''}
+          seasonRole={seasonRole}
+          studentRole={null}
+        />
+        <ProfileTimeline enrollments={enrollmentsResponse?.responseBody?.enrollments || []} />
+      </Grid.Col>
+      <Grid.Col span={{ base: 12, sm: 12, md: 12, lg: 9, xl: 10 }}>
+        <SegmentedControl
+          onChange={(value: any) =>
+            setTimeout(() => {
+              setSection(value);
+            }, 150)
+          }
+          mb={10}
+          className={classes.control}
+          size="sm"
+          data={['Leetcode', 'Mock Interviews']}
+        />
 
-          {section === 'Leetcode' ? LeetcodeComponent : null}
+        {section === 'Leetcode' ? LeetcodeComponent : null}
 
-          {section === 'Mock Interviews' ? MockInterviewComponent : null}
-        </Grid.Col>
-      </Grid>
-    </Layout>
+        {section === 'Mock Interviews' ? MockInterviewComponent : null}
+      </Grid.Col>
+    </Grid>
   );
 }
 

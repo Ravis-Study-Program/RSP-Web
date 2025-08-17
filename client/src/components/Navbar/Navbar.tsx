@@ -9,7 +9,7 @@ import {
   IconTrophy,
   IconUser,
 } from '@tabler/icons-react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   Anchor,
   Avatar,
@@ -100,28 +100,27 @@ export function Navbar({ isLoading, user, tabs, isSeasonUrl, enrollments = [] }:
         nothingFound="Nothing found..."
         highlightQuery
         searchProps={{
-          leftSection: <IconSearch size={20} stroke={1.5} />,
+          leftSection: <IconSearch size={30} stroke={1.5} />,
           placeholder: 'Search...',
         }}
       />
-      <div className={classes.header}>
-        <Flex justify="center" align="center">
-          <Anchor
-            href="/seasons"
-            underline="never"
-            c={computedColorScheme === 'light' ? 'dark' : 'white'}
-          >
-            <Title order={1} size="h3" ta="center">
-              Ravi's Study Program
-            </Title>
-          </Anchor>
-          {user?.isAdmin ? (
-            <Badge color="red" size="xs" ml={8} mt={3}>
-              Admin
-            </Badge>
-          ) : null}
-        </Flex>
-      </div>
+      <Flex justify="center" align="center" className={classes.header}>
+        <Anchor
+          component={Link}
+          to="/seasons"
+          underline="never"
+          c={computedColorScheme === 'light' ? 'dark' : 'white'}
+        >
+          <Title order={1} size="h4" ta="center">
+            Ravi's Study Program
+          </Title>
+        </Anchor>
+        {user?.isAdmin ? (
+          <Badge color="red" size="sm" ml={8}>
+            Admin
+          </Badge>
+        ) : null}
+      </Flex>
 
       <TextInput
         placeholder="Search"
@@ -191,15 +190,15 @@ export function Navbar({ isLoading, user, tabs, isSeasonUrl, enrollments = [] }:
             <Menu.Label>Application</Menu.Label>
             <Menu.Item
               leftSection={<IconUser style={{ width: rem(14), height: rem(14) }} />}
-              component="a"
-              href="/profile"
+              component={Link}
+              to="/profile"
             >
               Profile
             </Menu.Item>
             <Menu.Item
               leftSection={<IconSettings style={{ width: rem(14), height: rem(14) }} />}
-              component="a"
-              href="/settings"
+              component={Link}
+              to="/settings"
             >
               Settings
             </Menu.Item>

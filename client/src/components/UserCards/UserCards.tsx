@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import {
   Avatar,
   Badge,
@@ -191,8 +192,8 @@ export function UserCards({ users }: UserCardsProps) {
             )}
 
             <Button
-              component="a"
-              href={`/profile?user=${user.slug}`}
+              component={Link}
+              to={`/profile?user=${user.slug}`}
               radius="md"
               mt="sm"
               size="xs"

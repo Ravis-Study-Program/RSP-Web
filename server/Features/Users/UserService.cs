@@ -135,6 +135,7 @@ public class UserService : IUserService
 
     existingUser.DiscordId = request.DiscordId;
     existingUser.Name = request.Name;
+    existingUser.Email = request.Email;
     existingUser.ProfileImage = request.ProfileImage;
     existingUser.IsAdmin = request.IsAdmin;
 

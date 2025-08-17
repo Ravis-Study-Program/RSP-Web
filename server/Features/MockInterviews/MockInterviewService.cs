@@ -221,6 +221,10 @@ public class MockInterviewService : IMockInterviewService
         factory: () => _listMockInterview(modifiedRequest, cancellationToken),
         ttl: TimeSpan.FromHours(1)
       );
+      if (response == null)
+      {
+        throw new Exception("Error listing mock interviews");
+      }
 
       // Early return if any failure occurs
       if (!response.IsSuccess || response.Data == null)

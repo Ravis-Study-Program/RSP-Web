@@ -1,5 +1,4 @@
-import { Anchor, Flex, SimpleGrid, Text, useComputedColorScheme } from '@mantine/core';
-import { Layout } from '@/components/Layout/Layout';
+import { Card, Flex, SimpleGrid, Text, useComputedColorScheme } from '@mantine/core';
 import { getTabs } from '@/components/Navbar/NavbarRoutes';
 import { useSeasonSlug } from '@/shared/hooks/useSeasonSlug';
 import { useUserAndEnrollment } from '@/shared/hooks/useUserAndEnrollment';
@@ -17,28 +16,33 @@ export default function SeasonsOverviewPage() {
   }
 
   const items = tabItems.map((item) => (
-    <Anchor underline="never" key={item.label} className={classes.item} href={item.link}>
+    <Card
+      withBorder
+      shadow="sm"
+      key={item.label}
+      className={classes.item}
+      component="a"
+      href={item.link}
+    >
       <item.icon color={computedColorScheme === 'light' ? 'darkslategray' : 'white'} size="2rem" />
       <Text size="sm" mt={7} fw={500} c={computedColorScheme === 'light' ? 'dark' : 'white'}>
         {item.label}
       </Text>
-    </Anchor>
+    </Card>
   ));
 
   return (
-    <Layout>
-      <Flex justify="center">
-        <SimpleGrid
-          className={classes.grid}
-          cols={2}
-          w={{ base: '100%', sm: '90%', md: '80%', lg: '60%', xl: '50%' }}
-          spacing="xl"
-          verticalSpacing="xl"
-          mt="xl"
-        >
-          {items}
-        </SimpleGrid>
-      </Flex>
-    </Layout>
+    <Flex justify="center">
+      <SimpleGrid
+        className={classes.grid}
+        cols={2}
+        w={{ base: '100%', sm: '90%', md: '80%', lg: '60%', xl: '50%' }}
+        spacing="xl"
+        verticalSpacing="xl"
+        mt="xl"
+      >
+        {items}
+      </SimpleGrid>
+    </Flex>
   );
 }

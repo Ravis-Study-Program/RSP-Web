@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { IconEdit, IconTrash } from '@tabler/icons-react';
 import {
   MantineReactTable,
@@ -7,6 +7,7 @@ import {
   useMantineReactTable,
 } from 'mantine-react-table';
 import { ActionIcon, Button, Flex, Text, Title, Tooltip } from '@mantine/core';
+import { useLocalStorage } from '@mantine/hooks';
 import { modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
 import {
@@ -22,6 +23,17 @@ import { AdminUsersUpdateModal } from './AdminUsersUpdateModal';
 import classes from './AdminUsersTable.module.css';
 
 export const AdminUsersTable = () => {
+  const [pageSize, setPageSize] = useLocalStorage({
+    key: 'page-size',
+    defaultValue: 10,
+    getInitialValueInEffect: false,
+  });
+
+  const [pagination, setPagination] = useState({
+    pageIndex: 0,
+    pageSize,
+  });
+
   const {
     data: userResponse,
     isError: isLoadingUsersError,
@@ -117,14 +129,19 @@ export const AdminUsersTable = () => {
         className: classes.modalCloseButton,
       },
     },
+    onPaginationChange: (updater) => {
+      const next = typeof updater === 'function' ? updater(pagination) : updater;
+      setPageSize(next.pageSize);
+      setPagination(next);
+    },
     editDisplayMode: 'modal',
     enableEditing: true,
     initialState: {
       density: 'xs',
       sorting: [
         {
-          id: 'email',
-          desc: true,
+          id: 'name',
+          desc: false,
         },
       ],
     },
@@ -172,6 +189,7 @@ export const AdminUsersTable = () => {
       </Button>
     ),
     state: {
+      pagination,
       isLoading: isLoadingUsers,
       isSaving:
         isCreatingUserStatus === 'pending' ||

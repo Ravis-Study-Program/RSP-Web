@@ -1,5 +1,5 @@
+import { Link } from 'react-router-dom';
 import { Button, Card, Grid, Group, Image, Skeleton, Text } from '@mantine/core';
-import { Layout } from '@/components/Layout/Layout';
 import { SeasonRole, useGetIsCurrentUserEnrolled } from '@/generated/api/client';
 import { useSeasonSlug } from '@/shared/hooks/useSeasonSlug';
 import classes from './Resources.module.css';
@@ -51,11 +51,9 @@ export default function ResourcesPage() {
   }
 
   return (
-    <Layout>
-      <Grid gutter={{ base: 5, xs: 'md', md: 'xl', xl: 'xl' }}>
-        {!isLoading ? <ResourcesGridCards resources={resources} /> : <ResourcesSkeletonCards />}
-      </Grid>
-    </Layout>
+    <Grid gutter={{ base: 5, xs: 'md', md: 'xl', xl: 'xl' }}>
+      {!isLoading ? <ResourcesGridCards resources={resources} /> : <ResourcesSkeletonCards />}
+    </Grid>
   );
 }
 
@@ -99,9 +97,9 @@ const ResourcesGridCards = ({ resources }: ResourcesListProps) => {
               fullWidth
               mt="md"
               radius="md"
-              component="a"
+              component={Link}
               target="_blank"
-              href={resource.link}
+              to={resource.link}
             >
               View
             </Button>

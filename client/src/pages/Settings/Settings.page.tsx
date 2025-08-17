@@ -1,5 +1,4 @@
 import { Card, Grid, Group, Switch, Text } from '@mantine/core';
-import { Layout } from '@/components/Layout/Layout';
 import classes from './Settings.module.css';
 
 const data = [
@@ -41,12 +40,10 @@ export function NotificationSettings() {
 
 export default function SettingsPage() {
   return (
-    <Layout>
-      <Grid gutter={{ base: 5, xs: 'md', md: 'xl' }}>
-        <Grid.Col span={{ base: 12, sm: 6, md: 6, lg: 6 }}>
-          <NotificationSettings />
-        </Grid.Col>
-      </Grid>
-    </Layout>
+    <Grid gutter={{ base: 5, xs: 'md', md: 'xl' }}>
+      <Grid.Col span={{ base: 12, sm: 6, md: 6, lg: 6 }}>
+        <NotificationSettings />
+      </Grid.Col>
+    </Grid>
   );
 }

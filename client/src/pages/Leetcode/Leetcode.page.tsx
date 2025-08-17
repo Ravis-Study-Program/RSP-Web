@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Flex, Group, MultiSelect, Select } from '@mantine/core';
-import { Layout } from '@/components/Layout/Layout';
+import { useLocalStorage } from '@mantine/hooks';
 import {
   useGetCurrentUser,
   useGetIsCurrentUserEnrolled,
@@ -31,9 +31,10 @@ export default function LeetcodePage() {
   const [selectedSeasonWeeks, setSelectedSeasonWeeks] = useState<string[]>([]);
   const [selectedLeetcodeDifficulties, setSelectedLeetcodeDifficulties] = useState<string[]>([]);
   const [selectedLeetcodeCategories, setSelectedLeetcodeCategories] = useState<string[]>([]);
-  const [selectedGraphPreset, setSelectedGraphPreset] = useState<LeetcodeGraphPreset>(
-    LeetcodeGraphPreset.ScatterChart
-  );
+  const [selectedGraphPreset, setSelectedGraphPreset] = useLocalStorage({
+    key: 'leetcode-graph-preset',
+    defaultValue: LeetcodeGraphPreset.ScatterChart,
+  });
 
   const { data: currentUserResponse } = useGetCurrentUser();
   const email = currentUserResponse?.responseBody?.user.email ?? '';
@@ -105,7 +106,7 @@ export default function LeetcodePage() {
     .sort((a, b) => a.label.localeCompare(b.label));
 
   return (
-    <Layout>
+    <>
       <Flex justify="space-between">
         <Group mb="lg" justify="flex-start">
           <Select
@@ -177,6 +178,6 @@ export default function LeetcodePage() {
         showAuthor={false}
         showCategory
       />
-    </Layout>
+    </>
   );
 }

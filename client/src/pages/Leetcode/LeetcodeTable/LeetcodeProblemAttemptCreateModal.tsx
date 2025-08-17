@@ -18,7 +18,9 @@ import {
 import { createOptionsFilter } from '@/shared/table/globalFilters';
 
 const schema = z.object({
-  leetcodeProblemId: z.string(),
+  leetcodeProblemId: z.string().min(1, {
+    message: 'Leetcode must not be empty',
+  }),
   attemptStartDateUtc: z.string().min(1),
   timeTakenInMinutes: z
     .number()
@@ -45,7 +47,7 @@ export const LeetcodeProblemAttemptCreateModal = ({
     mode: 'uncontrolled',
     initialValues: {
       leetcodeProblemId: '',
-      attemptStartDateUtc: dayjs().format('YYYY-MM-DD'),
+      attemptStartDateUtc: dayjs().format('YYYY-MM-DD HH:mm'),
       timeTakenInMinutes: 0,
       notes: '',
     },
@@ -122,13 +124,17 @@ export const LeetcodeProblemAttemptCreateModal = ({
           mt="sm"
           label="Attempt Start Date"
           placeholder="Pick a start date"
-          valueFormat="YYYY-MM-DD"
+          valueFormat="YYYY-MM-DD HH:mm"
           minDate={daysBeforeToday(3)}
           maxDate={new Date()}
           withAsterisk
           highlightToday
           clearable
           error={form.errors.attemptStartDateUtc}
+          timePickerProps={{
+            withDropdown: true,
+            popoverProps: { withinPortal: false },
+          }}
         />
         <NumberInput
           {...form.getInputProps('timeTakenInMinutes')}
@@ -141,7 +147,7 @@ export const LeetcodeProblemAttemptCreateModal = ({
         <Textarea
           {...form.getInputProps('notes')}
           mt="sm"
-          label="Notes (Optional)"
+          label="Notes"
           autosize
           minRows={2}
           maxRows={6}

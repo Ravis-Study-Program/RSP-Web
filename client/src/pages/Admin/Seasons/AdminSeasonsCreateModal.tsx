@@ -59,8 +59,8 @@ export const AdminSeasonsCreateModal = ({
     initialValues: {
       name: '',
       slug: '',
-      startDateInclusiveUtc: dayjs().format('YYYY-MM-DD'),
-      endDateInclusiveUtc: dayjs().format('YYYY-MM-DD'),
+      startDateInclusiveUtc: dayjs().format('YYYY-MM-DD HH:mm'),
+      endDateInclusiveUtc: dayjs().format('YYYY-MM-DD HH:mm'),
       location: '',
       imageUrl: '',
     },
@@ -135,7 +135,7 @@ export const AdminSeasonsCreateModal = ({
           mt="sm"
           label="Start Date"
           placeholder="Pick a start date"
-          valueFormat="YYYY-MM-DD"
+          valueFormat="YYYY-MM-DD HH:mm"
           minDate={new Date()}
           error={form.errors.startDateInclusiveUtc}
           withAsterisk
@@ -147,7 +147,7 @@ export const AdminSeasonsCreateModal = ({
           mt="sm"
           label="End Date"
           placeholder="Pick an end date"
-          valueFormat="YYYY-MM-DD"
+          valueFormat="YYYY-MM-DD HH:mm"
           minDate={new Date()}
           error={form.errors.endDateInclusiveUtc}
           withAsterisk
@@ -163,16 +163,6 @@ export const AdminSeasonsCreateModal = ({
           data={Object.keys(locationImages)}
           filter={createOptionsFilter()}
           onChange={handleLocationChange}
-        />
-        <TextInput
-          {...form.getInputProps('imageUrl')}
-          mt="sm"
-          label="Image URL"
-          description="This field will be automatically populated by location"
-          placeholder="Enter Image"
-          withAsterisk
-          disabled
-          hidden
         />
         <Flex justify="flex-end">
           <Button type="submit" mt="xl" mb="md">

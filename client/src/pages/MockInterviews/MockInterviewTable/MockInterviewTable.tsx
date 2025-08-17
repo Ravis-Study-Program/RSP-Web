@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { IconEdit, IconTrash } from '@tabler/icons-react';
 import { QueryObserverResult, RefetchOptions } from '@tanstack/react-query';
 import {
@@ -8,7 +8,9 @@ import {
   MRT_Row,
   useMantineReactTable,
 } from 'mantine-react-table';
+import { Link } from 'react-router-dom';
 import { ActionIcon, Anchor, Box, Button, Flex, Table, Text, Title, Tooltip } from '@mantine/core';
+import { useLocalStorage } from '@mantine/hooks';
 import { modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
 import {
@@ -34,6 +36,17 @@ export const MockInterviewTable = ({
   mockInterviews,
   enableEditing,
 }: MockInterviewTableProps) => {
+  const [pageSize, setPageSize] = useLocalStorage({
+    key: 'page-size',
+    defaultValue: 10,
+    getInitialValueInEffect: false,
+  });
+
+  const [pagination, setPagination] = useState({
+    pageIndex: 0,
+    pageSize,
+  });
+
   const {
     data: leetcodeProblemsResponse,
     isError: isLoadingLeetcodeProblemsError,
@@ -191,6 +204,11 @@ export const MockInterviewTable = ({
         className: classes.modalCloseButton,
       },
     },
+    onPaginationChange: (updater) => {
+      const next = typeof updater === 'function' ? updater(pagination) : updater;
+      setPageSize(next.pageSize);
+      setPagination(next);
+    },
     editDisplayMode: 'modal',
     enableEditing,
     initialState: {
@@ -198,7 +216,7 @@ export const MockInterviewTable = ({
       sorting: [
         {
           id: 'startDate',
-          desc: true,
+          desc: false,
         },
       ],
     },
@@ -267,6 +285,7 @@ export const MockInterviewTable = ({
         </Button>
       ),
     state: {
+      pagination,
       isLoading: isLoadingLeetcodeProblems || isLoadingUsers,
       isSaving:
         isCreatingMockInterviewStatus === 'pending' ||
@@ -354,7 +373,7 @@ const CustomMockInterviewRoundsInnerTable = ({ rounds }: InnerMockInterviewTable
           <Text size="sm">{customMock.content}</Text>
         </Table.Td>
         <Table.Td>
-          <Anchor size="sm" fw={500} href={customMock.link}>
+          <Anchor component={Link} size="sm" fw={500} to={customMock.link}>
             Link
           </Anchor>
         </Table.Td>

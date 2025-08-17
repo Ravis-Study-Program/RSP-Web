@@ -16,8 +16,8 @@ const schema = z.object({
   name: z.string().min(1),
   email: z.string().email().min(1),
   isAdmin: z.boolean(),
-  discordId: z.string().min(1),
-  profileImage: z.string().url(),
+  discordId: z.string(),
+  profileImage: z.string().url().or(z.literal('')).optional(),
 });
 
 export const AdminUsersCreateModal = ({
@@ -89,14 +89,12 @@ export const AdminUsersCreateModal = ({
           mt="sm"
           label="Discord ID"
           placeholder="Enter user Discord ID"
-          withAsterisk
         />
         <TextInput
           {...form.getInputProps('profileImage')}
           mt="sm"
           label="Profile Image"
           placeholder="Enter user Profile Image"
-          withAsterisk
         />
         <Checkbox
           {...form.getInputProps('isAdmin', { type: 'checkbox' })}

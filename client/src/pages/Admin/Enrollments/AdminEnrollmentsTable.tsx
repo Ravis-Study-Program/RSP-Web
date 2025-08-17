@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { IconEdit, IconTrash } from '@tabler/icons-react';
 import {
   MantineReactTable,
@@ -7,6 +7,7 @@ import {
   useMantineReactTable,
 } from 'mantine-react-table';
 import { ActionIcon, Button, Flex, Text, Title, Tooltip } from '@mantine/core';
+import { useLocalStorage } from '@mantine/hooks';
 import { modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
 import {
@@ -26,6 +27,17 @@ import { AdminEnrollmentsUpdateModal } from './AdminEnrollmentsUpdateModal';
 import classes from './AdminEnrollmentsTable.module.css';
 
 export const AdminEnrollmentsTable = () => {
+  const [pageSize, setPageSize] = useLocalStorage({
+    key: 'page-size',
+    defaultValue: 10,
+    getInitialValueInEffect: false,
+  });
+
+  const [pagination, setPagination] = useState({
+    pageIndex: 0,
+    pageSize,
+  });
+
   const {
     data: enrollmentResponse,
     isError: isLoadingEnrollmentsError,
@@ -146,6 +158,11 @@ export const AdminEnrollmentsTable = () => {
         className: classes.modalCloseButton,
       },
     },
+    onPaginationChange: (updater) => {
+      const next = typeof updater === 'function' ? updater(pagination) : updater;
+      setPageSize(next.pageSize);
+      setPagination(next);
+    },
     editDisplayMode: 'modal',
     enableEditing: true,
     initialState: {
@@ -209,6 +226,7 @@ export const AdminEnrollmentsTable = () => {
       </Button>
     ),
     state: {
+      pagination,
       isLoading: isLoadingEnrollments || isLoadingSeasons || isLoadingUsers,
       isSaving:
         isCreatingEnrollmentStatus === 'pending' ||

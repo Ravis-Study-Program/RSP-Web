@@ -204,6 +204,10 @@ public class ProblemAttemptService : IProblemAttemptService
         factory: () => _listProblemAttempt(modifiedRequest, cancellationToken),
         ttl: TimeSpan.FromHours(1)
       );
+      if (response == null)
+      {
+        throw new Exception("Error listing problem attempts");
+      }
 
       // Early return if any failure occurs
       if (!response.IsSuccess || response.Data == null)

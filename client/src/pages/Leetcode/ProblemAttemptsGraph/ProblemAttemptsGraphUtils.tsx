@@ -163,10 +163,11 @@ export const LeetcodeScatterChart = ({
         withBorder
         style={{
           position: 'absolute',
-          left: (coordinate?.x ?? 0) + 12,
+          left: (coordinate?.x ?? 0) - 222,
           top: (coordinate?.y ?? 0) - 30,
           pointerEvents: 'none',
           minWidth: 200,
+          zIndex: 1000,
         }}
       >
         <Text fz="sm">

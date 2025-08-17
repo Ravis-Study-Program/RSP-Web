@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Anchor, Button, Container, Group, Text, Title } from '@mantine/core';
 import classes from './NotFound.module.css';
 
@@ -22,7 +22,7 @@ export default function NotFoundPage() {
             <Button onClick={goBack} size="md" color="gray">
               Go Back
             </Button>
-            <Anchor href="/" size="md">
+            <Anchor component={Link} to="/" size="md">
               <Button size="md">Home Page</Button>
             </Anchor>
           </Group>
