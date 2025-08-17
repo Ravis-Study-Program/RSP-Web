@@ -1,6 +1,7 @@
-import { useState } from 'react';
 import { IconChevronRight } from '@tabler/icons-react';
-import { Box, Collapse, Group, Text, ThemeIcon, UnstyledButton } from '@mantine/core';
+import { Link } from 'react-router-dom';
+import { Anchor, Box, Collapse, Group, Text, ThemeIcon, UnstyledButton } from '@mantine/core';
+import { useLocalStorage } from '@mantine/hooks';
 import { TabItem } from '../Navbar/NavbarRoutes';
 import classes from './NavbarLinksGroup.module.css';
 
@@ -22,12 +23,17 @@ export function LinksGroup({
   activeLink,
 }: LinksGroupProps) {
   const hasLinks = Array.isArray(links);
-  const [opened, setOpened] = useState(initiallyOpened || false);
+
+  const [opened, setOpened] = useLocalStorage({
+    key: `navbar-group-${label}-opened`,
+    defaultValue: initiallyOpened,
+  });
+
   const items = (hasLinks ? links.filter((item) => !item.hidden) : []).map((innerLink) => (
-    <Text<'a'>
-      component="a"
+    <Anchor
+      component={Link}
       className={`${classes.innerLink} ${activeLink === innerLink.link ? classes.activeLink : ''}`}
-      href={innerLink.link}
+      to={innerLink.link || ''}
       key={innerLink.label}
     >
       <Box style={{ display: 'flex', alignItems: 'center' }}>
@@ -38,7 +44,7 @@ export function LinksGroup({
           {innerLink.label}
         </Text>
       </Box>
-    </Text>
+    </Anchor>
   ));
 
   const button = (
@@ -75,13 +81,13 @@ export function LinksGroup({
   }
 
   return (
-    <Text
-      component="a"
-      href={link}
+    <Anchor
+      component={Link}
+      to={link}
       key={link}
       className={`${classes.link} ${activeLink === link ? classes.activeLink : ''}`}
     >
       {button}
-    </Text>
+    </Anchor>
   );
 }

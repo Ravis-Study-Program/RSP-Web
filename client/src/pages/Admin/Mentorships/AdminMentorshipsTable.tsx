@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { IconEdit, IconTrash } from '@tabler/icons-react';
 import {
   MantineReactTable,
@@ -7,6 +7,7 @@ import {
   useMantineReactTable,
 } from 'mantine-react-table';
 import { ActionIcon, Button, Flex, Text, Title, Tooltip } from '@mantine/core';
+import { useLocalStorage } from '@mantine/hooks';
 import { modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
 import {
@@ -24,6 +25,17 @@ import { AdminMentorshipsUpdateModal } from './AdminMentorshipsUpdateModal';
 import classes from './AdminMentorshipsTable.module.css';
 
 export const AdminMentorshipsTable = () => {
+  const [pageSize, setPageSize] = useLocalStorage({
+    key: 'page-size',
+    defaultValue: 10,
+    getInitialValueInEffect: false,
+  });
+
+  const [pagination, setPagination] = useState({
+    pageIndex: 0,
+    pageSize,
+  });
+
   const {
     data: mentorshipResponse,
     isError: isLoadingMentorshipsError,
@@ -126,6 +138,11 @@ export const AdminMentorshipsTable = () => {
         className: classes.modalCloseButton,
       },
     },
+    onPaginationChange: (updater) => {
+      const next = typeof updater === 'function' ? updater(pagination) : updater;
+      setPageSize(next.pageSize);
+      setPagination(next);
+    },
     editDisplayMode: 'modal',
     enableEditing: true,
     initialState: {
@@ -189,6 +206,7 @@ export const AdminMentorshipsTable = () => {
       </Button>
     ),
     state: {
+      pagination,
       isLoading: isLoadingMentorships || isLoadingEnrollments || isLoadingSeasons,
       isSaving:
         isCreatingMentorshipStatus === 'pending' ||

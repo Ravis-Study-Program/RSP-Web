@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { Link, Outlet } from 'react-router-dom';
 import {
   Anchor,
   AppShell,
@@ -20,11 +20,7 @@ import { Navbar } from '../Navbar/Navbar';
 import { getTabs, lookupTabByLink, TabItem } from '../Navbar/NavbarRoutes';
 import classes from './Layout.module.css';
 
-interface LayoutProps {
-  children: ReactNode;
-}
-
-export function Layout({ children }: LayoutProps) {
+export function Layout() {
   const [opened, { toggle }] = useDisclosure();
   const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
   const { seasonSlug, pathSegments } = useSeasonSlug();
@@ -99,7 +95,8 @@ export function Layout({ children }: LayoutProps) {
         <Group className={classes.mobile_nav_header}>
           <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
           <Anchor
-            href="/seasons"
+            component={Link}
+            to="/seasons"
             underline="never"
             c={computedColorScheme === 'light' ? 'dark' : 'white'}
           >
@@ -116,7 +113,9 @@ export function Layout({ children }: LayoutProps) {
           isSeasonUrl={seasonSlug !== ''}
         />
       </AppShell.Navbar>
-      <AppShell.Main className={classes.main}>{children}</AppShell.Main>
+      <AppShell.Main className={classes.main}>
+        <Outlet />
+      </AppShell.Main>
     </AppShell>
   );
 }

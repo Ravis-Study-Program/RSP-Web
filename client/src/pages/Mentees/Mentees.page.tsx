@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react';
 import { Flex, Group, MultiSelect, SegmentedControl, Text } from '@mantine/core';
-import { Layout } from '@/components/Layout/Layout';
 import {
   useGetCurrentUserMentees,
   useGetIsCurrentUserEnrolled,
@@ -125,7 +124,7 @@ export default function MenteesPage() {
   );
 
   return (
-    <Layout>
+    <>
       <Flex justify="space-between" align="flex-start">
         <Group mb="lg" justify="flex-start">
           <SegmentedControl
@@ -161,6 +160,6 @@ export default function MenteesPage() {
       {section === 'Portfolio' ? PortfolioComponent : null}
 
       {section === 'Performance' ? PerformanceComponent : null}
-    </Layout>
+    </>
   );
 }

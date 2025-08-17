@@ -60,7 +60,7 @@ export const MockInterviewCreateModal = ({
   const form = useForm({
     mode: 'uncontrolled',
     initialValues: {
-      startDate: dayjs().format('YYYY-MM-DD'),
+      startDate: dayjs().format('YYYY-MM-DD HH:mm'),
       timeTakenInMinutes: 0,
       interviewee: '',
       behaviouralScore: 0,
@@ -175,7 +175,7 @@ export const MockInterviewCreateModal = ({
     const today = new Date();
     const resultDate = new Date();
     resultDate.setDate(today.getDate() - days);
-    return dayjs(resultDate).format('YYYY-MM-DD');
+    return dayjs(resultDate).format('YYYY-MM-DD HH:mm');
   };
 
   return (
@@ -189,13 +189,17 @@ export const MockInterviewCreateModal = ({
           mt="sm"
           label="Date"
           placeholder="Pick a start date"
-          valueFormat="YYYY-MM-DD HH:MM"
+          valueFormat="YYYY-MM-DD HH:mm"
           minDate={daysBeforeToday(3)}
           maxDate={new Date()}
           withAsterisk
           highlightToday
           clearable
           error={form.errors.startDate}
+          timePickerProps={{
+            withDropdown: true,
+            popoverProps: { withinPortal: false },
+          }}
         />
         <NumberInput
           {...form.getInputProps('timeTakenInMinutes')}

@@ -1,5 +1,4 @@
 import { Grid } from '@mantine/core';
-import { Layout } from '@/components/Layout/Layout';
 import {
   useFilterUsers,
   UserCards,
@@ -29,7 +28,7 @@ export default function SeasonUsersPage() {
     filtered: filteredUsers,
   } = useFilterUsers(users);
   return (
-    <Layout>
+    <>
       <UserFilterPanel
         allUsers={users}
         selectedNames={selectedNames}
@@ -50,6 +49,6 @@ export default function SeasonUsersPage() {
           <UserSkeletonCards />
         )}
       </Grid>
-    </Layout>
+    </>
   );
 }

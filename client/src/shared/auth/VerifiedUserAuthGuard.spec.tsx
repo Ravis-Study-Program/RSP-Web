@@ -4,6 +4,7 @@ import VerifiedUserAuthGuard from './VerifiedUserAuthGuard';
 
 const OutletMock = () => <div data-testid="outlet">Outlet</div>;
 const NavigateMock = () => <div data-testid="navigate">Navigate</div>;
+const LinkMock = () => <div data-testid="link">Link</div>;
 
 const mocks = vi.hoisted(() => ({
   useAuth0: vi.fn(),
@@ -18,6 +19,7 @@ vi.mock('react-router-dom', () => ({
   useNavigate: vi.fn(),
   Navigate: () => <NavigateMock />,
   Outlet: () => <OutletMock />,
+  Link: () => <LinkMock />,
 }));
 
 describe('VerifiedUserAuthGuard', () => {

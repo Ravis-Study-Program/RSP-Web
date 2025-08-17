@@ -1,6 +1,5 @@
 import { Link, Navigate } from 'react-router-dom';
 import { Badge, Button, Card, Grid, Group, Image, Skeleton, Text } from '@mantine/core';
-import { Layout } from '@/components/Layout/Layout';
 import {
   EnrollmentResponseDto,
   useGetCurrentUser,
@@ -28,15 +27,13 @@ export default function SeasonsPage() {
   }
 
   return (
-    <Layout>
-      <Grid gutter={{ base: 5, xs: 'md', md: 'xl', xl: 50 }}>
-        {!isLoadingEnrollments && !isFetchingEnrollments && !isLoadingEnrollmentsError ? (
-          <SeasonsGridCards enrollments={enrollmentsResponse?.responseBody?.enrollments} />
-        ) : (
-          <SeasonsSkeletonCards />
-        )}
-      </Grid>
-    </Layout>
+    <Grid gutter={{ base: 5, xs: 'md', md: 'xl', xl: 50 }}>
+      {!isLoadingEnrollments && !isFetchingEnrollments && !isLoadingEnrollmentsError ? (
+        <SeasonsGridCards enrollments={enrollmentsResponse?.responseBody?.enrollments} />
+      ) : (
+        <SeasonsSkeletonCards />
+      )}
+    </Grid>
   );
 }
 

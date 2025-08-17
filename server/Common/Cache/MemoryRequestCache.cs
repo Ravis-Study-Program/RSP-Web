@@ -28,7 +28,7 @@ public class MemoryRequestCache : IRequestCache
     _cache = cache;
   }
 
-  public async Task<T> GetOrCreateAsync<T>(
+  public async Task<T?> GetOrCreateAsync<T>(
     string routeKey,
     string? primaryKey,
     Func<Task<T>> factory,
@@ -47,18 +47,17 @@ public class MemoryRequestCache : IRequestCache
 
     CacheStatus.WithLabels(routeKey, "miss").Inc();
     var fresh = await factory();
-
-    if (fresh == null)
+    RequestDuration.WithLabels(routeKey, "miss").Observe(sw.Elapsed.TotalSeconds);
+    if (fresh is null)
     {
-      throw new InvalidOperationException($"Factory returned null for key '{cacheKey}'");
+      return default;
     }
 
     _cache.Set(cacheKey, fresh, ttl ?? _defaultTtl);
-    RequestDuration.WithLabels(routeKey, "miss").Observe(sw.Elapsed.TotalSeconds);
     return fresh;
   }
 
-  public Task<T> GetOrCreateAsync<T>(
+  public Task<T?> GetOrCreateAsync<T>(
     string routeKey,
     Func<Task<T>> factory,
     TimeSpan? ttl = null

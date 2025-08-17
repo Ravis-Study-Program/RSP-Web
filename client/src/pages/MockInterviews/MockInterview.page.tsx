@@ -1,19 +1,28 @@
 import { useMemo, useState } from 'react';
 import { Flex, Group, MultiSelect, Select } from '@mantine/core';
-import { Layout } from '@/components/Layout/Layout';
+import { useLocalStorage } from '@mantine/hooks';
 import { useGetIsCurrentUserEnrolled, useListMockInterview } from '@/generated/api/client';
 import { useSeasonSlug } from '@/shared/hooks/useSeasonSlug';
 import { createOptionsFilter } from '@/shared/table/globalFilters';
 import { MockInterviewTable } from './MockInterviewTable/MockInterviewTable';
 import classes from './MockInterview.module.css';
 
+export enum MockInterviewsPreset {
+  All = 'All',
+  ReceivedMocks = 'Received Mocks',
+  GivenMocks = 'Given Mocks',
+}
+
 export default function MockInterviewPage() {
   const { seasonSlug } = useSeasonSlug();
   const { data: userResponse } = useGetIsCurrentUserEnrolled({ seasonSlug });
   const [selectedIsPassResult, setSelectedIsPassResult] = useState<boolean | null>(null);
-  const [selectedIsGivenMocks, setSelectedIsGivenMocks] = useState<boolean | null>(null);
   const [selectedInterviewers, setSelectedInterviewers] = useState<string[]>([]);
   const email = userResponse?.responseBody?.email ?? '';
+  const [selectedMockInterviewsPreset, setSelectedMockInterviewsPreset] = useLocalStorage({
+    key: 'mock-interviews-preset',
+    defaultValue: MockInterviewsPreset.All,
+  });
 
   const { data: mockInterviewsResponse, refetch: refetchMockInterviews } = useListMockInterview(
     {
@@ -25,11 +34,6 @@ export default function MockInterviewPage() {
     },
     { query: { enabled: email !== '' } }
   );
-
-  const displayMockOptions = [
-    { label: 'Received Mocks', value: 'false' },
-    { label: 'Given Mocks', value: 'true' },
-  ];
 
   const resultOptions = [
     { label: 'Pass', value: 'true' },
@@ -59,17 +63,17 @@ export default function MockInterviewPage() {
     return mocks.filter(
       (mock) =>
         (selectedIsPassResult === null &&
-          selectedIsGivenMocks === null &&
+          selectedMockInterviewsPreset === MockInterviewsPreset.All &&
           selectedInterviewers.length === 0) ||
         ((selectedIsPassResult === null ||
           (mock.isPass !== null &&
             (typeof mock.isPass === 'boolean' ? mock.isPass : mock.isPass === 'true') ===
               selectedIsPassResult)) &&
-          (selectedIsGivenMocks === null ||
-            (selectedIsGivenMocks === false &&
+          (selectedMockInterviewsPreset === MockInterviewsPreset.All ||
+            (selectedMockInterviewsPreset === MockInterviewsPreset.ReceivedMocks &&
               mock.interviewee?.email !== null &&
               email === mock.interviewee?.email) ||
-            (selectedIsGivenMocks === true &&
+            (selectedMockInterviewsPreset === MockInterviewsPreset.GivenMocks &&
               mock.interviewee?.email !== null &&
               email !== mock.interviewee?.email)) &&
           (selectedInterviewers.length === 0 ||
@@ -80,29 +84,32 @@ export default function MockInterviewPage() {
     email,
     mockInterviewsResponse,
     selectedIsPassResult,
-    selectedIsGivenMocks,
+    selectedMockInterviewsPreset,
     selectedInterviewers,
   ]);
 
+  const mockInterviewsPresetOptions = Object.values(MockInterviewsPreset)
+    .map((value) => ({
+      value,
+      label: value,
+    }))
+    .sort((a, b) => a.label.localeCompare(b.label));
+
   return (
-    <Layout>
+    <>
       <Flex justify="space-between">
         <Group mb="lg" justify="flex-start">
           <Select
             label="Mock Options"
-            data={displayMockOptions}
+            data={mockInterviewsPresetOptions}
             placeholder="Pick value"
             filter={createOptionsFilter()}
             miw={200}
             nothingFoundMessage="Nothing found..."
-            value={selectedIsGivenMocks === null ? null : selectedIsGivenMocks.toString()}
+            value={selectedMockInterviewsPreset.toString()}
             clearable
             onChange={(value) => {
-              if (value === null || value === '') {
-                setSelectedIsGivenMocks(null);
-              } else {
-                setSelectedIsGivenMocks(value === 'true');
-              }
+              setSelectedMockInterviewsPreset(value as MockInterviewsPreset);
             }}
           />
         </Group>
@@ -146,6 +153,6 @@ export default function MockInterviewPage() {
         seasonId={userResponse?.responseBody?.seasonId || ''}
         enableEditing
       />
-    </Layout>
+    </>
   );
 }

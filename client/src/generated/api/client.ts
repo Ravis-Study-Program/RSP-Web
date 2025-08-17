@@ -108,14 +108,14 @@ export interface AdminCreateSeasonWeekResponseApiResponse {
 
 export interface AdminCreateUserRequest {
   /** @minLength 1 */
-  discordId: string;
-  /** @minLength 1 */
   email: string;
   /** @minLength 1 */
   name: string;
-  /** @minLength 1 */
-  profileImage: string;
   isAdmin: boolean;
+  /** @nullable */
+  profileImage?: string | null;
+  /** @nullable */
+  discordId?: string | null;
 }
 
 export interface AdminCreateUserResponse {
@@ -1072,8 +1072,8 @@ export interface UpdateProblemAttemptRequest {
   timeTakenInMinutes: number;
   /** @minLength 1 */
   email: string;
-  /** @minLength 1 */
-  notes: string;
+  /** @nullable */
+  notes?: string | null;
   /** @nullable */
   leetcodeProblemId?: string | null;
   /** @nullable */

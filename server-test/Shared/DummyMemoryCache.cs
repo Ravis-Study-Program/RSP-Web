@@ -8,7 +8,7 @@ namespace RSPWebAPI.Tests.Shared;
 
 public class DummyRequestCache : IRequestCache
 {
-  public Task<T> GetOrCreateAsync<T>(
+  public Task<T?> GetOrCreateAsync<T>(
     string routeKey,
     string? primaryKey,
     Func<Task<T>> factory,
@@ -18,7 +18,7 @@ public class DummyRequestCache : IRequestCache
     return factory();
   }
 
-  public Task<T> GetOrCreateAsync<T>(string routeKey, Func<Task<T>> factory, TimeSpan? ttl = null)
+  public Task<T?> GetOrCreateAsync<T>(string routeKey, Func<Task<T>> factory, TimeSpan? ttl = null)
   {
     return factory();
   }

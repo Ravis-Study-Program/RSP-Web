@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { IconEdit, IconTrash } from '@tabler/icons-react';
 import { QueryObserverResult, RefetchOptions } from '@tanstack/react-query';
 import {
@@ -9,6 +9,7 @@ import {
   useMantineReactTable,
 } from 'mantine-react-table';
 import { ActionIcon, Anchor, Button, Flex, Pill, Text, Title, Tooltip } from '@mantine/core';
+import { useLocalStorage } from '@mantine/hooks';
 import { modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
 import {
@@ -35,6 +36,17 @@ export const LeetcodeTable = ({
   showAuthor,
   showCategory = true,
 }: LeetcodeTableProps) => {
+  const [pageSize, setPageSize] = useLocalStorage({
+    key: 'page-size',
+    defaultValue: 10,
+    getInitialValueInEffect: false,
+  });
+
+  const [pagination, setPagination] = useState({
+    pageIndex: 0,
+    pageSize,
+  });
+
   const { data: userResponse } = useGetCurrentUser();
   const email = userResponse?.responseBody?.user.email ?? '';
 
@@ -140,7 +152,7 @@ export const LeetcodeTable = ({
       {
         header: 'Attempt Date',
         id: 'attemptStartDate',
-        accessorFn: (row) => dayjs(row.attemptStartDateUtc).format('D MMM YYYY HH:mm'),
+        accessorFn: (row) => row.attemptStartDateUtc,
         Cell: ({ row }) => {
           const startFormatted = dayjs(row.original.attemptStartDateUtc).format('D MMM YYYY HH:mm');
           return startFormatted;
@@ -224,6 +236,11 @@ export const LeetcodeTable = ({
         className: classes.modalCloseButton,
       },
     },
+    onPaginationChange: (updater) => {
+      const next = typeof updater === 'function' ? updater(pagination) : updater;
+      setPageSize(next.pageSize);
+      setPagination(next);
+    },
     editDisplayMode: 'modal',
     enableEditing,
     initialState: {
@@ -286,6 +303,7 @@ export const LeetcodeTable = ({
         </Button>
       ),
     state: {
+      pagination,
       isLoading: isLoadingLeetcodeProblems,
       isSaving:
         isCreatingProblemAttemptStatus === 'pending' ||

@@ -47,8 +47,8 @@ export const AdminSeasonWeeksUpdateModal = ({
     initialValues: {
       seasonId: seasonWeek.seasonId,
       weekNumber: seasonWeek.weekNumber,
-      startDate: dayjs(seasonWeek.startDate).format('YYYY-MM-DD'),
-      endDate: dayjs(seasonWeek.endDate).format('YYYY-MM-DD'),
+      startDate: dayjs(seasonWeek.startDate).format('YYYY-MM-DD HH:mm'),
+      endDate: dayjs(seasonWeek.endDate).format('YYYY-MM-DD HH:mm'),
     },
     validate: zodResolver(schema),
   });
@@ -124,7 +124,7 @@ export const AdminSeasonWeeksUpdateModal = ({
           mt="sm"
           label="Start Date"
           placeholder="Pick a start date"
-          valueFormat="YYYY-MM-DD"
+          valueFormat="YYYY-MM-DD HH:mm"
           error={form.errors.startDate}
           withAsterisk
           highlightToday
@@ -135,7 +135,7 @@ export const AdminSeasonWeeksUpdateModal = ({
           mt="sm"
           label="End Date"
           placeholder="Pick an end date"
-          valueFormat="YYYY-MM-DD"
+          valueFormat="YYYY-MM-DD HH:mm"
           error={form.errors.endDate}
           withAsterisk
           highlightToday
