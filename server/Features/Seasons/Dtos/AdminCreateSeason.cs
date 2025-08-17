@@ -41,7 +41,7 @@ public class AdminCreateSeasonRequestValidator : AbstractValidator<AdminCreateSe
     RuleFor(c => c.EndDateInclusiveUtc)
       .NotEmpty()
       .GreaterThan(c => c.StartDateInclusiveUtc)
-      .WithMessage(Message.EndDateMustBeGreaterThanStartDate);
+      .WithMessage(Messages.Common.EndDateMustBeGreaterThanStartDate);
     RuleFor(c => c.Location).NotEmpty();
     RuleFor(c => c.ImageUrl).NotEmpty();
   }

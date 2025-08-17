@@ -466,16 +466,16 @@ public class DummyDataService : IDummyDataService
       await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
       return new SuccessServiceResponse<AdminGenerateDummyDataResponse>(
-        Message.DummyDataGeneratedSuccessfully
+        Messages.DummyData.Generated
       );
     }
     catch (Exception ex)
     {
-      _logger.LogError(ex, Message.DummyDataUnexpectedError);
+      _logger.LogError(ex, Messages.DummyData.GenerationError);
       await _unitOfWork.RollbackTransactionAsync(cancellationToken);
 
       return new ErrorServiceResponse<AdminGenerateDummyDataResponse>(
-        Message.DummyDataUnexpectedError
+        Messages.DummyData.GenerationError
       );
     }
   }

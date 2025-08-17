@@ -44,7 +44,7 @@ public class EnrollmentService : IEnrollmentService
     );
     if (existingEnrollment != null)
     {
-      return new ErrorServiceResponse<AdminCreateEnrollmentResponse>(Message.EnrollmentExists);
+      return new ErrorServiceResponse<AdminCreateEnrollmentResponse>(Messages.Enrollment.Exists);
     }
 
     if (
@@ -72,15 +72,15 @@ public class EnrollmentService : IEnrollmentService
       await AddEnrollmentAsync(enrollment, cancellationToken);
       await _unitOfWork.SaveChangesAsync(cancellationToken);
       return new SuccessServiceResponse<AdminCreateEnrollmentResponse>(
-        Message.EnrollmentCreatedSuccessfully,
+        Messages.Enrollment.Created,
         new AdminCreateEnrollmentResponse { EnrollmentId = enrollment.EnrollmentId }
       );
     }
     catch (Exception ex)
     {
-      _logger.LogError(ex, Message.EnrollmentCreationUnexpectedError);
+      _logger.LogError(ex, Messages.Enrollment.CreationError);
       return new ErrorServiceResponse<AdminCreateEnrollmentResponse>(
-        Message.EnrollmentCreationUnexpectedError
+        Messages.Enrollment.CreationError
       );
     }
   }
@@ -94,7 +94,7 @@ public class EnrollmentService : IEnrollmentService
     if (existingEnrollment == null)
     {
       return new ErrorServiceResponse<AdminDeleteEnrollmentResponse>(
-        Message.EnrollmentDoesNotExists
+        Messages.Enrollment.DoesNotExist
       );
     }
 
@@ -102,15 +102,13 @@ public class EnrollmentService : IEnrollmentService
     {
       await DeleteEnrollmentAsync(existingEnrollment.EnrollmentId, cancellationToken);
       await _unitOfWork.SaveChangesAsync(cancellationToken);
-      return new SuccessServiceResponse<AdminDeleteEnrollmentResponse>(
-        Message.EnrollmentDeletedSuccessfully
-      );
+      return new SuccessServiceResponse<AdminDeleteEnrollmentResponse>(Messages.Enrollment.Deleted);
     }
     catch (Exception ex)
     {
-      _logger.LogError(ex, Message.EnrollmentDeletionUnexpectedError);
+      _logger.LogError(ex, Messages.Enrollment.DeletionError);
       return new ErrorServiceResponse<AdminDeleteEnrollmentResponse>(
-        Message.EnrollmentDeletionUnexpectedError
+        Messages.Enrollment.DeletionError
       );
     }
   }
@@ -143,16 +141,14 @@ public class EnrollmentService : IEnrollmentService
         .OrderBy(e => e.SeasonName)
         .ToList();
       return new SuccessServiceResponse<AdminListEnrollmentResponse>(
-        Message.EnrollmentListSuccessfully,
+        Messages.Enrollment.Listed,
         new AdminListEnrollmentResponse { Enrollments = formattedEnrollments }
       );
     }
     catch (Exception ex)
     {
-      _logger.LogError(ex, Message.EnrollmentListUnexpectedError);
-      return new ErrorServiceResponse<AdminListEnrollmentResponse>(
-        Message.EnrollmentListUnexpectedError
-      );
+      _logger.LogError(ex, Messages.Enrollment.ListError);
+      return new ErrorServiceResponse<AdminListEnrollmentResponse>(Messages.Enrollment.ListError);
     }
   }
 
@@ -165,7 +161,7 @@ public class EnrollmentService : IEnrollmentService
     if (existingEnrollment == null)
     {
       return new ErrorServiceResponse<AdminUpdateEnrollmentResponse>(
-        Message.EnrollmentDoesNotExists
+        Messages.Enrollment.DoesNotExist
       );
     }
 
@@ -189,15 +185,13 @@ public class EnrollmentService : IEnrollmentService
     {
       await UpdateEnrollmentAsync(existingEnrollment, cancellationToken);
       await _unitOfWork.SaveChangesAsync(cancellationToken);
-      return new SuccessServiceResponse<AdminUpdateEnrollmentResponse>(
-        Message.EnrollmentUpdatedSuccessfully
-      );
+      return new SuccessServiceResponse<AdminUpdateEnrollmentResponse>(Messages.Enrollment.Updated);
     }
     catch (Exception ex)
     {
-      _logger.LogError(ex, Message.EnrollmentUpdateUnexpectedError);
+      _logger.LogError(ex, Messages.Enrollment.UpdateError);
       return new ErrorServiceResponse<AdminUpdateEnrollmentResponse>(
-        Message.EnrollmentUpdateUnexpectedError
+        Messages.Enrollment.UpdateError
       );
     }
   }
@@ -281,15 +275,15 @@ public class EnrollmentService : IEnrollmentService
       await _unitOfWork.SaveChangesAsync(cancellationToken);
 
       return new SuccessServiceResponse<GetUserEnrollmentsResponse>(
-        Message.EnrollmentUsersListSuccessfully,
+        Messages.Enrollment.UsersListed,
         new GetUserEnrollmentsResponse { Enrollments = enrollments }
       );
     }
     catch (Exception ex)
     {
-      _logger.LogError(ex, Message.EnrollmentUsersListUnexpectedError);
+      _logger.LogError(ex, Messages.Enrollment.UsersListError);
       return new ErrorServiceResponse<GetUserEnrollmentsResponse>(
-        Message.EnrollmentUsersListUnexpectedError
+        Messages.Enrollment.UsersListError
       );
     }
   }
@@ -337,15 +331,15 @@ public class EnrollmentService : IEnrollmentService
         .ToList();
 
       return new SuccessServiceResponse<GetEnrollmentUsersResponse>(
-        Message.EnrollmentUsersListSuccessfully,
+        Messages.Enrollment.UsersListed,
         new GetEnrollmentUsersResponse { EnrollmentUsers = distinctUsers }
       );
     }
     catch (Exception ex)
     {
-      _logger.LogError(ex, Message.EnrollmentUsersListUnexpectedError);
+      _logger.LogError(ex, Messages.Enrollment.UsersListError);
       return new ErrorServiceResponse<GetEnrollmentUsersResponse>(
-        Message.EnrollmentUsersListUnexpectedError
+        Messages.Enrollment.UsersListError
       );
     }
   }
@@ -364,7 +358,7 @@ public class EnrollmentService : IEnrollmentService
     if (existingEnrollment == null)
     {
       return new SuccessServiceResponse<GetIsUserEnrolledResponse>(
-        Message.EnrollmentDoesNotExists,
+        Messages.Enrollment.DoesNotExist,
         new GetIsUserEnrolledResponse
         {
           IsEnrolled = false,
@@ -378,7 +372,7 @@ public class EnrollmentService : IEnrollmentService
     }
 
     return new SuccessServiceResponse<GetIsUserEnrolledResponse>(
-      Message.EnrollmentExists,
+      Messages.Enrollment.Exists,
       new GetIsUserEnrolledResponse
       {
         IsEnrolled = true,
@@ -404,7 +398,7 @@ public class EnrollmentService : IEnrollmentService
     );
     if (existingEnrollment == null)
     {
-      return new ErrorServiceResponse<KickStudentResponse>(Message.EnrollmentDoesNotExists);
+      return new ErrorServiceResponse<KickStudentResponse>(Messages.Enrollment.DoesNotExist);
     }
 
     if (
@@ -424,7 +418,7 @@ public class EnrollmentService : IEnrollmentService
     );
     if (studentEnrollment == null)
     {
-      return new ErrorServiceResponse<KickStudentResponse>(Message.KickStudentMenteeDoesntExist);
+      return new ErrorServiceResponse<KickStudentResponse>(Messages.Student.KickMenteeDoesntExist);
     }
 
     if (
@@ -444,12 +438,12 @@ public class EnrollmentService : IEnrollmentService
     {
       _enrollmentRepository.Delete(studentEnrollment, cancellationToken);
       await _unitOfWork.SaveChangesAsync(cancellationToken);
-      return new SuccessServiceResponse<KickStudentResponse>(Message.KickStudentSuccessfully);
+      return new SuccessServiceResponse<KickStudentResponse>(Messages.Student.KickSuccess);
     }
     catch (Exception ex)
     {
-      _logger.LogError(ex, Message.KickStudentUnexpectedError);
-      return new ErrorServiceResponse<KickStudentResponse>(Message.KickStudentUnexpectedError);
+      _logger.LogError(ex, Messages.Student.KickError);
+      return new ErrorServiceResponse<KickStudentResponse>(Messages.Student.KickError);
     }
   }
 
@@ -469,7 +463,7 @@ public class EnrollmentService : IEnrollmentService
     if (existingEnrollment == null)
     {
       return new ErrorServiceResponse<UpdateStudentRolePromotionResponse>(
-        Message.EnrollmentDoesNotExists
+        Messages.Enrollment.DoesNotExist
       );
     }
 
@@ -491,7 +485,7 @@ public class EnrollmentService : IEnrollmentService
     if (studentEnrollment == null)
     {
       return new ErrorServiceResponse<UpdateStudentRolePromotionResponse>(
-        Message.UpdateStudentRolePromotionMenteeDoesntExist
+        Messages.Student.UpdateRolePromotionMenteeDoesntExist
       );
     }
 
@@ -525,14 +519,14 @@ public class EnrollmentService : IEnrollmentService
     {
       await _unitOfWork.SaveChangesAsync(cancellationToken);
       return new SuccessServiceResponse<UpdateStudentRolePromotionResponse>(
-        Message.UpdateStudentRolePromotionSuccessfully
+        Messages.Student.UpdateRolePromotionSuccess
       );
     }
     catch (Exception ex)
     {
-      _logger.LogError(ex, Message.UpdateStudentRolePromotionUnexpectedError);
+      _logger.LogError(ex, Messages.Student.UpdateRolePromotionError);
       return new ErrorServiceResponse<UpdateStudentRolePromotionResponse>(
-        Message.UpdateStudentRolePromotionUnexpectedError
+        Messages.Student.UpdateRolePromotionError
       );
     }
   }
@@ -551,23 +545,23 @@ public class EnrollmentService : IEnrollmentService
       switch (role)
       {
         case SeasonRole.Student:
-          errorMessage = Message.UserIsNotStudentInSeason;
+          errorMessage = Messages.User.NotInSeasonRole("student");
           break;
         case SeasonRole.Mentor:
-          errorMessage = Message.UserIsNotMentorInSeason;
+          errorMessage = Messages.User.NotInSeasonRole("mentor");
           break;
         case SeasonRole.Coordinator:
-          errorMessage = Message.UserIsNotCoordinatorInSeason;
+          errorMessage = Messages.User.NotInSeasonRole("coordinator");
           break;
         default:
-          errorMessage = Message.UnexpectedError;
+          errorMessage = Messages.Common.UnexpectedError;
           break;
       }
 
       return false;
     }
 
-    errorMessage = Message.UnexpectedError;
+    errorMessage = Messages.Common.UnexpectedError;
     return true;
   }
 
@@ -585,7 +579,7 @@ public class EnrollmentService : IEnrollmentService
       case SeasonRole.Student:
         if (rolePromotion == SeasonStudentRolePromotion.NotApplicable)
         {
-          errorMessage = Message.EnrollmentStudentMustHaveAppropriateRolePromotion;
+          errorMessage = Messages.Enrollment.StudentMustHaveRolePromotion;
           return false;
         }
 
@@ -595,14 +589,14 @@ public class EnrollmentService : IEnrollmentService
       case SeasonRole.Coordinator:
         if (rolePromotion != SeasonStudentRolePromotion.NotApplicable)
         {
-          errorMessage = Message.EnrollmentMentorOrCoordinatorMustNotHaveRolePromotion;
+          errorMessage = Messages.Enrollment.MentorOrCoordinatorMustNotHaveRolePromotion;
           return false;
         }
 
         break;
     }
 
-    errorMessage = Message.UnexpectedError;
+    errorMessage = Messages.Common.UnexpectedError;
     return true;
   }
 
@@ -627,7 +621,7 @@ public class EnrollmentService : IEnrollmentService
 
     if (enrollment == null)
     {
-      throw new KeyNotFoundException(Message.EnrollmentDoesNotExists);
+      throw new KeyNotFoundException(Messages.Enrollment.DoesNotExist);
     }
 
     _enrollmentRepository.Delete(enrollment, cancellationToken);
@@ -646,7 +640,7 @@ public class EnrollmentService : IEnrollmentService
     );
     if (existingEnrollment == null)
     {
-      throw new KeyNotFoundException(Message.EnrollmentDoesNotExists);
+      throw new KeyNotFoundException(Messages.Enrollment.DoesNotExist);
     }
 
     _enrollmentRepository.Update(enrollment, cancellationToken);

@@ -89,9 +89,7 @@ public class EnrollmentController : BaseController
     if (email == null)
     {
       return HandleResponse(
-        new ErrorServiceResponse<GetUserEnrollmentsResponse>(
-          Message.EnrollmentUsersListUnexpectedError
-        )
+        new ErrorServiceResponse<GetUserEnrollmentsResponse>(Messages.Enrollment.ListError)
       );
     }
     var request = new GetUserEnrollmentsRequest { Email = email };

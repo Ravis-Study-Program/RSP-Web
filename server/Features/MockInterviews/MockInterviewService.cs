@@ -80,7 +80,7 @@ public class MockInterviewService : IMockInterviewService
       if (existingEnrollment == null || existingEnrollment.User.UserId != request.IntervieweeUserId)
       {
         return new ErrorServiceResponse<CreateMockInterviewResponse>(
-          Message.EnrollmentDoesNotExists
+          Messages.Enrollment.DoesNotExist
         );
       }
 
@@ -98,7 +98,7 @@ public class MockInterviewService : IMockInterviewService
       if (seasonWeek == null)
       {
         return new ErrorServiceResponse<CreateMockInterviewResponse>(
-          Message.MockInterviewOutOfSeasonDateRange
+          Messages.MockInterview.OutOfSeasonDateRange
         );
       }
     }
@@ -114,7 +114,7 @@ public class MockInterviewService : IMockInterviewService
     if (interviewee == null || interviewer == null)
     {
       return new ErrorServiceResponse<CreateMockInterviewResponse>(
-        Message.MockInterviewInterviewerOrIntervieweeCannotBeFound
+        Messages.MockInterview.InterviewerOrIntervieweeCannotBeFound
       );
     }
 
@@ -142,15 +142,15 @@ public class MockInterviewService : IMockInterviewService
       _cache.Remove(RouteCacheKeys.ListMockInterviews, interviewee.Email);
       _cache.Remove(RouteCacheKeys.ListMockInterviews, interviewer.Email);
       return new SuccessServiceResponse<CreateMockInterviewResponse>(
-        Message.MockInterviewCreatedSuccessfully,
+        Messages.MockInterview.Created,
         new CreateMockInterviewResponse { MockInterviewId = mockInterview.MockInterviewId }
       );
     }
     catch (Exception ex)
     {
-      _logger.LogError(ex, Message.MockInterviewCreationUnexpectedError);
+      _logger.LogError(ex, Messages.MockInterview.CreationError);
       return new ErrorServiceResponse<CreateMockInterviewResponse>(
-        Message.MockInterviewCreationUnexpectedError
+        Messages.MockInterview.CreationError
       );
     }
   }
@@ -168,13 +168,13 @@ public class MockInterviewService : IMockInterviewService
     if (existingMockInterview == null)
     {
       return new ErrorServiceResponse<DeleteMockInterviewResponse>(
-        Message.MockInterviewDoesNotExists
+        Messages.MockInterview.DoesNotExist
       );
     }
     if (existingMockInterview.Interviewer.Email != request.Email)
     {
       return new ErrorServiceResponse<DeleteMockInterviewResponse>(
-        Message.MockInterviewDeletionOnlyInterviewerAllowed
+        Messages.MockInterview.DeletionOnlyInterviewerAllowed
       );
     }
 
@@ -185,14 +185,14 @@ public class MockInterviewService : IMockInterviewService
       _cache.Remove(RouteCacheKeys.ListMockInterviews, existingMockInterview.Interviewer.Email);
       _cache.Remove(RouteCacheKeys.ListMockInterviews, existingMockInterview.Interviewee.Email);
       return new SuccessServiceResponse<DeleteMockInterviewResponse>(
-        Message.MockInterviewDeletedSuccessfully
+        Messages.MockInterview.Deleted
       );
     }
     catch (Exception ex)
     {
-      _logger.LogError(ex, Message.MockInterviewDeletionUnexpectedError);
+      _logger.LogError(ex, Messages.MockInterview.DeletionError);
       return new ErrorServiceResponse<DeleteMockInterviewResponse>(
-        Message.MockInterviewDeletionUnexpectedError
+        Messages.MockInterview.DeletionError
       );
     }
   }
@@ -236,7 +236,7 @@ public class MockInterviewService : IMockInterviewService
     }
 
     return new SuccessServiceResponse<ListMockInterviewResponse>(
-      Message.MockInterviewListSuccessfully,
+      Messages.MockInterview.Listed,
       new ListMockInterviewResponse { MockInterviews = allMockInterviews }
     );
   }
@@ -255,7 +255,7 @@ public class MockInterviewService : IMockInterviewService
         var existingUser = await _userService.GetUserByEmailAsync(email, cancellationToken);
         if (existingUser == null)
         {
-          return new ErrorServiceResponse<ListMockInterviewResponse>(Message.UserIdDoesNotExists);
+          return new ErrorServiceResponse<ListMockInterviewResponse>(Messages.User.IdDoesNotExist);
         }
 
         var existingEnrollment = await _enrollmentService.GetEnrollmentBySeasonId(
@@ -267,7 +267,7 @@ public class MockInterviewService : IMockInterviewService
         );
         if (existingEnrollment == null || existingEnrollment.User.Email != email)
         {
-          return new ErrorServiceResponse<ListMockInterviewResponse>(Message.SeasonDoesNotExists);
+          return new ErrorServiceResponse<ListMockInterviewResponse>(Messages.Season.DoesNotExist);
         }
       }
 
@@ -314,16 +314,14 @@ public class MockInterviewService : IMockInterviewService
     try
     {
       return new SuccessServiceResponse<ListMockInterviewResponse>(
-        Message.MockInterviewListSuccessfully,
+        Messages.MockInterview.Listed,
         new ListMockInterviewResponse { MockInterviews = mockInterviews.ToList() }
       );
     }
     catch (Exception ex)
     {
-      _logger.LogError(ex, Message.MockInterviewListUnexpectedError);
-      return new ErrorServiceResponse<ListMockInterviewResponse>(
-        Message.MockInterviewListUnexpectedError
-      );
+      _logger.LogError(ex, Messages.MockInterview.ListError);
+      return new ErrorServiceResponse<ListMockInterviewResponse>(Messages.MockInterview.ListError);
     }
   }
 
@@ -348,14 +346,14 @@ public class MockInterviewService : IMockInterviewService
     if (existingMockInterview == null || request.SeasonId != existingMockInterview.SeasonId)
     {
       return new ErrorServiceResponse<UpdateMockInterviewResponse>(
-        Message.MockInterviewDoesNotExists
+        Messages.MockInterview.DoesNotExist
       );
     }
 
     if (request.InterviewerEmail != existingMockInterview.Interviewer.Email)
     {
       return new ErrorServiceResponse<UpdateMockInterviewResponse>(
-        Message.MockInterviewUpdateOnlyInterviewerAllowed
+        Messages.MockInterview.UpdateOnlyInterviewerAllowed
       );
     }
 
@@ -374,7 +372,7 @@ public class MockInterviewService : IMockInterviewService
       if (seasonWeek == null)
       {
         return new ErrorServiceResponse<UpdateMockInterviewResponse>(
-          Message.MockInterviewOutOfSeasonDateRange
+          Messages.MockInterview.OutOfSeasonDateRange
         );
       }
     }
@@ -390,7 +388,7 @@ public class MockInterviewService : IMockInterviewService
     if (interviewee == null || interviewer == null)
     {
       return new ErrorServiceResponse<UpdateMockInterviewResponse>(
-        Message.MockInterviewInterviewerOrIntervieweeCannotBeFound
+        Messages.MockInterview.InterviewerOrIntervieweeCannotBeFound
       );
     }
 
@@ -414,14 +412,14 @@ public class MockInterviewService : IMockInterviewService
       _cache.Remove(RouteCacheKeys.ListMockInterviews, interviewee.Email);
       _cache.Remove(RouteCacheKeys.ListMockInterviews, interviewer.Email);
       return new SuccessServiceResponse<UpdateMockInterviewResponse>(
-        Message.MockInterviewUpdatedSuccessfully
+        Messages.MockInterview.Updated
       );
     }
     catch (Exception ex)
     {
-      _logger.LogError(ex, Message.MockInterviewUpdateUnexpectedError);
+      _logger.LogError(ex, Messages.MockInterview.UpdateError);
       return new ErrorServiceResponse<UpdateMockInterviewResponse>(
-        Message.MockInterviewUpdateUnexpectedError
+        Messages.MockInterview.UpdateError
       );
     }
   }
@@ -617,7 +615,7 @@ public class MockInterviewService : IMockInterviewService
 
     if (mockInterview == null)
     {
-      throw new KeyNotFoundException(Message.MockInterviewDoesNotExists);
+      throw new KeyNotFoundException(Messages.MockInterview.DoesNotExist);
     }
 
     _mockInterviewRepository.Delete(mockInterview, cancellationToken);
@@ -636,7 +634,7 @@ public class MockInterviewService : IMockInterviewService
     );
     if (existingMockInterview == null)
     {
-      throw new KeyNotFoundException(Message.MockInterviewDoesNotExists);
+      throw new KeyNotFoundException(Messages.MockInterview.DoesNotExist);
     }
 
     _mockInterviewRepository.Update(mockInterview, cancellationToken);

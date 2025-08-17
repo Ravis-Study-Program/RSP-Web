@@ -92,7 +92,7 @@ public class LeetcodeService : ILeetcodeService
       );
 
       return new ErrorServiceResponse<AdminPopulateLeetcodeQuestionsResponse>(
-        Message.UnexpectedError
+        Messages.Common.UnexpectedError
       );
     }
 
@@ -102,7 +102,7 @@ public class LeetcodeService : ILeetcodeService
     {
       _logger.LogError("Failed to deserialize or missing required data in API response.");
       return new ErrorServiceResponse<AdminPopulateLeetcodeQuestionsResponse>(
-        Message.UnexpectedError
+        Messages.Common.UnexpectedError
       );
     }
 
@@ -233,12 +233,12 @@ public class LeetcodeService : ILeetcodeService
       _logger.LogError(ex, "Error occurred during transaction.");
       await _unitOfWork.RollbackTransactionAsync(cancellationToken);
       return new ErrorServiceResponse<AdminPopulateLeetcodeQuestionsResponse>(
-        Message.UnexpectedError
+        Messages.Common.UnexpectedError
       );
     }
 
     return new SuccessServiceResponse<AdminPopulateLeetcodeQuestionsResponse>(
-      Message.LeetcodeProblemsScrapedSuccessfully
+      Messages.LeetcodeProblem.ScrapedSuccessfully
     );
   }
 
@@ -288,7 +288,7 @@ public class LeetcodeService : ILeetcodeService
       .ToList();
 
     return new SuccessServiceResponse<ListLeetcodeProblemsResponse>(
-      Message.LeetcodeProblemsListSuccessfully,
+      Messages.LeetcodeProblem.Listed,
       new ListLeetcodeProblemsResponse { LeetcodeProblems = formattedLeetcodeProblems }
     );
   }

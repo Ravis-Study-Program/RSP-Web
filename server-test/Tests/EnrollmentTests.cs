@@ -67,7 +67,7 @@ namespace RSPWebAPI.Tests.Tests
       var listRequest = new AdminListEnrollmentRequest();
       var listResponse = await EnrollmentService.ListAdminEnrollment(listRequest);
       Assert.True(listResponse.IsSuccess);
-      Assert.Equal(Message.EnrollmentListSuccessfully, listResponse.Message);
+      Assert.Equal(Messages.Enrollment.Listed, listResponse.Message);
 
       var all = await _seeder.GetAllEnrollmentsAsync();
       Assert.Equal(count, all.Count);
@@ -89,7 +89,7 @@ namespace RSPWebAPI.Tests.Tests
       };
       var response = await EnrollmentService.CreateAdminEnrollment(request);
       Assert.False(response.IsSuccess);
-      Assert.Equal(Message.EnrollmentExists, response.Message);
+      Assert.Equal(Messages.Enrollment.Exists, response.Message);
     }
 
     [Fact]
@@ -110,7 +110,7 @@ namespace RSPWebAPI.Tests.Tests
       };
       var updateResponse = await EnrollmentService.UpdateAdminEnrollment(updateRequest);
       Assert.True(updateResponse.IsSuccess);
-      Assert.Equal(Message.EnrollmentUpdatedSuccessfully, updateResponse.Message);
+      Assert.Equal(Messages.Enrollment.Updated, updateResponse.Message);
 
       var updated = await EnrollmentService.GetEnrollmentByIdAsync(enrollmentId);
       Assert.NotNull(updated);
@@ -130,7 +130,7 @@ namespace RSPWebAPI.Tests.Tests
       var request = new AdminDeleteEnrollmentRequest { EnrollmentId = enrollmentId };
       var deleteResponse = await EnrollmentService.DeleteAdminEnrollment(request);
       Assert.True(deleteResponse.IsSuccess);
-      Assert.Equal(Message.EnrollmentDeletedSuccessfully, deleteResponse.Message);
+      Assert.Equal(Messages.Enrollment.Deleted, deleteResponse.Message);
 
       var afterDelete = await EnrollmentService.GetEnrollmentByIdAsync(enrollmentId);
       Assert.Null(afterDelete);
@@ -145,7 +145,7 @@ namespace RSPWebAPI.Tests.Tests
       };
       var response = await EnrollmentService.DeleteAdminEnrollment(request);
       Assert.False(response.IsSuccess);
-      Assert.Equal(Message.EnrollmentDoesNotExists, response.Message);
+      Assert.Equal(Messages.Enrollment.DoesNotExist, response.Message);
     }
 
     [Fact]
@@ -154,7 +154,7 @@ namespace RSPWebAPI.Tests.Tests
       var request = new AdminListEnrollmentRequest();
       var response = await EnrollmentService.ListAdminEnrollment(request);
       Assert.True(response.IsSuccess);
-      Assert.Equal(Message.EnrollmentListSuccessfully, response.Message);
+      Assert.Equal(Messages.Enrollment.Listed, response.Message);
     }
 
     [Fact]
@@ -168,7 +168,7 @@ namespace RSPWebAPI.Tests.Tests
       var request = new GetUserEnrollmentsRequest { Email = email };
       var enrollResp = await EnrollmentService.GetUserEnrollments(request);
       Assert.True(enrollResp.IsSuccess);
-      Assert.Equal(Message.EnrollmentUsersListSuccessfully, enrollResp.Message);
+      Assert.Equal(Messages.Enrollment.UsersListed, enrollResp.Message);
       Assert.NotEmpty(enrollResp.Data!.Enrollments);
     }
 
@@ -184,7 +184,7 @@ namespace RSPWebAPI.Tests.Tests
       var request = new GetEnrollmentUsersRequest { SeasonSlug = season.Slug };
       var userResp = await EnrollmentService.GetEnrollmentUsers(request);
       Assert.True(userResp.IsSuccess);
-      Assert.Equal(Message.EnrollmentUsersListSuccessfully, userResp.Message);
+      Assert.Equal(Messages.Enrollment.UsersListed, userResp.Message);
       Assert.NotEmpty(userResp.Data!.EnrollmentUsers);
     }
 
@@ -199,7 +199,7 @@ namespace RSPWebAPI.Tests.Tests
       var response = await EnrollmentService.GetIsUserEnrolled(request);
       Assert.True(response.IsSuccess);
       Assert.False(response.Data!.IsEnrolled);
-      Assert.Equal(Message.EnrollmentDoesNotExists, response.Message);
+      Assert.Equal(Messages.Enrollment.DoesNotExist, response.Message);
     }
 
     [Fact]
@@ -216,7 +216,7 @@ namespace RSPWebAPI.Tests.Tests
       var response = await EnrollmentService.GetIsUserEnrolled(request);
       Assert.True(response.IsSuccess);
       Assert.True(response.Data!.IsEnrolled);
-      Assert.Equal(Message.EnrollmentExists, response.Message);
+      Assert.Equal(Messages.Enrollment.Exists, response.Message);
     }
 
     [Fact]
@@ -230,7 +230,7 @@ namespace RSPWebAPI.Tests.Tests
       };
       var response = await EnrollmentService.KickStudent(request);
       Assert.False(response.IsSuccess);
-      Assert.Equal(Message.EnrollmentDoesNotExists, response.Message);
+      Assert.Equal(Messages.Enrollment.DoesNotExist, response.Message);
     }
 
     [Fact]
@@ -245,7 +245,7 @@ namespace RSPWebAPI.Tests.Tests
       };
       var response = await EnrollmentService.UpdateStudentRolePromotion(request);
       Assert.False(response.IsSuccess);
-      Assert.Equal(Message.EnrollmentDoesNotExists, response.Message);
+      Assert.Equal(Messages.Enrollment.DoesNotExist, response.Message);
     }
   }
 }

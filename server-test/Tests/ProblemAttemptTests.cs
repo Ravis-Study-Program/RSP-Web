@@ -72,7 +72,7 @@ namespace RSPWebAPI.Tests.Tests
 
       var listResponse = await ProblemAttemptService.ListProblemAttempt(listRequest);
       Assert.True(listResponse.IsSuccess);
-      Assert.Equal(Message.ProblemAttemptListSuccessfully, listResponse.Message);
+      Assert.Equal(Messages.ProblemAttempt.Listed, listResponse.Message);
       Assert.NotNull(listResponse.Data);
       Assert.Equal(count, listResponse.Data.ProblemAttempts.Count);
     }
@@ -97,7 +97,7 @@ namespace RSPWebAPI.Tests.Tests
       };
 
       var response = await ProblemAttemptService.CreateProblemAttempt(request);
-      Assert.Equal(Message.ProblemAttemptCreatedSuccessfully, response.Message);
+      Assert.Equal(Messages.ProblemAttempt.Created, response.Message);
       Assert.True(response.IsSuccess);
       Assert.NotNull(response.Data?.ProblemAttemptId);
 
@@ -124,7 +124,7 @@ namespace RSPWebAPI.Tests.Tests
       };
       var response = await ProblemAttemptService.CreateProblemAttempt(request);
       Assert.False(response.IsSuccess);
-      Assert.Equal(Message.EnrollmentDoesNotExists, response.Message);
+      Assert.Equal(Messages.Enrollment.DoesNotExist, response.Message);
     }
 
     [Fact]
@@ -137,7 +137,7 @@ namespace RSPWebAPI.Tests.Tests
       };
       var response = await ProblemAttemptService.CreateProblemAttempt(request);
       Assert.False(response.IsSuccess);
-      Assert.Equal(Message.UserEmailDoesNotExists, response.Message);
+      Assert.Equal(Messages.User.EmailDoesNotExist, response.Message);
     }
 
     [Fact]
@@ -166,7 +166,7 @@ namespace RSPWebAPI.Tests.Tests
 
       var updateResponse = await ProblemAttemptService.UpdateProblemAttempt(updateRequest);
       Assert.True(updateResponse.IsSuccess);
-      Assert.Equal(Message.ProblemAttemptUpdatedSuccessfully, updateResponse.Message);
+      Assert.Equal(Messages.ProblemAttempt.Updated, updateResponse.Message);
 
       var updated = await ProblemAttemptService.GetProblemAttemptByIdAsync(attemptId);
       Assert.NotNull(updated);
@@ -185,7 +185,7 @@ namespace RSPWebAPI.Tests.Tests
       };
       var response = await ProblemAttemptService.UpdateProblemAttempt(request);
       Assert.False(response.IsSuccess);
-      Assert.Equal(Message.ProblemAttemptDoesNotExists, response.Message);
+      Assert.Equal(Messages.ProblemAttempt.DoesNotExist, response.Message);
     }
 
     [Fact]
@@ -198,7 +198,7 @@ namespace RSPWebAPI.Tests.Tests
       var request = new DeleteProblemAttemptRequest { ProblemAttemptId = attemptId, Email = email };
       var deleteResponse = await ProblemAttemptService.DeleteProblemAttempt(request);
       Assert.True(deleteResponse.IsSuccess);
-      Assert.Equal(Message.ProblemAttemptDeletedSuccessfully, deleteResponse.Message);
+      Assert.Equal(Messages.ProblemAttempt.Deleted, deleteResponse.Message);
 
       var afterDelete = await ProblemAttemptService.GetProblemAttemptByIdAsync(attemptId);
       Assert.Null(afterDelete);
@@ -221,7 +221,7 @@ namespace RSPWebAPI.Tests.Tests
       };
       var response = await ProblemAttemptService.DeleteProblemAttempt(request);
       Assert.False(response.IsSuccess);
-      Assert.Equal(Message.ProblemAttemptDoesNotExists, response.Message);
+      Assert.Equal(Messages.ProblemAttempt.DoesNotExist, response.Message);
     }
 
     [Fact]
@@ -234,7 +234,7 @@ namespace RSPWebAPI.Tests.Tests
       };
       var response = await ProblemAttemptService.DeleteProblemAttempt(request);
       Assert.False(response.IsSuccess);
-      Assert.Equal(Message.ProblemAttemptDoesNotExists, response.Message);
+      Assert.Equal(Messages.ProblemAttempt.DoesNotExist, response.Message);
     }
 
     [Fact]
@@ -253,7 +253,7 @@ namespace RSPWebAPI.Tests.Tests
 
       var listResponse = await ProblemAttemptService.ListProblemAttempt(listRequest);
       Assert.True(listResponse.IsSuccess);
-      Assert.Equal(Message.ProblemAttemptListSuccessfully, listResponse.Message);
+      Assert.Equal(Messages.ProblemAttempt.Listed, listResponse.Message);
       Assert.NotNull(listResponse.Data);
       Assert.NotEmpty(listResponse.Data.ProblemAttempts);
     }

@@ -85,7 +85,7 @@ public class UserTests : BaseIntegrationTest, IAsyncLifetime
 
     var updateResponse = await UserService.UpdateAdminUser(updateRequest);
     Assert.True(updateResponse.IsSuccess);
-    Assert.Equal(Message.UserUpdatedSuccessfully, updateResponse.Message);
+    Assert.Equal(Messages.User.Updated, updateResponse.Message);
 
     var updatedUser = await UserService.GetUserByIdAsync(targetUser.UserId);
     Assert.NotNull(updatedUser);
@@ -111,7 +111,7 @@ public class UserTests : BaseIntegrationTest, IAsyncLifetime
     var deleteRequest = new AdminDeleteUserRequest { Email = targetUser.Email };
     var deleteResponse = await UserService.DeleteAdminUser(deleteRequest);
     Assert.True(deleteResponse.IsSuccess);
-    Assert.Equal(Message.UserDeletedSuccessfully, deleteResponse.Message);
+    Assert.Equal(Messages.User.Deleted, deleteResponse.Message);
 
     var deletedUser = await UserService.GetUserByEmailAsync(targetUser.Email);
     Assert.Null(deletedUser);
@@ -140,12 +140,12 @@ public class UserTests : BaseIntegrationTest, IAsyncLifetime
       .Verifiable();
 
     var firstResponse = await UserService.CreateUserIfNotExists(request, email);
-    Assert.Equal(Message.UserCreatedSuccessfully, firstResponse.Message);
+    Assert.Equal(Messages.User.Created, firstResponse.Message);
     Assert.True(firstResponse.IsSuccess);
 
     var secondResponse = await UserService.CreateUserIfNotExists(request, email);
     Assert.True(secondResponse.IsSuccess);
-    Assert.Equal(Message.UserCreatedSuccessfully, secondResponse.Message);
+    Assert.Equal(Messages.User.Created, secondResponse.Message);
 
     var users = await _seeder.GetAllUsersAsync();
     Assert.Single(users.Where(u => u.Email == email));
@@ -225,7 +225,7 @@ public class UserTests : BaseIntegrationTest, IAsyncLifetime
 
     var currentUserResponse = await UserService.GetCurrentUser(email);
     Assert.True(currentUserResponse.IsSuccess);
-    Assert.Equal(Message.UserEmailExists, currentUserResponse.Message);
+    Assert.Equal(Messages.User.EmailExists, currentUserResponse.Message);
 
     var currentUser = currentUserResponse.Data?.User;
     Assert.NotNull(currentUser);

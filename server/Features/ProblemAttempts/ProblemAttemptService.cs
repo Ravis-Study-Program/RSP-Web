@@ -81,7 +81,7 @@ public class ProblemAttemptService : IProblemAttemptService
       if (existingEnrollment == null || existingEnrollment.User.Email != request.Email)
       {
         return new ErrorServiceResponse<CreateProblemAttemptResponse>(
-          Message.EnrollmentDoesNotExists
+          Messages.Enrollment.DoesNotExist
         );
       }
 
@@ -97,7 +97,7 @@ public class ProblemAttemptService : IProblemAttemptService
       if (seasonWeek == null)
       {
         return new ErrorServiceResponse<CreateProblemAttemptResponse>(
-          Message.ProblemAttemptOutOfSeasonDateRange
+          Messages.ProblemAttempt.OutOfSeasonDateRange
         );
       }
     }
@@ -111,7 +111,9 @@ public class ProblemAttemptService : IProblemAttemptService
     var user = await _userService.GetUserByEmailAsync(request.Email, cancellationToken);
     if (user == null)
     {
-      return new ErrorServiceResponse<CreateProblemAttemptResponse>(Message.UserEmailDoesNotExists);
+      return new ErrorServiceResponse<CreateProblemAttemptResponse>(
+        Messages.User.EmailDoesNotExist
+      );
     }
 
     var problemAttempt = new ProblemAttemptEntity
@@ -133,15 +135,15 @@ public class ProblemAttemptService : IProblemAttemptService
       await _unitOfWork.SaveChangesAsync(cancellationToken);
       _cache.Remove(RouteCacheKeys.ListProblemAttempts, request.Email);
       return new SuccessServiceResponse<CreateProblemAttemptResponse>(
-        Message.ProblemAttemptCreatedSuccessfully,
+        Messages.ProblemAttempt.Created,
         new CreateProblemAttemptResponse { ProblemAttemptId = problemAttempt.ProblemAttemptId }
       );
     }
     catch (Exception ex)
     {
-      _logger.LogError(ex, Message.ProblemAttemptCreationUnexpectedError);
+      _logger.LogError(ex, Messages.ProblemAttempt.CreationError);
       return new ErrorServiceResponse<CreateProblemAttemptResponse>(
-        Message.ProblemAttemptCreationUnexpectedError
+        Messages.ProblemAttempt.CreationError
       );
     }
   }
@@ -159,7 +161,7 @@ public class ProblemAttemptService : IProblemAttemptService
     if (existingProblemAttempt == null || existingProblemAttempt.User.Email != request.Email)
     {
       return new ErrorServiceResponse<DeleteProblemAttemptResponse>(
-        Message.ProblemAttemptDoesNotExists
+        Messages.ProblemAttempt.DoesNotExist
       );
     }
 
@@ -169,14 +171,14 @@ public class ProblemAttemptService : IProblemAttemptService
       await _unitOfWork.SaveChangesAsync(cancellationToken);
       _cache.Remove(RouteCacheKeys.ListProblemAttempts, request.Email);
       return new SuccessServiceResponse<DeleteProblemAttemptResponse>(
-        Message.ProblemAttemptDeletedSuccessfully
+        Messages.ProblemAttempt.Deleted
       );
     }
     catch (Exception ex)
     {
-      _logger.LogError(ex, Message.ProblemAttemptDeletionUnexpectedError);
+      _logger.LogError(ex, Messages.ProblemAttempt.DeletionError);
       return new ErrorServiceResponse<DeleteProblemAttemptResponse>(
-        Message.ProblemAttemptDeletionUnexpectedError
+        Messages.ProblemAttempt.DeletionError
       );
     }
   }
@@ -219,7 +221,7 @@ public class ProblemAttemptService : IProblemAttemptService
     }
 
     return new SuccessServiceResponse<ListProblemAttemptResponse>(
-      Message.ProblemAttemptListSuccessfully,
+      Messages.ProblemAttempt.Listed,
       new ListProblemAttemptResponse { ProblemAttempts = allProblemAttempts }
     );
   }
@@ -239,7 +241,7 @@ public class ProblemAttemptService : IProblemAttemptService
         var existingUser = await _userService.GetUserByEmailAsync(email, cancellationToken);
         if (existingUser == null)
         {
-          return new ErrorServiceResponse<ListProblemAttemptResponse>(Message.UserIdDoesNotExists);
+          return new ErrorServiceResponse<ListProblemAttemptResponse>(Messages.User.IdDoesNotExist);
         }
 
         var existingEnrollment = await _enrollmentService.GetEnrollmentBySeasonId(
@@ -251,7 +253,7 @@ public class ProblemAttemptService : IProblemAttemptService
         );
         if (existingEnrollment == null || existingEnrollment.User.Email != email)
         {
-          return new ErrorServiceResponse<ListProblemAttemptResponse>(Message.SeasonDoesNotExists);
+          return new ErrorServiceResponse<ListProblemAttemptResponse>(Messages.Season.DoesNotExist);
         }
       }
 
@@ -287,15 +289,15 @@ public class ProblemAttemptService : IProblemAttemptService
     try
     {
       return new SuccessServiceResponse<ListProblemAttemptResponse>(
-        Message.ProblemAttemptListSuccessfully,
+        Messages.ProblemAttempt.Listed,
         new ListProblemAttemptResponse { ProblemAttempts = problemAttempts.ToList() }
       );
     }
     catch (Exception ex)
     {
-      _logger.LogError(ex, Message.ProblemAttemptListUnexpectedError);
+      _logger.LogError(ex, Messages.ProblemAttempt.ListError);
       return new ErrorServiceResponse<ListProblemAttemptResponse>(
-        Message.ProblemAttemptListUnexpectedError
+        Messages.ProblemAttempt.ListError
       );
     }
   }
@@ -316,7 +318,7 @@ public class ProblemAttemptService : IProblemAttemptService
     )
     {
       return new ErrorServiceResponse<UpdateProblemAttemptResponse>(
-        Message.ProblemAttemptDoesNotExists
+        Messages.ProblemAttempt.DoesNotExist
       );
     }
 
@@ -335,7 +337,7 @@ public class ProblemAttemptService : IProblemAttemptService
       if (seasonWeek == null)
       {
         return new ErrorServiceResponse<UpdateProblemAttemptResponse>(
-          Message.ProblemAttemptOutOfSeasonDateRange
+          Messages.ProblemAttempt.OutOfSeasonDateRange
         );
       }
     }
@@ -359,14 +361,14 @@ public class ProblemAttemptService : IProblemAttemptService
       await _unitOfWork.SaveChangesAsync(cancellationToken);
       _cache.Remove(RouteCacheKeys.ListProblemAttempts, request.Email);
       return new SuccessServiceResponse<UpdateProblemAttemptResponse>(
-        Message.ProblemAttemptUpdatedSuccessfully
+        Messages.ProblemAttempt.Updated
       );
     }
     catch (Exception ex)
     {
-      _logger.LogError(ex, Message.ProblemAttemptUpdateUnexpectedError);
+      _logger.LogError(ex, Messages.ProblemAttempt.UpdateError);
       return new ErrorServiceResponse<UpdateProblemAttemptResponse>(
-        Message.ProblemAttemptUpdateUnexpectedError
+        Messages.ProblemAttempt.UpdateError
       );
     }
   }
@@ -395,7 +397,7 @@ public class ProblemAttemptService : IProblemAttemptService
 
     if (problemAttempt == null)
     {
-      throw new KeyNotFoundException(Message.ProblemAttemptDoesNotExists);
+      throw new KeyNotFoundException(Messages.ProblemAttempt.DoesNotExist);
     }
 
     _problemAttemptRepository.Delete(problemAttempt, cancellationToken);
@@ -414,7 +416,7 @@ public class ProblemAttemptService : IProblemAttemptService
     );
     if (existingProblemAttempt == null)
     {
-      throw new KeyNotFoundException(Message.ProblemAttemptDoesNotExists);
+      throw new KeyNotFoundException(Messages.ProblemAttempt.DoesNotExist);
     }
 
     _problemAttemptRepository.Update(problemAttempt, cancellationToken);
