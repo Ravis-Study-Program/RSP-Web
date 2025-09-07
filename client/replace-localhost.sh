@@ -4,7 +4,7 @@
 # Usage: ./replace-localhost.sh
 
 CLIENT_FILE="src/generated/api/client.ts"
-API_BASE_URL="${VITE_APP_BASE_API_URL:-http://localhost}"
+API_BASE_URL="${SERVER_URL:-http://localhost}"
 
 if [ ! -f "$CLIENT_FILE" ]; then
     echo "Error: $CLIENT_FILE not found!"
