@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Script to replace localhost with environment variable in generated client.ts
 # Usage: ./replace-localhost.sh
