@@ -11,8 +11,6 @@
         condition: service_healthy
     ports:
       - "3000:3000"
-    env_file:
-      - .env.dev
     networks:
       - dokploy-network
     restart: unless-stopped
@@ -32,8 +30,6 @@
         condition: service_healthy
     ports:
       - "4000:4000"
-    env_file:
-      - .env.dev
     networks:
       - dokploy-network
     restart: unless-stopped
@@ -47,8 +43,6 @@
     image: postgres:17.5-alpine
     ports:
       - "5432:5432"
-    env_file:
-      - .env.dev
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./logs/postgres:/var/log/postgresql
