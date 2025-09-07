@@ -25,17 +25,12 @@ COPY --from=build /app/dist .
 
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-COPY entrypoint.sh .
-RUN chmod +x entrypoint.sh
-
 EXPOSE 3000
 
 HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
     CMD curl -f http://localhost:3000/health || exit 1
 
-# ENTRYPOINT ["./entrypoint.sh"]
-
-RUN yarn run build
+CMD ["nginx", "-g", "daemon off;"]
 
 # Development stage
 FROM node:20-alpine AS development
