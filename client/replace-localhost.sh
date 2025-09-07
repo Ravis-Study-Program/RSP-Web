@@ -4,6 +4,8 @@
 # Usage: ./replace-localhost.sh
 
 CLIENT_FILE="src/generated/api/client.ts"
+echo "DEBUG: SERVER_URL = '$SERVER_URL'"
+echo "DEBUG: VITE_APP_BASE_API_URL = '$VITE_APP_BASE_API_URL'"
 API_BASE_URL="${SERVER_URL:-http://localhost}"
 
 if [ ! -f "$CLIENT_FILE" ]; then
