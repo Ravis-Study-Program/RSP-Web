@@ -13,7 +13,7 @@ COPY . .
 ARG BUILD_CONFIGURATION=Release
 ARG BUILD_ENVIRONMENT=Production
 
-RUN yarn run build:no-api
+RUN yarn run build
 
 # Production stage
 FROM nginx:1.25-alpine AS production
