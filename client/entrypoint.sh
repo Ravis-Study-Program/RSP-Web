@@ -2,7 +2,7 @@
 
 if [ "$NODE_ENV" = "production" ]; then
   echo "Running production build..."
-  yarn run build
+  nginx -g daemon off
 else
   echo "Running development server..."
   yarn run dev
