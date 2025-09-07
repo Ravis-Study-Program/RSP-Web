@@ -1,14 +1,4 @@
 services:
-  nginx:
-    container_name: nginx-dev
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./nginx/ssl:/etc/nginx/ssl:ro
-      - ./logs/nginx:/var/log/nginx
-
   server:
     container_name: server-dev
     build:
@@ -50,7 +40,7 @@ services:
     build:
       target: development
     ports:
-      - "3000:3000"
+      - "8080:8080"
     env_file:
       - .env.dev
     volumes:

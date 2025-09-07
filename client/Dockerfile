@@ -12,8 +12,12 @@ COPY . .
 
 ARG BUILD_CONFIGURATION=Release
 ARG BUILD_ENVIRONMENT=Production
+ARG SERVER_URL=http://localhost
 
-RUN yarn run build:no-api
+# Replace with SERVER_URL
+RUN sed -i "s|http://localhost|${SERVER_URL}|g" src/generated/api/client.ts
+
+RUN yarn run build
 
 # Production stage
 FROM nginx:1.25-alpine AS production
@@ -25,13 +29,10 @@ COPY --from=build /app/dist .
 
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-COPY entrypoint.sh .
-RUN chmod +x entrypoint.sh
-
-EXPOSE 3000
+EXPOSE 8080
 
 HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
-    CMD curl -f http://localhost:3000/health || exit 1
+    CMD curl -f http://localhost:8080/health || exit 1
 
 ENTRYPOINT ["./entrypoint.sh"]
 
@@ -53,9 +54,9 @@ COPY . .
 COPY entrypoint.sh .
 RUN chmod +x entrypoint.sh
 
-EXPOSE 3000
+EXPOSE 8080
 
 HEALTHCHECK --interval=10s --timeout=5s --start-period=30s --retries=10 \
-    CMD curl -f http://localhost:3000/health || exit 1
+    CMD curl -f http://localhost:8080/health || exit 1
 
 ENTRYPOINT ["./entrypoint.sh"]
