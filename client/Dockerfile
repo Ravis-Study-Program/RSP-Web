@@ -9,11 +9,12 @@ COPY package.json yarn.lock ./
 RUN yarn install --immutable --inline-builds
 
 COPY . .
-COPY replace-localhost.sh ./
 
 ARG BUILD_CONFIGURATION=Release
 ARG BUILD_ENVIRONMENT=Production
+ARG SERVER_URL=http://localhost
 
+RUN sed -i "s|http://localhost|${SERVER_URL}|g" src/generated/api/client.ts
 RUN yarn run build
 
 # Production stage
