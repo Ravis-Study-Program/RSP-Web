@@ -2,8 +2,8 @@
 
 if [ "$NODE_ENV" = "production" ]; then
   echo "Running production build..."
-  yarn run build
+  exec yarn run build
 else
   echo "Running development server..."
-  yarn run dev
+  exec yarn run dev
 fi

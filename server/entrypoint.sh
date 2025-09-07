@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 if [ "$ASPNETCORE_ENVIRONMENT" = "Production" ]; then
   echo "Running production build..."
