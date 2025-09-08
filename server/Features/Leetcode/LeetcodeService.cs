@@ -62,9 +62,7 @@ public class LeetcodeService : ILeetcodeService
     return await _leetcodeProblemRepository.GetAllAsync(predicate, cancellationToken, include);
   }
 
-  public async Task<
-    IServiceResponse<AdminPopulateLeetcodeQuestionsResponse>
-  > AdminPopulateLeetcodeQuestions(
+  public async Task<AdminPopulateLeetcodeQuestionsResponse> AdminPopulateLeetcodeQuestions(
     AdminPopulateLeetcodeQuestionsRequest request,
     CancellationToken cancellationToken = default
   )
@@ -91,9 +89,7 @@ public class LeetcodeService : ILeetcodeService
         errorContent
       );
 
-      return new ErrorServiceResponse<AdminPopulateLeetcodeQuestionsResponse>(
-        Messages.Common.UnexpectedError
-      );
+      throw new InvalidOperationException(Messages.Common.UnexpectedError);
     }
 
     var output = await response.Content.ReadAsStringAsync(cancellationToken);
@@ -101,9 +97,7 @@ public class LeetcodeService : ILeetcodeService
     if (jsonData == null)
     {
       _logger.LogError("Failed to deserialize or missing required data in API response.");
-      return new ErrorServiceResponse<AdminPopulateLeetcodeQuestionsResponse>(
-        Messages.Common.UnexpectedError
-      );
+      throw new InvalidOperationException(Messages.Common.UnexpectedError);
     }
 
     await _unitOfWork.BeginTransactionAsync(cancellationToken);
@@ -232,17 +226,13 @@ public class LeetcodeService : ILeetcodeService
     {
       _logger.LogError(ex, "Error occurred during transaction.");
       await _unitOfWork.RollbackTransactionAsync(cancellationToken);
-      return new ErrorServiceResponse<AdminPopulateLeetcodeQuestionsResponse>(
-        Messages.Common.UnexpectedError
-      );
+      throw new InvalidOperationException(Messages.Common.UnexpectedError);
     }
 
-    return new SuccessServiceResponse<AdminPopulateLeetcodeQuestionsResponse>(
-      Messages.LeetcodeProblem.ScrapedSuccessfully
-    );
+    return new AdminPopulateLeetcodeQuestionsResponse();
   }
 
-  public async Task<IServiceResponse<ListLeetcodeProblemsResponse>> ListLeetcodeProblems(
+  public async Task<ListLeetcodeProblemsResponse> ListLeetcodeProblems(
     ListLeetcodeProblemsRequest request,
     CancellationToken cancellationToken = default
   )
@@ -256,13 +246,13 @@ public class LeetcodeService : ILeetcodeService
 
     if (response == null)
     {
-      throw new Exception("Error listing leetcode problems");
+      throw new InvalidOperationException("Error listing leetcode problems");
     }
 
     return response;
   }
 
-  private async Task<IServiceResponse<ListLeetcodeProblemsResponse>> _listLeetcodeProblems(
+  private async Task<ListLeetcodeProblemsResponse> _listLeetcodeProblems(
     ListLeetcodeProblemsRequest request,
     CancellationToken cancellationToken = default
   )
@@ -287,9 +277,6 @@ public class LeetcodeService : ILeetcodeService
       })
       .ToList();
 
-    return new SuccessServiceResponse<ListLeetcodeProblemsResponse>(
-      Messages.LeetcodeProblem.Listed,
-      new ListLeetcodeProblemsResponse { LeetcodeProblems = formattedLeetcodeProblems }
-    );
+    return new ListLeetcodeProblemsResponse { LeetcodeProblems = formattedLeetcodeProblems };
   }
 }

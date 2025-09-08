@@ -13,12 +13,12 @@ public interface ILeetcodeService
     Func<IQueryable<LeetcodeProblemEntity>, IQueryable<LeetcodeProblemEntity>>? include = null
   );
 
-  Task<IServiceResponse<AdminPopulateLeetcodeQuestionsResponse>> AdminPopulateLeetcodeQuestions(
+  Task<AdminPopulateLeetcodeQuestionsResponse> AdminPopulateLeetcodeQuestions(
     AdminPopulateLeetcodeQuestionsRequest request,
     CancellationToken cancellationToken = default
   );
 
-  Task<IServiceResponse<ListLeetcodeProblemsResponse>> ListLeetcodeProblems(
+  Task<ListLeetcodeProblemsResponse> ListLeetcodeProblems(
     ListLeetcodeProblemsRequest request,
     CancellationToken cancellationToken = default
   );

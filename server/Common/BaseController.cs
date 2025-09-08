@@ -1,6 +1,5 @@
 using System.Net;
 using Microsoft.AspNetCore.Mvc;
-using RSPWebAPI.Common.Interfaces;
 using RSPWebAPI.Shared;
 
 namespace RSPWebAPI.Common;
@@ -30,15 +29,9 @@ public class BaseController : ControllerBase
     );
   }
 
-  protected ActionResult<ApiResponse<T>> HandleResponse<T>(
-    IServiceResponse<T> response,
-    HttpStatusCode errorHttpStatusCode = HttpStatusCode.BadRequest,
-    HttpStatusCode successHttpStatusCode = HttpStatusCode.OK
-  )
+  protected ActionResult<ApiResponse<T>> OkResponse<T>(T responseBody)
   {
-    return response.IsSuccess
-      ? SuccessResponse(response.Message, successHttpStatusCode, response.Data)
-      : ErrorResponse<T>(response.Message, errorHttpStatusCode);
+    return Ok(new ApiResponse<T> { ResponseBody = responseBody });
   }
 
   protected string? GetCurrentUserEmail()

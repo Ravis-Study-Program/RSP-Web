@@ -28,8 +28,8 @@ public class MentorshipController : BaseController
     CancellationToken cancellationToken = default
   )
   {
-    var response = await _mentorshipService.CreateAdminMentorship(request, cancellationToken);
-    return HandleResponse(response);
+    var result = await _mentorshipService.CreateAdminMentorship(request, cancellationToken);
+    return OkResponse(result);
   }
 
   [HttpDelete]
@@ -41,8 +41,8 @@ public class MentorshipController : BaseController
     CancellationToken cancellationToken = default
   )
   {
-    var response = await _mentorshipService.DeleteAdminMentorship(request, cancellationToken);
-    return HandleResponse(response);
+    var result = await _mentorshipService.DeleteAdminMentorship(request, cancellationToken);
+    return OkResponse(result);
   }
 
   [HttpGet]
@@ -54,8 +54,8 @@ public class MentorshipController : BaseController
     CancellationToken cancellationToken = default
   )
   {
-    var response = await _mentorshipService.ListAdminMentorship(request, cancellationToken);
-    return HandleResponse(response);
+    var result = await _mentorshipService.ListAdminMentorship(request, cancellationToken);
+    return OkResponse(result);
   }
 
   [HttpPut]
@@ -67,8 +67,8 @@ public class MentorshipController : BaseController
     CancellationToken cancellationToken = default
   )
   {
-    var response = await _mentorshipService.UpdateAdminMentorship(request, cancellationToken);
-    return HandleResponse(response);
+    var result = await _mentorshipService.UpdateAdminMentorship(request, cancellationToken);
+    return OkResponse(result);
   }
 
   [HttpGet]
@@ -82,8 +82,8 @@ public class MentorshipController : BaseController
     CancellationToken cancellationToken = default
   )
   {
-    var response = await _mentorshipService.GetCurrentUserMenteesList(request, cancellationToken);
-    return HandleResponse(response);
+    var result = await _mentorshipService.GetCurrentUserMenteesList(request, cancellationToken);
+    return OkResponse(result);
   }
 
   #endregion

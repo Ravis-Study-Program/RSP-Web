@@ -39,27 +39,27 @@ public interface ISeasonWeekService
     Func<IQueryable<SeasonWeekEntity>, IQueryable<SeasonWeekEntity>>? include = null
   );
 
-  Task<IServiceResponse<AdminCreateSeasonWeekResponse>> CreateAdminSeasonWeek(
+  Task<AdminCreateSeasonWeekResponse> CreateAdminSeasonWeek(
     AdminCreateSeasonWeekRequest request,
     CancellationToken cancellationToken = default
   );
 
-  Task<IServiceResponse<AdminDeleteSeasonWeekResponse>> DeleteAdminSeasonWeek(
+  Task<AdminDeleteSeasonWeekResponse> DeleteAdminSeasonWeek(
     AdminDeleteSeasonWeekRequest request,
     CancellationToken cancellationToken = default
   );
 
-  Task<IServiceResponse<AdminListSeasonWeekResponse>> ListAdminSeasonWeek(
+  Task<AdminListSeasonWeekResponse> ListAdminSeasonWeek(
     AdminListSeasonWeekRequest request,
     CancellationToken cancellationToken = default
   );
 
-  Task<IServiceResponse<AdminUpdateSeasonWeekResponse>> UpdateAdminSeasonWeek(
+  Task<AdminUpdateSeasonWeekResponse> UpdateAdminSeasonWeek(
     AdminUpdateSeasonWeekRequest request,
     CancellationToken cancellationToken = default
   );
 
-  Task<IServiceResponse<GetSeasonWeeksBySeasonSlugResponse>> GetSeasonWeeksBySeasonSlug(
+  Task<GetSeasonWeeksBySeasonSlugResponse> GetSeasonWeeksBySeasonSlug(
     GetSeasonWeeksBySeasonSlugRequest request,
     CancellationToken cancellationToken = default
   );

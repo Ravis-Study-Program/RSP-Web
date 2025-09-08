@@ -65,7 +65,7 @@ public class ProblemAttemptService : IProblemAttemptService
     );
   }
 
-  public async Task<IServiceResponse<CreateProblemAttemptResponse>> CreateProblemAttempt(
+  public async Task<CreateProblemAttemptResponse> CreateProblemAttempt(
     CreateProblemAttemptRequest request,
     CancellationToken cancellationToken = default
   )
@@ -80,9 +80,7 @@ public class ProblemAttemptService : IProblemAttemptService
       );
       if (existingEnrollment == null || existingEnrollment.User.Email != request.Email)
       {
-        return new ErrorServiceResponse<CreateProblemAttemptResponse>(
-          Messages.Enrollment.DoesNotExist
-        );
+        throw new KeyNotFoundException(Messages.Enrollment.DoesNotExist);
       }
 
       var currentDate = request.AttemptStartDateUtc;
@@ -96,9 +94,7 @@ public class ProblemAttemptService : IProblemAttemptService
       seasonWeek = seasonWeeks.FirstOrDefault();
       if (seasonWeek == null)
       {
-        return new ErrorServiceResponse<CreateProblemAttemptResponse>(
-          Messages.ProblemAttempt.OutOfSeasonDateRange
-        );
+        throw new InvalidOperationException(Messages.ProblemAttempt.OutOfSeasonDateRange);
       }
     }
 
@@ -111,9 +107,7 @@ public class ProblemAttemptService : IProblemAttemptService
     var user = await _userService.GetUserByEmailAsync(request.Email, cancellationToken);
     if (user == null)
     {
-      return new ErrorServiceResponse<CreateProblemAttemptResponse>(
-        Messages.User.EmailDoesNotExist
-      );
+      throw new KeyNotFoundException(Messages.User.EmailDoesNotExist);
     }
 
     var problemAttempt = new ProblemAttemptEntity
@@ -134,21 +128,19 @@ public class ProblemAttemptService : IProblemAttemptService
       await AddProblemAttemptAsync(problemAttempt, cancellationToken);
       await _unitOfWork.SaveChangesAsync(cancellationToken);
       _cache.Remove(RouteCacheKeys.ListProblemAttempts, request.Email);
-      return new SuccessServiceResponse<CreateProblemAttemptResponse>(
-        Messages.ProblemAttempt.Created,
-        new CreateProblemAttemptResponse { ProblemAttemptId = problemAttempt.ProblemAttemptId }
-      );
+      return new CreateProblemAttemptResponse
+      {
+        ProblemAttemptId = problemAttempt.ProblemAttemptId,
+      };
     }
     catch (Exception ex)
     {
       _logger.LogError(ex, Messages.ProblemAttempt.CreationError);
-      return new ErrorServiceResponse<CreateProblemAttemptResponse>(
-        Messages.ProblemAttempt.CreationError
-      );
+      throw new InvalidOperationException(Messages.ProblemAttempt.CreationError);
     }
   }
 
-  public async Task<IServiceResponse<DeleteProblemAttemptResponse>> DeleteProblemAttempt(
+  public async Task<DeleteProblemAttemptResponse> DeleteProblemAttempt(
     DeleteProblemAttemptRequest request,
     CancellationToken cancellationToken = default
   )
@@ -160,9 +152,7 @@ public class ProblemAttemptService : IProblemAttemptService
     );
     if (existingProblemAttempt == null || existingProblemAttempt.User.Email != request.Email)
     {
-      return new ErrorServiceResponse<DeleteProblemAttemptResponse>(
-        Messages.ProblemAttempt.DoesNotExist
-      );
+      throw new KeyNotFoundException(Messages.ProblemAttempt.DoesNotExist);
     }
 
     try
@@ -170,20 +160,16 @@ public class ProblemAttemptService : IProblemAttemptService
       await DeleteProblemAttemptAsync(existingProblemAttempt.ProblemAttemptId, cancellationToken);
       await _unitOfWork.SaveChangesAsync(cancellationToken);
       _cache.Remove(RouteCacheKeys.ListProblemAttempts, request.Email);
-      return new SuccessServiceResponse<DeleteProblemAttemptResponse>(
-        Messages.ProblemAttempt.Deleted
-      );
+      return new DeleteProblemAttemptResponse();
     }
     catch (Exception ex)
     {
       _logger.LogError(ex, Messages.ProblemAttempt.DeletionError);
-      return new ErrorServiceResponse<DeleteProblemAttemptResponse>(
-        Messages.ProblemAttempt.DeletionError
-      );
+      throw new InvalidOperationException(Messages.ProblemAttempt.DeletionError);
     }
   }
 
-  public async Task<IServiceResponse<ListProblemAttemptResponse>> ListProblemAttempt(
+  public async Task<ListProblemAttemptResponse> ListProblemAttempt(
     ListProblemAttemptRequest request,
     CancellationToken cancellationToken = default
   )
@@ -208,25 +194,16 @@ public class ProblemAttemptService : IProblemAttemptService
       );
       if (response == null)
       {
-        throw new Exception("Error listing problem attempts");
+        throw new InvalidOperationException("Error listing problem attempts");
       }
 
-      // Early return if any failure occurs
-      if (!response.IsSuccess || response.Data == null)
-      {
-        return response;
-      }
-
-      allProblemAttempts.AddRange(response.Data.ProblemAttempts);
+      allProblemAttempts.AddRange(response.ProblemAttempts);
     }
 
-    return new SuccessServiceResponse<ListProblemAttemptResponse>(
-      Messages.ProblemAttempt.Listed,
-      new ListProblemAttemptResponse { ProblemAttempts = allProblemAttempts }
-    );
+    return new ListProblemAttemptResponse { ProblemAttempts = allProblemAttempts };
   }
 
-  private async Task<IServiceResponse<ListProblemAttemptResponse>> _listProblemAttempt(
+  private async Task<ListProblemAttemptResponse> _listProblemAttempt(
     ListProblemAttemptRequest request,
     CancellationToken cancellationToken = default
   )
@@ -241,7 +218,7 @@ public class ProblemAttemptService : IProblemAttemptService
         var existingUser = await _userService.GetUserByEmailAsync(email, cancellationToken);
         if (existingUser == null)
         {
-          return new ErrorServiceResponse<ListProblemAttemptResponse>(Messages.User.IdDoesNotExist);
+          throw new KeyNotFoundException(Messages.User.IdDoesNotExist);
         }
 
         var existingEnrollment = await _enrollmentService.GetEnrollmentBySeasonId(
@@ -253,7 +230,7 @@ public class ProblemAttemptService : IProblemAttemptService
         );
         if (existingEnrollment == null || existingEnrollment.User.Email != email)
         {
-          return new ErrorServiceResponse<ListProblemAttemptResponse>(Messages.Season.DoesNotExist);
+          throw new KeyNotFoundException(Messages.Season.DoesNotExist);
         }
       }
 
@@ -288,21 +265,16 @@ public class ProblemAttemptService : IProblemAttemptService
 
     try
     {
-      return new SuccessServiceResponse<ListProblemAttemptResponse>(
-        Messages.ProblemAttempt.Listed,
-        new ListProblemAttemptResponse { ProblemAttempts = problemAttempts.ToList() }
-      );
+      return new ListProblemAttemptResponse { ProblemAttempts = problemAttempts.ToList() };
     }
     catch (Exception ex)
     {
       _logger.LogError(ex, Messages.ProblemAttempt.ListError);
-      return new ErrorServiceResponse<ListProblemAttemptResponse>(
-        Messages.ProblemAttempt.ListError
-      );
+      throw new InvalidOperationException(Messages.ProblemAttempt.ListError);
     }
   }
 
-  public async Task<IServiceResponse<UpdateProblemAttemptResponse>> UpdateProblemAttempt(
+  public async Task<UpdateProblemAttemptResponse> UpdateProblemAttempt(
     UpdateProblemAttemptRequest request,
     CancellationToken cancellationToken = default
   )
@@ -317,9 +289,7 @@ public class ProblemAttemptService : IProblemAttemptService
       || request.EnrollmentId != existingProblemAttempt.EnrollmentId
     )
     {
-      return new ErrorServiceResponse<UpdateProblemAttemptResponse>(
-        Messages.ProblemAttempt.DoesNotExist
-      );
+      throw new KeyNotFoundException(Messages.ProblemAttempt.DoesNotExist);
     }
 
     SeasonWeekEntity? seasonWeek = null;
@@ -336,9 +306,7 @@ public class ProblemAttemptService : IProblemAttemptService
       seasonWeek = seasonWeeks.FirstOrDefault();
       if (seasonWeek == null)
       {
-        return new ErrorServiceResponse<UpdateProblemAttemptResponse>(
-          Messages.ProblemAttempt.OutOfSeasonDateRange
-        );
+        throw new InvalidOperationException(Messages.ProblemAttempt.OutOfSeasonDateRange);
       }
     }
 
@@ -360,16 +328,12 @@ public class ProblemAttemptService : IProblemAttemptService
       await UpdateProblemAttemptAsync(existingProblemAttempt, cancellationToken);
       await _unitOfWork.SaveChangesAsync(cancellationToken);
       _cache.Remove(RouteCacheKeys.ListProblemAttempts, request.Email);
-      return new SuccessServiceResponse<UpdateProblemAttemptResponse>(
-        Messages.ProblemAttempt.Updated
-      );
+      return new UpdateProblemAttemptResponse();
     }
     catch (Exception ex)
     {
       _logger.LogError(ex, Messages.ProblemAttempt.UpdateError);
-      return new ErrorServiceResponse<UpdateProblemAttemptResponse>(
-        Messages.ProblemAttempt.UpdateError
-      );
+      throw new InvalidOperationException(Messages.ProblemAttempt.UpdateError);
     }
   }
 

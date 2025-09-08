@@ -63,8 +63,6 @@ namespace RSPWebAPI.Tests.Tests
       }
       var listRequest = new AdminListSeasonWeekRequest();
       var listResponse = await SeasonWeekService.ListAdminSeasonWeek(listRequest);
-      Assert.True(listResponse.IsSuccess);
-      Assert.Equal(Messages.SeasonWeek.Listed, listResponse.Message);
       var allWeeks = await _seeder.GetAllSeasonWeeksAsync();
       Assert.Equal(count, allWeeks.Count);
     }
@@ -79,9 +77,9 @@ namespace RSPWebAPI.Tests.Tests
         StartDate = DateTime.UtcNow,
         EndDate = DateTime.UtcNow.AddDays(6),
       };
-      var response = await SeasonWeekService.CreateAdminSeasonWeek(request);
-      Assert.False(response.IsSuccess);
-      Assert.Equal(Messages.Season.DoesNotExist, response.Message);
+      await Assert.ThrowsAsync<KeyNotFoundException>(
+        () => SeasonWeekService.CreateAdminSeasonWeek(request)
+      );
     }
 
     [Fact]
@@ -100,8 +98,6 @@ namespace RSPWebAPI.Tests.Tests
         EndDate = DateTime.UtcNow.AddDays(6),
       };
       var firstResponse = await SeasonWeekService.CreateAdminSeasonWeek(firstRequest);
-      Assert.True(firstResponse.IsSuccess);
-      Assert.Equal(Messages.SeasonWeek.Created, firstResponse.Message);
       var secondRequest = new AdminCreateSeasonWeekRequest
       {
         SeasonId = seasonId,
@@ -109,9 +105,9 @@ namespace RSPWebAPI.Tests.Tests
         StartDate = DateTime.UtcNow,
         EndDate = DateTime.UtcNow.AddDays(6),
       };
-      var secondResponse = await SeasonWeekService.CreateAdminSeasonWeek(secondRequest);
-      Assert.False(secondResponse.IsSuccess);
-      Assert.Equal(Messages.SeasonWeek.Exists, secondResponse.Message);
+      await Assert.ThrowsAsync<InvalidOperationException>(
+        () => SeasonWeekService.CreateAdminSeasonWeek(secondRequest)
+      );
     }
 
     [Fact]
@@ -126,9 +122,9 @@ namespace RSPWebAPI.Tests.Tests
         StartDate = season!.EndDateInclusiveUtc.AddDays(1),
         EndDate = season.EndDateInclusiveUtc.AddDays(2),
       };
-      var response = await SeasonWeekService.CreateAdminSeasonWeek(request);
-      Assert.False(response.IsSuccess);
-      Assert.Equal(Messages.SeasonWeek.DatesNotWithinSeasonDates, response.Message);
+      await Assert.ThrowsAsync<ArgumentException>(
+        () => SeasonWeekService.CreateAdminSeasonWeek(request)
+      );
     }
 
     [Fact]
@@ -145,8 +141,6 @@ namespace RSPWebAPI.Tests.Tests
         EndDate = DateTime.UtcNow.AddDays(7),
       };
       var updateResponse = await SeasonWeekService.UpdateAdminSeasonWeek(updateRequest);
-      Assert.True(updateResponse.IsSuccess);
-      Assert.Equal(Messages.SeasonWeek.Updated, updateResponse.Message);
       var updated = await SeasonWeekService.GetSeasonWeekByIdAsync(seasonWeekId);
       Assert.NotNull(updated);
       Assert.Equal(updateRequest.WeekNumber, updated!.WeekNumber);
@@ -161,8 +155,6 @@ namespace RSPWebAPI.Tests.Tests
       var seasonWeekId = await _seeder.SeedSeasonWeekAsync(seasonId, 1);
       var request = new AdminDeleteSeasonWeekRequest { SeasonWeekId = seasonWeekId };
       var deleteResponse = await SeasonWeekService.DeleteAdminSeasonWeek(request);
-      Assert.True(deleteResponse.IsSuccess);
-      Assert.Equal(Messages.SeasonWeek.Deleted, deleteResponse.Message);
       var afterDelete = await SeasonWeekService.GetSeasonWeekByIdAsync(seasonWeekId);
       Assert.Null(afterDelete);
     }
@@ -174,9 +166,9 @@ namespace RSPWebAPI.Tests.Tests
       {
         SeasonWeekId = _faker.Random.AlphaNumeric(10),
       };
-      var response = await SeasonWeekService.DeleteAdminSeasonWeek(request);
-      Assert.False(response.IsSuccess);
-      Assert.Equal(Messages.SeasonWeek.DoesNotExist, response.Message);
+      await Assert.ThrowsAsync<KeyNotFoundException>(
+        () => SeasonWeekService.DeleteAdminSeasonWeek(request)
+      );
     }
 
     [Fact]
@@ -184,8 +176,7 @@ namespace RSPWebAPI.Tests.Tests
     {
       var listRequest = new AdminListSeasonWeekRequest();
       var listResponse = await SeasonWeekService.ListAdminSeasonWeek(listRequest);
-      Assert.True(listResponse.IsSuccess);
-      Assert.Equal(Messages.SeasonWeek.Listed, listResponse.Message);
+      Assert.NotNull(listResponse.SeasonWeeks);
     }
   }
 }

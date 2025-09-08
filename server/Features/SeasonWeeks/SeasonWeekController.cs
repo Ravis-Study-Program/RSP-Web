@@ -28,8 +28,8 @@ public class SeasonWeekController : BaseController
     CancellationToken cancellationToken = default
   )
   {
-    var response = await _seasonWeekService.CreateAdminSeasonWeek(request, cancellationToken);
-    return HandleResponse(response);
+    var result = await _seasonWeekService.CreateAdminSeasonWeek(request, cancellationToken);
+    return OkResponse(result);
   }
 
   [HttpDelete]
@@ -41,8 +41,8 @@ public class SeasonWeekController : BaseController
     CancellationToken cancellationToken = default
   )
   {
-    var response = await _seasonWeekService.DeleteAdminSeasonWeek(request, cancellationToken);
-    return HandleResponse(response);
+    var result = await _seasonWeekService.DeleteAdminSeasonWeek(request, cancellationToken);
+    return OkResponse(result);
   }
 
   [HttpGet]
@@ -54,8 +54,8 @@ public class SeasonWeekController : BaseController
     CancellationToken cancellationToken = default
   )
   {
-    var response = await _seasonWeekService.ListAdminSeasonWeek(request, cancellationToken);
-    return HandleResponse(response);
+    var result = await _seasonWeekService.ListAdminSeasonWeek(request, cancellationToken);
+    return OkResponse(result);
   }
 
   [HttpPut]
@@ -67,8 +67,8 @@ public class SeasonWeekController : BaseController
     CancellationToken cancellationToken = default
   )
   {
-    var response = await _seasonWeekService.UpdateAdminSeasonWeek(request, cancellationToken);
-    return HandleResponse(response);
+    var result = await _seasonWeekService.UpdateAdminSeasonWeek(request, cancellationToken);
+    return OkResponse(result);
   }
 
   [HttpGet]
@@ -82,8 +82,8 @@ public class SeasonWeekController : BaseController
     CancellationToken cancellationToken = default
   )
   {
-    var response = await _seasonWeekService.GetSeasonWeeksBySeasonSlug(request, cancellationToken);
-    return HandleResponse(response);
+    var result = await _seasonWeekService.GetSeasonWeeksBySeasonSlug(request, cancellationToken);
+    return OkResponse(result);
   }
 
   #endregion

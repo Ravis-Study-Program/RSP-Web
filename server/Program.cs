@@ -182,11 +182,12 @@ builder.Logging.AddConsole();
 var app = builder.Build();
 
 // app.UseMiddleware<RequestLoggingMiddleware>();
+app.UseMiddleware<GlobalExceptionHandlingMiddleware>();
 
 app.UseRouting();
 app.MapControllers();
 app.UseCors("CorsPolicy");
-app.UseExceptionHandler("/error");
+
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseSwagger();

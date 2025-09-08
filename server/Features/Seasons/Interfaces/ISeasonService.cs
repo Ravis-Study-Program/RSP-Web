@@ -29,22 +29,22 @@ public interface ISeasonService
     Func<IQueryable<SeasonEntity>, IQueryable<SeasonEntity>>? include = null
   );
 
-  Task<IServiceResponse<AdminCreateSeasonResponse>> CreateAdminSeason(
+  Task<AdminCreateSeasonResponse> CreateAdminSeason(
     AdminCreateSeasonRequest request,
     CancellationToken cancellationToken = default
   );
 
-  Task<IServiceResponse<AdminDeleteSeasonResponse>> DeleteAdminSeason(
+  Task<AdminDeleteSeasonResponse> DeleteAdminSeason(
     AdminDeleteSeasonRequest request,
     CancellationToken cancellationToken = default
   );
 
-  Task<IServiceResponse<AdminListSeasonResponse>> ListAdminSeason(
+  Task<AdminListSeasonResponse> ListAdminSeason(
     AdminListSeasonRequest request,
     CancellationToken cancellationToken = default
   );
 
-  Task<IServiceResponse<AdminUpdateSeasonResponse>> UpdateAdminSeason(
+  Task<AdminUpdateSeasonResponse> UpdateAdminSeason(
     AdminUpdateSeasonRequest request,
     CancellationToken cancellationToken = default
   );

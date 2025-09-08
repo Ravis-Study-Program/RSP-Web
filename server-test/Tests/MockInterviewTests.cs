@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Bogus;
@@ -71,10 +72,9 @@ namespace RSPWebAPI.Tests.Tests
         IncludeCustom = false,
       };
       var listResponse = await MockInterviewService.ListMockInterview(listRequest);
-      Assert.Equal(Messages.MockInterview.Listed, listResponse.Message);
-      Assert.True(listResponse.IsSuccess);
-      Assert.NotNull(listResponse.Data?.MockInterviews);
-      Assert.Equal(count, listResponse.Data.MockInterviews.Count);
+      Assert.NotNull(listResponse);
+      Assert.NotNull(listResponse.MockInterviews);
+      Assert.Equal(count, listResponse.MockInterviews.Count);
     }
 
     [Fact]
@@ -105,9 +105,9 @@ namespace RSPWebAPI.Tests.Tests
         SeasonId = seasonId,
         StartDate = DateTime.UtcNow,
       };
-      var response = await MockInterviewService.CreateMockInterview(request);
-      Assert.False(response.IsSuccess);
-      Assert.Equal(Messages.Enrollment.DoesNotExist, response.Message);
+      await Assert.ThrowsAsync<KeyNotFoundException>(
+        () => MockInterviewService.CreateMockInterview(request)
+      );
     }
 
     [Fact]
@@ -134,8 +134,7 @@ namespace RSPWebAPI.Tests.Tests
       };
 
       var updateResp = await MockInterviewService.UpdateMockInterview(updateRequest);
-      Assert.Equal(Messages.MockInterview.Updated, updateResp.Message);
-      Assert.True(updateResp.IsSuccess);
+      Assert.NotNull(updateResp);
 
       var afterUpdate = await MockInterviewService.GetMockInterviewByIdAsync(mockInterviewId);
       Assert.NotNull(afterUpdate);
@@ -162,8 +161,7 @@ namespace RSPWebAPI.Tests.Tests
         Email = interviewerEmail,
       };
       var deleteResp = await MockInterviewService.DeleteMockInterview(request);
-      Assert.True(deleteResp.IsSuccess);
-      Assert.Equal(Messages.MockInterview.Deleted, deleteResp.Message);
+      Assert.NotNull(deleteResp);
 
       var afterDelete = await MockInterviewService.GetMockInterviewByIdAsync(mockInterviewId);
       Assert.Null(afterDelete);
@@ -187,9 +185,9 @@ namespace RSPWebAPI.Tests.Tests
         MockInterviewId = mockInterviewId,
         Email = _faker.Internet.Email().ToLower(),
       };
-      var deleteResp = await MockInterviewService.DeleteMockInterview(request);
-      Assert.False(deleteResp.IsSuccess);
-      Assert.Equal(Messages.MockInterview.DeletionOnlyInterviewerAllowed, deleteResp.Message);
+      await Assert.ThrowsAsync<ArgumentException>(
+        () => MockInterviewService.DeleteMockInterview(request)
+      );
     }
 
     [Fact]
@@ -207,10 +205,9 @@ namespace RSPWebAPI.Tests.Tests
         IncludeCustom = true,
       };
       var listResp = await MockInterviewService.ListMockInterview(listRequest);
-      Assert.True(listResp.IsSuccess);
-      Assert.Equal(Messages.MockInterview.Listed, listResp.Message);
-      Assert.NotNull(listResp.Data?.MockInterviews);
-      Assert.NotEmpty(listResp.Data.MockInterviews);
+      Assert.NotNull(listResp);
+      Assert.NotNull(listResp.MockInterviews);
+      Assert.NotEmpty(listResp.MockInterviews);
     }
   }
 }

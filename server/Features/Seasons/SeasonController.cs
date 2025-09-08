@@ -28,8 +28,8 @@ public class SeasonController : BaseController
     CancellationToken cancellationToken = default
   )
   {
-    var response = await _seasonService.CreateAdminSeason(request, cancellationToken);
-    return HandleResponse(response);
+    var result = await _seasonService.CreateAdminSeason(request, cancellationToken);
+    return OkResponse(result);
   }
 
   [HttpDelete]
@@ -41,8 +41,8 @@ public class SeasonController : BaseController
     CancellationToken cancellationToken = default
   )
   {
-    var response = await _seasonService.DeleteAdminSeason(request, cancellationToken);
-    return HandleResponse(response);
+    var result = await _seasonService.DeleteAdminSeason(request, cancellationToken);
+    return OkResponse(result);
   }
 
   [HttpGet]
@@ -54,8 +54,8 @@ public class SeasonController : BaseController
     CancellationToken cancellationToken = default
   )
   {
-    var response = await _seasonService.ListAdminSeason(request, cancellationToken);
-    return HandleResponse(response);
+    var result = await _seasonService.ListAdminSeason(request, cancellationToken);
+    return OkResponse(result);
   }
 
   [HttpPut]
@@ -67,8 +67,8 @@ public class SeasonController : BaseController
     CancellationToken cancellationToken = default
   )
   {
-    var response = await _seasonService.UpdateAdminSeason(request, cancellationToken);
-    return HandleResponse(response);
+    var result = await _seasonService.UpdateAdminSeason(request, cancellationToken);
+    return OkResponse(result);
   }
 
   #endregion

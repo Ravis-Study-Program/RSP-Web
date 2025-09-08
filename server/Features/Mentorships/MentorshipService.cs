@@ -49,7 +49,7 @@ public class MentorshipService : IMentorshipService
     return await _mentorshipRepository.GetByIdAsync(mentorshipId, cancellationToken, include);
   }
 
-  public async Task<IServiceResponse<AdminCreateMentorshipResponse>> CreateAdminMentorship(
+  public async Task<AdminCreateMentorshipResponse> CreateAdminMentorship(
     AdminCreateMentorshipRequest request,
     CancellationToken cancellationToken = default
   )
@@ -62,9 +62,7 @@ public class MentorshipService : IMentorshipService
     );
     if (mentorEnrollment == null)
     {
-      return new ErrorServiceResponse<AdminCreateMentorshipResponse>(
-        Messages.Enrollment.DoesNotExist
-      );
+      throw new KeyNotFoundException(Messages.Enrollment.DoesNotExist);
     }
 
     if (
@@ -75,7 +73,7 @@ public class MentorshipService : IMentorshipService
       )
     )
     {
-      return new ErrorServiceResponse<AdminCreateMentorshipResponse>(errorMessage);
+      throw new ArgumentException(errorMessage);
     }
 
     // Get Mentee
@@ -86,9 +84,7 @@ public class MentorshipService : IMentorshipService
     );
     if (menteeEnrollment == null)
     {
-      return new ErrorServiceResponse<AdminCreateMentorshipResponse>(
-        Messages.Enrollment.DoesNotExist
-      );
+      throw new KeyNotFoundException(Messages.Enrollment.DoesNotExist);
     }
 
     if (
@@ -99,15 +95,13 @@ public class MentorshipService : IMentorshipService
       )
     )
     {
-      return new ErrorServiceResponse<AdminCreateMentorshipResponse>(errorMessage);
+      throw new ArgumentException(errorMessage);
     }
 
     // Ensure mentor and mentee are part of the same season
     if (mentorEnrollment.SeasonId != menteeEnrollment.SeasonId)
     {
-      return new ErrorServiceResponse<AdminCreateMentorshipResponse>(
-        Messages.Mentorship.NotPermittedDueToDifferentSeason
-      );
+      throw new InvalidOperationException(Messages.Mentorship.NotPermittedDueToDifferentSeason);
     }
 
     // Ensure that there isn't an existing mentorship
@@ -118,7 +112,7 @@ public class MentorshipService : IMentorshipService
     );
     if (existingMentorship != null)
     {
-      return new ErrorServiceResponse<AdminCreateMentorshipResponse>(Messages.Mentorship.Exists);
+      throw new InvalidOperationException(Messages.Mentorship.Exists);
     }
 
     var mentorship = new MentorshipEntity
@@ -132,21 +126,16 @@ public class MentorshipService : IMentorshipService
     {
       await AddMentorshipAsync(mentorship, cancellationToken);
       await _unitOfWork.SaveChangesAsync(cancellationToken);
-      return new SuccessServiceResponse<AdminCreateMentorshipResponse>(
-        Messages.Mentorship.Created,
-        new AdminCreateMentorshipResponse { MentorshipId = mentorship.MentorshipId }
-      );
+      return new AdminCreateMentorshipResponse { MentorshipId = mentorship.MentorshipId };
     }
     catch (Exception ex)
     {
       _logger.LogError(ex, Messages.Mentorship.CreationError);
-      return new ErrorServiceResponse<AdminCreateMentorshipResponse>(
-        Messages.Mentorship.CreationError
-      );
+      throw new InvalidOperationException(Messages.Mentorship.CreationError);
     }
   }
 
-  public async Task<IServiceResponse<AdminDeleteMentorshipResponse>> DeleteAdminMentorship(
+  public async Task<AdminDeleteMentorshipResponse> DeleteAdminMentorship(
     AdminDeleteMentorshipRequest request,
     CancellationToken cancellationToken = default
   )
@@ -154,27 +143,23 @@ public class MentorshipService : IMentorshipService
     var existingMentorship = await GetMentorshipByIdAsync(request.MentorshipId, cancellationToken);
     if (existingMentorship == null)
     {
-      return new ErrorServiceResponse<AdminDeleteMentorshipResponse>(
-        Messages.Mentorship.DoesNotExist
-      );
+      throw new KeyNotFoundException(Messages.Mentorship.DoesNotExist);
     }
 
     try
     {
       await DeleteMentorshipAsync(existingMentorship.MentorshipId, cancellationToken);
       await _unitOfWork.SaveChangesAsync(cancellationToken);
-      return new SuccessServiceResponse<AdminDeleteMentorshipResponse>(Messages.Mentorship.Deleted);
+      return new AdminDeleteMentorshipResponse();
     }
     catch (Exception ex)
     {
       _logger.LogError(ex, Messages.Mentorship.DeletionError);
-      return new ErrorServiceResponse<AdminDeleteMentorshipResponse>(
-        Messages.Mentorship.DeletionError
-      );
+      throw new InvalidOperationException(Messages.Mentorship.DeletionError);
     }
   }
 
-  public async Task<IServiceResponse<AdminListMentorshipResponse>> ListAdminMentorship(
+  public async Task<AdminListMentorshipResponse> ListAdminMentorship(
     AdminListMentorshipRequest request,
     CancellationToken cancellationToken = default
   )
@@ -207,19 +192,16 @@ public class MentorshipService : IMentorshipService
           MenteeName = m.MenteeEnrollment.User.Name,
         })
         .ToList();
-      return new SuccessServiceResponse<AdminListMentorshipResponse>(
-        Messages.Mentorship.Listed,
-        new AdminListMentorshipResponse { Mentorships = formattedMentorships }
-      );
+      return new AdminListMentorshipResponse { Mentorships = formattedMentorships };
     }
     catch (Exception ex)
     {
       _logger.LogError(ex, Messages.Mentorship.ListError);
-      return new ErrorServiceResponse<AdminListMentorshipResponse>(Messages.Mentorship.ListError);
+      throw new InvalidOperationException(Messages.Mentorship.ListError);
     }
   }
 
-  public async Task<IServiceResponse<AdminUpdateMentorshipResponse>> UpdateAdminMentorship(
+  public async Task<AdminUpdateMentorshipResponse> UpdateAdminMentorship(
     AdminUpdateMentorshipRequest request,
     CancellationToken cancellationToken = default
   )
@@ -227,9 +209,7 @@ public class MentorshipService : IMentorshipService
     var existingMentorship = await GetMentorshipByIdAsync(request.MentorshipId, cancellationToken);
     if (existingMentorship == null)
     {
-      return new ErrorServiceResponse<AdminUpdateMentorshipResponse>(
-        Messages.Mentorship.DoesNotExist
-      );
+      throw new KeyNotFoundException(Messages.Mentorship.DoesNotExist);
     }
 
     // Get Mentor
@@ -240,9 +220,7 @@ public class MentorshipService : IMentorshipService
     );
     if (mentorEnrollment == null)
     {
-      return new ErrorServiceResponse<AdminUpdateMentorshipResponse>(
-        Messages.Enrollment.DoesNotExist
-      );
+      throw new KeyNotFoundException(Messages.Enrollment.DoesNotExist);
     }
 
     if (
@@ -253,7 +231,7 @@ public class MentorshipService : IMentorshipService
       )
     )
     {
-      return new ErrorServiceResponse<AdminUpdateMentorshipResponse>(errorMessage);
+      throw new ArgumentException(errorMessage);
     }
 
     // Get Mentee
@@ -264,9 +242,7 @@ public class MentorshipService : IMentorshipService
     );
     if (menteeEnrollment == null)
     {
-      return new ErrorServiceResponse<AdminUpdateMentorshipResponse>(
-        Messages.Enrollment.DoesNotExist
-      );
+      throw new KeyNotFoundException(Messages.Enrollment.DoesNotExist);
     }
 
     if (
@@ -277,15 +253,13 @@ public class MentorshipService : IMentorshipService
       )
     )
     {
-      return new ErrorServiceResponse<AdminUpdateMentorshipResponse>(errorMessage);
+      throw new ArgumentException(errorMessage);
     }
 
     // Ensure mentor and mentee are part of the same season
     if (mentorEnrollment.SeasonId != menteeEnrollment.SeasonId)
     {
-      return new ErrorServiceResponse<AdminUpdateMentorshipResponse>(
-        Messages.Mentorship.NotPermittedDueToDifferentSeason
-      );
+      throw new InvalidOperationException(Messages.Mentorship.NotPermittedDueToDifferentSeason);
     }
 
     existingMentorship.MentorEnrollmentId = request.MentorEnrollmentId;
@@ -295,18 +269,16 @@ public class MentorshipService : IMentorshipService
     {
       await UpdateMentorshipAsync(existingMentorship, cancellationToken);
       await _unitOfWork.SaveChangesAsync(cancellationToken);
-      return new SuccessServiceResponse<AdminUpdateMentorshipResponse>(Messages.Mentorship.Updated);
+      return new AdminUpdateMentorshipResponse();
     }
     catch (Exception ex)
     {
       _logger.LogError(ex, Messages.Mentorship.UpdateError);
-      return new ErrorServiceResponse<AdminUpdateMentorshipResponse>(
-        Messages.Mentorship.UpdateError
-      );
+      throw new InvalidOperationException(Messages.Mentorship.UpdateError);
     }
   }
 
-  public async Task<IServiceResponse<GetCurrentUserMenteesListResponse>> GetCurrentUserMenteesList(
+  public async Task<GetCurrentUserMenteesListResponse> GetCurrentUserMenteesList(
     GetCurrentUserMenteesListRequest request,
     CancellationToken cancellationToken = default
   )
@@ -344,17 +316,12 @@ public class MentorshipService : IMentorshipService
       .ToList();
     try
     {
-      return new SuccessServiceResponse<GetCurrentUserMenteesListResponse>(
-        Messages.Mentorship.Listed,
-        new GetCurrentUserMenteesListResponse { Mentorships = formattedMentorships }
-      );
+      return new GetCurrentUserMenteesListResponse { Mentorships = formattedMentorships };
     }
     catch (Exception ex)
     {
       _logger.LogError(ex, Messages.Mentorship.ListError);
-      return new ErrorServiceResponse<GetCurrentUserMenteesListResponse>(
-        Messages.Mentorship.ListError
-      );
+      throw new InvalidOperationException(Messages.Mentorship.ListError);
     }
   }
 

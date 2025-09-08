@@ -28,8 +28,8 @@ public class MockInterviewController : BaseController
     CancellationToken cancellationToken = default
   )
   {
-    var response = await _mockInterviewService.CreateMockInterview(request, cancellationToken);
-    return HandleResponse(response);
+    var result = await _mockInterviewService.CreateMockInterview(request, cancellationToken);
+    return OkResponse(result);
   }
 
   [HttpDelete]
@@ -41,8 +41,8 @@ public class MockInterviewController : BaseController
     CancellationToken cancellationToken = default
   )
   {
-    var response = await _mockInterviewService.DeleteMockInterview(request, cancellationToken);
-    return HandleResponse(response);
+    var result = await _mockInterviewService.DeleteMockInterview(request, cancellationToken);
+    return OkResponse(result);
   }
 
   [HttpGet]
@@ -54,8 +54,8 @@ public class MockInterviewController : BaseController
     CancellationToken cancellationToken = default
   )
   {
-    var response = await _mockInterviewService.ListMockInterview(request, cancellationToken);
-    return HandleResponse(response);
+    var result = await _mockInterviewService.ListMockInterview(request, cancellationToken);
+    return OkResponse(result);
   }
 
   [HttpPut]
@@ -67,8 +67,8 @@ public class MockInterviewController : BaseController
     CancellationToken cancellationToken = default
   )
   {
-    var response = await _mockInterviewService.UpdateMockInterview(request, cancellationToken);
-    return HandleResponse(response);
+    var result = await _mockInterviewService.UpdateMockInterview(request, cancellationToken);
+    return OkResponse(result);
   }
 
   #endregion

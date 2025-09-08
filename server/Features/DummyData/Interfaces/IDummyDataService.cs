@@ -7,7 +7,7 @@ namespace RSPWebAPI.Features.DummyData.Interfaces;
 
 public interface IDummyDataService
 {
-  Task<IServiceResponse<AdminGenerateDummyDataResponse>> AdminGenerateDummyData(
+  Task<AdminGenerateDummyDataResponse> AdminGenerateDummyData(
     AdminGenerateDummyDataRequest request,
     CancellationToken cancellationToken = default
   );

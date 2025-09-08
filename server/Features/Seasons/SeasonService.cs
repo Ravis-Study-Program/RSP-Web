@@ -25,7 +25,7 @@ public class SeasonService : ISeasonService
     _logger = logger;
   }
 
-  public async Task<IServiceResponse<AdminCreateSeasonResponse>> CreateAdminSeason(
+  public async Task<AdminCreateSeasonResponse> CreateAdminSeason(
     AdminCreateSeasonRequest request,
     CancellationToken cancellationToken = default
   )
@@ -33,7 +33,7 @@ public class SeasonService : ISeasonService
     var existingSeason = await GetSeasonBySlugAsync(request.Slug, cancellationToken);
     if (existingSeason != null)
     {
-      return new ErrorServiceResponse<AdminCreateSeasonResponse>(Messages.Season.Exists);
+      throw new InvalidOperationException(Messages.Season.Exists);
     }
 
     var season = new SeasonEntity
@@ -51,19 +51,16 @@ public class SeasonService : ISeasonService
     {
       await AddSeasonAsync(season, cancellationToken);
       await _unitOfWork.SaveChangesAsync(cancellationToken);
-      return new SuccessServiceResponse<AdminCreateSeasonResponse>(
-        Messages.Season.Created,
-        new AdminCreateSeasonResponse { SeasonId = season.SeasonId }
-      );
+      return new AdminCreateSeasonResponse { SeasonId = season.SeasonId };
     }
     catch (Exception ex)
     {
       _logger.LogError(ex, Messages.Season.CreationError);
-      return new ErrorServiceResponse<AdminCreateSeasonResponse>(Messages.Season.CreationError);
+      throw new InvalidOperationException(Messages.Season.CreationError);
     }
   }
 
-  public async Task<IServiceResponse<AdminDeleteSeasonResponse>> DeleteAdminSeason(
+  public async Task<AdminDeleteSeasonResponse> DeleteAdminSeason(
     AdminDeleteSeasonRequest request,
     CancellationToken cancellationToken = default
   )
@@ -71,23 +68,23 @@ public class SeasonService : ISeasonService
     var existingSeason = await GetSeasonByIdAsync(request.SeasonId, cancellationToken);
     if (existingSeason == null)
     {
-      return new ErrorServiceResponse<AdminDeleteSeasonResponse>(Messages.Season.DoesNotExist);
+      throw new KeyNotFoundException(Messages.Season.DoesNotExist);
     }
 
     try
     {
       await DeleteSeasonAsync(existingSeason.SeasonId, cancellationToken);
       await _unitOfWork.SaveChangesAsync(cancellationToken);
-      return new SuccessServiceResponse<AdminDeleteSeasonResponse>(Messages.Season.Deleted);
+      return new AdminDeleteSeasonResponse();
     }
     catch (Exception ex)
     {
       _logger.LogError(ex, Messages.Season.DeletionError);
-      return new ErrorServiceResponse<AdminDeleteSeasonResponse>(Messages.Season.DeletionError);
+      throw new InvalidOperationException(Messages.Season.DeletionError);
     }
   }
 
-  public async Task<IServiceResponse<AdminListSeasonResponse>> ListAdminSeason(
+  public async Task<AdminListSeasonResponse> ListAdminSeason(
     AdminListSeasonRequest request,
     CancellationToken cancellationToken = default
   )
@@ -96,19 +93,16 @@ public class SeasonService : ISeasonService
     {
       var seasons = await GetAllSeasonsAsync(null, cancellationToken);
       await _unitOfWork.SaveChangesAsync(cancellationToken);
-      return new SuccessServiceResponse<AdminListSeasonResponse>(
-        Messages.Season.Listed,
-        new AdminListSeasonResponse() { Seasons = seasons.ToList() }
-      );
+      return new AdminListSeasonResponse() { Seasons = seasons.ToList() };
     }
     catch (Exception ex)
     {
       _logger.LogError(ex, Messages.Season.ListError);
-      return new ErrorServiceResponse<AdminListSeasonResponse>(Messages.Season.ListError);
+      throw new InvalidOperationException(Messages.Season.ListError);
     }
   }
 
-  public async Task<IServiceResponse<AdminUpdateSeasonResponse>> UpdateAdminSeason(
+  public async Task<AdminUpdateSeasonResponse> UpdateAdminSeason(
     AdminUpdateSeasonRequest request,
     CancellationToken cancellationToken = default
   )
@@ -116,7 +110,7 @@ public class SeasonService : ISeasonService
     var existingSeason = await GetSeasonByIdAsync(request.SeasonId, cancellationToken);
     if (existingSeason == null)
     {
-      return new ErrorServiceResponse<AdminUpdateSeasonResponse>(Messages.Season.DoesNotExist);
+      throw new KeyNotFoundException(Messages.Season.DoesNotExist);
     }
 
     existingSeason.Name = request.Name;
@@ -130,12 +124,12 @@ public class SeasonService : ISeasonService
     {
       await UpdateSeasonAsync(existingSeason, cancellationToken);
       await _unitOfWork.SaveChangesAsync(cancellationToken);
-      return new SuccessServiceResponse<AdminUpdateSeasonResponse>(Messages.Season.Updated);
+      return new AdminUpdateSeasonResponse();
     }
     catch (Exception ex)
     {
       _logger.LogError(ex, Messages.Season.UpdateError);
-      return new ErrorServiceResponse<AdminUpdateSeasonResponse>(Messages.Season.UpdateError);
+      throw new InvalidOperationException(Messages.Season.UpdateError);
     }
   }
 

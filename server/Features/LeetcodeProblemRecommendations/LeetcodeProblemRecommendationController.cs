@@ -32,12 +32,11 @@ public class LeetcodeProblemRecommendationController : BaseController
     CancellationToken cancellationToken = default
   )
   {
-    var response =
-      await _leetcodeProblemRecommendationService.GenerateLeetcodeProblemRecommendation(
-        request,
-        cancellationToken
-      );
-    return HandleResponse(response);
+    var result = await _leetcodeProblemRecommendationService.GenerateLeetcodeProblemRecommendation(
+      request,
+      cancellationToken
+    );
+    return OkResponse(result);
   }
 
   #endregion

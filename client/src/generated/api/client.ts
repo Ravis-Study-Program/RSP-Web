@@ -1223,7 +1223,7 @@ export const adminGenerateDummyData = (
 ) => {
   return CustomAxiosInstance<AdminGenerateDummyDataResponseApiResponse>(
     {
-      url: `http://localhost:4000/api/v1/dummy-data/admin/generate`,
+      url: `http://localhost/api/v1/dummy-data/admin/generate`,
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       data: adminGenerateDummyDataRequest,
@@ -1301,7 +1301,7 @@ export const adminCreateEnrollment = (
 ) => {
   return CustomAxiosInstance<AdminCreateEnrollmentResponseApiResponse>(
     {
-      url: `http://localhost:4000/api/v1/enrollments/admin/create`,
+      url: `http://localhost/api/v1/enrollments/admin/create`,
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       data: adminCreateEnrollmentRequest,
@@ -1378,7 +1378,7 @@ export const adminDeleteEnrollment = (
 ) => {
   return CustomAxiosInstance<AdminDeleteEnrollmentResponseApiResponse>(
     {
-      url: `http://localhost:4000/api/v1/enrollments/admin/delete`,
+      url: `http://localhost/api/v1/enrollments/admin/delete`,
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
       data: adminDeleteEnrollmentRequest,
@@ -1454,16 +1454,13 @@ export const adminListEnrollment = (
   signal?: AbortSignal
 ) => {
   return CustomAxiosInstance<AdminListEnrollmentResponseApiResponse>(
-    { url: `http://localhost:4000/api/v1/enrollments/admin/get`, method: 'GET', params, signal },
+    { url: `http://localhost/api/v1/enrollments/admin/get`, method: 'GET', params, signal },
     options
   );
 };
 
 export const getAdminListEnrollmentQueryKey = (params?: AdminListEnrollmentParams) => {
-  return [
-    `http://localhost:4000/api/v1/enrollments/admin/get`,
-    ...(params ? [params] : []),
-  ] as const;
+  return [`http://localhost/api/v1/enrollments/admin/get`, ...(params ? [params] : [])] as const;
 };
 
 export const getAdminListEnrollmentQueryOptions = <
@@ -1579,7 +1576,7 @@ export const adminUpdateEnrollment = (
 ) => {
   return CustomAxiosInstance<AdminUpdateEnrollmentResponseApiResponse>(
     {
-      url: `http://localhost:4000/api/v1/enrollments/admin/update`,
+      url: `http://localhost/api/v1/enrollments/admin/update`,
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       data: adminUpdateEnrollmentRequest,
@@ -1656,7 +1653,7 @@ export const getUserEnrollments = (
 ) => {
   return CustomAxiosInstance<GetUserEnrollmentsResponseApiResponse>(
     {
-      url: `http://localhost:4000/api/v1/enrollments/get-user-enrollments`,
+      url: `http://localhost/api/v1/enrollments/get-user-enrollments`,
       method: 'GET',
       params,
       signal,
@@ -1667,7 +1664,7 @@ export const getUserEnrollments = (
 
 export const getGetUserEnrollmentsQueryKey = (params?: GetUserEnrollmentsParams) => {
   return [
-    `http://localhost:4000/api/v1/enrollments/get-user-enrollments`,
+    `http://localhost/api/v1/enrollments/get-user-enrollments`,
     ...(params ? [params] : []),
   ] as const;
 };
@@ -1778,7 +1775,7 @@ export const getIsCurrentUserEnrolled = (
 ) => {
   return CustomAxiosInstance<GetIsUserEnrolledResponseApiResponse>(
     {
-      url: `http://localhost:4000/api/v1/enrollments/is-current-user-enrolled`,
+      url: `http://localhost/api/v1/enrollments/is-current-user-enrolled`,
       method: 'GET',
       params,
       signal,
@@ -1789,7 +1786,7 @@ export const getIsCurrentUserEnrolled = (
 
 export const getGetIsCurrentUserEnrolledQueryKey = (params?: GetIsCurrentUserEnrolledParams) => {
   return [
-    `http://localhost:4000/api/v1/enrollments/is-current-user-enrolled`,
+    `http://localhost/api/v1/enrollments/is-current-user-enrolled`,
     ...(params ? [params] : []),
   ] as const;
 };
@@ -1909,7 +1906,7 @@ export const getEnrollmentUsers = (
 ) => {
   return CustomAxiosInstance<GetEnrollmentUsersResponseApiResponse>(
     {
-      url: `http://localhost:4000/api/v1/enrollments/get-enrollment-users`,
+      url: `http://localhost/api/v1/enrollments/get-enrollment-users`,
       method: 'GET',
       params,
       signal,
@@ -1920,7 +1917,7 @@ export const getEnrollmentUsers = (
 
 export const getGetEnrollmentUsersQueryKey = (params?: GetEnrollmentUsersParams) => {
   return [
-    `http://localhost:4000/api/v1/enrollments/get-enrollment-users`,
+    `http://localhost/api/v1/enrollments/get-enrollment-users`,
     ...(params ? [params] : []),
   ] as const;
 };
@@ -2031,7 +2028,7 @@ export const kickStudent = (
 ) => {
   return CustomAxiosInstance<KickStudentResponseApiResponse>(
     {
-      url: `http://localhost:4000/api/v1/enrollments/kick-student`,
+      url: `http://localhost/api/v1/enrollments/kick-student`,
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       data: kickStudentRequest,
@@ -2104,7 +2101,7 @@ export const updateStudentRolePromotion = (
 ) => {
   return CustomAxiosInstance<UpdateStudentRolePromotionResponseApiResponse>(
     {
-      url: `http://localhost:4000/api/v1/enrollments/update-student-role-promotion`,
+      url: `http://localhost/api/v1/enrollments/update-student-role-promotion`,
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       data: updateStudentRolePromotionRequest,
@@ -2182,7 +2179,7 @@ export const adminPopulateLeetcodeQuestions = (
 ) => {
   return CustomAxiosInstance<AdminPopulateLeetcodeQuestionsResponseApiResponse>(
     {
-      url: `http://localhost:4000/api/v1/leetcode/admin/populate-leetcode-questions`,
+      url: `http://localhost/api/v1/leetcode/admin/populate-leetcode-questions`,
       method: 'GET',
       params,
       signal,
@@ -2195,7 +2192,7 @@ export const getAdminPopulateLeetcodeQuestionsQueryKey = (
   params?: AdminPopulateLeetcodeQuestionsParams
 ) => {
   return [
-    `http://localhost:4000/api/v1/leetcode/admin/populate-leetcode-questions`,
+    `http://localhost/api/v1/leetcode/admin/populate-leetcode-questions`,
     ...(params ? [params] : []),
   ] as const;
 };
@@ -2315,7 +2312,7 @@ export const listLeetcodeProblems = (
 ) => {
   return CustomAxiosInstance<ListLeetcodeProblemsResponseApiResponse>(
     {
-      url: `http://localhost:4000/api/v1/leetcode/list-leetcode-problems`,
+      url: `http://localhost/api/v1/leetcode/list-leetcode-problems`,
       method: 'GET',
       params,
       signal,
@@ -2326,7 +2323,7 @@ export const listLeetcodeProblems = (
 
 export const getListLeetcodeProblemsQueryKey = (params?: ListLeetcodeProblemsParams) => {
   return [
-    `http://localhost:4000/api/v1/leetcode/list-leetcode-problems`,
+    `http://localhost/api/v1/leetcode/list-leetcode-problems`,
     ...(params ? [params] : []),
   ] as const;
 };
@@ -2445,7 +2442,7 @@ export const generateLeetcodeProblemRecommendation = (
 ) => {
   return CustomAxiosInstance<GenerateLeetcodeProblemRecommendationResponseApiResponse>(
     {
-      url: `http://localhost:4000/api/v1/leetcode-recommendations/generate`,
+      url: `http://localhost/api/v1/leetcode-recommendations/generate`,
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       data: generateLeetcodeProblemRecommendationRequest,
@@ -2527,7 +2524,7 @@ export const adminCreateMentorship = (
 ) => {
   return CustomAxiosInstance<AdminCreateMentorshipResponseApiResponse>(
     {
-      url: `http://localhost:4000/api/v1/mentorships/admin/create`,
+      url: `http://localhost/api/v1/mentorships/admin/create`,
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       data: adminCreateMentorshipRequest,
@@ -2604,7 +2601,7 @@ export const adminDeleteMentorship = (
 ) => {
   return CustomAxiosInstance<AdminDeleteMentorshipResponseApiResponse>(
     {
-      url: `http://localhost:4000/api/v1/mentorships/admin/delete`,
+      url: `http://localhost/api/v1/mentorships/admin/delete`,
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
       data: adminDeleteMentorshipRequest,
@@ -2680,16 +2677,13 @@ export const adminListMentorship = (
   signal?: AbortSignal
 ) => {
   return CustomAxiosInstance<AdminListMentorshipResponseApiResponse>(
-    { url: `http://localhost:4000/api/v1/mentorships/admin/get`, method: 'GET', params, signal },
+    { url: `http://localhost/api/v1/mentorships/admin/get`, method: 'GET', params, signal },
     options
   );
 };
 
 export const getAdminListMentorshipQueryKey = (params?: AdminListMentorshipParams) => {
-  return [
-    `http://localhost:4000/api/v1/mentorships/admin/get`,
-    ...(params ? [params] : []),
-  ] as const;
+  return [`http://localhost/api/v1/mentorships/admin/get`, ...(params ? [params] : [])] as const;
 };
 
 export const getAdminListMentorshipQueryOptions = <
@@ -2805,7 +2799,7 @@ export const adminUpdateMentorship = (
 ) => {
   return CustomAxiosInstance<AdminUpdateMentorshipResponseApiResponse>(
     {
-      url: `http://localhost:4000/api/v1/mentorships/admin/update`,
+      url: `http://localhost/api/v1/mentorships/admin/update`,
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       data: adminUpdateMentorshipRequest,
@@ -2882,7 +2876,7 @@ export const getCurrentUserMentees = (
 ) => {
   return CustomAxiosInstance<GetCurrentUserMenteesListResponseApiResponse>(
     {
-      url: `http://localhost:4000/api/v1/mentorships/get-current-user-mentees`,
+      url: `http://localhost/api/v1/mentorships/get-current-user-mentees`,
       method: 'GET',
       params,
       signal,
@@ -2893,7 +2887,7 @@ export const getCurrentUserMentees = (
 
 export const getGetCurrentUserMenteesQueryKey = (params: GetCurrentUserMenteesParams) => {
   return [
-    `http://localhost:4000/api/v1/mentorships/get-current-user-mentees`,
+    `http://localhost/api/v1/mentorships/get-current-user-mentees`,
     ...(params ? [params] : []),
   ] as const;
 };
@@ -3012,7 +3006,7 @@ export const createMockInterview = (
 ) => {
   return CustomAxiosInstance<CreateMockInterviewResponseApiResponse>(
     {
-      url: `http://localhost:4000/api/v1/mock-interviews/create`,
+      url: `http://localhost/api/v1/mock-interviews/create`,
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       data: createMockInterviewRequest,
@@ -3089,7 +3083,7 @@ export const deleteMockInterview = (
 ) => {
   return CustomAxiosInstance<DeleteMockInterviewResponseApiResponse>(
     {
-      url: `http://localhost:4000/api/v1/mock-interviews/delete`,
+      url: `http://localhost/api/v1/mock-interviews/delete`,
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
       data: deleteMockInterviewRequest,
@@ -3165,13 +3159,13 @@ export const listMockInterview = (
   signal?: AbortSignal
 ) => {
   return CustomAxiosInstance<ListMockInterviewResponseApiResponse>(
-    { url: `http://localhost:4000/api/v1/mock-interviews/get`, method: 'GET', params, signal },
+    { url: `http://localhost/api/v1/mock-interviews/get`, method: 'GET', params, signal },
     options
   );
 };
 
 export const getListMockInterviewQueryKey = (params: ListMockInterviewParams) => {
-  return [`http://localhost:4000/api/v1/mock-interviews/get`, ...(params ? [params] : [])] as const;
+  return [`http://localhost/api/v1/mock-interviews/get`, ...(params ? [params] : [])] as const;
 };
 
 export const getListMockInterviewQueryOptions = <
@@ -3277,7 +3271,7 @@ export const updateMockInterview = (
 ) => {
   return CustomAxiosInstance<UpdateMockInterviewResponseApiResponse>(
     {
-      url: `http://localhost:4000/api/v1/mock-interviews/update`,
+      url: `http://localhost/api/v1/mock-interviews/update`,
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       data: updateMockInterviewRequest,
@@ -3354,7 +3348,7 @@ export const createProblemAttempt = (
 ) => {
   return CustomAxiosInstance<CreateProblemAttemptResponseApiResponse>(
     {
-      url: `http://localhost:4000/api/v1/problem-attempts/create`,
+      url: `http://localhost/api/v1/problem-attempts/create`,
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       data: createProblemAttemptRequest,
@@ -3431,7 +3425,7 @@ export const deleteProblemAttempt = (
 ) => {
   return CustomAxiosInstance<DeleteProblemAttemptResponseApiResponse>(
     {
-      url: `http://localhost:4000/api/v1/problem-attempts/delete`,
+      url: `http://localhost/api/v1/problem-attempts/delete`,
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
       data: deleteProblemAttemptRequest,
@@ -3507,16 +3501,13 @@ export const listProblemAttempt = (
   signal?: AbortSignal
 ) => {
   return CustomAxiosInstance<ListProblemAttemptResponseApiResponse>(
-    { url: `http://localhost:4000/api/v1/problem-attempts/get`, method: 'GET', params, signal },
+    { url: `http://localhost/api/v1/problem-attempts/get`, method: 'GET', params, signal },
     options
   );
 };
 
 export const getListProblemAttemptQueryKey = (params: ListProblemAttemptParams) => {
-  return [
-    `http://localhost:4000/api/v1/problem-attempts/get`,
-    ...(params ? [params] : []),
-  ] as const;
+  return [`http://localhost/api/v1/problem-attempts/get`, ...(params ? [params] : [])] as const;
 };
 
 export const getListProblemAttemptQueryOptions = <
@@ -3624,7 +3615,7 @@ export const updateProblemAttempt = (
 ) => {
   return CustomAxiosInstance<UpdateProblemAttemptResponseApiResponse>(
     {
-      url: `http://localhost:4000/api/v1/problem-attempts/update`,
+      url: `http://localhost/api/v1/problem-attempts/update`,
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       data: updateProblemAttemptRequest,
@@ -3701,7 +3692,7 @@ export const adminCreateSeason = (
 ) => {
   return CustomAxiosInstance<AdminCreateSeasonResponseApiResponse>(
     {
-      url: `http://localhost:4000/api/v1/seasons/admin/create`,
+      url: `http://localhost/api/v1/seasons/admin/create`,
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       data: adminCreateSeasonRequest,
@@ -3778,7 +3769,7 @@ export const adminDeleteSeason = (
 ) => {
   return CustomAxiosInstance<AdminDeleteSeasonResponseApiResponse>(
     {
-      url: `http://localhost:4000/api/v1/seasons/admin/delete`,
+      url: `http://localhost/api/v1/seasons/admin/delete`,
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
       data: adminDeleteSeasonRequest,
@@ -3854,13 +3845,13 @@ export const adminListSeason = (
   signal?: AbortSignal
 ) => {
   return CustomAxiosInstance<AdminListSeasonResponseApiResponse>(
-    { url: `http://localhost:4000/api/v1/seasons/admin/get`, method: 'GET', params, signal },
+    { url: `http://localhost/api/v1/seasons/admin/get`, method: 'GET', params, signal },
     options
   );
 };
 
 export const getAdminListSeasonQueryKey = (params?: AdminListSeasonParams) => {
-  return [`http://localhost:4000/api/v1/seasons/admin/get`, ...(params ? [params] : [])] as const;
+  return [`http://localhost/api/v1/seasons/admin/get`, ...(params ? [params] : [])] as const;
 };
 
 export const getAdminListSeasonQueryOptions = <
@@ -3964,7 +3955,7 @@ export const adminUpdateSeason = (
 ) => {
   return CustomAxiosInstance<AdminUpdateSeasonResponseApiResponse>(
     {
-      url: `http://localhost:4000/api/v1/seasons/admin/update`,
+      url: `http://localhost/api/v1/seasons/admin/update`,
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       data: adminUpdateSeasonRequest,
@@ -4041,7 +4032,7 @@ export const adminCreateSeasonWeek = (
 ) => {
   return CustomAxiosInstance<AdminCreateSeasonWeekResponseApiResponse>(
     {
-      url: `http://localhost:4000/api/v1/season-weeks/admin/create`,
+      url: `http://localhost/api/v1/season-weeks/admin/create`,
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       data: adminCreateSeasonWeekRequest,
@@ -4118,7 +4109,7 @@ export const adminDeleteSeasonWeek = (
 ) => {
   return CustomAxiosInstance<AdminDeleteSeasonWeekResponseApiResponse>(
     {
-      url: `http://localhost:4000/api/v1/season-weeks/admin/delete`,
+      url: `http://localhost/api/v1/season-weeks/admin/delete`,
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
       data: adminDeleteSeasonWeekRequest,
@@ -4194,16 +4185,13 @@ export const adminListSeasonWeek = (
   signal?: AbortSignal
 ) => {
   return CustomAxiosInstance<AdminListSeasonWeekResponseApiResponse>(
-    { url: `http://localhost:4000/api/v1/season-weeks/admin/get`, method: 'GET', params, signal },
+    { url: `http://localhost/api/v1/season-weeks/admin/get`, method: 'GET', params, signal },
     options
   );
 };
 
 export const getAdminListSeasonWeekQueryKey = (params?: AdminListSeasonWeekParams) => {
-  return [
-    `http://localhost:4000/api/v1/season-weeks/admin/get`,
-    ...(params ? [params] : []),
-  ] as const;
+  return [`http://localhost/api/v1/season-weeks/admin/get`, ...(params ? [params] : [])] as const;
 };
 
 export const getAdminListSeasonWeekQueryOptions = <
@@ -4319,7 +4307,7 @@ export const adminUpdateSeasonWeek = (
 ) => {
   return CustomAxiosInstance<AdminUpdateSeasonWeekResponseApiResponse>(
     {
-      url: `http://localhost:4000/api/v1/season-weeks/admin/update`,
+      url: `http://localhost/api/v1/season-weeks/admin/update`,
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       data: adminUpdateSeasonWeekRequest,
@@ -4395,13 +4383,13 @@ export const getSeasonWeeksBySeasonSlug = (
   signal?: AbortSignal
 ) => {
   return CustomAxiosInstance<GetSeasonWeeksBySeasonSlugResponseApiResponse>(
-    { url: `http://localhost:4000/api/v1/season-weeks/get`, method: 'GET', params, signal },
+    { url: `http://localhost/api/v1/season-weeks/get`, method: 'GET', params, signal },
     options
   );
 };
 
 export const getGetSeasonWeeksBySeasonSlugQueryKey = (params: GetSeasonWeeksBySeasonSlugParams) => {
-  return [`http://localhost:4000/api/v1/season-weeks/get`, ...(params ? [params] : [])] as const;
+  return [`http://localhost/api/v1/season-weeks/get`, ...(params ? [params] : [])] as const;
 };
 
 export const getGetSeasonWeeksBySeasonSlugQueryOptions = <
@@ -4519,7 +4507,7 @@ export const adminCreateUser = (
 ) => {
   return CustomAxiosInstance<AdminCreateUserResponseApiResponse>(
     {
-      url: `http://localhost:4000/api/v1/users/admin/create`,
+      url: `http://localhost/api/v1/users/admin/create`,
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       data: adminCreateUserRequest,
@@ -4593,7 +4581,7 @@ export const adminDeleteUser = (
 ) => {
   return CustomAxiosInstance<AdminDeleteUserResponseApiResponse>(
     {
-      url: `http://localhost:4000/api/v1/users/admin/delete`,
+      url: `http://localhost/api/v1/users/admin/delete`,
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
       data: adminDeleteUserRequest,
@@ -4666,13 +4654,13 @@ export const adminListUser = (
   signal?: AbortSignal
 ) => {
   return CustomAxiosInstance<AdminListUserResponseApiResponse>(
-    { url: `http://localhost:4000/api/v1/users/admin/get`, method: 'GET', params, signal },
+    { url: `http://localhost/api/v1/users/admin/get`, method: 'GET', params, signal },
     options
   );
 };
 
 export const getAdminListUserQueryKey = (params?: AdminListUserParams) => {
-  return [`http://localhost:4000/api/v1/users/admin/get`, ...(params ? [params] : [])] as const;
+  return [`http://localhost/api/v1/users/admin/get`, ...(params ? [params] : [])] as const;
 };
 
 export const getAdminListUserQueryOptions = <
@@ -4776,7 +4764,7 @@ export const adminUpdateUser = (
 ) => {
   return CustomAxiosInstance<AdminUpdateUserResponseApiResponse>(
     {
-      url: `http://localhost:4000/api/v1/users/admin/update`,
+      url: `http://localhost/api/v1/users/admin/update`,
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       data: adminUpdateUserRequest,
@@ -4850,7 +4838,7 @@ export const createUserIfNotExists = (
 ) => {
   return CustomAxiosInstance<CreateUserIfNotExistsResponseApiResponse>(
     {
-      url: `http://localhost:4000/api/v1/users/create-user-if-not-exists`,
+      url: `http://localhost/api/v1/users/create-user-if-not-exists`,
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       data: createUserIfNotExistsRequest,
@@ -4927,16 +4915,13 @@ export const getCurrentUser = (
   signal?: AbortSignal
 ) => {
   return CustomAxiosInstance<GetCurrentUserResponseApiResponse>(
-    { url: `http://localhost:4000/api/v1/users/get-current-user`, method: 'GET', params, signal },
+    { url: `http://localhost/api/v1/users/get-current-user`, method: 'GET', params, signal },
     options
   );
 };
 
 export const getGetCurrentUserQueryKey = (params?: GetCurrentUserParams) => {
-  return [
-    `http://localhost:4000/api/v1/users/get-current-user`,
-    ...(params ? [params] : []),
-  ] as const;
+  return [`http://localhost/api/v1/users/get-current-user`, ...(params ? [params] : [])] as const;
 };
 
 export const getGetCurrentUserQueryOptions = <
@@ -5040,13 +5025,13 @@ export const getUser = (
   signal?: AbortSignal
 ) => {
   return CustomAxiosInstance<GetUserResponseApiResponse>(
-    { url: `http://localhost:4000/api/v1/users/get-user`, method: 'GET', params, signal },
+    { url: `http://localhost/api/v1/users/get-user`, method: 'GET', params, signal },
     options
   );
 };
 
 export const getGetUserQueryKey = (params?: GetUserParams) => {
-  return [`http://localhost:4000/api/v1/users/get-user`, ...(params ? [params] : [])] as const;
+  return [`http://localhost/api/v1/users/get-user`, ...(params ? [params] : [])] as const;
 };
 
 export const getGetUserQueryOptions = <

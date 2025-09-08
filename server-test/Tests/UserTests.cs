@@ -84,8 +84,7 @@ public class UserTests : BaseIntegrationTest, IAsyncLifetime
     };
 
     var updateResponse = await UserService.UpdateAdminUser(updateRequest);
-    Assert.True(updateResponse.IsSuccess);
-    Assert.Equal(Messages.User.Updated, updateResponse.Message);
+    Assert.NotNull(updateResponse);
 
     var updatedUser = await UserService.GetUserByIdAsync(targetUser.UserId);
     Assert.NotNull(updatedUser);
@@ -110,8 +109,7 @@ public class UserTests : BaseIntegrationTest, IAsyncLifetime
     var targetUser = users.Last();
     var deleteRequest = new AdminDeleteUserRequest { Email = targetUser.Email };
     var deleteResponse = await UserService.DeleteAdminUser(deleteRequest);
-    Assert.True(deleteResponse.IsSuccess);
-    Assert.Equal(Messages.User.Deleted, deleteResponse.Message);
+    Assert.NotNull(deleteResponse);
 
     var deletedUser = await UserService.GetUserByEmailAsync(targetUser.Email);
     Assert.Null(deletedUser);
@@ -140,12 +138,12 @@ public class UserTests : BaseIntegrationTest, IAsyncLifetime
       .Verifiable();
 
     var firstResponse = await UserService.CreateUserIfNotExists(request, email);
-    Assert.Equal(Messages.User.Created, firstResponse.Message);
-    Assert.True(firstResponse.IsSuccess);
+    Assert.NotNull(firstResponse);
+    Assert.NotNull(firstResponse.UserId);
 
     var secondResponse = await UserService.CreateUserIfNotExists(request, email);
-    Assert.True(secondResponse.IsSuccess);
-    Assert.Equal(Messages.User.Created, secondResponse.Message);
+    Assert.NotNull(secondResponse);
+    Assert.NotNull(secondResponse.UserId);
 
     var users = await _seeder.GetAllUsersAsync();
     Assert.Single(users.Where(u => u.Email == email));
@@ -173,7 +171,7 @@ public class UserTests : BaseIntegrationTest, IAsyncLifetime
     var result = await UserService.CreateUserIfNotExists(request, email);
 
     mock.Verify(x => x.SendVerificationEmailAsync("auth0|123"), Times.Never());
-    Assert.True(result.IsSuccess);
+    Assert.NotNull(result);
   }
 
   [Fact]
@@ -214,7 +212,7 @@ public class UserTests : BaseIntegrationTest, IAsyncLifetime
     var result = await UserService.CreateUserIfNotExists(request, email);
 
     mock.Verify(x => x.LinkAccountAsync(user1.UserId, user2), Times.Once());
-    Assert.True(result.IsSuccess);
+    Assert.NotNull(result);
   }
 
   [Fact]
@@ -224,10 +222,9 @@ public class UserTests : BaseIntegrationTest, IAsyncLifetime
     await _seeder.SeedUserAsync(email);
 
     var currentUserResponse = await UserService.GetCurrentUser(email);
-    Assert.True(currentUserResponse.IsSuccess);
-    Assert.Equal(Messages.User.EmailExists, currentUserResponse.Message);
+    Assert.NotNull(currentUserResponse);
 
-    var currentUser = currentUserResponse.Data?.User;
+    var currentUser = currentUserResponse.User;
     Assert.NotNull(currentUser);
     Assert.Equal(email, currentUser!.Email);
   }

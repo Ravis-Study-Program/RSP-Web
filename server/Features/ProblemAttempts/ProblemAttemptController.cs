@@ -30,8 +30,8 @@ public class ProblemAttemptController : BaseController
   {
     var email = GetCurrentUserEmail() ?? "";
     request.Email = email;
-    var response = await _problemAttemptService.CreateProblemAttempt(request, cancellationToken);
-    return HandleResponse(response);
+    var result = await _problemAttemptService.CreateProblemAttempt(request, cancellationToken);
+    return OkResponse(result);
   }
 
   [HttpDelete]
@@ -43,8 +43,8 @@ public class ProblemAttemptController : BaseController
     CancellationToken cancellationToken = default
   )
   {
-    var response = await _problemAttemptService.DeleteProblemAttempt(request, cancellationToken);
-    return HandleResponse(response);
+    var result = await _problemAttemptService.DeleteProblemAttempt(request, cancellationToken);
+    return OkResponse(result);
   }
 
   [HttpGet]
@@ -56,8 +56,8 @@ public class ProblemAttemptController : BaseController
     CancellationToken cancellationToken = default
   )
   {
-    var response = await _problemAttemptService.ListProblemAttempt(request, cancellationToken);
-    return HandleResponse(response);
+    var result = await _problemAttemptService.ListProblemAttempt(request, cancellationToken);
+    return OkResponse(result);
   }
 
   [HttpPut]
@@ -71,8 +71,8 @@ public class ProblemAttemptController : BaseController
   {
     var email = GetCurrentUserEmail() ?? "";
     request.Email = email;
-    var response = await _problemAttemptService.UpdateProblemAttempt(request, cancellationToken);
-    return HandleResponse(response);
+    var result = await _problemAttemptService.UpdateProblemAttempt(request, cancellationToken);
+    return OkResponse(result);
   }
 
   #endregion

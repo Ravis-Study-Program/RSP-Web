@@ -5,9 +5,7 @@ namespace RSPWebAPI.Features.LeetcodeProblemRecommendations.Interfaces;
 
 public interface ILeetcodeProblemRecommendationService
 {
-  Task<
-    IServiceResponse<GenerateLeetcodeProblemRecommendationResponse>
-  > GenerateLeetcodeProblemRecommendation(
+  Task<GenerateLeetcodeProblemRecommendationResponse> GenerateLeetcodeProblemRecommendation(
     GenerateLeetcodeProblemRecommendationRequest request,
     CancellationToken cancellationToken = default
   );

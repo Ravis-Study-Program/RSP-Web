@@ -65,9 +65,7 @@ namespace RSPWebAPI.Tests.Tests
 
       var listRequest = new AdminListMentorshipRequest();
       var listResponse = await MentorshipService.ListAdminMentorship(listRequest);
-      Assert.True(listResponse.IsSuccess);
-      Assert.Equal(Messages.Mentorship.Listed, listResponse.Message);
-      Assert.NotNull(listResponse.Data?.Mentorships);
+      Assert.NotNull(listResponse.Mentorships);
 
       var all = await _seeder.GetAllMentorshipsAsync();
       Assert.Equal(count, all.Count);
@@ -92,10 +90,9 @@ namespace RSPWebAPI.Tests.Tests
         MentorEnrollmentId = _faker.Random.AlphaNumeric(12),
         MenteeEnrollmentId = menteeEnrollmentId,
       };
-
-      var response = await MentorshipService.CreateAdminMentorship(request);
-      Assert.False(response.IsSuccess);
-      Assert.Equal(Messages.Enrollment.DoesNotExist, response.Message);
+      await Assert.ThrowsAsync<KeyNotFoundException>(
+        () => MentorshipService.CreateAdminMentorship(request)
+      );
     }
 
     [Fact]
@@ -115,9 +112,9 @@ namespace RSPWebAPI.Tests.Tests
         ,
       };
 
-      var response = await MentorshipService.CreateAdminMentorship(request);
-      Assert.False(response.IsSuccess);
-      Assert.Equal(Messages.Enrollment.DoesNotExist, response.Message);
+      await Assert.ThrowsAsync<KeyNotFoundException>(
+        () => MentorshipService.CreateAdminMentorship(request)
+      );
     }
 
     [Fact]
@@ -132,9 +129,9 @@ namespace RSPWebAPI.Tests.Tests
         MentorEnrollmentId = pair.MentorEnrollmentId,
         MenteeEnrollmentId = pair.MenteeEnrollmentId,
       };
-      var response = await MentorshipService.CreateAdminMentorship(request);
-      Assert.False(response.IsSuccess);
-      Assert.Equal(Messages.Mentorship.Exists, response.Message);
+      await Assert.ThrowsAsync<InvalidOperationException>(
+        () => MentorshipService.CreateAdminMentorship(request)
+      );
     }
 
     [Fact]
@@ -163,8 +160,6 @@ namespace RSPWebAPI.Tests.Tests
       };
 
       var updateResp = await MentorshipService.UpdateAdminMentorship(updateRequest);
-      Assert.Equal(Messages.Mentorship.Updated, updateResp.Message);
-      Assert.True(updateResp.IsSuccess);
 
       var afterUpdate = await MentorshipService.GetMentorshipByIdAsync(mentorshipId);
       Assert.NotNull(afterUpdate);
@@ -181,9 +176,9 @@ namespace RSPWebAPI.Tests.Tests
         MentorEnrollmentId = _faker.Random.AlphaNumeric(10),
         MenteeEnrollmentId = _faker.Random.AlphaNumeric(10),
       };
-      var resp = await MentorshipService.UpdateAdminMentorship(request);
-      Assert.False(resp.IsSuccess);
-      Assert.Equal(Messages.Mentorship.DoesNotExist, resp.Message);
+      await Assert.ThrowsAsync<KeyNotFoundException>(
+        () => MentorshipService.UpdateAdminMentorship(request)
+      );
     }
 
     [Fact]
@@ -195,8 +190,6 @@ namespace RSPWebAPI.Tests.Tests
 
       var deleteRequest = new AdminDeleteMentorshipRequest { MentorshipId = mentorshipId };
       var deleteResp = await MentorshipService.DeleteAdminMentorship(deleteRequest);
-      Assert.True(deleteResp.IsSuccess);
-      Assert.Equal(Messages.Mentorship.Deleted, deleteResp.Message);
 
       var afterDelete = await MentorshipService.GetMentorshipByIdAsync(mentorshipId);
       Assert.Null(afterDelete);
@@ -209,9 +202,9 @@ namespace RSPWebAPI.Tests.Tests
       {
         MentorshipId = _faker.Random.AlphaNumeric(10),
       };
-      var resp = await MentorshipService.DeleteAdminMentorship(request);
-      Assert.False(resp.IsSuccess);
-      Assert.Equal(Messages.Mentorship.DoesNotExist, resp.Message);
+      await Assert.ThrowsAsync<KeyNotFoundException>(
+        () => MentorshipService.DeleteAdminMentorship(request)
+      );
     }
 
     [Fact]
@@ -219,8 +212,7 @@ namespace RSPWebAPI.Tests.Tests
     {
       var request = new AdminListMentorshipRequest();
       var listResp = await MentorshipService.ListAdminMentorship(request);
-      Assert.True(listResp.IsSuccess);
-      Assert.Equal(Messages.Mentorship.Listed, listResp.Message);
+      Assert.NotNull(listResp.Mentorships);
     }
 
     [Fact]
@@ -252,9 +244,7 @@ namespace RSPWebAPI.Tests.Tests
         SeasonSlug = season.Slug,
       };
       var menteesResp = await MentorshipService.GetCurrentUserMenteesList(menteesReq);
-      Assert.True(menteesResp.IsSuccess);
-      Assert.Equal(Messages.Mentorship.Listed, menteesResp.Message);
-      Assert.Single(menteesResp.Data!.Mentorships);
+      Assert.Single(menteesResp.Mentorships);
     }
   }
 }

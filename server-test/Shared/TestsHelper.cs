@@ -79,10 +79,9 @@ public class TestDataSeeder
     };
 
     var response = await _userService.CreateAdminUser(request);
-    Assert.Equal(Messages.User.Created, response.Message);
-    Assert.NotNull(response.Data?.UserId);
+    Assert.NotNull(response.UserId);
 
-    return response.Data.UserId;
+    return response.UserId;
   }
 
   public async Task<string> SeedSeasonAsync(
@@ -105,10 +104,9 @@ public class TestDataSeeder
     };
 
     var response = await _seasonService.CreateAdminSeason(request);
-    Assert.Equal(Messages.Season.Created, response.Message);
-    Assert.NotNull(response.Data?.SeasonId);
+    Assert.NotNull(response.SeasonId);
 
-    return response.Data.SeasonId;
+    return response.SeasonId;
   }
 
   public async Task<string> SeedSeasonWeekAsync(string seasonId, int weekNumber)
@@ -122,10 +120,9 @@ public class TestDataSeeder
     };
 
     var response = await _seasonWeekService.CreateAdminSeasonWeek(request);
-    Assert.Equal(Messages.SeasonWeek.Created, response.Message);
-    Assert.NotNull(response.Data?.SeasonWeekId);
+    Assert.NotNull(response.SeasonWeekId);
 
-    return response.Data.SeasonWeekId;
+    return response.SeasonWeekId;
   }
 
   public async Task<string> SeedEnrollmentAsync(
@@ -154,20 +151,17 @@ public class TestDataSeeder
     };
 
     var response = await _enrollmentService.CreateAdminEnrollment(request);
-    Assert.Equal(Messages.Enrollment.Created, response.Message);
-    Assert.True(response.IsSuccess);
-    Assert.NotNull(response.Data?.EnrollmentId);
+    Assert.NotNull(response.EnrollmentId);
 
-    return response.Data.EnrollmentId;
+    return response.EnrollmentId;
   }
 
   public async Task<List<UserEntity>> GetAllUsersAsync()
   {
     var response = await _userService.ListAdminUser(new AdminListUserRequest());
-    Assert.True(response.IsSuccess);
-    Assert.Equal(Messages.User.Listed, response.Message);
+    Assert.NotNull(response.Users);
 
-    return response.Data!.Users.ToList();
+    return response.Users.ToList();
   }
 
   public async Task<List<SeasonEntity>> GetAllSeasonsAsync()
@@ -332,11 +326,9 @@ public class TestDataSeeder
     };
 
     var response = await _mockInterviewService.CreateMockInterview(request);
-    Assert.Equal(Messages.MockInterview.Created, response.Message);
-    Assert.True(response.IsSuccess);
-    Assert.NotNull(response.Data?.MockInterviewId);
+    Assert.NotNull(response.MockInterviewId);
 
-    return response.Data.MockInterviewId;
+    return response.MockInterviewId;
   }
 
   public async Task<string> SeedSeasonAndSeasonWeeks()
@@ -396,11 +388,9 @@ public class TestDataSeeder
     };
 
     var response = await _mentorshipService.CreateAdminMentorship(request);
-    Assert.Equal(Messages.Mentorship.Created, response.Message);
-    Assert.True(response.IsSuccess);
-    Assert.NotNull(response.Data?.MentorshipId);
+    Assert.NotNull(response.MentorshipId);
 
-    return response.Data.MentorshipId;
+    return response.MentorshipId;
   }
 
   public async Task<

@@ -30,11 +30,8 @@ public class LeetcodeController : BaseController
     CancellationToken cancellationToken = default
   )
   {
-    var response = await _leetcodeService.AdminPopulateLeetcodeQuestions(
-      request,
-      cancellationToken
-    );
-    return HandleResponse(response);
+    var result = await _leetcodeService.AdminPopulateLeetcodeQuestions(request, cancellationToken);
+    return OkResponse(result);
   }
 
   [HttpGet]
@@ -46,8 +43,8 @@ public class LeetcodeController : BaseController
     CancellationToken cancellationToken = default
   )
   {
-    var response = await _leetcodeService.ListLeetcodeProblems(request, cancellationToken);
-    return HandleResponse(response);
+    var result = await _leetcodeService.ListLeetcodeProblems(request, cancellationToken);
+    return OkResponse(result);
   }
 
   #endregion

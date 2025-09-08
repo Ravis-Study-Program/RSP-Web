@@ -34,22 +34,22 @@ public interface IMockInterviewService
     Func<IQueryable<MockInterviewEntity>, IQueryable<MockInterviewEntity>>? include = null
   );
 
-  Task<IServiceResponse<CreateMockInterviewResponse>> CreateMockInterview(
+  Task<CreateMockInterviewResponse> CreateMockInterview(
     CreateMockInterviewRequest request,
     CancellationToken cancellationToken = default
   );
 
-  Task<IServiceResponse<DeleteMockInterviewResponse>> DeleteMockInterview(
+  Task<DeleteMockInterviewResponse> DeleteMockInterview(
     DeleteMockInterviewRequest request,
     CancellationToken cancellationToken = default
   );
 
-  Task<IServiceResponse<ListMockInterviewResponse>> ListMockInterview(
+  Task<ListMockInterviewResponse> ListMockInterview(
     ListMockInterviewRequest request,
     CancellationToken cancellationToken = default
   );
 
-  Task<IServiceResponse<UpdateMockInterviewResponse>> UpdateMockInterview(
+  Task<UpdateMockInterviewResponse> UpdateMockInterview(
     UpdateMockInterviewRequest request,
     CancellationToken cancellationToken = default
   );

@@ -415,7 +415,7 @@ public class DummyDataService : IDummyDataService
     };
   }
 
-  public async Task<IServiceResponse<AdminGenerateDummyDataResponse>> AdminGenerateDummyData(
+  public async Task<AdminGenerateDummyDataResponse> AdminGenerateDummyData(
     AdminGenerateDummyDataRequest request,
     CancellationToken cancellationToken = default
   )
@@ -465,18 +465,13 @@ public class DummyDataService : IDummyDataService
       await _unitOfWork.SaveChangesAsync(cancellationToken);
       await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
-      return new SuccessServiceResponse<AdminGenerateDummyDataResponse>(
-        Messages.DummyData.Generated
-      );
+      return new AdminGenerateDummyDataResponse();
     }
     catch (Exception ex)
     {
       _logger.LogError(ex, Messages.DummyData.GenerationError);
       await _unitOfWork.RollbackTransactionAsync(cancellationToken);
-
-      return new ErrorServiceResponse<AdminGenerateDummyDataResponse>(
-        Messages.DummyData.GenerationError
-      );
+      throw new InvalidOperationException(Messages.DummyData.GenerationError);
     }
   }
 }
