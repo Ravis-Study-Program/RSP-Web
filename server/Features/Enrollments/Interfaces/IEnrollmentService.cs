@@ -47,47 +47,47 @@ public interface IEnrollmentService
     Func<IQueryable<EnrollmentEntity>, IQueryable<EnrollmentEntity>>? include = null
   );
 
-  Task<IServiceResponse<AdminCreateEnrollmentResponse>> CreateAdminEnrollment(
+  Task<AdminCreateEnrollmentResponse> CreateAdminEnrollment(
     AdminCreateEnrollmentRequest request,
     CancellationToken cancellationToken = default
   );
 
-  Task<IServiceResponse<AdminDeleteEnrollmentResponse>> DeleteAdminEnrollment(
+  Task<AdminDeleteEnrollmentResponse> DeleteAdminEnrollment(
     AdminDeleteEnrollmentRequest request,
     CancellationToken cancellationToken = default
   );
 
-  Task<IServiceResponse<AdminListEnrollmentResponse>> ListAdminEnrollment(
+  Task<AdminListEnrollmentResponse> ListAdminEnrollment(
     AdminListEnrollmentRequest request,
     CancellationToken cancellationToken = default
   );
 
-  Task<IServiceResponse<AdminUpdateEnrollmentResponse>> UpdateAdminEnrollment(
+  Task<AdminUpdateEnrollmentResponse> UpdateAdminEnrollment(
     AdminUpdateEnrollmentRequest request,
     CancellationToken cancellationToken = default
   );
 
-  Task<IServiceResponse<GetUserEnrollmentsResponse>> GetUserEnrollments(
+  Task<GetUserEnrollmentsResponse> GetUserEnrollments(
     GetUserEnrollmentsRequest request,
     CancellationToken cancellationToken = default
   );
 
-  Task<IServiceResponse<GetEnrollmentUsersResponse>> GetEnrollmentUsers(
+  Task<GetEnrollmentUsersResponse> GetEnrollmentUsers(
     GetEnrollmentUsersRequest request,
     CancellationToken cancellationToken = default
   );
 
-  Task<IServiceResponse<GetIsUserEnrolledResponse>> GetIsUserEnrolled(
+  Task<GetIsUserEnrolledResponse> GetIsUserEnrolled(
     GetIsUserEnrolledRequest request,
     CancellationToken cancellationToken = default
   );
 
-  Task<IServiceResponse<KickStudentResponse>> KickStudent(
+  Task<KickStudentResponse> KickStudent(
     KickStudentRequest request,
     CancellationToken cancellationToken = default
   );
 
-  Task<IServiceResponse<UpdateStudentRolePromotionResponse>> UpdateStudentRolePromotion(
+  Task<UpdateStudentRolePromotionResponse> UpdateStudentRolePromotion(
     UpdateStudentRolePromotionRequest request,
     CancellationToken cancellationToken = default
   );

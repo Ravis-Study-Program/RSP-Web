@@ -47,9 +47,7 @@ public class LeetcodeProblemRecommendationService : ILeetcodeProblemRecommendati
     _logger = logger;
   }
 
-  public async Task<
-    IServiceResponse<GenerateLeetcodeProblemRecommendationResponse>
-  > GenerateLeetcodeProblemRecommendation(
+  public async Task<GenerateLeetcodeProblemRecommendationResponse> GenerateLeetcodeProblemRecommendation(
     GenerateLeetcodeProblemRecommendationRequest request,
     CancellationToken cancellationToken = default
   )
@@ -58,17 +56,16 @@ public class LeetcodeProblemRecommendationService : ILeetcodeProblemRecommendati
     if (existingRecommendation != null)
     {
       // Return success even though we didn't generate anything
-      return new SuccessServiceResponse<GenerateLeetcodeProblemRecommendationResponse>(
-        Messages.LeetcodeProblemRecommendation.Created
-      );
+      return new GenerateLeetcodeProblemRecommendationResponse
+      {
+        LeetcodeProblemRecommendationId = existingRecommendation.LeetcodeProblemRecommendationId,
+      };
     }
 
     var user = await _userService.GetUserByIdAsync(request.UserId, cancellationToken);
     if (user == null)
     {
-      return new ErrorServiceResponse<GenerateLeetcodeProblemRecommendationResponse>(
-        Messages.User.EmailDoesNotExist
-      );
+      throw new KeyNotFoundException(Messages.User.EmailDoesNotExist);
     }
 
     var problemAttemptsResponse = await _problemAttemptService.ListProblemAttempt(
@@ -81,14 +78,12 @@ public class LeetcodeProblemRecommendationService : ILeetcodeProblemRecommendati
       cancellationToken
     );
     var problemRecommendation = await GenerateRandom(
-      problemAttemptsResponse.Data?.ProblemAttempts.ToList() ?? new List<ProblemAttemptEntity>(),
+      problemAttemptsResponse?.ProblemAttempts.ToList() ?? new List<ProblemAttemptEntity>(),
       cancellationToken
     );
     if (problemRecommendation == null)
     {
-      return new ErrorServiceResponse<GenerateLeetcodeProblemRecommendationResponse>(
-        Messages.LeetcodeProblemRecommendation.NoProblemsLeft
-      );
+      throw new InvalidOperationException(Messages.LeetcodeProblemRecommendation.NoProblemsLeft);
     }
 
     var newRecommendation = new LeetcodeProblemRecommendationEntity
@@ -102,20 +97,15 @@ public class LeetcodeProblemRecommendationService : ILeetcodeProblemRecommendati
     {
       await AddLeetcodeProblemRecommendationAsync(newRecommendation, cancellationToken);
       await _unitOfWork.SaveChangesAsync(cancellationToken);
-      return new SuccessServiceResponse<GenerateLeetcodeProblemRecommendationResponse>(
-        Messages.LeetcodeProblemRecommendation.Created,
-        new GenerateLeetcodeProblemRecommendationResponse
-        {
-          LeetcodeProblemRecommendationId = newRecommendation.LeetcodeProblemRecommendationId,
-        }
-      );
+      return new GenerateLeetcodeProblemRecommendationResponse
+      {
+        LeetcodeProblemRecommendationId = newRecommendation.LeetcodeProblemRecommendationId,
+      };
     }
     catch (Exception ex)
     {
       _logger.LogError(ex, Messages.LeetcodeProblemRecommendation.CreationError);
-      return new ErrorServiceResponse<GenerateLeetcodeProblemRecommendationResponse>(
-        Messages.LeetcodeProblemRecommendation.CreationError
-      );
+      throw new InvalidOperationException(Messages.LeetcodeProblemRecommendation.CreationError);
     }
   }
 

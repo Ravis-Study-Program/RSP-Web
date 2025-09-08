@@ -30,8 +30,8 @@ public class EnrollmentController : BaseController
     CancellationToken cancellationToken = default
   )
   {
-    var response = await _enrollmentService.CreateAdminEnrollment(request, cancellationToken);
-    return HandleResponse(response);
+    var result = await _enrollmentService.CreateAdminEnrollment(request, cancellationToken);
+    return OkResponse(result);
   }
 
   [HttpDelete]
@@ -43,8 +43,8 @@ public class EnrollmentController : BaseController
     CancellationToken cancellationToken = default
   )
   {
-    var response = await _enrollmentService.DeleteAdminEnrollment(request, cancellationToken);
-    return HandleResponse(response);
+    var result = await _enrollmentService.DeleteAdminEnrollment(request, cancellationToken);
+    return OkResponse(result);
   }
 
   [HttpGet]
@@ -56,8 +56,8 @@ public class EnrollmentController : BaseController
     CancellationToken cancellationToken = default
   )
   {
-    var response = await _enrollmentService.ListAdminEnrollment(request, cancellationToken);
-    return HandleResponse(response);
+    var result = await _enrollmentService.ListAdminEnrollment(request, cancellationToken);
+    return OkResponse(result);
   }
 
   [HttpPut]
@@ -69,8 +69,8 @@ public class EnrollmentController : BaseController
     CancellationToken cancellationToken = default
   )
   {
-    var response = await _enrollmentService.UpdateAdminEnrollment(request, cancellationToken);
-    return HandleResponse(response);
+    var result = await _enrollmentService.UpdateAdminEnrollment(request, cancellationToken);
+    return OkResponse(result);
   }
 
   [HttpGet]
@@ -88,13 +88,11 @@ public class EnrollmentController : BaseController
     }
     if (email == null)
     {
-      return HandleResponse(
-        new ErrorServiceResponse<GetUserEnrollmentsResponse>(Messages.Enrollment.ListError)
-      );
+      throw new ArgumentException(Messages.Enrollment.ListError);
     }
     var request = new GetUserEnrollmentsRequest { Email = email };
-    var response = await _enrollmentService.GetUserEnrollments(request, cancellationToken);
-    return HandleResponse(response);
+    var result = await _enrollmentService.GetUserEnrollments(request, cancellationToken);
+    return OkResponse(result);
   }
 
   [HttpGet]
@@ -108,8 +106,8 @@ public class EnrollmentController : BaseController
   {
     var email = GetCurrentUserEmail() ?? "";
     var request = new GetIsUserEnrolledRequest { Email = email, SeasonSlug = seasonSlug ?? "" };
-    var response = await _enrollmentService.GetIsUserEnrolled(request, cancellationToken);
-    return HandleResponse(response);
+    var result = await _enrollmentService.GetIsUserEnrolled(request, cancellationToken);
+    return OkResponse(result);
   }
 
   [HttpGet]
@@ -121,8 +119,8 @@ public class EnrollmentController : BaseController
     CancellationToken cancellationToken = default
   )
   {
-    var response = await _enrollmentService.GetEnrollmentUsers(request, cancellationToken);
-    return HandleResponse(response);
+    var result = await _enrollmentService.GetEnrollmentUsers(request, cancellationToken);
+    return OkResponse(result);
   }
 
   [HttpPost]
@@ -134,8 +132,8 @@ public class EnrollmentController : BaseController
     CancellationToken cancellationToken = default
   )
   {
-    var response = await _enrollmentService.KickStudent(request, cancellationToken);
-    return HandleResponse(response);
+    var result = await _enrollmentService.KickStudent(request, cancellationToken);
+    return OkResponse(result);
   }
 
   [HttpPost]
@@ -149,8 +147,8 @@ public class EnrollmentController : BaseController
     CancellationToken cancellationToken = default
   )
   {
-    var response = await _enrollmentService.UpdateStudentRolePromotion(request, cancellationToken);
-    return HandleResponse(response);
+    var result = await _enrollmentService.UpdateStudentRolePromotion(request, cancellationToken);
+    return OkResponse(result);
   }
 
   #endregion

@@ -34,22 +34,22 @@ public interface IProblemAttemptService
     Func<IQueryable<ProblemAttemptEntity>, IQueryable<ProblemAttemptEntity>>? include = null
   );
 
-  Task<IServiceResponse<CreateProblemAttemptResponse>> CreateProblemAttempt(
+  Task<CreateProblemAttemptResponse> CreateProblemAttempt(
     CreateProblemAttemptRequest request,
     CancellationToken cancellationToken = default
   );
 
-  Task<IServiceResponse<DeleteProblemAttemptResponse>> DeleteProblemAttempt(
+  Task<DeleteProblemAttemptResponse> DeleteProblemAttempt(
     DeleteProblemAttemptRequest request,
     CancellationToken cancellationToken = default
   );
 
-  Task<IServiceResponse<ListProblemAttemptResponse>> ListProblemAttempt(
+  Task<ListProblemAttemptResponse> ListProblemAttempt(
     ListProblemAttemptRequest request,
     CancellationToken cancellationToken = default
   );
 
-  Task<IServiceResponse<UpdateProblemAttemptResponse>> UpdateProblemAttempt(
+  Task<UpdateProblemAttemptResponse> UpdateProblemAttempt(
     UpdateProblemAttemptRequest request,
     CancellationToken cancellationToken = default
   );

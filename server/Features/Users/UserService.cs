@@ -38,7 +38,7 @@ public class UserService : IUserService
     _cache = cache;
   }
 
-  public async Task<IServiceResponse<AdminCreateUserResponse>> CreateAdminUser(
+  public async Task<AdminCreateUserResponse> CreateAdminUser(
     AdminCreateUserRequest request,
     CancellationToken cancellationToken = default
   )
@@ -46,7 +46,7 @@ public class UserService : IUserService
     var existingUser = await GetUserByEmailAsync(request.Email, cancellationToken);
     if (existingUser != null)
     {
-      return new ErrorServiceResponse<AdminCreateUserResponse>(Messages.User.EmailExists);
+      throw new InvalidOperationException(Messages.User.EmailExists);
     }
 
     var slug = await createSlug(request.Name);
@@ -65,19 +65,16 @@ public class UserService : IUserService
     {
       await AddUserAsync(user, cancellationToken);
       await _unitOfWork.SaveChangesAsync(cancellationToken);
-      return new SuccessServiceResponse<AdminCreateUserResponse>(
-        Messages.User.Created,
-        new AdminCreateUserResponse { UserId = user.UserId }
-      );
+      return new AdminCreateUserResponse { UserId = user.UserId };
     }
     catch (Exception ex)
     {
       _logger.LogError(ex, Messages.User.CreationError);
-      return new ErrorServiceResponse<AdminCreateUserResponse>(Messages.User.CreationError);
+      throw new InvalidOperationException(Messages.User.CreationError);
     }
   }
 
-  public async Task<IServiceResponse<AdminDeleteUserResponse>> DeleteAdminUser(
+  public async Task<AdminDeleteUserResponse> DeleteAdminUser(
     AdminDeleteUserRequest request,
     CancellationToken cancellationToken = default
   )
@@ -85,23 +82,23 @@ public class UserService : IUserService
     var existingUser = await GetUserByEmailAsync(request.Email, cancellationToken);
     if (existingUser == null)
     {
-      return new ErrorServiceResponse<AdminDeleteUserResponse>(Messages.User.EmailDoesNotExist);
+      throw new KeyNotFoundException(Messages.User.EmailDoesNotExist);
     }
 
     try
     {
       await DeleteUserAsync(existingUser.UserId, cancellationToken);
       await _unitOfWork.SaveChangesAsync(cancellationToken);
-      return new SuccessServiceResponse<AdminDeleteUserResponse>(Messages.User.Deleted);
+      return new AdminDeleteUserResponse();
     }
     catch (Exception ex)
     {
       _logger.LogError(ex, Messages.User.DeletionError);
-      return new ErrorServiceResponse<AdminDeleteUserResponse>(Messages.User.DeletionError);
+      throw new InvalidOperationException(Messages.User.DeletionError);
     }
   }
 
-  public async Task<IServiceResponse<AdminListUserResponse>> ListAdminUser(
+  public async Task<AdminListUserResponse> ListAdminUser(
     AdminListUserRequest request,
     CancellationToken cancellationToken = default
   )
@@ -110,19 +107,16 @@ public class UserService : IUserService
     {
       var users = await GetAllUsersAsync(null, cancellationToken);
       await _unitOfWork.SaveChangesAsync(cancellationToken);
-      return new SuccessServiceResponse<AdminListUserResponse>(
-        Messages.User.Listed,
-        new AdminListUserResponse { Users = users.ToList() }
-      );
+      return new AdminListUserResponse { Users = users.ToList() };
     }
     catch (Exception ex)
     {
       _logger.LogError(ex, Messages.User.ListError);
-      return new ErrorServiceResponse<AdminListUserResponse>(Messages.User.ListError);
+      throw new InvalidOperationException(Messages.User.ListError);
     }
   }
 
-  public async Task<IServiceResponse<AdminUpdateUserResponse>> UpdateAdminUser(
+  public async Task<AdminUpdateUserResponse> UpdateAdminUser(
     AdminUpdateUserRequest request,
     CancellationToken cancellationToken = default
   )
@@ -130,7 +124,7 @@ public class UserService : IUserService
     var existingUser = await GetUserByIdAsync(request.UserId, cancellationToken);
     if (existingUser == null)
     {
-      return new ErrorServiceResponse<AdminUpdateUserResponse>(Messages.User.IdDoesNotExist);
+      throw new KeyNotFoundException(Messages.User.IdDoesNotExist);
     }
 
     existingUser.DiscordId = request.DiscordId;
@@ -143,16 +137,16 @@ public class UserService : IUserService
     {
       await UpdateUserAsync(existingUser, cancellationToken);
       await _unitOfWork.SaveChangesAsync(cancellationToken);
-      return new SuccessServiceResponse<AdminUpdateUserResponse>(Messages.User.Updated);
+      return new AdminUpdateUserResponse();
     }
     catch (Exception ex)
     {
       _logger.LogError(ex, Messages.User.UpdateError);
-      return new ErrorServiceResponse<AdminUpdateUserResponse>(Messages.User.UpdateError);
+      throw new InvalidOperationException(Messages.User.UpdateError);
     }
   }
 
-  public async Task<IServiceResponse<GetCurrentUserResponse>> GetCurrentUser(
+  public async Task<GetCurrentUserResponse> GetCurrentUser(
     string? email,
     CancellationToken cancellationToken = default
   )
@@ -160,16 +154,13 @@ public class UserService : IUserService
     var user = await GetUserByEmailAsync(email, cancellationToken);
     if (user == null)
     {
-      return new ErrorServiceResponse<GetCurrentUserResponse>(Messages.User.EmailDoesNotExist);
+      throw new KeyNotFoundException(Messages.User.EmailDoesNotExist);
     }
 
-    return new SuccessServiceResponse<GetCurrentUserResponse>(
-      Messages.User.EmailExists,
-      new GetCurrentUserResponse { User = user }
-    );
+    return new GetCurrentUserResponse { User = user };
   }
 
-  public async Task<IServiceResponse<GetUserResponse>> GetUserBySlug(
+  public async Task<GetUserResponse> GetUserBySlug(
     GetUserRequest request,
     CancellationToken cancellationToken = default
   )
@@ -177,16 +168,13 @@ public class UserService : IUserService
     var user = await GetUserByEmailAsync(request.Email, cancellationToken);
     if (user == null)
     {
-      return new ErrorServiceResponse<GetUserResponse>(Messages.User.EmailDoesNotExist);
+      throw new KeyNotFoundException(Messages.User.EmailDoesNotExist);
     }
 
-    return new SuccessServiceResponse<GetUserResponse>(
-      Messages.User.Found,
-      new GetUserResponse { User = user }
-    );
+    return new GetUserResponse { User = user };
   }
 
-  public async Task<IServiceResponse<GetUserResponse>> GetUser(
+  public async Task<GetUserResponse> GetUser(
     GetUserRequest request,
     CancellationToken cancellationToken = default
   )
@@ -204,16 +192,13 @@ public class UserService : IUserService
 
     if (user == null)
     {
-      return new ErrorServiceResponse<GetUserResponse>(Messages.User.EmailDoesNotExist);
+      throw new KeyNotFoundException(Messages.User.EmailDoesNotExist);
     }
 
-    return new SuccessServiceResponse<GetUserResponse>(
-      Messages.User.Found,
-      new GetUserResponse { User = user }
-    );
+    return new GetUserResponse { User = user };
   }
 
-  public async Task<IServiceResponse<CreateUserIfNotExistsResponse>> CreateUserIfNotExists(
+  public async Task<CreateUserIfNotExistsResponse> CreateUserIfNotExists(
     CreateUserIfNotExistsRequest request,
     string? email,
     CancellationToken cancellationToken = default
@@ -232,8 +217,18 @@ public class UserService : IUserService
       }
 
       var isVerified = auth0User?.EmailVerified == true;
-      var existingUserResponse = await GetCurrentUser(email, cancellationToken);
-      var userExists = existingUserResponse.IsSuccess;
+      UserEntity? existingUser = null;
+      var userExists = false;
+
+      try
+      {
+        existingUser = await GetUserByEmailAsync(email, cancellationToken);
+        userExists = existingUser != null;
+      }
+      catch (KeyNotFoundException)
+      {
+        userExists = false;
+      }
 
       if (userExists && isVerified)
       {
@@ -253,9 +248,7 @@ public class UserService : IUserService
           }
         }
 
-        return new SuccessServiceResponse<CreateUserIfNotExistsResponse>(
-          existingUserResponse.Message
-        );
+        return new CreateUserIfNotExistsResponse();
       }
 
       // Create user in database if it doesn't exists
@@ -283,16 +276,13 @@ public class UserService : IUserService
       await _unitOfWork.SaveChangesAsync(cancellationToken);
       await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
-      return new SuccessServiceResponse<CreateUserIfNotExistsResponse>(
-        Messages.User.Created,
-        new CreateUserIfNotExistsResponse()
-      );
+      return new CreateUserIfNotExistsResponse();
     }
     catch (Exception ex)
     {
       _logger.LogError(ex, Messages.User.CreationError);
       await _unitOfWork.RollbackTransactionAsync(cancellationToken);
-      return new ErrorServiceResponse<CreateUserIfNotExistsResponse>(Messages.User.CreationError);
+      throw new InvalidOperationException(Messages.User.CreationError);
     }
   }
 

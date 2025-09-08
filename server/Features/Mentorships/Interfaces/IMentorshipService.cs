@@ -31,27 +31,27 @@ public interface IMentorshipService
     Func<IQueryable<MentorshipEntity>, IQueryable<MentorshipEntity>>? include = null
   );
 
-  Task<IServiceResponse<AdminCreateMentorshipResponse>> CreateAdminMentorship(
+  Task<AdminCreateMentorshipResponse> CreateAdminMentorship(
     AdminCreateMentorshipRequest request,
     CancellationToken cancellationToken = default
   );
 
-  Task<IServiceResponse<AdminDeleteMentorshipResponse>> DeleteAdminMentorship(
+  Task<AdminDeleteMentorshipResponse> DeleteAdminMentorship(
     AdminDeleteMentorshipRequest request,
     CancellationToken cancellationToken = default
   );
 
-  Task<IServiceResponse<AdminListMentorshipResponse>> ListAdminMentorship(
+  Task<AdminListMentorshipResponse> ListAdminMentorship(
     AdminListMentorshipRequest request,
     CancellationToken cancellationToken = default
   );
 
-  Task<IServiceResponse<AdminUpdateMentorshipResponse>> UpdateAdminMentorship(
+  Task<AdminUpdateMentorshipResponse> UpdateAdminMentorship(
     AdminUpdateMentorshipRequest request,
     CancellationToken cancellationToken = default
   );
 
-  Task<IServiceResponse<GetCurrentUserMenteesListResponse>> GetCurrentUserMenteesList(
+  Task<GetCurrentUserMenteesListResponse> GetCurrentUserMenteesList(
     GetCurrentUserMenteesListRequest request,
     CancellationToken cancellationToken = default
   );

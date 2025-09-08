@@ -62,8 +62,7 @@ public class SeasonTests : BaseIntegrationTest, IAsyncLifetime
 
     var listRequest = new AdminListSeasonRequest();
     var listResponse = await SeasonService.ListAdminSeason(listRequest);
-    Assert.True(listResponse.IsSuccess);
-    Assert.Equal(Messages.Season.Listed, listResponse.Message);
+    Assert.NotNull(listResponse.Seasons);
 
     var allSeasons = await _seeder.GetAllSeasonsAsync();
     Assert.Equal(count, allSeasons.Count);
@@ -84,8 +83,7 @@ public class SeasonTests : BaseIntegrationTest, IAsyncLifetime
     };
 
     var firstResponse = await SeasonService.CreateAdminSeason(firstRequest);
-    Assert.True(firstResponse.IsSuccess);
-    Assert.Equal(Messages.Season.Created, firstResponse.Message);
+    Assert.NotNull(firstResponse.SeasonId);
 
     var secondRequest = new AdminCreateSeasonRequest
     {
@@ -97,9 +95,9 @@ public class SeasonTests : BaseIntegrationTest, IAsyncLifetime
       ImageUrl = _faker.Image.PicsumUrl(),
     };
 
-    var secondResponse = await SeasonService.CreateAdminSeason(secondRequest);
-    Assert.False(secondResponse.IsSuccess);
-    Assert.Equal(Messages.Season.Exists, secondResponse.Message);
+    await Assert.ThrowsAsync<InvalidOperationException>(
+      () => SeasonService.CreateAdminSeason(secondRequest)
+    );
   }
 
   [Fact]
@@ -121,8 +119,6 @@ public class SeasonTests : BaseIntegrationTest, IAsyncLifetime
     };
 
     var updateResponse = await SeasonService.UpdateAdminSeason(updateRequest);
-    Assert.Equal(Messages.Season.Updated, updateResponse.Message);
-    Assert.True(updateResponse.IsSuccess);
 
     var updatedSeason = await SeasonService.GetSeasonByIdAsync(seasonId);
     Assert.NotNull(updatedSeason);
@@ -143,8 +139,6 @@ public class SeasonTests : BaseIntegrationTest, IAsyncLifetime
 
     var request = new AdminDeleteSeasonRequest { SeasonId = season.SeasonId };
     var deleteResponse = await SeasonService.DeleteAdminSeason(request);
-    Assert.True(deleteResponse.IsSuccess);
-    Assert.Equal(Messages.Season.Deleted, deleteResponse.Message);
 
     var afterDelete = await SeasonService.GetSeasonByIdAsync(seasonId);
     Assert.Null(afterDelete);
@@ -154,9 +148,7 @@ public class SeasonTests : BaseIntegrationTest, IAsyncLifetime
   public async Task Delete_Season_Fails_If_Not_Found()
   {
     var request = new AdminDeleteSeasonRequest { SeasonId = _faker.Random.AlphaNumeric(12) };
-    var deleteResponse = await SeasonService.DeleteAdminSeason(request);
-    Assert.False(deleteResponse.IsSuccess);
-    Assert.Equal(Messages.Season.DoesNotExist, deleteResponse.Message);
+    await Assert.ThrowsAsync<KeyNotFoundException>(() => SeasonService.DeleteAdminSeason(request));
   }
 
   [Fact]
@@ -164,7 +156,6 @@ public class SeasonTests : BaseIntegrationTest, IAsyncLifetime
   {
     var request = new AdminListSeasonRequest();
     var response = await SeasonService.ListAdminSeason(request);
-    Assert.True(response.IsSuccess);
-    Assert.Equal(Messages.Season.Listed, response.Message);
+    Assert.NotNull(response.Seasons);
   }
 }

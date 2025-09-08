@@ -27,8 +27,8 @@ public class UserController : BaseController
     CancellationToken cancellationToken = default
   )
   {
-    var response = await _userService.CreateAdminUser(request, cancellationToken);
-    return HandleResponse(response);
+    var result = await _userService.CreateAdminUser(request, cancellationToken);
+    return OkResponse(result);
   }
 
   [HttpDelete]
@@ -39,8 +39,8 @@ public class UserController : BaseController
     CancellationToken cancellationToken = default
   )
   {
-    var response = await _userService.DeleteAdminUser(request, cancellationToken);
-    return HandleResponse(response);
+    var result = await _userService.DeleteAdminUser(request, cancellationToken);
+    return OkResponse(result);
   }
 
   [HttpGet]
@@ -51,8 +51,8 @@ public class UserController : BaseController
     CancellationToken cancellationToken = default
   )
   {
-    var response = await _userService.ListAdminUser(request, cancellationToken);
-    return HandleResponse(response);
+    var result = await _userService.ListAdminUser(request, cancellationToken);
+    return OkResponse(result);
   }
 
   [HttpPut]
@@ -63,8 +63,8 @@ public class UserController : BaseController
     CancellationToken cancellationToken = default
   )
   {
-    var response = await _userService.UpdateAdminUser(request, cancellationToken);
-    return HandleResponse(response);
+    var result = await _userService.UpdateAdminUser(request, cancellationToken);
+    return OkResponse(result);
   }
 
   [HttpPost]
@@ -77,12 +77,12 @@ public class UserController : BaseController
   )
   {
     var currentUserEmail = GetCurrentUserEmail();
-    var response = await _userService.CreateUserIfNotExists(
+    var result = await _userService.CreateUserIfNotExists(
       request,
       currentUserEmail,
       cancellationToken
     );
-    return HandleResponse(response);
+    return OkResponse(result);
   }
 
   [HttpGet]
@@ -95,8 +95,8 @@ public class UserController : BaseController
   )
   {
     var currentUserEmail = GetCurrentUserEmail();
-    var response = await _userService.GetCurrentUser(currentUserEmail, cancellationToken);
-    return HandleResponse(response);
+    var result = await _userService.GetCurrentUser(currentUserEmail, cancellationToken);
+    return OkResponse(result);
   }
 
   [HttpGet]
@@ -108,8 +108,8 @@ public class UserController : BaseController
     CancellationToken cancellationToken = default
   )
   {
-    var response = await _userService.GetUser(request, cancellationToken);
-    return HandleResponse(response);
+    var result = await _userService.GetUser(request, cancellationToken);
+    return OkResponse(result);
   }
 
   #endregion

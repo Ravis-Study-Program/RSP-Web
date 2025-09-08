@@ -8,19 +8,23 @@ namespace RSPWebAPI.Tests.Shared;
 
 public class DummyRequestCache : IRequestCache
 {
-  public Task<T?> GetOrCreateAsync<T>(
+  public async Task<T?> GetOrCreateAsync<T>(
     string routeKey,
     string? primaryKey,
     Func<Task<T>> factory,
     TimeSpan? ttl = null
   )
   {
-    return factory();
+    return await factory();
   }
 
-  public Task<T?> GetOrCreateAsync<T>(string routeKey, Func<Task<T>> factory, TimeSpan? ttl = null)
+  public async Task<T?> GetOrCreateAsync<T>(
+    string routeKey,
+    Func<Task<T>> factory,
+    TimeSpan? ttl = null
+  )
   {
-    return factory();
+    return await factory();
   }
 
   public void Remove(string routeKey, string? primaryKey) { }

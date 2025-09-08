@@ -30,8 +30,8 @@ public class DummyDataController : BaseController
     CancellationToken cancellationToken = default
   )
   {
-    var response = await _dummyDataService.AdminGenerateDummyData(request, cancellationToken);
-    return HandleResponse(response);
+    var result = await _dummyDataService.AdminGenerateDummyData(request, cancellationToken);
+    return OkResponse(result);
   }
 
   #endregion

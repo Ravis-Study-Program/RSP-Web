@@ -29,37 +29,37 @@ public interface IUserService
     Func<IQueryable<UserEntity>, IQueryable<UserEntity>>? include = null
   );
 
-  Task<IServiceResponse<AdminCreateUserResponse>> CreateAdminUser(
+  Task<AdminCreateUserResponse> CreateAdminUser(
     AdminCreateUserRequest request,
     CancellationToken cancellationToken = default
   );
 
-  Task<IServiceResponse<AdminDeleteUserResponse>> DeleteAdminUser(
+  Task<AdminDeleteUserResponse> DeleteAdminUser(
     AdminDeleteUserRequest request,
     CancellationToken cancellationToken = default
   );
 
-  Task<IServiceResponse<AdminListUserResponse>> ListAdminUser(
+  Task<AdminListUserResponse> ListAdminUser(
     AdminListUserRequest request,
     CancellationToken cancellationToken = default
   );
 
-  Task<IServiceResponse<AdminUpdateUserResponse>> UpdateAdminUser(
+  Task<AdminUpdateUserResponse> UpdateAdminUser(
     AdminUpdateUserRequest request,
     CancellationToken cancellationToken = default
   );
 
-  Task<IServiceResponse<GetCurrentUserResponse>> GetCurrentUser(
+  Task<GetCurrentUserResponse> GetCurrentUser(
     string? email,
     CancellationToken cancellationToken = default
   );
 
-  Task<IServiceResponse<GetUserResponse>> GetUser(
+  Task<GetUserResponse> GetUser(
     GetUserRequest request,
     CancellationToken cancellationToken = default
   );
 
-  Task<IServiceResponse<CreateUserIfNotExistsResponse>> CreateUserIfNotExists(
+  Task<CreateUserIfNotExistsResponse> CreateUserIfNotExists(
     CreateUserIfNotExistsRequest request,
     string? email,
     CancellationToken cancellationToken = default
