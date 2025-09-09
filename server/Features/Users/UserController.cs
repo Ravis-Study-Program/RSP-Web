@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using RSPWebAPI.Common;
+using RSPWebAPI.Features.Constants;
 using RSPWebAPI.Features.Users.Dtos;
 using RSPWebAPI.Features.Users.Interfaces;
 using RSPWebAPI.Shared;
@@ -28,7 +29,7 @@ public class UserController : BaseController
   )
   {
     var result = await _userService.CreateAdminUser(request, cancellationToken);
-    return OkResponse(result);
+    return OkResponse(result, Messages.User.Created);
   }
 
   [HttpDelete]
@@ -40,7 +41,7 @@ public class UserController : BaseController
   )
   {
     var result = await _userService.DeleteAdminUser(request, cancellationToken);
-    return OkResponse(result);
+    return OkResponse(result, Messages.User.Deleted);
   }
 
   [HttpGet]
@@ -52,7 +53,7 @@ public class UserController : BaseController
   )
   {
     var result = await _userService.ListAdminUser(request, cancellationToken);
-    return OkResponse(result);
+    return OkResponse(result, Messages.User.Listed);
   }
 
   [HttpPut]
@@ -64,7 +65,7 @@ public class UserController : BaseController
   )
   {
     var result = await _userService.UpdateAdminUser(request, cancellationToken);
-    return OkResponse(result);
+    return OkResponse(result, Messages.User.Updated);
   }
 
   [HttpPost]
@@ -82,7 +83,7 @@ public class UserController : BaseController
       currentUserEmail,
       cancellationToken
     );
-    return OkResponse(result);
+    return OkResponse(result, Messages.User.Created);
   }
 
   [HttpGet]
@@ -96,7 +97,7 @@ public class UserController : BaseController
   {
     var currentUserEmail = GetCurrentUserEmail();
     var result = await _userService.GetCurrentUser(currentUserEmail, cancellationToken);
-    return OkResponse(result);
+    return OkResponse(result, Messages.User.Listed);
   }
 
   [HttpGet]
@@ -109,7 +110,7 @@ public class UserController : BaseController
   )
   {
     var result = await _userService.GetUser(request, cancellationToken);
-    return OkResponse(result);
+    return OkResponse(result, Messages.User.Listed);
   }
 
   #endregion

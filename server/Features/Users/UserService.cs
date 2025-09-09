@@ -15,10 +15,8 @@ using RSPWebAPI.Shared.Strings;
 
 namespace RSPWebAPI.Features.Users;
 
-public class UserService : IUserService
+public class UserService : BaseService, IUserService
 {
-  private readonly ILogger<UserService> _logger;
-  private readonly IUnitOfWork _unitOfWork;
   private readonly IRepository<UserEntity> _userRepository;
   private readonly IUserIdentityService _userIdentityService;
   private readonly IRequestCache _cache;
@@ -30,10 +28,9 @@ public class UserService : IUserService
     IUserIdentityService userIdentityService,
     IRequestCache cache
   )
+    : base(unitOfWork, logger)
   {
     _userRepository = userRepository;
-    _unitOfWork = unitOfWork;
-    _logger = logger;
     _userIdentityService = userIdentityService;
     _cache = cache;
   }
@@ -61,17 +58,15 @@ public class UserService : IUserService
       Slug = slug,
     };
 
-    try
-    {
-      await AddUserAsync(user, cancellationToken);
-      await _unitOfWork.SaveChangesAsync(cancellationToken);
-      return new AdminCreateUserResponse { UserId = user.UserId };
-    }
-    catch (Exception ex)
-    {
-      _logger.LogError(ex, Messages.User.CreationError);
-      throw new InvalidOperationException(Messages.User.CreationError);
-    }
+    return await ExecuteWithSaveAsync(
+      async () =>
+      {
+        await AddUserAsync(user, cancellationToken);
+        return new AdminCreateUserResponse { UserId = user.UserId };
+      },
+      Messages.User.CreationError,
+      cancellationToken
+    );
   }
 
   public async Task<AdminDeleteUserResponse> DeleteAdminUser(
@@ -85,17 +80,15 @@ public class UserService : IUserService
       throw new KeyNotFoundException(Messages.User.EmailDoesNotExist);
     }
 
-    try
-    {
-      await DeleteUserAsync(existingUser.UserId, cancellationToken);
-      await _unitOfWork.SaveChangesAsync(cancellationToken);
-      return new AdminDeleteUserResponse();
-    }
-    catch (Exception ex)
-    {
-      _logger.LogError(ex, Messages.User.DeletionError);
-      throw new InvalidOperationException(Messages.User.DeletionError);
-    }
+    return await ExecuteWithSaveAsync(
+      async () =>
+      {
+        await DeleteUserAsync(existingUser.UserId, cancellationToken);
+        return new AdminDeleteUserResponse();
+      },
+      Messages.User.DeletionError,
+      cancellationToken
+    );
   }
 
   public async Task<AdminListUserResponse> ListAdminUser(
@@ -103,17 +96,15 @@ public class UserService : IUserService
     CancellationToken cancellationToken = default
   )
   {
-    try
-    {
-      var users = await GetAllUsersAsync(null, cancellationToken);
-      await _unitOfWork.SaveChangesAsync(cancellationToken);
-      return new AdminListUserResponse { Users = users.ToList() };
-    }
-    catch (Exception ex)
-    {
-      _logger.LogError(ex, Messages.User.ListError);
-      throw new InvalidOperationException(Messages.User.ListError);
-    }
+    return await ExecuteWithSaveAsync(
+      async () =>
+      {
+        var users = await GetAllUsersAsync(null, cancellationToken);
+        return new AdminListUserResponse { Users = users.ToList() };
+      },
+      Messages.User.ListError,
+      cancellationToken
+    );
   }
 
   public async Task<AdminUpdateUserResponse> UpdateAdminUser(
@@ -133,17 +124,15 @@ public class UserService : IUserService
     existingUser.ProfileImage = request.ProfileImage;
     existingUser.IsAdmin = request.IsAdmin;
 
-    try
-    {
-      await UpdateUserAsync(existingUser, cancellationToken);
-      await _unitOfWork.SaveChangesAsync(cancellationToken);
-      return new AdminUpdateUserResponse();
-    }
-    catch (Exception ex)
-    {
-      _logger.LogError(ex, Messages.User.UpdateError);
-      throw new InvalidOperationException(Messages.User.UpdateError);
-    }
+    return await ExecuteWithSaveAsync(
+      async () =>
+      {
+        await UpdateUserAsync(existingUser, cancellationToken);
+        return new AdminUpdateUserResponse();
+      },
+      Messages.User.UpdateError,
+      cancellationToken
+    );
   }
 
   public async Task<GetCurrentUserResponse> GetCurrentUser(
@@ -204,86 +193,79 @@ public class UserService : IUserService
     CancellationToken cancellationToken = default
   )
   {
-    await _unitOfWork.BeginTransactionAsync(cancellationToken);
-
-    try
-    {
-      var auth0Users =
-        (await _userIdentityService.GetUserByEmailAsync(email!, cancellationToken)) ?? [];
-      var auth0User = auth0Users.First();
-      if (auth0User == null)
+    return await ExecuteWithTransactionAsync(
+      async () =>
       {
-        throw new Exception("Couldn't find auth0 user");
-      }
-
-      var isVerified = auth0User?.EmailVerified == true;
-      UserEntity? existingUser = null;
-      var userExists = false;
-
-      try
-      {
-        existingUser = await GetUserByEmailAsync(email, cancellationToken);
-        userExists = existingUser != null;
-      }
-      catch (KeyNotFoundException)
-      {
-        userExists = false;
-      }
-
-      if (userExists && isVerified)
-      {
-        // Perform linking if it's another synonymous account
-        if (auth0Users.Count >= 2)
+        var auth0Users =
+          (await _userIdentityService.GetUserByEmailAsync(email!, cancellationToken)) ?? [];
+        var auth0User = auth0Users.First();
+        if (auth0User == null)
         {
-          var primaryUser = auth0Users
-            .OrderBy(u => int.TryParse(u.LoginsCount, out var count) ? count : 0)
-            .First();
+          throw new Exception("Couldn't find auth0 user");
+        }
 
-          foreach (var user in auth0Users)
+        var isVerified = auth0User?.EmailVerified == true;
+        UserEntity? existingUser = null;
+        var userExists = false;
+
+        try
+        {
+          existingUser = await GetUserByEmailAsync(email, cancellationToken);
+          userExists = existingUser != null;
+        }
+        catch (KeyNotFoundException)
+        {
+          userExists = false;
+        }
+
+        if (userExists && isVerified)
+        {
+          // Perform linking if it's another synonymous account
+          if (auth0Users.Count >= 2)
           {
-            if (user.UserId != primaryUser.UserId)
+            var primaryUser = auth0Users
+              .OrderBy(u => int.TryParse(u.LoginsCount, out var count) ? count : 0)
+              .First();
+
+            foreach (var user in auth0Users)
             {
-              await _userIdentityService.LinkAccountAsync(primaryUser.UserId, user);
+              if (user.UserId != primaryUser.UserId)
+              {
+                await _userIdentityService.LinkAccountAsync(primaryUser.UserId, user);
+              }
             }
           }
+
+          return new CreateUserIfNotExistsResponse();
+        }
+
+        // Create user in database if it doesn't exists
+        if (!userExists)
+        {
+          var slug = await createSlug(request.Name);
+          var user = new UserEntity
+          {
+            UserId = Database.Constants.GeneratePrimaryKeyId(),
+            Email = email!, // null email would have been captured earlier in GetCurrentUser
+            Name = request.Name,
+            Slug = slug,
+            IsAdmin = false,
+          };
+
+          await AddUserAsync(user, cancellationToken);
+        }
+
+        // Send verification email if user is not verified
+        if (!isVerified && auth0User?.UserId != null)
+        {
+          await _userIdentityService.SendVerificationEmailAsync(auth0User.UserId);
         }
 
         return new CreateUserIfNotExistsResponse();
-      }
-
-      // Create user in database if it doesn't exists
-      if (!userExists)
-      {
-        var slug = await createSlug(request.Name);
-        var user = new UserEntity
-        {
-          UserId = Database.Constants.GeneratePrimaryKeyId(),
-          Email = email!, // null email would have been captured earlier in GetCurrentUser
-          Name = request.Name,
-          Slug = slug,
-          IsAdmin = false,
-        };
-
-        await AddUserAsync(user, cancellationToken);
-      }
-
-      // Send verification email if user is not verified
-      if (!isVerified && auth0User?.UserId != null)
-      {
-        await _userIdentityService.SendVerificationEmailAsync(auth0User.UserId);
-      }
-
-      await _unitOfWork.SaveChangesAsync(cancellationToken);
-      await _unitOfWork.CommitTransactionAsync(cancellationToken);
-
-      return new CreateUserIfNotExistsResponse();
-    }
-    catch (Exception ex)
-    {
-      _logger.LogError(ex, Messages.User.CreationError);
-      await _unitOfWork.RollbackTransactionAsync(cancellationToken);
-      throw new InvalidOperationException(Messages.User.CreationError);
-    }
+      },
+      Messages.User.CreationError,
+      cancellationToken
+    );
   }
 
   private async Task<string> createSlug(string name)

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using RSPWebAPI.Common;
+using RSPWebAPI.Features.Constants;
 using RSPWebAPI.Features.Leetcode.Dtos;
 using RSPWebAPI.Features.Leetcodes.Interfaces;
 using RSPWebAPI.Shared;
@@ -31,7 +32,7 @@ public class LeetcodeController : BaseController
   )
   {
     var result = await _leetcodeService.AdminPopulateLeetcodeQuestions(request, cancellationToken);
-    return OkResponse(result);
+    return OkResponse(result, Messages.LeetcodeProblem.ScrapedSuccessfully);
   }
 
   [HttpGet]
@@ -44,7 +45,7 @@ public class LeetcodeController : BaseController
   )
   {
     var result = await _leetcodeService.ListLeetcodeProblems(request, cancellationToken);
-    return OkResponse(result);
+    return OkResponse(result, Messages.LeetcodeProblem.Listed);
   }
 
   #endregion

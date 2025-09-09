@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using RSPWebAPI.Common;
+using RSPWebAPI.Features.Constants;
 using RSPWebAPI.Features.MockInterviews.Dtos;
 using RSPWebAPI.Features.MockInterviews.Interfaces;
 using RSPWebAPI.Shared;
@@ -29,7 +30,7 @@ public class MockInterviewController : BaseController
   )
   {
     var result = await _mockInterviewService.CreateMockInterview(request, cancellationToken);
-    return OkResponse(result);
+    return OkResponse(result, Messages.MockInterview.Created);
   }
 
   [HttpDelete]
@@ -42,7 +43,7 @@ public class MockInterviewController : BaseController
   )
   {
     var result = await _mockInterviewService.DeleteMockInterview(request, cancellationToken);
-    return OkResponse(result);
+    return OkResponse(result, Messages.MockInterview.Deleted);
   }
 
   [HttpGet]
@@ -55,7 +56,7 @@ public class MockInterviewController : BaseController
   )
   {
     var result = await _mockInterviewService.ListMockInterview(request, cancellationToken);
-    return OkResponse(result);
+    return OkResponse(result, Messages.MockInterview.Listed);
   }
 
   [HttpPut]
@@ -68,7 +69,7 @@ public class MockInterviewController : BaseController
   )
   {
     var result = await _mockInterviewService.UpdateMockInterview(request, cancellationToken);
-    return OkResponse(result);
+    return OkResponse(result, Messages.MockInterview.Updated);
   }
 
   #endregion

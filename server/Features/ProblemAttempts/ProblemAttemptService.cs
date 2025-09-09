@@ -14,14 +14,12 @@ using RSPWebAPI.Features.Users.Interfaces;
 
 namespace RSPWebAPI.Features.ProblemAttempts;
 
-public class ProblemAttemptService : IProblemAttemptService
+public class ProblemAttemptService : BaseService, IProblemAttemptService
 {
   private readonly IEnrollmentService _enrollmentService;
-  private readonly ILogger<ProblemAttemptService> _logger;
   private readonly IRepository<ProblemAttemptEntity> _problemAttemptRepository;
   private readonly ISeasonWeekService _seasonWeekService;
   private readonly IRequestCache _cache;
-  private readonly IUnitOfWork _unitOfWork;
   private readonly IUserService _userService;
 
   public ProblemAttemptService(
@@ -33,14 +31,13 @@ public class ProblemAttemptService : IProblemAttemptService
     IUnitOfWork unitOfWork,
     ILogger<ProblemAttemptService> logger
   )
+    : base(unitOfWork, logger)
   {
     _problemAttemptRepository = problemAttemptRepository;
     _seasonWeekService = seasonWeekService;
     _userService = userService;
     _enrollmentService = enrollmentService;
     _cache = cache;
-    _unitOfWork = unitOfWork;
-    _logger = logger;
   }
 
   public async Task<IEnumerable<ProblemAttemptEntity>> GetAllProblemAttemptsAsync(
@@ -123,21 +120,19 @@ public class ProblemAttemptService : IProblemAttemptService
       SeasonWeekId = seasonWeek?.SeasonWeekId,
     };
 
-    try
-    {
-      await AddProblemAttemptAsync(problemAttempt, cancellationToken);
-      await _unitOfWork.SaveChangesAsync(cancellationToken);
-      _cache.Remove(RouteCacheKeys.ListProblemAttempts, request.Email);
-      return new CreateProblemAttemptResponse
+    return await ExecuteWithSaveAsync(
+      async () =>
       {
-        ProblemAttemptId = problemAttempt.ProblemAttemptId,
-      };
-    }
-    catch (Exception ex)
-    {
-      _logger.LogError(ex, Messages.ProblemAttempt.CreationError);
-      throw new InvalidOperationException(Messages.ProblemAttempt.CreationError);
-    }
+        await AddProblemAttemptAsync(problemAttempt, cancellationToken);
+        _cache.Remove(RouteCacheKeys.ListProblemAttempts, request.Email);
+        return new CreateProblemAttemptResponse
+        {
+          ProblemAttemptId = problemAttempt.ProblemAttemptId,
+        };
+      },
+      Messages.ProblemAttempt.CreationError,
+      cancellationToken
+    );
   }
 
   public async Task<DeleteProblemAttemptResponse> DeleteProblemAttempt(
@@ -155,18 +150,16 @@ public class ProblemAttemptService : IProblemAttemptService
       throw new KeyNotFoundException(Messages.ProblemAttempt.DoesNotExist);
     }
 
-    try
-    {
-      await DeleteProblemAttemptAsync(existingProblemAttempt.ProblemAttemptId, cancellationToken);
-      await _unitOfWork.SaveChangesAsync(cancellationToken);
-      _cache.Remove(RouteCacheKeys.ListProblemAttempts, request.Email);
-      return new DeleteProblemAttemptResponse();
-    }
-    catch (Exception ex)
-    {
-      _logger.LogError(ex, Messages.ProblemAttempt.DeletionError);
-      throw new InvalidOperationException(Messages.ProblemAttempt.DeletionError);
-    }
+    return await ExecuteWithSaveAsync(
+      async () =>
+      {
+        await DeleteProblemAttemptAsync(existingProblemAttempt.ProblemAttemptId, cancellationToken);
+        _cache.Remove(RouteCacheKeys.ListProblemAttempts, request.Email);
+        return new DeleteProblemAttemptResponse();
+      },
+      Messages.ProblemAttempt.DeletionError,
+      cancellationToken
+    );
   }
 
   public async Task<ListProblemAttemptResponse> ListProblemAttempt(
@@ -263,15 +256,7 @@ public class ProblemAttemptService : IProblemAttemptService
       _ => query
     );
 
-    try
-    {
-      return new ListProblemAttemptResponse { ProblemAttempts = problemAttempts.ToList() };
-    }
-    catch (Exception ex)
-    {
-      _logger.LogError(ex, Messages.ProblemAttempt.ListError);
-      throw new InvalidOperationException(Messages.ProblemAttempt.ListError);
-    }
+    return new ListProblemAttemptResponse { ProblemAttempts = problemAttempts.ToList() };
   }
 
   public async Task<UpdateProblemAttemptResponse> UpdateProblemAttempt(
@@ -323,18 +308,16 @@ public class ProblemAttemptService : IProblemAttemptService
     existingProblemAttempt.Notes = request.Notes;
     existingProblemAttempt.SeasonWeekId = seasonWeek?.SeasonWeekId;
 
-    try
-    {
-      await UpdateProblemAttemptAsync(existingProblemAttempt, cancellationToken);
-      await _unitOfWork.SaveChangesAsync(cancellationToken);
-      _cache.Remove(RouteCacheKeys.ListProblemAttempts, request.Email);
-      return new UpdateProblemAttemptResponse();
-    }
-    catch (Exception ex)
-    {
-      _logger.LogError(ex, Messages.ProblemAttempt.UpdateError);
-      throw new InvalidOperationException(Messages.ProblemAttempt.UpdateError);
-    }
+    return await ExecuteWithSaveAsync(
+      async () =>
+      {
+        await UpdateProblemAttemptAsync(existingProblemAttempt, cancellationToken);
+        _cache.Remove(RouteCacheKeys.ListProblemAttempts, request.Email);
+        return new UpdateProblemAttemptResponse();
+      },
+      Messages.ProblemAttempt.UpdateError,
+      cancellationToken
+    );
   }
 
   #region CRUD Operations

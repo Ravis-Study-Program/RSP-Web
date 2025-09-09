@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using RSPWebAPI.Common;
+using RSPWebAPI.Features.Constants;
 using RSPWebAPI.Features.LeetcodeProblemRecommendations.Dtos;
 using RSPWebAPI.Features.LeetcodeProblemRecommendations.Interfaces;
 using RSPWebAPI.Shared;
@@ -36,7 +37,7 @@ public class LeetcodeProblemRecommendationController : BaseController
       request,
       cancellationToken
     );
-    return OkResponse(result);
+    return OkResponse(result, Messages.LeetcodeProblemRecommendation.Created);
   }
 
   #endregion

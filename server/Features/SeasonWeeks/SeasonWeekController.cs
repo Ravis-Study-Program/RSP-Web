@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using RSPWebAPI.Common;
+using RSPWebAPI.Features.Constants;
 using RSPWebAPI.Features.SeasonWeeks.Dtos;
 using RSPWebAPI.Features.SeasonWeeks.Interfaces;
 using RSPWebAPI.Shared;
@@ -29,7 +30,7 @@ public class SeasonWeekController : BaseController
   )
   {
     var result = await _seasonWeekService.CreateAdminSeasonWeek(request, cancellationToken);
-    return OkResponse(result);
+    return OkResponse(result, Messages.SeasonWeek.Created);
   }
 
   [HttpDelete]
@@ -42,7 +43,7 @@ public class SeasonWeekController : BaseController
   )
   {
     var result = await _seasonWeekService.DeleteAdminSeasonWeek(request, cancellationToken);
-    return OkResponse(result);
+    return OkResponse(result, Messages.SeasonWeek.Deleted);
   }
 
   [HttpGet]
@@ -55,7 +56,7 @@ public class SeasonWeekController : BaseController
   )
   {
     var result = await _seasonWeekService.ListAdminSeasonWeek(request, cancellationToken);
-    return OkResponse(result);
+    return OkResponse(result, Messages.SeasonWeek.Listed);
   }
 
   [HttpPut]
@@ -68,7 +69,7 @@ public class SeasonWeekController : BaseController
   )
   {
     var result = await _seasonWeekService.UpdateAdminSeasonWeek(request, cancellationToken);
-    return OkResponse(result);
+    return OkResponse(result, Messages.SeasonWeek.Updated);
   }
 
   [HttpGet]
@@ -83,7 +84,7 @@ public class SeasonWeekController : BaseController
   )
   {
     var result = await _seasonWeekService.GetSeasonWeeksBySeasonSlug(request, cancellationToken);
-    return OkResponse(result);
+    return OkResponse(result, Messages.SeasonWeek.Listed);
   }
 
   #endregion
