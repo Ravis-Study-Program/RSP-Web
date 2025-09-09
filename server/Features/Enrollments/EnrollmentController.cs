@@ -31,7 +31,7 @@ public class EnrollmentController : BaseController
   )
   {
     var result = await _enrollmentService.CreateAdminEnrollment(request, cancellationToken);
-    return OkResponse(result);
+    return OkResponse(result, Messages.Enrollment.Created);
   }
 
   [HttpDelete]
@@ -44,7 +44,7 @@ public class EnrollmentController : BaseController
   )
   {
     var result = await _enrollmentService.DeleteAdminEnrollment(request, cancellationToken);
-    return OkResponse(result);
+    return OkResponse(result, Messages.Enrollment.Deleted);
   }
 
   [HttpGet]
@@ -57,7 +57,7 @@ public class EnrollmentController : BaseController
   )
   {
     var result = await _enrollmentService.ListAdminEnrollment(request, cancellationToken);
-    return OkResponse(result);
+    return OkResponse(result, Messages.Enrollment.Listed);
   }
 
   [HttpPut]
@@ -70,7 +70,7 @@ public class EnrollmentController : BaseController
   )
   {
     var result = await _enrollmentService.UpdateAdminEnrollment(request, cancellationToken);
-    return OkResponse(result);
+    return OkResponse(result, Messages.Enrollment.Updated);
   }
 
   [HttpGet]
@@ -92,7 +92,7 @@ public class EnrollmentController : BaseController
     }
     var request = new GetUserEnrollmentsRequest { Email = email };
     var result = await _enrollmentService.GetUserEnrollments(request, cancellationToken);
-    return OkResponse(result);
+    return OkResponse(result, Messages.Enrollment.Listed);
   }
 
   [HttpGet]
@@ -107,7 +107,7 @@ public class EnrollmentController : BaseController
     var email = GetCurrentUserEmail() ?? "";
     var request = new GetIsUserEnrolledRequest { Email = email, SeasonSlug = seasonSlug ?? "" };
     var result = await _enrollmentService.GetIsUserEnrolled(request, cancellationToken);
-    return OkResponse(result);
+    return OkResponse(result, Messages.Enrollment.Listed);
   }
 
   [HttpGet]
@@ -120,7 +120,7 @@ public class EnrollmentController : BaseController
   )
   {
     var result = await _enrollmentService.GetEnrollmentUsers(request, cancellationToken);
-    return OkResponse(result);
+    return OkResponse(result, Messages.Enrollment.UsersListed);
   }
 
   [HttpPost]
@@ -133,7 +133,7 @@ public class EnrollmentController : BaseController
   )
   {
     var result = await _enrollmentService.KickStudent(request, cancellationToken);
-    return OkResponse(result);
+    return OkResponse(result, Messages.Student.KickSuccess);
   }
 
   [HttpPost]
@@ -148,7 +148,7 @@ public class EnrollmentController : BaseController
   )
   {
     var result = await _enrollmentService.UpdateStudentRolePromotion(request, cancellationToken);
-    return OkResponse(result);
+    return OkResponse(result, Messages.Student.UpdateRolePromotionSuccess);
   }
 
   #endregion

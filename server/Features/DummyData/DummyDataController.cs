@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using RSPWebAPI.Common;
+using RSPWebAPI.Features.Constants;
 using RSPWebAPI.Features.DummyData.Dtos;
 using RSPWebAPI.Features.DummyData.Interfaces;
 using RSPWebAPI.Shared;
@@ -31,7 +32,7 @@ public class DummyDataController : BaseController
   )
   {
     var result = await _dummyDataService.AdminGenerateDummyData(request, cancellationToken);
-    return OkResponse(result);
+    return OkResponse(result, Messages.DummyData.Generated);
   }
 
   #endregion

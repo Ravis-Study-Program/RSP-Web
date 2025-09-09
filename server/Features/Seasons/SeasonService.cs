@@ -8,21 +8,18 @@ using RSPWebAPI.Features.Seasons.Interfaces;
 
 namespace RSPWebAPI.Features.Seasons;
 
-public class SeasonService : ISeasonService
+public class SeasonService : BaseService, ISeasonService
 {
-  private readonly ILogger<SeasonService> _logger;
   private readonly IRepository<SeasonEntity> _seasonRepository;
-  private readonly IUnitOfWork _unitOfWork;
 
   public SeasonService(
     IRepository<SeasonEntity> seasonRepository,
     IUnitOfWork unitOfWork,
     ILogger<SeasonService> logger
   )
+    : base(unitOfWork, logger)
   {
     _seasonRepository = seasonRepository;
-    _unitOfWork = unitOfWork;
-    _logger = logger;
   }
 
   public async Task<AdminCreateSeasonResponse> CreateAdminSeason(
@@ -47,17 +44,15 @@ public class SeasonService : ISeasonService
       ImageUrl = request.ImageUrl,
     };
 
-    try
-    {
-      await AddSeasonAsync(season, cancellationToken);
-      await _unitOfWork.SaveChangesAsync(cancellationToken);
-      return new AdminCreateSeasonResponse { SeasonId = season.SeasonId };
-    }
-    catch (Exception ex)
-    {
-      _logger.LogError(ex, Messages.Season.CreationError);
-      throw new InvalidOperationException(Messages.Season.CreationError);
-    }
+    return await ExecuteWithSaveAsync(
+      async () =>
+      {
+        await AddSeasonAsync(season, cancellationToken);
+        return new AdminCreateSeasonResponse { SeasonId = season.SeasonId };
+      },
+      Messages.Season.CreationError,
+      cancellationToken
+    );
   }
 
   public async Task<AdminDeleteSeasonResponse> DeleteAdminSeason(
@@ -71,17 +66,15 @@ public class SeasonService : ISeasonService
       throw new KeyNotFoundException(Messages.Season.DoesNotExist);
     }
 
-    try
-    {
-      await DeleteSeasonAsync(existingSeason.SeasonId, cancellationToken);
-      await _unitOfWork.SaveChangesAsync(cancellationToken);
-      return new AdminDeleteSeasonResponse();
-    }
-    catch (Exception ex)
-    {
-      _logger.LogError(ex, Messages.Season.DeletionError);
-      throw new InvalidOperationException(Messages.Season.DeletionError);
-    }
+    return await ExecuteWithSaveAsync(
+      async () =>
+      {
+        await DeleteSeasonAsync(existingSeason.SeasonId, cancellationToken);
+        return new AdminDeleteSeasonResponse();
+      },
+      Messages.Season.DeletionError,
+      cancellationToken
+    );
   }
 
   public async Task<AdminListSeasonResponse> ListAdminSeason(
@@ -89,17 +82,15 @@ public class SeasonService : ISeasonService
     CancellationToken cancellationToken = default
   )
   {
-    try
-    {
-      var seasons = await GetAllSeasonsAsync(null, cancellationToken);
-      await _unitOfWork.SaveChangesAsync(cancellationToken);
-      return new AdminListSeasonResponse() { Seasons = seasons.ToList() };
-    }
-    catch (Exception ex)
-    {
-      _logger.LogError(ex, Messages.Season.ListError);
-      throw new InvalidOperationException(Messages.Season.ListError);
-    }
+    return await ExecuteWithSaveAsync(
+      async () =>
+      {
+        var seasons = await GetAllSeasonsAsync(null, cancellationToken);
+        return new AdminListSeasonResponse() { Seasons = seasons.ToList() };
+      },
+      Messages.Season.ListError,
+      cancellationToken
+    );
   }
 
   public async Task<AdminUpdateSeasonResponse> UpdateAdminSeason(
@@ -120,17 +111,15 @@ public class SeasonService : ISeasonService
     existingSeason.Location = request.Location;
     existingSeason.ImageUrl = request.ImageUrl;
 
-    try
-    {
-      await UpdateSeasonAsync(existingSeason, cancellationToken);
-      await _unitOfWork.SaveChangesAsync(cancellationToken);
-      return new AdminUpdateSeasonResponse();
-    }
-    catch (Exception ex)
-    {
-      _logger.LogError(ex, Messages.Season.UpdateError);
-      throw new InvalidOperationException(Messages.Season.UpdateError);
-    }
+    return await ExecuteWithSaveAsync(
+      async () =>
+      {
+        await UpdateSeasonAsync(existingSeason, cancellationToken);
+        return new AdminUpdateSeasonResponse();
+      },
+      Messages.Season.UpdateError,
+      cancellationToken
+    );
   }
 
   #region CRUD Operations

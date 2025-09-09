@@ -11,12 +11,10 @@ using RSPWebAPI.Features.Mentorships.Interfaces;
 
 namespace RSPWebAPI.Features.Mentorships;
 
-public class MentorshipService : IMentorshipService
+public class MentorshipService : BaseService, IMentorshipService
 {
   private readonly IEnrollmentService _enrollmentService;
-  private readonly ILogger<MentorshipService> _logger;
   private readonly IRepository<MentorshipEntity> _mentorshipRepository;
-  private readonly IUnitOfWork _unitOfWork;
 
   public MentorshipService(
     IRepository<MentorshipEntity> mentorshipRepository,
@@ -24,11 +22,10 @@ public class MentorshipService : IMentorshipService
     IUnitOfWork unitOfWork,
     ILogger<MentorshipService> logger
   )
+    : base(unitOfWork, logger)
   {
     _mentorshipRepository = mentorshipRepository;
     _enrollmentService = enrollmentService;
-    _unitOfWork = unitOfWork;
-    _logger = logger;
   }
 
   public async Task<IEnumerable<MentorshipEntity>> GetAllMentorshipsAsync(
@@ -122,17 +119,15 @@ public class MentorshipService : IMentorshipService
       MenteeEnrollmentId = request.MenteeEnrollmentId,
     };
 
-    try
-    {
-      await AddMentorshipAsync(mentorship, cancellationToken);
-      await _unitOfWork.SaveChangesAsync(cancellationToken);
-      return new AdminCreateMentorshipResponse { MentorshipId = mentorship.MentorshipId };
-    }
-    catch (Exception ex)
-    {
-      _logger.LogError(ex, Messages.Mentorship.CreationError);
-      throw new InvalidOperationException(Messages.Mentorship.CreationError);
-    }
+    return await ExecuteWithSaveAsync(
+      async () =>
+      {
+        await AddMentorshipAsync(mentorship, cancellationToken);
+        return new AdminCreateMentorshipResponse { MentorshipId = mentorship.MentorshipId };
+      },
+      Messages.Mentorship.CreationError,
+      cancellationToken
+    );
   }
 
   public async Task<AdminDeleteMentorshipResponse> DeleteAdminMentorship(
@@ -146,17 +141,15 @@ public class MentorshipService : IMentorshipService
       throw new KeyNotFoundException(Messages.Mentorship.DoesNotExist);
     }
 
-    try
-    {
-      await DeleteMentorshipAsync(existingMentorship.MentorshipId, cancellationToken);
-      await _unitOfWork.SaveChangesAsync(cancellationToken);
-      return new AdminDeleteMentorshipResponse();
-    }
-    catch (Exception ex)
-    {
-      _logger.LogError(ex, Messages.Mentorship.DeletionError);
-      throw new InvalidOperationException(Messages.Mentorship.DeletionError);
-    }
+    return await ExecuteWithSaveAsync(
+      async () =>
+      {
+        await DeleteMentorshipAsync(existingMentorship.MentorshipId, cancellationToken);
+        return new AdminDeleteMentorshipResponse();
+      },
+      Messages.Mentorship.DeletionError,
+      cancellationToken
+    );
   }
 
   public async Task<AdminListMentorshipResponse> ListAdminMentorship(
@@ -164,41 +157,40 @@ public class MentorshipService : IMentorshipService
     CancellationToken cancellationToken = default
   )
   {
-    try
-    {
-      var mentorships = await GetAllMentorshipsAsync(
-        null,
-        cancellationToken,
-        q =>
-          q.Include(m => m.MentorEnrollment)
-            .ThenInclude(m => m.Season)
-            .Include(m => m.MentorEnrollment)
-            .ThenInclude(m => m.User)
-            .Include(m => m.MenteeEnrollment)
-            .ThenInclude(m => m.Season)
-            .Include(m => m.MenteeEnrollment)
-            .ThenInclude(m => m.User)
-      );
-      var formattedMentorships = mentorships
-        .Select(m => new MentorshipResponse
-        {
-          SeasonId = m.MentorEnrollment.SeasonId,
-          MentorshipId = m.MentorshipId,
-          SeasonName = m.MentorEnrollment.Season.Name,
-          SeasonSlug = m.MentorEnrollment.Season.Slug,
-          MentorEnrollmentId = m.MentorEnrollmentId,
-          MentorName = m.MentorEnrollment.User.Name,
-          MenteeEnrollmentId = m.MenteeEnrollmentId,
-          MenteeName = m.MenteeEnrollment.User.Name,
-        })
-        .ToList();
-      return new AdminListMentorshipResponse { Mentorships = formattedMentorships };
-    }
-    catch (Exception ex)
-    {
-      _logger.LogError(ex, Messages.Mentorship.ListError);
-      throw new InvalidOperationException(Messages.Mentorship.ListError);
-    }
+    return await ExecuteWithSaveAsync(
+      async () =>
+      {
+        var mentorships = await GetAllMentorshipsAsync(
+          null,
+          cancellationToken,
+          q =>
+            q.Include(m => m.MentorEnrollment)
+              .ThenInclude(m => m.Season)
+              .Include(m => m.MentorEnrollment)
+              .ThenInclude(m => m.User)
+              .Include(m => m.MenteeEnrollment)
+              .ThenInclude(m => m.Season)
+              .Include(m => m.MenteeEnrollment)
+              .ThenInclude(m => m.User)
+        );
+        var formattedMentorships = mentorships
+          .Select(m => new MentorshipResponse
+          {
+            SeasonId = m.MentorEnrollment.SeasonId,
+            MentorshipId = m.MentorshipId,
+            SeasonName = m.MentorEnrollment.Season.Name,
+            SeasonSlug = m.MentorEnrollment.Season.Slug,
+            MentorEnrollmentId = m.MentorEnrollmentId,
+            MentorName = m.MentorEnrollment.User.Name,
+            MenteeEnrollmentId = m.MenteeEnrollmentId,
+            MenteeName = m.MenteeEnrollment.User.Name,
+          })
+          .ToList();
+        return new AdminListMentorshipResponse { Mentorships = formattedMentorships };
+      },
+      Messages.Mentorship.ListError,
+      cancellationToken
+    );
   }
 
   public async Task<AdminUpdateMentorshipResponse> UpdateAdminMentorship(
@@ -265,17 +257,15 @@ public class MentorshipService : IMentorshipService
     existingMentorship.MentorEnrollmentId = request.MentorEnrollmentId;
     existingMentorship.MenteeEnrollmentId = request.MenteeEnrollmentId;
 
-    try
-    {
-      await UpdateMentorshipAsync(existingMentorship, cancellationToken);
-      await _unitOfWork.SaveChangesAsync(cancellationToken);
-      return new AdminUpdateMentorshipResponse();
-    }
-    catch (Exception ex)
-    {
-      _logger.LogError(ex, Messages.Mentorship.UpdateError);
-      throw new InvalidOperationException(Messages.Mentorship.UpdateError);
-    }
+    return await ExecuteWithSaveAsync(
+      async () =>
+      {
+        await UpdateMentorshipAsync(existingMentorship, cancellationToken);
+        return new AdminUpdateMentorshipResponse();
+      },
+      Messages.Mentorship.UpdateError,
+      cancellationToken
+    );
   }
 
   public async Task<GetCurrentUserMenteesListResponse> GetCurrentUserMenteesList(
@@ -314,15 +304,7 @@ public class MentorshipService : IMentorshipService
         MenteeEmail = m.MenteeEnrollment.User.Email,
       })
       .ToList();
-    try
-    {
-      return new GetCurrentUserMenteesListResponse { Mentorships = formattedMentorships };
-    }
-    catch (Exception ex)
-    {
-      _logger.LogError(ex, Messages.Mentorship.ListError);
-      throw new InvalidOperationException(Messages.Mentorship.ListError);
-    }
+    return new GetCurrentUserMenteesListResponse { Mentorships = formattedMentorships };
   }
 
   public async Task<MentorshipEntity?> GetMentorshipByEnrollmentIdsAsync(

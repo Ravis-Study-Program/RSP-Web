@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using RSPWebAPI.Common;
+using RSPWebAPI.Features.Constants;
 using RSPWebAPI.Features.ProblemAttempts.Dtos;
 using RSPWebAPI.Features.ProblemAttempts.Interfaces;
 using RSPWebAPI.Shared;
@@ -31,7 +32,7 @@ public class ProblemAttemptController : BaseController
     var email = GetCurrentUserEmail() ?? "";
     request.Email = email;
     var result = await _problemAttemptService.CreateProblemAttempt(request, cancellationToken);
-    return OkResponse(result);
+    return OkResponse(result, Messages.ProblemAttempt.Created);
   }
 
   [HttpDelete]
@@ -44,7 +45,7 @@ public class ProblemAttemptController : BaseController
   )
   {
     var result = await _problemAttemptService.DeleteProblemAttempt(request, cancellationToken);
-    return OkResponse(result);
+    return OkResponse(result, Messages.ProblemAttempt.Deleted);
   }
 
   [HttpGet]
@@ -57,7 +58,7 @@ public class ProblemAttemptController : BaseController
   )
   {
     var result = await _problemAttemptService.ListProblemAttempt(request, cancellationToken);
-    return OkResponse(result);
+    return OkResponse(result, Messages.ProblemAttempt.Listed);
   }
 
   [HttpPut]
@@ -72,7 +73,7 @@ public class ProblemAttemptController : BaseController
     var email = GetCurrentUserEmail() ?? "";
     request.Email = email;
     var result = await _problemAttemptService.UpdateProblemAttempt(request, cancellationToken);
-    return OkResponse(result);
+    return OkResponse(result, Messages.ProblemAttempt.Updated);
   }
 
   #endregion

@@ -14,14 +14,12 @@ using RSPWebAPI.Features.Users.Interfaces;
 
 namespace RSPWebAPI.Features.MockInterviews;
 
-public class MockInterviewService : IMockInterviewService
+public class MockInterviewService : BaseService, IMockInterviewService
 {
   private readonly IEnrollmentService _enrollmentService;
-  private readonly ILogger<MockInterviewService> _logger;
   private readonly IRepository<MockInterviewEntity> _mockInterviewRepository;
   private readonly ISeasonWeekService _seasonWeekService;
   private readonly IRequestCache _cache;
-  private readonly IUnitOfWork _unitOfWork;
   private readonly IUserService _userService;
 
   public MockInterviewService(
@@ -33,14 +31,13 @@ public class MockInterviewService : IMockInterviewService
     IUnitOfWork unitOfWork,
     ILogger<MockInterviewService> logger
   )
+    : base(unitOfWork, logger)
   {
     _mockInterviewRepository = mockInterviewRepository;
     _seasonWeekService = seasonWeekService;
     _userService = userService;
     _enrollmentService = enrollmentService;
     _cache = cache;
-    _unitOfWork = unitOfWork;
-    _logger = logger;
   }
 
   public async Task<IEnumerable<MockInterviewEntity>> GetAllMockInterviewsAsync(
@@ -129,19 +126,17 @@ public class MockInterviewService : IMockInterviewService
       SeasonWeekId = seasonWeek?.SeasonWeekId,
     };
 
-    try
-    {
-      await AddMockInterviewAsync(mockInterview, cancellationToken);
-      await _unitOfWork.SaveChangesAsync(cancellationToken);
-      _cache.Remove(RouteCacheKeys.ListMockInterviews, interviewee.Email);
-      _cache.Remove(RouteCacheKeys.ListMockInterviews, interviewer.Email);
-      return new CreateMockInterviewResponse { MockInterviewId = mockInterview.MockInterviewId };
-    }
-    catch (Exception ex)
-    {
-      _logger.LogError(ex, Messages.MockInterview.CreationError);
-      throw new InvalidOperationException(Messages.MockInterview.CreationError);
-    }
+    return await ExecuteWithSaveAsync(
+      async () =>
+      {
+        await AddMockInterviewAsync(mockInterview, cancellationToken);
+        _cache.Remove(RouteCacheKeys.ListMockInterviews, interviewee.Email);
+        _cache.Remove(RouteCacheKeys.ListMockInterviews, interviewer.Email);
+        return new CreateMockInterviewResponse { MockInterviewId = mockInterview.MockInterviewId };
+      },
+      Messages.MockInterview.CreationError,
+      cancellationToken
+    );
   }
 
   public async Task<DeleteMockInterviewResponse> DeleteMockInterview(
@@ -163,19 +158,17 @@ public class MockInterviewService : IMockInterviewService
       throw new ArgumentException(Messages.MockInterview.DeletionOnlyInterviewerAllowed);
     }
 
-    try
-    {
-      await DeleteMockInterviewAsync(existingMockInterview.MockInterviewId, cancellationToken);
-      await _unitOfWork.SaveChangesAsync(cancellationToken);
-      _cache.Remove(RouteCacheKeys.ListMockInterviews, existingMockInterview.Interviewer.Email);
-      _cache.Remove(RouteCacheKeys.ListMockInterviews, existingMockInterview.Interviewee.Email);
-      return new DeleteMockInterviewResponse();
-    }
-    catch (Exception ex)
-    {
-      _logger.LogError(ex, Messages.MockInterview.DeletionError);
-      throw new InvalidOperationException(Messages.MockInterview.DeletionError);
-    }
+    return await ExecuteWithSaveAsync(
+      async () =>
+      {
+        await DeleteMockInterviewAsync(existingMockInterview.MockInterviewId, cancellationToken);
+        _cache.Remove(RouteCacheKeys.ListMockInterviews, existingMockInterview.Interviewer.Email);
+        _cache.Remove(RouteCacheKeys.ListMockInterviews, existingMockInterview.Interviewee.Email);
+        return new DeleteMockInterviewResponse();
+      },
+      Messages.MockInterview.DeletionError,
+      cancellationToken
+    );
   }
 
   public async Task<ListMockInterviewResponse> ListMockInterview(
@@ -283,15 +276,7 @@ public class MockInterviewService : IMockInterviewService
       _ => query
     );
 
-    try
-    {
-      return new ListMockInterviewResponse { MockInterviews = mockInterviews.ToList() };
-    }
-    catch (Exception ex)
-    {
-      _logger.LogError(ex, Messages.MockInterview.ListError);
-      throw new InvalidOperationException(Messages.MockInterview.ListError);
-    }
+    return new ListMockInterviewResponse { MockInterviews = mockInterviews.ToList() };
   }
 
   public async Task<UpdateMockInterviewResponse> UpdateMockInterview(
@@ -366,19 +351,17 @@ public class MockInterviewService : IMockInterviewService
     existingMockInterview.TimeTakenInMinutes = request.TimeTakenInMinutes;
     existingMockInterview.SeasonWeekId = seasonWeek?.SeasonWeekId;
 
-    try
-    {
-      await UpdateMockInterviewAsync(existingMockInterview, cancellationToken);
-      await _unitOfWork.SaveChangesAsync(cancellationToken);
-      _cache.Remove(RouteCacheKeys.ListMockInterviews, interviewee.Email);
-      _cache.Remove(RouteCacheKeys.ListMockInterviews, interviewer.Email);
-      return new UpdateMockInterviewResponse();
-    }
-    catch (Exception ex)
-    {
-      _logger.LogError(ex, Messages.MockInterview.UpdateError);
-      throw new InvalidOperationException(Messages.MockInterview.UpdateError);
-    }
+    return await ExecuteWithSaveAsync(
+      async () =>
+      {
+        await UpdateMockInterviewAsync(existingMockInterview, cancellationToken);
+        _cache.Remove(RouteCacheKeys.ListMockInterviews, interviewee.Email);
+        _cache.Remove(RouteCacheKeys.ListMockInterviews, interviewer.Email);
+        return new UpdateMockInterviewResponse();
+      },
+      Messages.MockInterview.UpdateError,
+      cancellationToken
+    );
   }
 
   public void UpdateMockInterviewRounds(

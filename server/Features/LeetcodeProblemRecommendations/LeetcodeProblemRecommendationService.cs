@@ -12,16 +12,16 @@ using RSPWebAPI.Features.Users.Interfaces;
 
 namespace RSPWebAPI.Features.LeetcodeProblemRecommendations;
 
-public class LeetcodeProblemRecommendationService : ILeetcodeProblemRecommendationService
+public class LeetcodeProblemRecommendationService
+  : BaseService,
+    ILeetcodeProblemRecommendationService
 {
   private readonly IEnrollmentService _enrollmentService;
   private readonly IRepository<LeetcodeProblemCategoryEntity> _leetcodeProblemCategoryRepository;
   private readonly IRepository<LeetcodeProblemRecommendationEntity> _leetcodeProblemRecommendationRepository;
   private readonly IRepository<LeetcodeProblemEntity> _leetcodeProblemRepository;
-  private readonly ILogger<LeetcodeProblemRecommendationService> _logger;
   private readonly IProblemAttemptService _problemAttemptService;
   private readonly IRepository<ProblemEntity> _problemRepository;
-  private readonly IUnitOfWork _unitOfWork;
   private readonly IUserService _userService;
 
   public LeetcodeProblemRecommendationService(
@@ -35,6 +35,7 @@ public class LeetcodeProblemRecommendationService : ILeetcodeProblemRecommendati
     IUnitOfWork unitOfWork,
     ILogger<LeetcodeProblemRecommendationService> logger
   )
+    : base(unitOfWork, logger)
   {
     _leetcodeProblemRecommendationRepository = leetcodeProblemRecommendationRepository;
     _leetcodeProblemRepository = leetcodeProblemRepository;
@@ -43,8 +44,6 @@ public class LeetcodeProblemRecommendationService : ILeetcodeProblemRecommendati
     _problemAttemptService = problemAttemptService;
     _userService = userService;
     _enrollmentService = enrollmentService;
-    _unitOfWork = unitOfWork;
-    _logger = logger;
   }
 
   public async Task<GenerateLeetcodeProblemRecommendationResponse> GenerateLeetcodeProblemRecommendation(
@@ -93,20 +92,18 @@ public class LeetcodeProblemRecommendationService : ILeetcodeProblemRecommendati
       LeetcodeProblemId = problemRecommendation.LeetcodeProblemId,
     };
 
-    try
-    {
-      await AddLeetcodeProblemRecommendationAsync(newRecommendation, cancellationToken);
-      await _unitOfWork.SaveChangesAsync(cancellationToken);
-      return new GenerateLeetcodeProblemRecommendationResponse
+    return await ExecuteWithSaveAsync(
+      async () =>
       {
-        LeetcodeProblemRecommendationId = newRecommendation.LeetcodeProblemRecommendationId,
-      };
-    }
-    catch (Exception ex)
-    {
-      _logger.LogError(ex, Messages.LeetcodeProblemRecommendation.CreationError);
-      throw new InvalidOperationException(Messages.LeetcodeProblemRecommendation.CreationError);
-    }
+        await AddLeetcodeProblemRecommendationAsync(newRecommendation, cancellationToken);
+        return new GenerateLeetcodeProblemRecommendationResponse
+        {
+          LeetcodeProblemRecommendationId = newRecommendation.LeetcodeProblemRecommendationId,
+        };
+      },
+      Messages.LeetcodeProblemRecommendation.CreationError,
+      cancellationToken
+    );
   }
 
   #region CRUD Operations

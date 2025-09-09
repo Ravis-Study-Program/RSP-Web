@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using RSPWebAPI.Common;
+using RSPWebAPI.Features.Constants;
 using RSPWebAPI.Features.Mentorships.Dtos;
 using RSPWebAPI.Features.Mentorships.Interfaces;
 using RSPWebAPI.Shared;
@@ -29,7 +30,7 @@ public class MentorshipController : BaseController
   )
   {
     var result = await _mentorshipService.CreateAdminMentorship(request, cancellationToken);
-    return OkResponse(result);
+    return OkResponse(result, Messages.Mentorship.Created);
   }
 
   [HttpDelete]
@@ -42,7 +43,7 @@ public class MentorshipController : BaseController
   )
   {
     var result = await _mentorshipService.DeleteAdminMentorship(request, cancellationToken);
-    return OkResponse(result);
+    return OkResponse(result, Messages.Mentorship.Deleted);
   }
 
   [HttpGet]
@@ -55,7 +56,7 @@ public class MentorshipController : BaseController
   )
   {
     var result = await _mentorshipService.ListAdminMentorship(request, cancellationToken);
-    return OkResponse(result);
+    return OkResponse(result, Messages.Mentorship.Listed);
   }
 
   [HttpPut]
@@ -68,7 +69,7 @@ public class MentorshipController : BaseController
   )
   {
     var result = await _mentorshipService.UpdateAdminMentorship(request, cancellationToken);
-    return OkResponse(result);
+    return OkResponse(result, Messages.Mentorship.Updated);
   }
 
   [HttpGet]
@@ -83,7 +84,7 @@ public class MentorshipController : BaseController
   )
   {
     var result = await _mentorshipService.GetCurrentUserMenteesList(request, cancellationToken);
-    return OkResponse(result);
+    return OkResponse(result, Messages.Mentorship.Listed);
   }
 
   #endregion

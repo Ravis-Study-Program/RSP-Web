@@ -11,16 +11,10 @@ using RSPWebAPI.Features.DummyData.Interfaces;
 
 namespace RSPWebAPI.Features.DummyData;
 
-public class DummyDataService : IDummyDataService
+public class DummyDataService : BaseService, IDummyDataService
 {
-  private readonly ILogger<DummyDataService> _logger;
-  private readonly IUnitOfWork _unitOfWork;
-
   public DummyDataService(IUnitOfWork unitOfWork, ILogger<DummyDataService> logger)
-  {
-    _unitOfWork = unitOfWork;
-    _logger = logger;
-  }
+    : base(unitOfWork, logger) { }
 
   private static List<SeasonEntity> GenerateSeasons(Faker faker, int total)
   {
@@ -353,7 +347,6 @@ public class DummyDataService : IDummyDataService
     await _unitOfWork
       .GetRepository<BehaviouralMockInterviewRoundEntity>()
       .AddAsync(behaviouralRound);
-    await _unitOfWork.SaveChangesAsync();
     rounds.Add(
       new MockInterviewRoundEntity
       {
@@ -373,7 +366,6 @@ public class DummyDataService : IDummyDataService
     {
       var leetcodeRound = await GenerateLeetcodeMockInterviewRound(faker);
       await _unitOfWork.GetRepository<LeetcodeMockInterviewRoundEntity>().AddAsync(leetcodeRound);
-      await _unitOfWork.SaveChangesAsync();
 
       rounds.Add(
         new MockInterviewRoundEntity
@@ -422,56 +414,46 @@ public class DummyDataService : IDummyDataService
   {
     // Chose a shortcut way of accessing the entity directly which is not recommended.
     // The only reason why this is valid is because we want to move fast and
-    await _unitOfWork.BeginTransactionAsync(cancellationToken);
-    try
-    {
-      var faker = new Faker();
+    return await ExecuteWithTransactionAsync(
+      async () =>
+      {
+        var faker = new Faker();
 
-      var seasons = GenerateSeasons(faker, request.NumberOfSeasons);
-      await _unitOfWork.GetRepository<SeasonEntity>().AddRangeAsync(seasons, cancellationToken);
-      await _unitOfWork.SaveChangesAsync(cancellationToken);
+        var seasons = GenerateSeasons(faker, request.NumberOfSeasons);
+        await _unitOfWork.GetRepository<SeasonEntity>().AddRangeAsync(seasons, cancellationToken);
 
-      var seasonWeeks = GenerateSeasonWeeks(faker, seasons);
-      await _unitOfWork
-        .GetRepository<SeasonWeekEntity>()
-        .AddRangeAsync(seasonWeeks, cancellationToken);
-      await _unitOfWork.SaveChangesAsync(cancellationToken);
+        var seasonWeeks = GenerateSeasonWeeks(faker, seasons);
+        await _unitOfWork
+          .GetRepository<SeasonWeekEntity>()
+          .AddRangeAsync(seasonWeeks, cancellationToken);
 
-      var users = GenerateUsers(faker, request.NumberOfUsers);
-      await _unitOfWork.GetRepository<UserEntity>().AddRangeAsync(users, cancellationToken);
-      await _unitOfWork.SaveChangesAsync(cancellationToken);
+        var users = GenerateUsers(faker, request.NumberOfUsers);
+        await _unitOfWork.GetRepository<UserEntity>().AddRangeAsync(users, cancellationToken);
 
-      var enrollments = GenerateEnrollments(faker, users, seasons);
-      await _unitOfWork
-        .GetRepository<EnrollmentEntity>()
-        .AddRangeAsync(enrollments, cancellationToken);
-      await _unitOfWork.SaveChangesAsync(cancellationToken);
+        var enrollments = GenerateEnrollments(faker, users, seasons);
+        await _unitOfWork
+          .GetRepository<EnrollmentEntity>()
+          .AddRangeAsync(enrollments, cancellationToken);
 
-      var mentorships = GenerateMentorships(faker, enrollments);
-      await _unitOfWork
-        .GetRepository<MentorshipEntity>()
-        .AddRangeAsync(mentorships, cancellationToken);
+        var mentorships = GenerateMentorships(faker, enrollments);
+        await _unitOfWork
+          .GetRepository<MentorshipEntity>()
+          .AddRangeAsync(mentorships, cancellationToken);
 
-      var problemAttempts = await GenerateProblemAttempts(faker, users);
-      await _unitOfWork
-        .GetRepository<ProblemAttemptEntity>()
-        .AddRangeAsync(problemAttempts, cancellationToken);
+        var problemAttempts = await GenerateProblemAttempts(faker, users);
+        await _unitOfWork
+          .GetRepository<ProblemAttemptEntity>()
+          .AddRangeAsync(problemAttempts, cancellationToken);
 
-      var mockInterviews = await GenerateMockInterviews(faker);
-      await _unitOfWork
-        .GetRepository<MockInterviewEntity>()
-        .AddRangeAsync(mockInterviews, cancellationToken);
+        var mockInterviews = await GenerateMockInterviews(faker);
+        await _unitOfWork
+          .GetRepository<MockInterviewEntity>()
+          .AddRangeAsync(mockInterviews, cancellationToken);
 
-      await _unitOfWork.SaveChangesAsync(cancellationToken);
-      await _unitOfWork.CommitTransactionAsync(cancellationToken);
-
-      return new AdminGenerateDummyDataResponse();
-    }
-    catch (Exception ex)
-    {
-      _logger.LogError(ex, Messages.DummyData.GenerationError);
-      await _unitOfWork.RollbackTransactionAsync(cancellationToken);
-      throw new InvalidOperationException(Messages.DummyData.GenerationError);
-    }
+        return new AdminGenerateDummyDataResponse();
+      },
+      Messages.DummyData.GenerationError,
+      cancellationToken
+    );
   }
 }

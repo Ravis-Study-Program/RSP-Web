@@ -29,9 +29,9 @@ public class BaseController : ControllerBase
     );
   }
 
-  protected ActionResult<ApiResponse<T>> OkResponse<T>(T responseBody)
+  protected ActionResult<ApiResponse<T>> OkResponse<T>(T responseBody, string successMessage)
   {
-    return Ok(new ApiResponse<T> { ResponseBody = responseBody });
+    return Ok(new ApiResponse<T> { ResponseBody = responseBody, SuccessMessage = successMessage });
   }
 
   protected string? GetCurrentUserEmail()

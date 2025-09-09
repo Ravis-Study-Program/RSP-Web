@@ -11,11 +11,9 @@ using RSPWebAPI.Features.Mentorships.Interfaces;
 
 namespace RSPWebAPI.Features.Enrollments;
 
-public class EnrollmentService : IEnrollmentService
+public class EnrollmentService : BaseService, IEnrollmentService
 {
   private readonly IRepository<EnrollmentEntity> _enrollmentRepository;
-  private readonly ILogger<EnrollmentService> _logger;
-  private readonly IUnitOfWork _unitOfWork;
   private readonly Lazy<IMentorshipService> _mentorshipService;
 
   public EnrollmentService(
@@ -24,10 +22,9 @@ public class EnrollmentService : IEnrollmentService
     ILogger<EnrollmentService> logger,
     Lazy<IMentorshipService> mentorshipService
   )
+    : base(unitOfWork, logger)
   {
     _enrollmentRepository = seasonRepository;
-    _unitOfWork = unitOfWork;
-    _logger = logger;
     _mentorshipService = mentorshipService;
   }
 
@@ -67,17 +64,15 @@ public class EnrollmentService : IEnrollmentService
       StudentRolePromotion = request.StudentRolePromotion,
     };
 
-    try
-    {
-      await AddEnrollmentAsync(enrollment, cancellationToken);
-      await _unitOfWork.SaveChangesAsync(cancellationToken);
-      return new AdminCreateEnrollmentResponse { EnrollmentId = enrollment.EnrollmentId };
-    }
-    catch (Exception ex)
-    {
-      _logger.LogError(ex, Messages.Enrollment.CreationError);
-      throw new InvalidOperationException(Messages.Enrollment.CreationError);
-    }
+    return await ExecuteWithSaveAsync(
+      async () =>
+      {
+        await AddEnrollmentAsync(enrollment, cancellationToken);
+        return new AdminCreateEnrollmentResponse { EnrollmentId = enrollment.EnrollmentId };
+      },
+      Messages.Enrollment.CreationError,
+      cancellationToken
+    );
   }
 
   public async Task<AdminDeleteEnrollmentResponse> DeleteAdminEnrollment(
@@ -91,17 +86,15 @@ public class EnrollmentService : IEnrollmentService
       throw new KeyNotFoundException(Messages.Enrollment.DoesNotExist);
     }
 
-    try
-    {
-      await DeleteEnrollmentAsync(existingEnrollment.EnrollmentId, cancellationToken);
-      await _unitOfWork.SaveChangesAsync(cancellationToken);
-      return new AdminDeleteEnrollmentResponse();
-    }
-    catch (Exception ex)
-    {
-      _logger.LogError(ex, Messages.Enrollment.DeletionError);
-      throw new InvalidOperationException(Messages.Enrollment.DeletionError);
-    }
+    return await ExecuteWithSaveAsync(
+      async () =>
+      {
+        await DeleteEnrollmentAsync(existingEnrollment.EnrollmentId, cancellationToken);
+        return new AdminDeleteEnrollmentResponse();
+      },
+      Messages.Enrollment.DeletionError,
+      cancellationToken
+    );
   }
 
   public async Task<AdminListEnrollmentResponse> ListAdminEnrollment(
@@ -109,35 +102,34 @@ public class EnrollmentService : IEnrollmentService
     CancellationToken cancellationToken = default
   )
   {
-    try
-    {
-      var enrollments = await GetAllEnrollmentsAsync(
-        null,
-        cancellationToken,
-        q => q.Include(e => e.User).Include(e => e.Season)
-      );
-      var formattedEnrollments = enrollments
-        .Select(e => new EnrollmentResponseDto
-        {
-          EnrollmentId = e.EnrollmentId,
-          Role = e.Role,
-          SeasonId = e.SeasonId,
-          SeasonName = e.Season.Name,
-          SeasonImageUrl = e.Season.ImageUrl,
-          SeasonSlug = e.Season.Slug,
-          UserId = e.UserId,
-          UserName = e.User.Name,
-          StudentRolePromotion = e.StudentRolePromotion,
-        })
-        .OrderBy(e => e.SeasonName)
-        .ToList();
-      return new AdminListEnrollmentResponse { Enrollments = formattedEnrollments };
-    }
-    catch (Exception ex)
-    {
-      _logger.LogError(ex, Messages.Enrollment.ListError);
-      throw new InvalidOperationException(Messages.Enrollment.ListError);
-    }
+    return await ExecuteWithSaveAsync(
+      async () =>
+      {
+        var enrollments = await GetAllEnrollmentsAsync(
+          null,
+          cancellationToken,
+          q => q.Include(e => e.User).Include(e => e.Season)
+        );
+        var formattedEnrollments = enrollments
+          .Select(e => new EnrollmentResponseDto
+          {
+            EnrollmentId = e.EnrollmentId,
+            Role = e.Role,
+            SeasonId = e.SeasonId,
+            SeasonName = e.Season.Name,
+            SeasonImageUrl = e.Season.ImageUrl,
+            SeasonSlug = e.Season.Slug,
+            UserId = e.UserId,
+            UserName = e.User.Name,
+            StudentRolePromotion = e.StudentRolePromotion,
+          })
+          .OrderBy(e => e.SeasonName)
+          .ToList();
+        return new AdminListEnrollmentResponse { Enrollments = formattedEnrollments };
+      },
+      Messages.Enrollment.ListError,
+      cancellationToken
+    );
   }
 
   public async Task<AdminUpdateEnrollmentResponse> UpdateAdminEnrollment(
@@ -167,17 +159,15 @@ public class EnrollmentService : IEnrollmentService
     existingEnrollment.Role = request.Role;
     existingEnrollment.StudentRolePromotion = request.StudentRolePromotion;
 
-    try
-    {
-      await UpdateEnrollmentAsync(existingEnrollment, cancellationToken);
-      await _unitOfWork.SaveChangesAsync(cancellationToken);
-      return new AdminUpdateEnrollmentResponse();
-    }
-    catch (Exception ex)
-    {
-      _logger.LogError(ex, Messages.Enrollment.UpdateError);
-      throw new InvalidOperationException(Messages.Enrollment.UpdateError);
-    }
+    return await ExecuteWithSaveAsync(
+      async () =>
+      {
+        await UpdateEnrollmentAsync(existingEnrollment, cancellationToken);
+        return new AdminUpdateEnrollmentResponse();
+      },
+      Messages.Enrollment.UpdateError,
+      cancellationToken
+    );
   }
 
   public async Task<GetUserEnrollmentsResponse> GetUserEnrollments(
@@ -185,83 +175,80 @@ public class EnrollmentService : IEnrollmentService
     CancellationToken cancellationToken = default
   )
   {
-    try
-    {
-      var rawEnrollments = await _enrollmentRepository
-        .Table.Where(e => e.User.Email == request.Email)
-        .Include(e => e.Season)
-        .Include(e => e.User)
-        .AsNoTracking()
-        .ToListAsync(cancellationToken);
-
-      var seasonIds = rawEnrollments.Select(e => e.SeasonId).Distinct().ToList();
-
-      var usersInSeason = await _enrollmentRepository
-        .Table.Where(e => seasonIds.Contains(e.SeasonId))
-        .GroupBy(e => e.SeasonId)
-        .Select(g => new
-        {
-          SeasonId = g.Key,
-          NumStudents = g.Count(e => e.Role == SeasonRole.Student),
-          NumMentors = g.Count(e => e.Role == SeasonRole.Mentor),
-        })
-        .ToListAsync(cancellationToken);
-
-      var menteesBySeason = new Dictionary<string, int>(); // SeasonId -> MenteeCount
-      foreach (var enrollment in rawEnrollments.Where(e => e.Role == SeasonRole.Mentor))
+    return await ExecuteWithSaveAsync(
+      async () =>
       {
-        var menteesRequest = new GetCurrentUserMenteesListRequest
-        {
-          Email = request.Email,
-          SeasonSlug = enrollment.Season.Slug,
-        };
+        var rawEnrollments = await _enrollmentRepository
+          .Table.Where(e => e.User.Email == request.Email)
+          .Include(e => e.Season)
+          .Include(e => e.User)
+          .AsNoTracking()
+          .ToListAsync(cancellationToken);
 
-        var menteesResponse = await _mentorshipService.Value.GetCurrentUserMenteesList(
-          menteesRequest,
-          cancellationToken
-        );
-        menteesBySeason[enrollment.SeasonId] = menteesResponse?.Mentorships.Count ?? 0;
-      }
+        var seasonIds = rawEnrollments.Select(e => e.SeasonId).Distinct().ToList();
 
-      var enrollments = rawEnrollments
-        .Select(e =>
-        {
-          var userCount =
-            usersInSeason.FirstOrDefault(x => x.SeasonId == e.SeasonId)?.NumStudents ?? 0;
-          var mentorsCount =
-            usersInSeason.FirstOrDefault(x => x.SeasonId == e.SeasonId)?.NumMentors ?? 0;
-          var menteeCount = menteesBySeason.TryGetValue(e.SeasonId, out var count) ? count : 0;
-
-          return new EnrollmentResponseDto
+        var usersInSeason = await _enrollmentRepository
+          .Table.Where(e => seasonIds.Contains(e.SeasonId))
+          .GroupBy(e => e.SeasonId)
+          .Select(g => new
           {
-            EnrollmentId = e.EnrollmentId,
-            SeasonStartDate = e.Season.StartDateInclusiveUtc,
-            SeasonEndDate = e.Season.EndDateInclusiveUtc,
-            SeasonId = e.SeasonId,
-            SeasonSlug = e.Season.Slug,
-            SeasonName = e.Season.Name,
-            SeasonImageUrl = e.Season.ImageUrl,
-            UserId = e.User.UserId,
-            UserName = e.User.Name,
-            Role = e.Role,
-            StudentRolePromotion = e.StudentRolePromotion,
-            NumStudentsInSeason = userCount,
-            NumMentorsInSeason = mentorsCount,
-            NumMenteesInSeason = e.Role == SeasonRole.Mentor ? menteeCount : 0,
+            SeasonId = g.Key,
+            NumStudents = g.Count(e => e.Role == SeasonRole.Student),
+            NumMentors = g.Count(e => e.Role == SeasonRole.Mentor),
+          })
+          .ToListAsync(cancellationToken);
+
+        var menteesBySeason = new Dictionary<string, int>(); // SeasonId -> MenteeCount
+        foreach (var enrollment in rawEnrollments.Where(e => e.Role == SeasonRole.Mentor))
+        {
+          var menteesRequest = new GetCurrentUserMenteesListRequest
+          {
+            Email = request.Email,
+            SeasonSlug = enrollment.Season.Slug,
           };
-        })
-        .OrderBy(e => e.SeasonName)
-        .ToList();
 
-      await _unitOfWork.SaveChangesAsync(cancellationToken);
+          var menteesResponse = await _mentorshipService.Value.GetCurrentUserMenteesList(
+            menteesRequest,
+            cancellationToken
+          );
+          menteesBySeason[enrollment.SeasonId] = menteesResponse?.Mentorships.Count ?? 0;
+        }
 
-      return new GetUserEnrollmentsResponse { Enrollments = enrollments };
-    }
-    catch (Exception ex)
-    {
-      _logger.LogError(ex, Messages.Enrollment.UsersListError);
-      throw new InvalidOperationException(Messages.Enrollment.UsersListError);
-    }
+        var enrollments = rawEnrollments
+          .Select(e =>
+          {
+            var userCount =
+              usersInSeason.FirstOrDefault(x => x.SeasonId == e.SeasonId)?.NumStudents ?? 0;
+            var mentorsCount =
+              usersInSeason.FirstOrDefault(x => x.SeasonId == e.SeasonId)?.NumMentors ?? 0;
+            var menteeCount = menteesBySeason.TryGetValue(e.SeasonId, out var count) ? count : 0;
+
+            return new EnrollmentResponseDto
+            {
+              EnrollmentId = e.EnrollmentId,
+              SeasonStartDate = e.Season.StartDateInclusiveUtc,
+              SeasonEndDate = e.Season.EndDateInclusiveUtc,
+              SeasonId = e.SeasonId,
+              SeasonSlug = e.Season.Slug,
+              SeasonName = e.Season.Name,
+              SeasonImageUrl = e.Season.ImageUrl,
+              UserId = e.User.UserId,
+              UserName = e.User.Name,
+              Role = e.Role,
+              StudentRolePromotion = e.StudentRolePromotion,
+              NumStudentsInSeason = userCount,
+              NumMentorsInSeason = mentorsCount,
+              NumMenteesInSeason = e.Role == SeasonRole.Mentor ? menteeCount : 0,
+            };
+          })
+          .OrderBy(e => e.SeasonName)
+          .ToList();
+
+        return new GetUserEnrollmentsResponse { Enrollments = enrollments };
+      },
+      Messages.Enrollment.UsersListError,
+      cancellationToken
+    );
   }
 
   public async Task<GetEnrollmentUsersResponse> GetEnrollmentUsers(
@@ -269,50 +256,42 @@ public class EnrollmentService : IEnrollmentService
     CancellationToken cancellationToken = default
   )
   {
-    try
+    var query = _enrollmentRepository
+      .Table.AsNoTracking()
+      .Include(e => e.User)
+      .Include(e => e.Season)
+      .AsQueryable();
+
+    var filterBySeason = !string.IsNullOrEmpty(request.SeasonSlug);
+
+    if (filterBySeason)
     {
-      var query = _enrollmentRepository
-        .Table.AsNoTracking()
-        .Include(e => e.User)
-        .Include(e => e.Season)
-        .AsQueryable();
+      query = query.Where(e => e.Season.Slug == request.SeasonSlug);
+    }
 
-      var filterBySeason = !string.IsNullOrEmpty(request.SeasonSlug);
+    var enrollmentUsers = await query.ToListAsync(cancellationToken);
 
-      if (filterBySeason)
+    var distinctUsers = enrollmentUsers
+      .GroupBy(e => e.User.Slug)
+      .Select(g =>
       {
-        query = query.Where(e => e.Season.Slug == request.SeasonSlug);
-      }
+        var e = g.First();
 
-      var enrollmentUsers = await query.ToListAsync(cancellationToken);
-
-      var distinctUsers = enrollmentUsers
-        .GroupBy(e => e.User.Slug)
-        .Select(g =>
+        return new EnrollmentUserDto
         {
-          var e = g.First();
+          UserId = e.User.UserId,
+          Name = e.User.Name,
+          Slug = e.User.Slug,
+          Email = e.User.Email,
+          ProfileImage = e.User?.ProfileImage,
+          Role = filterBySeason ? e.Role : null,
+          StudentRolePromotion = filterBySeason ? e.StudentRolePromotion : null,
+        };
+      })
+      .OrderBy(e => e.Name)
+      .ToList();
 
-          return new EnrollmentUserDto
-          {
-            UserId = e.User.UserId,
-            Name = e.User.Name,
-            Slug = e.User.Slug,
-            Email = e.User.Email,
-            ProfileImage = e.User?.ProfileImage,
-            Role = filterBySeason ? e.Role : null,
-            StudentRolePromotion = filterBySeason ? e.StudentRolePromotion : null,
-          };
-        })
-        .OrderBy(e => e.Name)
-        .ToList();
-
-      return new GetEnrollmentUsersResponse { EnrollmentUsers = distinctUsers };
-    }
-    catch (Exception ex)
-    {
-      _logger.LogError(ex, Messages.Enrollment.UsersListError);
-      throw new InvalidOperationException(Messages.Enrollment.UsersListError);
-    }
+    return new GetEnrollmentUsersResponse { EnrollmentUsers = distinctUsers };
   }
 
   public async Task<GetIsUserEnrolledResponse> GetIsUserEnrolled(
@@ -399,17 +378,15 @@ public class EnrollmentService : IEnrollmentService
 
     // TODO: ensure mentorship integrity if the mentor is kicking the student out
 
-    try
-    {
-      _enrollmentRepository.Delete(studentEnrollment, cancellationToken);
-      await _unitOfWork.SaveChangesAsync(cancellationToken);
-      return new KickStudentResponse();
-    }
-    catch (Exception ex)
-    {
-      _logger.LogError(ex, Messages.Student.KickError);
-      throw new InvalidOperationException(Messages.Student.KickError);
-    }
+    return await ExecuteWithSaveAsync(
+      () =>
+      {
+        _enrollmentRepository.Delete(studentEnrollment, cancellationToken);
+        return Task.FromResult(new KickStudentResponse());
+      },
+      Messages.Student.KickError,
+      cancellationToken
+    );
   }
 
   public async Task<UpdateStudentRolePromotionResponse> UpdateStudentRolePromotion(
@@ -474,16 +451,14 @@ public class EnrollmentService : IEnrollmentService
 
     studentEnrollment.StudentRolePromotion = request.StudentRolePromotion;
 
-    try
-    {
-      await _unitOfWork.SaveChangesAsync(cancellationToken);
-      return new UpdateStudentRolePromotionResponse();
-    }
-    catch (Exception ex)
-    {
-      _logger.LogError(ex, Messages.Student.UpdateRolePromotionError);
-      throw new InvalidOperationException(Messages.Student.UpdateRolePromotionError);
-    }
+    return await ExecuteWithSaveAsync(
+      () =>
+      {
+        return Task.FromResult(new UpdateStudentRolePromotionResponse());
+      },
+      Messages.Student.UpdateRolePromotionError,
+      cancellationToken
+    );
   }
 
   /// <summary>

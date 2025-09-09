@@ -12,12 +12,10 @@ using RSPWebAPI.Features.SeasonWeeks.Interfaces;
 
 namespace RSPWebAPI.Features.SeasonWeeks;
 
-public class SeasonWeekService : ISeasonWeekService
+public class SeasonWeekService : BaseService, ISeasonWeekService
 {
-  private readonly ILogger<SeasonWeekService> _logger;
   private readonly ISeasonService _seasonService;
   private readonly IRepository<SeasonWeekEntity> _seasonWeekRepository;
-  private readonly IUnitOfWork _unitOfWork;
 
   public SeasonWeekService(
     IRepository<SeasonWeekEntity> seasonWeekRepository,
@@ -25,11 +23,10 @@ public class SeasonWeekService : ISeasonWeekService
     IUnitOfWork unitOfWork,
     ILogger<SeasonWeekService> logger
   )
+    : base(unitOfWork, logger)
   {
     _seasonWeekRepository = seasonWeekRepository;
     _seasonService = seasonService;
-    _unitOfWork = unitOfWork;
-    _logger = logger;
   }
 
   public async Task<AdminCreateSeasonWeekResponse> CreateAdminSeasonWeek(
@@ -78,17 +75,15 @@ public class SeasonWeekService : ISeasonWeekService
       EndDate = request.EndDate,
     };
 
-    try
-    {
-      await AddSeasonWeekAsync(seasonWeek, cancellationToken);
-      await _unitOfWork.SaveChangesAsync(cancellationToken);
-      return new AdminCreateSeasonWeekResponse { SeasonWeekId = seasonWeek.SeasonWeekId };
-    }
-    catch (Exception ex)
-    {
-      _logger.LogError(ex, Messages.SeasonWeek.CreationError);
-      throw new InvalidOperationException(Messages.SeasonWeek.CreationError);
-    }
+    return await ExecuteWithSaveAsync(
+      async () =>
+      {
+        await AddSeasonWeekAsync(seasonWeek, cancellationToken);
+        return new AdminCreateSeasonWeekResponse { SeasonWeekId = seasonWeek.SeasonWeekId };
+      },
+      Messages.SeasonWeek.CreationError,
+      cancellationToken
+    );
   }
 
   public async Task<AdminDeleteSeasonWeekResponse> DeleteAdminSeasonWeek(
@@ -102,17 +97,15 @@ public class SeasonWeekService : ISeasonWeekService
       throw new KeyNotFoundException(Messages.SeasonWeek.DoesNotExist);
     }
 
-    try
-    {
-      await DeleteSeasonWeekAsync(existingSeasonWeek.SeasonWeekId, cancellationToken);
-      await _unitOfWork.SaveChangesAsync(cancellationToken);
-      return new AdminDeleteSeasonWeekResponse();
-    }
-    catch (Exception ex)
-    {
-      _logger.LogError(ex, Messages.SeasonWeek.DeletionError);
-      throw new InvalidOperationException(Messages.SeasonWeek.DeletionError);
-    }
+    return await ExecuteWithSaveAsync(
+      async () =>
+      {
+        await DeleteSeasonWeekAsync(existingSeasonWeek.SeasonWeekId, cancellationToken);
+        return new AdminDeleteSeasonWeekResponse();
+      },
+      Messages.SeasonWeek.DeletionError,
+      cancellationToken
+    );
   }
 
   public async Task<AdminListSeasonWeekResponse> ListAdminSeasonWeek(
@@ -120,21 +113,12 @@ public class SeasonWeekService : ISeasonWeekService
     CancellationToken cancellationToken = default
   )
   {
-    try
-    {
-      var seasonWeeks = await GetAllSeasonWeeksAsync(
-        null,
-        cancellationToken,
-        q => q.Include(s => s.Season)
-      );
-      await _unitOfWork.SaveChangesAsync(cancellationToken);
-      return new AdminListSeasonWeekResponse { SeasonWeeks = seasonWeeks.ToList() };
-    }
-    catch (Exception ex)
-    {
-      _logger.LogError(ex, Messages.SeasonWeek.ListError);
-      throw new InvalidOperationException(Messages.SeasonWeek.ListError);
-    }
+    var seasonWeeks = await GetAllSeasonWeeksAsync(
+      null,
+      cancellationToken,
+      q => q.Include(s => s.Season)
+    );
+    return new AdminListSeasonWeekResponse { SeasonWeeks = seasonWeeks.ToList() };
   }
 
   public async Task<AdminUpdateSeasonWeekResponse> UpdateAdminSeasonWeek(
@@ -185,17 +169,15 @@ public class SeasonWeekService : ISeasonWeekService
     existingSeasonWeek.StartDate = request.StartDate;
     existingSeasonWeek.EndDate = request.EndDate;
 
-    try
-    {
-      await UpdateSeasonWeekAsync(existingSeasonWeek, cancellationToken);
-      await _unitOfWork.SaveChangesAsync(cancellationToken);
-      return new AdminUpdateSeasonWeekResponse();
-    }
-    catch (Exception ex)
-    {
-      _logger.LogError(ex, Messages.SeasonWeek.UpdateError);
-      throw new InvalidOperationException(Messages.SeasonWeek.UpdateError);
-    }
+    return await ExecuteWithSaveAsync(
+      async () =>
+      {
+        await UpdateSeasonWeekAsync(existingSeasonWeek, cancellationToken);
+        return new AdminUpdateSeasonWeekResponse();
+      },
+      Messages.SeasonWeek.UpdateError,
+      cancellationToken
+    );
   }
 
   public async Task<GetSeasonWeeksBySeasonSlugResponse> GetSeasonWeeksBySeasonSlug(
@@ -209,15 +191,7 @@ public class SeasonWeekService : ISeasonWeekService
       q => q.Include(s => s.Season)
     );
 
-    try
-    {
-      return new GetSeasonWeeksBySeasonSlugResponse() { SeasonWeeks = seasonWeeks.ToList() };
-    }
-    catch (Exception ex)
-    {
-      _logger.LogError(ex, Messages.SeasonWeek.ListError);
-      throw new InvalidOperationException(Messages.SeasonWeek.ListError);
-    }
+    return new GetSeasonWeeksBySeasonSlugResponse() { SeasonWeeks = seasonWeeks.ToList() };
   }
 
   public bool IsSeasonWeekDateRangeValid(
