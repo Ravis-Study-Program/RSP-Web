@@ -31,7 +31,6 @@ export const useAuth0User = () => {
           setUserId(payload[AUTH_CLAIMS.USER_ID] ?? null);
         }
       } catch (error) {
-        console.error('Error getting claims from JWT:', error);
         setIsAdmin(false);
         setUserId(null);
       }
