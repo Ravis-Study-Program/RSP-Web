@@ -9,7 +9,7 @@ import {
   AdminCreateUserRequest,
   AdminCreateUserResponseApiResponse,
   AdminListUserResponseApiResponse,
-  UserEntity,
+  AdminUserDto,
 } from '@/generated/api/client';
 
 const schema = z.object({
@@ -112,7 +112,7 @@ export const AdminUsersCreateModal = ({
 };
 
 type AdminUsersCreateModalProps = {
-  table: MRT_TableInstance<UserEntity>;
+  table: MRT_TableInstance<AdminUserDto>;
   createUser: UseMutateAsyncFunction<
     AdminCreateUserResponseApiResponse,
     unknown,

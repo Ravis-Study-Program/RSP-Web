@@ -35,7 +35,14 @@ import { LinksGroup } from '../NavbarLinksGroup/NavbarLinksGroup';
 import { createAdminSpotlightActions, createNonAdminSpotlightActions, Tabs } from './NavbarRoutes';
 import classes from './Navbar.module.css';
 
-export function Navbar({ isLoading, user, tabs, isSeasonUrl, enrollments = [] }: NavbarProps) {
+export function Navbar({
+  isLoading,
+  user,
+  isAdmin,
+  tabs,
+  isSeasonUrl,
+  enrollments = [],
+}: NavbarProps) {
   const { setColorScheme } = useMantineColorScheme();
   const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
   const { logout } = useAuth0();
@@ -47,7 +54,7 @@ export function Navbar({ isLoading, user, tabs, isSeasonUrl, enrollments = [] }:
       ?.filter((item) => !item.hidden)
       ?.map((item) => {
         // Inject the enrolled seasons as links
-        if (item.label === 'Seasons' && !user?.isAdmin) {
+        if (item.label === 'Seasons' && !isAdmin) {
           item.links = enrollments.map((e) => ({
             label: e.seasonName,
             icon: IconTrophy,
@@ -96,7 +103,7 @@ export function Navbar({ isLoading, user, tabs, isSeasonUrl, enrollments = [] }:
   return (
     <nav className={classes.navbar}>
       <Spotlight
-        actions={user?.isAdmin ? adminSpotlightActions : nonAdminSpotlightActions}
+        actions={isAdmin ? adminSpotlightActions : nonAdminSpotlightActions}
         nothingFound="Nothing found..."
         highlightQuery
         searchProps={{
@@ -115,7 +122,7 @@ export function Navbar({ isLoading, user, tabs, isSeasonUrl, enrollments = [] }:
             Ravi's Study Program
           </Title>
         </Anchor>
-        {user?.isAdmin ? (
+        {isAdmin ? (
           <Badge color="red" size="sm" ml={8}>
             Admin
           </Badge>
@@ -178,7 +185,7 @@ export function Navbar({ isLoading, user, tabs, isSeasonUrl, enrollments = [] }:
                   </Text>
 
                   <Text c="dimmed" size="xs">
-                    {user?.email || null}
+                    {user?.slug || null}
                   </Text>
                 </div>
                 <IconChevronRight style={{ width: rem(20), height: rem(20) }} stroke={2} />
@@ -234,6 +241,7 @@ export function Navbar({ isLoading, user, tabs, isSeasonUrl, enrollments = [] }:
 type NavbarProps = {
   isLoading: boolean;
   user: UserEntity | undefined;
+  isAdmin: boolean;
   tabs: Tabs | null;
   isSeasonUrl: boolean;
   enrollments: EnrollmentResponseDto[];

@@ -6,20 +6,15 @@ const OutletMock = () => <div data-testid="outlet">Outlet</div>;
 const NotFoundMock = () => <div data-testid="not-found">Not Found</div>;
 
 const mocks = vi.hoisted(() => ({
-  useAuth0: vi.fn(),
-  useGetCurrentUser: vi.fn(),
+  useAuth0User: vi.fn(),
 }));
 
-vi.mock('@auth0/auth0-react', () => ({
-  useAuth0: mocks.useAuth0,
+vi.mock('@/shared/hooks/useAuth0User', () => ({
+  useAuth0User: mocks.useAuth0User,
 }));
 
 vi.mock('react-router-dom', () => ({
   Outlet: () => <OutletMock />,
-}));
-
-vi.mock('@/generated/api/client', () => ({
-  useGetCurrentUser: mocks.useGetCurrentUser,
 }));
 
 vi.mock('../../pages/NotFound/NotFound.page', () => ({
@@ -28,9 +23,12 @@ vi.mock('../../pages/NotFound/NotFound.page', () => ({
 }));
 
 describe('AdminRouteGuard', () => {
-  it('renders null when either auth0 or user data is loading', () => {
-    mocks.useAuth0.mockReturnValue({ isAuthenticated: true, isLoading: true });
-    mocks.useGetCurrentUser.mockReturnValue({ data: undefined, isLoading: true });
+  it('renders null when auth0 is loading', () => {
+    mocks.useAuth0User.mockReturnValue({
+      isAuthenticated: true,
+      isLoading: true,
+      isAdmin: false,
+    });
 
     render(<AdminRouteGuard />);
     expect(screen.queryByTestId('outlet')).toBeNull();
@@ -38,16 +36,10 @@ describe('AdminRouteGuard', () => {
   });
 
   it('renders Outlet when authenticated and user is admin', () => {
-    mocks.useAuth0.mockReturnValue({ isAuthenticated: true, isLoading: false });
-    mocks.useGetCurrentUser.mockReturnValue({
+    mocks.useAuth0User.mockReturnValue({
+      isAuthenticated: true,
       isLoading: false,
-      data: {
-        responseBody: {
-          user: {
-            isAdmin: true,
-          },
-        },
-      },
+      isAdmin: true,
     });
 
     render(<AdminRouteGuard />);
@@ -56,16 +48,10 @@ describe('AdminRouteGuard', () => {
   });
 
   it('renders NotFound when authenticated but user is not admin', () => {
-    mocks.useAuth0.mockReturnValue({ isAuthenticated: true, isLoading: false });
-    mocks.useGetCurrentUser.mockReturnValue({
+    mocks.useAuth0User.mockReturnValue({
+      isAuthenticated: true,
       isLoading: false,
-      data: {
-        responseBody: {
-          user: {
-            isAdmin: false,
-          },
-        },
-      },
+      isAdmin: false,
     });
 
     render(<AdminRouteGuard />);
@@ -74,16 +60,10 @@ describe('AdminRouteGuard', () => {
   });
 
   it('renders NotFound when not authenticated', () => {
-    mocks.useAuth0.mockReturnValue({ isAuthenticated: false, isLoading: false });
-    mocks.useGetCurrentUser.mockReturnValue({
+    mocks.useAuth0User.mockReturnValue({
+      isAuthenticated: false,
       isLoading: false,
-      data: {
-        responseBody: {
-          user: {
-            isAdmin: false,
-          },
-        },
-      },
+      isAdmin: false,
     });
 
     render(<AdminRouteGuard />);

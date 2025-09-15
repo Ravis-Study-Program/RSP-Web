@@ -156,7 +156,7 @@ public class TestDataSeeder
     return response.EnrollmentId;
   }
 
-  public async Task<List<UserEntity>> GetAllUsersAsync()
+  public async Task<List<AdminUserDto>> GetAllUsersAsync()
   {
     var response = await _userService.ListAdminUser(new AdminListUserRequest());
     Assert.NotNull(response.Users);
@@ -256,7 +256,7 @@ public class TestDataSeeder
     string? customProblemId = null
   )
   {
-    var user = await _userService.GetUserByEmailAsync(email);
+    var user = await _userService.GetUserAsync(email: email);
     Assert.NotNull(user);
 
     if (string.IsNullOrWhiteSpace(enrollmentId))
@@ -295,7 +295,7 @@ public class TestDataSeeder
     List<MockInterviewRoundDto>? rounds = null
   )
   {
-    var interviewer = await _userService.GetUserByEmailAsync(interviewerEmail);
+    var interviewer = await _userService.GetUserAsync(email: interviewerEmail);
     var seasonId = await SeedSeasonAsync(null, DateTime.UtcNow, DateTime.UtcNow.AddDays(4 * 7));
     Assert.NotNull(interviewer);
 
@@ -317,7 +317,7 @@ public class TestDataSeeder
 
     var request = new CreateMockInterviewRequest
     {
-      InterviewerEmail = interviewerEmail,
+      InterviewerUserId = interviewer.UserId,
       IntervieweeUserId = intervieweeUserId,
       SeasonId = seasonId,
       StartDate = startDate ?? DateTime.UtcNow,

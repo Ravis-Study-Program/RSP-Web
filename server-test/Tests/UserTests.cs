@@ -86,7 +86,7 @@ public class UserTests : BaseIntegrationTest, IAsyncLifetime
     var updateResponse = await UserService.UpdateAdminUser(updateRequest);
     Assert.NotNull(updateResponse);
 
-    var updatedUser = await UserService.GetUserByIdAsync(targetUser.UserId);
+    var updatedUser = await UserService.GetUserAsync(userId: targetUser.UserId);
     Assert.NotNull(updatedUser);
     Assert.Equal(updateRequest.Name, updatedUser!.Name);
     Assert.Equal(updateRequest.ProfileImage, updatedUser.ProfileImage);
@@ -107,11 +107,11 @@ public class UserTests : BaseIntegrationTest, IAsyncLifetime
     Assert.Equal(count, users.Count);
 
     var targetUser = users.Last();
-    var deleteRequest = new AdminDeleteUserRequest { Email = targetUser.Email };
+    var deleteRequest = new AdminDeleteUserRequest { UserId = targetUser.UserId };
     var deleteResponse = await UserService.DeleteAdminUser(deleteRequest);
     Assert.NotNull(deleteResponse);
 
-    var deletedUser = await UserService.GetUserByEmailAsync(targetUser.Email);
+    var deletedUser = await UserService.GetUserAsync(userId: targetUser.UserId);
     Assert.Null(deletedUser);
 
     users = await _seeder.GetAllUsersAsync();
@@ -219,13 +219,13 @@ public class UserTests : BaseIntegrationTest, IAsyncLifetime
   public async Task GetCurrentUser_Returns_Correct_User()
   {
     var email = _faker.Internet.Email();
-    await _seeder.SeedUserAsync(email);
+    var userId = await _seeder.SeedUserAsync(email);
 
-    var currentUserResponse = await UserService.GetCurrentUser(email);
+    var currentUserResponse = await UserService.GetCurrentUser(userId);
     Assert.NotNull(currentUserResponse);
 
     var currentUser = currentUserResponse.User;
     Assert.NotNull(currentUser);
-    Assert.Equal(email, currentUser!.Email);
+    Assert.Equal(userId, currentUser!.UserId);
   }
 }

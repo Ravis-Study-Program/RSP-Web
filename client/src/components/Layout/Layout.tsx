@@ -108,6 +108,7 @@ export function Layout() {
         <Navbar
           isLoading={isLoading}
           user={user}
+          isAdmin={isAdmin}
           tabs={tabs}
           enrollments={enrollmentsResponse?.responseBody?.enrollments || []}
           isSeasonUrl={seasonSlug !== ''}

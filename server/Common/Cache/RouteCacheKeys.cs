@@ -7,4 +7,5 @@ public static class RouteCacheKeys
   public const string ListMockInterviews = "list-mock-interviews";
   public const string GetUserByEmail = "get-user-by-email";
   public const string GetUserBySlug = "get-user-by-slug";
+  public const string GetUserByUserId = "get-user-by-userid";
 }

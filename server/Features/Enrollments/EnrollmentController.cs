@@ -78,19 +78,11 @@ public class EnrollmentController : BaseController
   [Route("get-user-enrollments")]
   [ActionName("GetUserEnrollments")]
   public async Task<ActionResult<ApiResponse<GetUserEnrollmentsResponse>>> GetUserEnrollments(
-    string? email,
+    string? userId,
     CancellationToken cancellationToken = default
   )
   {
-    if (email.IsNullOrEmpty())
-    {
-      email = GetCurrentUserEmail();
-    }
-    if (email == null)
-    {
-      throw new ArgumentException(Messages.Enrollment.ListError);
-    }
-    var request = new GetUserEnrollmentsRequest { Email = email };
+    var request = new GetUserEnrollmentsRequest { UserId = GetCurrentUserId() };
     var result = await _enrollmentService.GetUserEnrollments(request, cancellationToken);
     return OkResponse(result, Messages.Enrollment.Listed);
   }
@@ -104,8 +96,11 @@ public class EnrollmentController : BaseController
     CancellationToken cancellationToken = default
   )
   {
-    var email = GetCurrentUserEmail() ?? "";
-    var request = new GetIsUserEnrolledRequest { Email = email, SeasonSlug = seasonSlug ?? "" };
+    var request = new GetIsUserEnrolledRequest
+    {
+      UserId = GetCurrentUserId(),
+      SeasonSlug = seasonSlug ?? "",
+    };
     var result = await _enrollmentService.GetIsUserEnrolled(request, cancellationToken);
     return OkResponse(result, Messages.Enrollment.Listed);
   }

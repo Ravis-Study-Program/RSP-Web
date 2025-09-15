@@ -57,7 +57,7 @@ namespace RSPWebAPI.Tests.Tests
     {
       const int count = 2;
       var email = _faker.Internet.Email().ToLower();
-      await _seeder.SeedUserAsync(email);
+      var userId = await _seeder.SeedUserAsync(email);
 
       for (var i = 0; i < count; i++)
       {
@@ -66,7 +66,7 @@ namespace RSPWebAPI.Tests.Tests
 
       var listRequest = new ListProblemAttemptRequest
       {
-        Emails = new List<string> { email },
+        UserIds = new List<string> { userId },
         IncludeLeetcode = false,
         IncludeCustom = false,
       };
@@ -87,7 +87,7 @@ namespace RSPWebAPI.Tests.Tests
 
       var request = new CreateProblemAttemptRequest
       {
-        Email = email,
+        UserId = userId,
         EnrollmentId = enrollmentId,
         LeetcodeProblemId = null,
         CustomProblemId = null,
@@ -112,11 +112,11 @@ namespace RSPWebAPI.Tests.Tests
       var enrollmentId = await _seeder.SeedEnrollmentAsync(userId: user1Id);
 
       var user2Email = _faker.Internet.Email().ToLower();
-      await _seeder.SeedUserAsync(user2Email);
+      var user2Id = await _seeder.SeedUserAsync(user2Email);
 
       var request = new CreateProblemAttemptRequest
       {
-        Email = user2Email,
+        UserId = user2Id,
         EnrollmentId = enrollmentId,
         AttemptStartDateUtc = DateTime.UtcNow,
         TimeTakenInMinutes = 30,
@@ -131,7 +131,7 @@ namespace RSPWebAPI.Tests.Tests
     {
       var request = new CreateProblemAttemptRequest
       {
-        Email = _faker.Internet.Email().ToLower(),
+        UserId = "random ID",
         TimeTakenInMinutes = 20,
       };
       await Assert.ThrowsAsync<KeyNotFoundException>(
@@ -190,10 +190,14 @@ namespace RSPWebAPI.Tests.Tests
     public async Task Delete_ProblemAttempt_Removes_It()
     {
       var email = _faker.Internet.Email().ToLower();
-      await _seeder.SeedUserAsync(email);
+      var userId = await _seeder.SeedUserAsync(email);
       var attemptId = await _seeder.SeedProblemAttemptAsync(email);
 
-      var request = new DeleteProblemAttemptRequest { ProblemAttemptId = attemptId, Email = email };
+      var request = new DeleteProblemAttemptRequest
+      {
+        ProblemAttemptId = attemptId,
+        UserId = userId,
+      };
       var deleteResponse = await ProblemAttemptService.DeleteProblemAttempt(request);
       Assert.NotNull(deleteResponse);
 
@@ -209,12 +213,12 @@ namespace RSPWebAPI.Tests.Tests
       var attemptId = await _seeder.SeedProblemAttemptAsync(email1);
 
       var email2 = _faker.Internet.Email().ToLower();
-      await _seeder.SeedUserAsync(email2);
+      var userId2 = await _seeder.SeedUserAsync(email2);
 
       var request = new DeleteProblemAttemptRequest
       {
         ProblemAttemptId = attemptId,
-        Email = email2,
+        UserId = userId2,
       };
       await Assert.ThrowsAsync<KeyNotFoundException>(
         () => ProblemAttemptService.DeleteProblemAttempt(request)
@@ -227,7 +231,7 @@ namespace RSPWebAPI.Tests.Tests
       var request = new DeleteProblemAttemptRequest
       {
         ProblemAttemptId = _faker.Random.AlphaNumeric(10),
-        Email = _faker.Internet.Email().ToLower(),
+        UserId = await _seeder.SeedUserAsync(_faker.Internet.Email().ToLower()),
       };
       await Assert.ThrowsAsync<KeyNotFoundException>(
         () => ProblemAttemptService.DeleteProblemAttempt(request)
@@ -238,12 +242,12 @@ namespace RSPWebAPI.Tests.Tests
     public async Task ListProblemAttempt_Succeeds()
     {
       var email = _faker.Internet.Email().ToLower();
-      await _seeder.SeedUserAsync(email);
+      var userId = await _seeder.SeedUserAsync(email);
       await _seeder.SeedProblemAttemptAsync(email);
 
       var listRequest = new ListProblemAttemptRequest
       {
-        Emails = new List<string> { email },
+        UserIds = new List<string> { userId },
         IncludeLeetcode = true,
         IncludeCustom = true,
       };

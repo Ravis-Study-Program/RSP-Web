@@ -235,12 +235,12 @@ namespace RSPWebAPI.Tests.Tests
 
       var season = await SeasonService.GetSeasonByIdAsync(seasonId);
       Assert.NotNull(season);
-      var mentorUser = await UserService.GetUserByIdAsync(mentorUserId);
+      var mentorUser = await UserService.GetUserAsync(userId: mentorUserId);
       Assert.NotNull(mentorUser);
 
       var menteesReq = new GetCurrentUserMenteesListRequest
       {
-        Email = mentorUser.Email,
+        UserId = mentorUser.UserId,
         SeasonSlug = season.Slug,
       };
       var menteesResp = await MentorshipService.GetCurrentUserMenteesList(menteesReq);

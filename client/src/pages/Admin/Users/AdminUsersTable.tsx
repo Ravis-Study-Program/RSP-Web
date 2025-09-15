@@ -12,11 +12,11 @@ import { modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
 import {
   AdminDeleteUserResponseApiResponse,
+  AdminUserDto,
   useAdminCreateUser,
   useAdminDeleteUser,
   useAdminListUser,
   useAdminUpdateUser,
-  UserEntity,
 } from '@/generated/api/client';
 import { AdminUsersCreateModal } from './AdminUsersCreateModal';
 import { AdminUsersUpdateModal } from './AdminUsersUpdateModal';
@@ -45,7 +45,7 @@ export const AdminUsersTable = () => {
   const { mutateAsync: updateUser, status: isUpdatingUserStatus } = useAdminUpdateUser();
   const { mutateAsync: deleteUser, status: isDeletingUserStatus } = useAdminDeleteUser();
 
-  const openDeleteConfirmModal = (row: MRT_Row<UserEntity>) => {
+  const openDeleteConfirmModal = (row: MRT_Row<AdminUserDto>) => {
     modals.openConfirmModal({
       children: (
         <>
@@ -59,7 +59,7 @@ export const AdminUsersTable = () => {
       confirmProps: { color: 'red' },
       onConfirm: async () => {
         try {
-          await deleteUser({ data: { email: row.original.email } });
+          await deleteUser({ data: { userId: row.original.userId } });
           await refetchUsers();
           modals.closeAll();
           notifications.show({
@@ -80,7 +80,7 @@ export const AdminUsersTable = () => {
     });
   };
 
-  const columns = useMemo<MRT_ColumnDef<UserEntity>[]>(
+  const columns = useMemo<MRT_ColumnDef<AdminUserDto>[]>(
     () => [
       {
         accessorKey: 'name',

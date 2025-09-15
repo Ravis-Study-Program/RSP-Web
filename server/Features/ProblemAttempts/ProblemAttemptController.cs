@@ -29,8 +29,7 @@ public class ProblemAttemptController : BaseController
     CancellationToken cancellationToken = default
   )
   {
-    var email = GetCurrentUserEmail() ?? "";
-    request.Email = email;
+    request.UserId = GetCurrentUserId();
     var result = await _problemAttemptService.CreateProblemAttempt(request, cancellationToken);
     return OkResponse(result, Messages.ProblemAttempt.Created);
   }
@@ -70,8 +69,7 @@ public class ProblemAttemptController : BaseController
     CancellationToken cancellationToken = default
   )
   {
-    var email = GetCurrentUserEmail() ?? "";
-    request.Email = email;
+    request.UserId = GetCurrentUserId();
     var result = await _problemAttemptService.UpdateProblemAttempt(request, cancellationToken);
     return OkResponse(result, Messages.ProblemAttempt.Updated);
   }

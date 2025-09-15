@@ -37,7 +37,7 @@ export default function LeetcodePage() {
   });
 
   const { data: currentUserResponse } = useGetCurrentUser();
-  const email = currentUserResponse?.responseBody?.user.email ?? '';
+  const userId = currentUserResponse?.responseBody?.user.userId ?? '';
 
   // TODO: Handle error and loading states using skeleton
   // TODO: Add Custom Problems support
@@ -48,9 +48,9 @@ export default function LeetcodePage() {
       SeasonId: userResponse?.responseBody?.seasonId || undefined,
       IncludeCustom: !isLeetcode,
       IncludeLeetcode: isLeetcode,
-      Emails: [email],
+      UserIds: [userId],
     },
-    { query: { enabled: email !== '' } }
+    { query: { enabled: userId !== '' } }
   );
 
   const { data: seasonWeeksResponse } = useGetSeasonWeeksBySeasonSlug(

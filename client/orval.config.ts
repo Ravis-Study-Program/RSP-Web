@@ -2,6 +2,8 @@ import * as dotenv from 'dotenv';
 import { defineConfig } from 'orval';
 import { customTransformer } from './src/shared/api/Transformer';
 
+// Load .env.dev by default, fallback to .env
+dotenv.config({ path: '../.env.dev' });
 dotenv.config();
 
 const serverUrl = process.env.VITE_APP_SERVER_URL;

@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using RSPWebAPI.Common;
 using RSPWebAPI.Features.Constants;
@@ -77,12 +78,13 @@ public class UserController : BaseController
     CancellationToken cancellationToken = default
   )
   {
-    var currentUserEmail = GetCurrentUserEmail();
-    var result = await _userService.CreateUserIfNotExists(
-      request,
-      currentUserEmail,
-      cancellationToken
-    );
+    var email = GetCurrentUserEmail();
+    if (string.IsNullOrEmpty(email))
+    {
+      return ErrorResponse<CreateUserIfNotExistsResponse>("Email not found in token");
+    }
+
+    var result = await _userService.CreateUserIfNotExists(request, email, cancellationToken);
     return OkResponse(result, Messages.User.Created);
   }
 
@@ -95,8 +97,8 @@ public class UserController : BaseController
     CancellationToken cancellationToken = default
   )
   {
-    var currentUserEmail = GetCurrentUserEmail();
-    var result = await _userService.GetCurrentUser(currentUserEmail, cancellationToken);
+    var userId = GetCurrentUserId();
+    var result = await _userService.GetCurrentUser(userId, cancellationToken);
     return OkResponse(result, Messages.User.Listed);
   }
 
@@ -109,6 +111,11 @@ public class UserController : BaseController
     CancellationToken cancellationToken = default
   )
   {
+    if (string.IsNullOrEmpty(request.UserId) && string.IsNullOrEmpty(request.Slug))
+    {
+      return ErrorResponse<GetUserResponse>("Either UserId or Slug must be provided");
+    }
+
     var result = await _userService.GetUser(request, cancellationToken);
     return OkResponse(result, Messages.User.Listed);
   }

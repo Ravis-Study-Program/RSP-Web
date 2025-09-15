@@ -4,6 +4,7 @@ using System.Text.Json.Serialization;
 using Carter;
 using DotNetEnv;
 using FluentValidation;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.EntityFrameworkCore;
@@ -12,6 +13,7 @@ using Microsoft.OpenApi.Models;
 using Prometheus;
 using RSPWebAPI.Clients.Interfaces;
 using RSPWebAPI.Common;
+using RSPWebAPI.Common.Auth;
 using RSPWebAPI.Common.Cache;
 using RSPWebAPI.Common.Interfaces;
 using RSPWebAPI.Common.Middlewares;
@@ -128,6 +130,9 @@ builder
       ValidateIssuerSigningKey = true,
     };
   });
+
+// Add custom claims transformation
+builder.Services.AddScoped<IClaimsTransformation, UserClaimsTransformation>();
 
 builder
   .Services.AddControllers()

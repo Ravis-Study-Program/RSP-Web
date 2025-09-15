@@ -38,7 +38,7 @@ export const MenteesTable = ({ refetchMentorships, mentorships }: MenteesTablePr
 
   const { seasonSlug } = useSeasonSlug();
   const { data: userResponse } = useGetCurrentUser();
-  const email = userResponse?.responseBody?.user.email ?? '';
+  const userId = userResponse?.responseBody?.user.userId ?? '';
   const { mutateAsync: kickStudent, status: isKickingStudentStatus } = useKickStudent();
   const { mutateAsync: updateStudentRolePromotion, status: isUpdatingStudentRolePromotionStatus } =
     useUpdateStudentRolePromotion();
@@ -63,7 +63,7 @@ export const MenteesTable = ({ refetchMentorships, mentorships }: MenteesTablePr
             data: {
               seasonSlug,
               menteeEnrollmentId: row.original.menteeEnrollmentId,
-              email,
+              userId,
             },
           });
           await refetchMentorships();

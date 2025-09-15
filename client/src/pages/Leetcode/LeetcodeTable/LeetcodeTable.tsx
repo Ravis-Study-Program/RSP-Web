@@ -48,7 +48,7 @@ export const LeetcodeTable = ({
   });
 
   const { data: userResponse } = useGetCurrentUser();
-  const email = userResponse?.responseBody?.user.email ?? '';
+  const userId = userResponse?.responseBody?.user.userId ?? '';
 
   const {
     data: leetcodeProblemsResponse,
@@ -81,7 +81,7 @@ export const LeetcodeTable = ({
       onConfirm: async () => {
         try {
           await deleteProblemAttempt({
-            data: { problemAttemptId: row.original.problemAttemptId, email },
+            data: { problemAttemptId: row.original.problemAttemptId, userId },
           });
           await refetchProblemAttempts();
           modals.closeAll();

@@ -15,7 +15,7 @@ ARG BUILD_ENVIRONMENT=Production
 ARG SERVER_URL=http://localhost
 
 # Replace with SERVER_URL
-RUN sed -i "s|http://localhost|${SERVER_URL}|g" src/generated/api/client.ts
+RUN sed -i "s|http://localhost:4000|${SERVER_URL}|g" src/generated/api/client.ts
 
 RUN yarn run build
 

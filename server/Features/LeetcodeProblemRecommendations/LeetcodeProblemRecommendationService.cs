@@ -2,6 +2,7 @@ using System.Linq.Expressions;
 using RSPWebAPI.Common;
 using RSPWebAPI.Common.Interfaces;
 using RSPWebAPI.Entities;
+using RSPWebAPI.Extensions;
 using RSPWebAPI.Features.Constants;
 using RSPWebAPI.Features.Enrollments.Interfaces;
 using RSPWebAPI.Features.LeetcodeProblemRecommendations.Dtos;
@@ -61,7 +62,10 @@ public class LeetcodeProblemRecommendationService
       };
     }
 
-    var user = await _userService.GetUserByIdAsync(request.UserId, cancellationToken);
+    var user = await _userService.GetUserAsync(
+      userId: request.UserId,
+      cancellationToken: cancellationToken
+    );
     if (user == null)
     {
       throw new KeyNotFoundException(Messages.User.EmailDoesNotExist);
@@ -70,14 +74,25 @@ public class LeetcodeProblemRecommendationService
     var problemAttemptsResponse = await _problemAttemptService.ListProblemAttempt(
       new ListProblemAttemptRequest
       {
-        Emails = new List<string> { user.Email },
+        UserIds = new List<string> { user.UserId },
         IncludeLeetcode = true,
         IncludeCustom = false,
       },
       cancellationToken
     );
     var problemRecommendation = await GenerateRandom(
-      problemAttemptsResponse?.ProblemAttempts.ToList() ?? new List<ProblemAttemptEntity>(),
+      problemAttemptsResponse
+        ?.ProblemAttempts.Select(dto => new ProblemAttemptEntity
+        {
+          ProblemAttemptId = dto.ProblemAttemptId,
+          AttemptStartDateUtc = dto.AttemptStartDateUtc,
+          TimeTakenInMinutes = dto.TimeTakenInMinutes,
+          Notes = dto.Notes,
+          LeetcodeProblemId = dto.LeetcodeProblemId,
+          CustomProblemId = dto.CustomProblemId,
+          SeasonWeekId = dto.SeasonWeekId,
+        })
+        .ToList() ?? new List<ProblemAttemptEntity>(),
       cancellationToken
     );
     if (problemRecommendation == null)

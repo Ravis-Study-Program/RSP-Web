@@ -60,16 +60,28 @@ public class UserIdentityService : IUserIdentityService
     return users;
   }
 
-  public async Task SendVerificationEmailAsync(string userId)
+  public async Task SendVerificationEmailAsync(string auth0UserId)
   {
-    if (string.IsNullOrWhiteSpace(userId))
+    if (string.IsNullOrWhiteSpace(auth0UserId))
     {
-      throw new ArgumentException("User ID must be provided", nameof(userId));
+      throw new ArgumentException("User ID must be provided", nameof(auth0UserId));
     }
 
     var client = await GetClientAsync();
-    var request = new VerifyEmailJobRequest { UserId = userId };
+    var request = new VerifyEmailJobRequest { UserId = auth0UserId };
     await client.Jobs.SendVerificationEmailAsync(request);
+  }
+
+  public async Task AddMetadata(string auth0UserId, dynamic metadata)
+  {
+    if (string.IsNullOrWhiteSpace(auth0UserId))
+    {
+      throw new ArgumentException("User ID must be provided", nameof(auth0UserId));
+    }
+
+    var client = await GetClientAsync();
+    var request = new UserUpdateRequest { AppMetadata = metadata };
+    await client.Users.UpdateAsync(auth0UserId, request);
   }
 
   public async Task LinkAccountAsync(string userId, User user)

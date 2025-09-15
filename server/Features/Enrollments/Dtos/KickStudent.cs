@@ -12,7 +12,7 @@ public record KickStudentRequest
   public string SeasonSlug { get; set; } = string.Empty;
 
   [Required]
-  public string Email { get; set; } = string.Empty;
+  public string UserId { get; set; } = string.Empty;
 }
 
 public record KickStudentResponse { }
@@ -23,6 +23,6 @@ public class KickStudentRequestValidator : AbstractValidator<KickStudentRequest>
   {
     RuleFor(c => c.MenteeEnrollmentId).NotEmpty();
     RuleFor(c => c.SeasonSlug).NotEmpty();
-    RuleFor(c => c.Email).NotEmpty().EmailAddress();
+    RuleFor(c => c.UserId).NotEmpty();
   }
 }

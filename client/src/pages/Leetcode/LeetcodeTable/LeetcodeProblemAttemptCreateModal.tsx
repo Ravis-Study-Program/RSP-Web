@@ -41,7 +41,7 @@ export const LeetcodeProblemAttemptCreateModal = ({
   enrollmentId,
 }: LeetcodeProblemAttemptCreateModalProps) => {
   const { data: userResponse } = useGetCurrentUser();
-  const email = userResponse?.responseBody?.user.email ?? '';
+  const userId = userResponse?.responseBody?.user.userId ?? '';
 
   const form = useForm({
     mode: 'uncontrolled',
@@ -63,7 +63,7 @@ export const LeetcodeProblemAttemptCreateModal = ({
     try {
       const requestData: CreateProblemAttemptRequest = {
         ...values,
-        email,
+        userId,
         attemptStartDateUtc: dayjs(values.attemptStartDateUtc).toISOString(),
       };
       if (enrollmentId !== '') {

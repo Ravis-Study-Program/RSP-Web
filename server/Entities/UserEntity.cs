@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using RSPWebAPI.Entities.Interfaces;
@@ -13,6 +14,7 @@ public class UserEntity : ISoftDelete
   public string? DiscordId { get; set; }
 
   [Required]
+  [JsonIgnore]
   public string Email { get; set; } = string.Empty;
 
   [Required]

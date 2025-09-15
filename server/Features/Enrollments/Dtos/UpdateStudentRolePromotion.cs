@@ -13,7 +13,7 @@ public record UpdateStudentRolePromotionRequest
   public string SeasonSlug { get; set; } = string.Empty;
 
   [Required]
-  public string Email { get; set; } = string.Empty;
+  public string UserId { get; set; } = string.Empty;
 
   [Required]
   public SeasonStudentRolePromotion StudentRolePromotion { get; set; }
@@ -28,7 +28,7 @@ public class UpdateStudentRolePromotionRequestValidator
   {
     RuleFor(c => c.MenteeEnrollmentId).NotEmpty();
     RuleFor(c => c.SeasonSlug).NotEmpty();
-    RuleFor(c => c.Email).NotEmpty().EmailAddress();
+    RuleFor(c => c.UserId).NotEmpty();
     RuleFor(c => c.StudentRolePromotion).IsInEnum();
   }
 }
