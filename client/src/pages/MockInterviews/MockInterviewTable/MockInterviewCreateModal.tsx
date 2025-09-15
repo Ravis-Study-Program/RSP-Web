@@ -55,7 +55,7 @@ export const MockInterviewCreateModal = ({
   users,
 }: MockInterviewCreateModalProps) => {
   const { data: currentUserResponse } = useGetCurrentUser();
-  const email = currentUserResponse?.responseBody?.user.email ?? '';
+  const userId = currentUserResponse?.responseBody?.user.userId ?? '';
 
   const form = useForm({
     mode: 'uncontrolled',
@@ -134,7 +134,7 @@ export const MockInterviewCreateModal = ({
         timeTakenInMinutes: values.timeTakenInMinutes,
         intervieweeUserId: values.interviewee,
         mockInterviewRounds,
-        interviewerEmail: email,
+        interviewerUserId: userId,
       };
       if (seasonId !== '') {
         requestData.seasonId = seasonId;

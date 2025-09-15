@@ -33,16 +33,10 @@ public record MentorshipResponse
   public string MentorName { get; set; } = string.Empty;
 
   [Required]
-  public string MentorEmail { get; set; } = string.Empty;
-
-  [Required]
   public string MenteeEnrollmentId { get; set; } = string.Empty;
 
   [Required]
   public string MenteeName { get; set; } = string.Empty;
-
-  [Required]
-  public string MenteeEmail { get; set; } = string.Empty;
 
   [Required]
   public SeasonStudentRolePromotion StudentRolePromotion { get; set; }

@@ -57,7 +57,7 @@ namespace RSPWebAPI.Tests.Tests
     {
       const int count = 2;
       var email = _faker.Internet.Email().ToLower();
-      await _seeder.SeedUserAsync(email);
+      var userId = await _seeder.SeedUserAsync(email);
 
       for (var i = 0; i < count; i++)
       {
@@ -66,7 +66,7 @@ namespace RSPWebAPI.Tests.Tests
 
       var listRequest = new ListMockInterviewRequest
       {
-        Emails = new List<string> { email },
+        UserIds = new List<string> { userId },
         IncludeBehavioural = false,
         IncludeLeetcode = false,
         IncludeCustom = false,
@@ -95,12 +95,12 @@ namespace RSPWebAPI.Tests.Tests
       var email2 = _faker.Internet.Email().ToLower();
       var user1Id = await _seeder.SeedUserAsync(email1);
       var seasonId = await _seeder.SeedSeasonAsync();
-      await _seeder.SeedUserAsync(email2);
+      var user2Id = await _seeder.SeedUserAsync(email2);
       await _seeder.SeedEnrollmentAsync(userId: user1Id);
 
       var request = new CreateMockInterviewRequest
       {
-        InterviewerEmail = email2,
+        InterviewerUserId = user2Id,
         IntervieweeUserId = user1Id,
         SeasonId = seasonId,
         StartDate = DateTime.UtcNow,
@@ -114,7 +114,7 @@ namespace RSPWebAPI.Tests.Tests
     public async Task Update_MockInterview_Should_Reflect_New_Values()
     {
       var email = _faker.Internet.Email().ToLower();
-      await _seeder.SeedUserAsync(email);
+      var userId = await _seeder.SeedUserAsync(email);
       var mockInterviewId = await _seeder.SeedMockInterviewAsync(email);
       var existing = await MockInterviewService.GetMockInterviewByIdAsync(mockInterviewId);
       Assert.NotNull(existing);
@@ -127,7 +127,7 @@ namespace RSPWebAPI.Tests.Tests
         MockInterviewId = mockInterviewId,
         SeasonId = existing.SeasonId,
         IntervieweeUserId = newUserId,
-        InterviewerEmail = email,
+        InterviewerUserId = userId,
         StartDate = DateTime.UtcNow.AddDays(2),
         TimeTakenInMinutes = 90,
         MockInterviewRounds = new(),
@@ -148,7 +148,7 @@ namespace RSPWebAPI.Tests.Tests
       var intervieweeEmail = _faker.Internet.Email().ToLower();
       var intervieweeUserId = await _seeder.SeedUserAsync(intervieweeEmail);
       var interviewerEmail = _faker.Internet.Email().ToLower();
-      await _seeder.SeedUserAsync(interviewerEmail);
+      var interviewerUserId = await _seeder.SeedUserAsync(interviewerEmail);
 
       var mockInterviewId = await _seeder.SeedMockInterviewAsync(
         interviewerEmail: interviewerEmail,
@@ -158,7 +158,7 @@ namespace RSPWebAPI.Tests.Tests
       var request = new DeleteMockInterviewRequest
       {
         MockInterviewId = mockInterviewId,
-        Email = interviewerEmail,
+        UserId = interviewerUserId,
       };
       var deleteResp = await MockInterviewService.DeleteMockInterview(request);
       Assert.NotNull(deleteResp);
@@ -183,7 +183,7 @@ namespace RSPWebAPI.Tests.Tests
       var request = new DeleteMockInterviewRequest
       {
         MockInterviewId = mockInterviewId,
-        Email = _faker.Internet.Email().ToLower(),
+        UserId = await _seeder.SeedUserAsync(_faker.Internet.Email().ToLower()),
       };
       await Assert.ThrowsAsync<ArgumentException>(
         () => MockInterviewService.DeleteMockInterview(request)
@@ -194,12 +194,12 @@ namespace RSPWebAPI.Tests.Tests
     public async Task ListMockInterview_Succeeds()
     {
       var email = _faker.Internet.Email().ToLower();
-      await _seeder.SeedUserAsync(email);
+      var userId = await _seeder.SeedUserAsync(email);
       await _seeder.SeedMockInterviewAsync(email);
 
       var listRequest = new ListMockInterviewRequest
       {
-        Emails = new List<string> { email },
+        UserIds = new List<string> { userId },
         IncludeBehavioural = true,
         IncludeLeetcode = true,
         IncludeCustom = true,

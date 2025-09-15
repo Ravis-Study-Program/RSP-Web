@@ -1,16 +1,12 @@
 import { Link, Navigate } from 'react-router-dom';
 import { Badge, Button, Card, Grid, Group, Image, Skeleton, Text } from '@mantine/core';
-import {
-  EnrollmentResponseDto,
-  useGetCurrentUser,
-  useGetUserEnrollments,
-} from '@/generated/api/client';
+import { EnrollmentResponseDto, useGetUserEnrollments } from '@/generated/api/client';
 import { SeasonRoleReverseIndex } from '@/shared/entities/reverseIndex';
+import { useAuth0User } from '@/shared/hooks/useAuth0User';
 import classes from './Seasons.module.css';
 
 export default function SeasonsPage() {
-  const { data, isLoading } = useGetCurrentUser();
-  const isAdmin = data?.responseBody?.user.isAdmin;
+  const { isAdmin } = useAuth0User();
   const {
     data: enrollmentsResponse,
     isError: isLoadingEnrollmentsError,
@@ -18,7 +14,7 @@ export default function SeasonsPage() {
     isLoading: isLoadingEnrollments,
   } = useGetUserEnrollments();
 
-  if (isLoading) {
+  if (isLoadingEnrollments) {
     return null;
   }
 

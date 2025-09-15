@@ -6,7 +6,7 @@ namespace RSPWebAPI.Features.MockInterviews.Dtos;
 public record CreateMockInterviewRequest
 {
   [Required]
-  public string InterviewerEmail { get; set; } = string.Empty;
+  public string InterviewerUserId { get; set; } = string.Empty;
 
   [Required]
   public string IntervieweeUserId { get; set; } = string.Empty;
@@ -34,7 +34,7 @@ public class CreateMockInterviewRequestValidator : AbstractValidator<CreateMockI
   public CreateMockInterviewRequestValidator()
   {
     RuleFor(c => c.IntervieweeUserId).NotEmpty();
-    RuleFor(c => c.InterviewerEmail).NotEmpty().EmailAddress();
+    RuleFor(c => c.InterviewerUserId).NotEmpty();
     RuleFor(c => c.StartDate).NotEmpty();
     RuleFor(c => c.TimeTakenInMinutes).NotEmpty().GreaterThan(0);
     RuleFor(c => c.MockInterviewRounds).NotEmpty();

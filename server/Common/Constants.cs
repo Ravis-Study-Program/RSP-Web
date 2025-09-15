@@ -6,6 +6,8 @@ public static class Constants
 {
   public const int GenerateIdLength = 10;
 
+  public const string Domain = "https://app.rsp.org.au/";
+
   private static readonly Random Random = new();
 
   public static string GeneratePrimaryKeyId()

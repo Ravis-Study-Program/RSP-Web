@@ -5,6 +5,7 @@ using RSPWebAPI.Common.Cache;
 using RSPWEBAPI.Common.Cache;
 using RSPWebAPI.Common.Interfaces;
 using RSPWebAPI.Entities;
+using RSPWebAPI.Extensions;
 using RSPWebAPI.Features.Constants;
 using RSPWebAPI.Features.Enrollments.Interfaces;
 using RSPWebAPI.Features.ProblemAttempts.Dtos;
@@ -75,7 +76,7 @@ public class ProblemAttemptService : BaseService, IProblemAttemptService
         cancellationToken,
         q => q.Include(e => e.User)
       );
-      if (existingEnrollment == null || existingEnrollment.User.Email != request.Email)
+      if (existingEnrollment == null || existingEnrollment.User.UserId != request.UserId)
       {
         throw new KeyNotFoundException(Messages.Enrollment.DoesNotExist);
       }
@@ -101,7 +102,10 @@ public class ProblemAttemptService : BaseService, IProblemAttemptService
       request.CustomProblemId = null;
     }
 
-    var user = await _userService.GetUserByEmailAsync(request.Email, cancellationToken);
+    var user = await _userService.GetUserAsync(
+      userId: request.UserId,
+      cancellationToken: cancellationToken
+    );
     if (user == null)
     {
       throw new KeyNotFoundException(Messages.User.EmailDoesNotExist);
@@ -124,7 +128,7 @@ public class ProblemAttemptService : BaseService, IProblemAttemptService
       async () =>
       {
         await AddProblemAttemptAsync(problemAttempt, cancellationToken);
-        _cache.Remove(RouteCacheKeys.ListProblemAttempts, request.Email);
+        _cache.Remove(RouteCacheKeys.ListProblemAttempts, request.UserId);
         return new CreateProblemAttemptResponse
         {
           ProblemAttemptId = problemAttempt.ProblemAttemptId,
@@ -145,7 +149,7 @@ public class ProblemAttemptService : BaseService, IProblemAttemptService
       cancellationToken,
       q => q.Include(p => p.User)
     );
-    if (existingProblemAttempt == null || existingProblemAttempt.User.Email != request.Email)
+    if (existingProblemAttempt == null || existingProblemAttempt.User.UserId != request.UserId)
     {
       throw new KeyNotFoundException(Messages.ProblemAttempt.DoesNotExist);
     }
@@ -154,7 +158,7 @@ public class ProblemAttemptService : BaseService, IProblemAttemptService
       async () =>
       {
         await DeleteProblemAttemptAsync(existingProblemAttempt.ProblemAttemptId, cancellationToken);
-        _cache.Remove(RouteCacheKeys.ListProblemAttempts, request.Email);
+        _cache.Remove(RouteCacheKeys.ListProblemAttempts, request.UserId);
         return new DeleteProblemAttemptResponse();
       },
       Messages.ProblemAttempt.DeletionError,
@@ -169,11 +173,11 @@ public class ProblemAttemptService : BaseService, IProblemAttemptService
   {
     var allProblemAttempts = new List<ProblemAttemptEntity>();
 
-    foreach (var email in request.Emails.Distinct())
+    foreach (var userId in request.UserIds.Distinct())
     {
       var modifiedRequest = new ListProblemAttemptRequest
       {
-        Emails = new List<string> { email },
+        UserIds = new List<string> { userId },
         SeasonId = request.SeasonId,
         IncludeLeetcode = request.IncludeLeetcode,
         IncludeCustom = request.IncludeCustom,
@@ -181,7 +185,7 @@ public class ProblemAttemptService : BaseService, IProblemAttemptService
 
       var response = await _cache.GetOrCreateAsync(
         routeKey: RouteCacheKeys.ListProblemAttempts,
-        primaryKey: email,
+        primaryKey: userId,
         factory: () => _listProblemAttempt(modifiedRequest, cancellationToken),
         ttl: TimeSpan.FromHours(1)
       );
@@ -206,9 +210,12 @@ public class ProblemAttemptService : BaseService, IProblemAttemptService
     if (request.SeasonId != null)
     {
       // TODO: Parallelize to speed things up
-      foreach (var email in request.Emails)
+      foreach (var userId in request.UserIds)
       {
-        var existingUser = await _userService.GetUserByEmailAsync(email, cancellationToken);
+        var existingUser = await _userService.GetUserAsync(
+          userId: userId,
+          cancellationToken: cancellationToken
+        );
         if (existingUser == null)
         {
           throw new KeyNotFoundException(Messages.User.IdDoesNotExist);
@@ -221,7 +228,7 @@ public class ProblemAttemptService : BaseService, IProblemAttemptService
           cancellationToken,
           q => q.Include(e => e.User)
         );
-        if (existingEnrollment == null || existingEnrollment.User.Email != email)
+        if (existingEnrollment == null || existingEnrollment.User.UserId != userId)
         {
           throw new KeyNotFoundException(Messages.Season.DoesNotExist);
         }
@@ -251,7 +258,7 @@ public class ProblemAttemptService : BaseService, IProblemAttemptService
       .Include(e => e.SeasonWeek);
 
     var problemAttempts = await _problemAttemptRepository.GetAllAsync(
-      p => request.Emails.Contains(p.User.Email),
+      p => request.UserIds.Contains(p.User.UserId),
       cancellationToken,
       _ => query
     );
@@ -312,7 +319,7 @@ public class ProblemAttemptService : BaseService, IProblemAttemptService
       async () =>
       {
         await UpdateProblemAttemptAsync(existingProblemAttempt, cancellationToken);
-        _cache.Remove(RouteCacheKeys.ListProblemAttempts, request.Email);
+        _cache.Remove(RouteCacheKeys.ListProblemAttempts, request.UserId);
         return new UpdateProblemAttemptResponse();
       },
       Messages.ProblemAttempt.UpdateError,

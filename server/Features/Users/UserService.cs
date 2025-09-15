@@ -40,7 +40,10 @@ public class UserService : BaseService, IUserService
     CancellationToken cancellationToken = default
   )
   {
-    var existingUser = await GetUserByEmailAsync(request.Email, cancellationToken);
+    var existingUser = await GetUserAsync(
+      email: request.Email,
+      cancellationToken: cancellationToken
+    );
     if (existingUser != null)
     {
       throw new InvalidOperationException(Messages.User.EmailExists);
@@ -74,10 +77,13 @@ public class UserService : BaseService, IUserService
     CancellationToken cancellationToken = default
   )
   {
-    var existingUser = await GetUserByEmailAsync(request.Email, cancellationToken);
+    var existingUser = await GetUserAsync(
+      userId: request.UserId,
+      cancellationToken: cancellationToken
+    );
     if (existingUser == null)
     {
-      throw new KeyNotFoundException(Messages.User.EmailDoesNotExist);
+      throw new KeyNotFoundException(Messages.User.IdDoesNotExist);
     }
 
     return await ExecuteWithSaveAsync(
@@ -100,7 +106,20 @@ public class UserService : BaseService, IUserService
       async () =>
       {
         var users = await GetAllUsersAsync(null, cancellationToken);
-        return new AdminListUserResponse { Users = users.ToList() };
+        var adminUsers = users
+          .Select(u => new AdminUserDto
+          {
+            UserId = u.UserId,
+            DiscordId = u.DiscordId,
+            Email = u.Email,
+            IsAdmin = u.IsAdmin,
+            Name = u.Name,
+            Slug = u.Slug,
+            ProfileImage = u.ProfileImage,
+            DeletedAtUtc = u.DeletedAtUtc,
+          })
+          .ToList();
+        return new AdminListUserResponse { Users = adminUsers };
       },
       Messages.User.ListError,
       cancellationToken
@@ -112,7 +131,11 @@ public class UserService : BaseService, IUserService
     CancellationToken cancellationToken = default
   )
   {
-    var existingUser = await GetUserByIdAsync(request.UserId, cancellationToken);
+    var existingUser = await GetUserAsync(
+      userId: request.UserId,
+      bypassCache: true,
+      cancellationToken: cancellationToken
+    );
     if (existingUser == null)
     {
       throw new KeyNotFoundException(Messages.User.IdDoesNotExist);
@@ -136,14 +159,14 @@ public class UserService : BaseService, IUserService
   }
 
   public async Task<GetCurrentUserResponse> GetCurrentUser(
-    string? email,
+    string? userId,
     CancellationToken cancellationToken = default
   )
   {
-    var user = await GetUserByEmailAsync(email, cancellationToken);
+    var user = await GetUserAsync(userId: userId, cancellationToken: cancellationToken);
     if (user == null)
     {
-      throw new KeyNotFoundException(Messages.User.EmailDoesNotExist);
+      throw new KeyNotFoundException(Messages.User.IdDoesNotExist);
     }
 
     return new GetCurrentUserResponse { User = user };
@@ -154,10 +177,10 @@ public class UserService : BaseService, IUserService
     CancellationToken cancellationToken = default
   )
   {
-    var user = await GetUserByEmailAsync(request.Email, cancellationToken);
+    var user = await GetUserAsync(userId: request.UserId!, cancellationToken: cancellationToken);
     if (user == null)
     {
-      throw new KeyNotFoundException(Messages.User.EmailDoesNotExist);
+      throw new KeyNotFoundException(Messages.User.IdDoesNotExist);
     }
 
     return new GetUserResponse { User = user };
@@ -172,16 +195,16 @@ public class UserService : BaseService, IUserService
 
     if (request.Slug != null)
     {
-      user = await GetUserBySlugAsync(request.Slug, cancellationToken);
+      user = await GetUserAsync(slug: request.Slug, cancellationToken: cancellationToken);
     }
-    else if (request.Email != null)
+    else if (request.UserId != null)
     {
-      user = await GetUserByEmailAsync(request.Email, cancellationToken);
+      user = await GetUserAsync(userId: request.UserId, cancellationToken: cancellationToken);
     }
 
     if (user == null)
     {
-      throw new KeyNotFoundException(Messages.User.EmailDoesNotExist);
+      throw new KeyNotFoundException(Messages.User.IdDoesNotExist);
     }
 
     return new GetUserResponse { User = user };
@@ -196,6 +219,7 @@ public class UserService : BaseService, IUserService
     return await ExecuteWithTransactionAsync(
       async () =>
       {
+        // Get Auth0 user data
         var auth0Users =
           (await _userIdentityService.GetUserByEmailAsync(email!, cancellationToken)) ?? [];
         var auth0User = auth0Users.First();
@@ -204,68 +228,98 @@ public class UserService : BaseService, IUserService
           throw new Exception("Couldn't find auth0 user");
         }
 
-        var isVerified = auth0User?.EmailVerified == true;
-        UserEntity? existingUser = null;
-        var userExists = false;
+        var isVerified = auth0User.EmailVerified == true;
 
-        try
-        {
-          existingUser = await GetUserByEmailAsync(email, cancellationToken);
-          userExists = existingUser != null;
-        }
-        catch (KeyNotFoundException)
-        {
-          userExists = false;
-        }
+        // Check if user exists in database
+        var existingUser = await GetUserByEmailOrNull(email, cancellationToken);
+        var userExists = existingUser != null;
+        var userId = existingUser?.UserId;
 
+        // Handle account linking for existing verified users
         if (userExists && isVerified)
         {
-          // Perform linking if it's another synonymous account
-          if (auth0Users.Count >= 2)
-          {
-            var primaryUser = auth0Users
-              .OrderBy(u => int.TryParse(u.LoginsCount, out var count) ? count : 0)
-              .First();
-
-            foreach (var user in auth0Users)
-            {
-              if (user.UserId != primaryUser.UserId)
-              {
-                await _userIdentityService.LinkAccountAsync(primaryUser.UserId, user);
-              }
-            }
-          }
-
-          return new CreateUserIfNotExistsResponse();
+          await LinkMultipleAuth0Accounts(auth0Users);
         }
 
-        // Create user in database if it doesn't exists
         if (!userExists)
         {
-          var slug = await createSlug(request.Name);
-          var user = new UserEntity
-          {
-            UserId = Database.Constants.GeneratePrimaryKeyId(),
-            Email = email!, // null email would have been captured earlier in GetCurrentUser
-            Name = request.Name,
-            Slug = slug,
-            IsAdmin = false,
-          };
-
-          await AddUserAsync(user, cancellationToken);
+          userId = await CreateNewUser(request, email!, cancellationToken);
         }
 
-        // Send verification email if user is not verified
-        if (!isVerified && auth0User?.UserId != null)
+        if (!isVerified)
         {
           await _userIdentityService.SendVerificationEmailAsync(auth0User.UserId);
         }
 
-        return new CreateUserIfNotExistsResponse();
+        await _userIdentityService.AddMetadata(
+          auth0User.UserId,
+          new
+          {
+            isAdmin = existingUser?.IsAdmin ?? false,
+            userId = existingUser?.UserId ?? "Unknown User",
+            userSlug = existingUser?.Slug ?? "Unknown Slug",
+          }
+        );
+
+        return new CreateUserIfNotExistsResponse() { UserId = userId ?? "" };
       },
       Messages.User.CreationError,
       cancellationToken
     );
+  }
+
+  private async Task<UserEntity?> GetUserByEmailOrNull(
+    string? email,
+    CancellationToken cancellationToken
+  )
+  {
+    try
+    {
+      return await GetUserAsync(email: email, cancellationToken: cancellationToken);
+    }
+    catch (KeyNotFoundException)
+    {
+      return null;
+    }
+  }
+
+  private async Task LinkMultipleAuth0Accounts(IList<User> auth0Users)
+  {
+    if (auth0Users.Count >= 2)
+    {
+      var primaryUser = auth0Users
+        .OrderBy(u => int.TryParse(u.LoginsCount, out var count) ? count : 0)
+        .First();
+
+      foreach (var user in auth0Users)
+      {
+        if (user.UserId != primaryUser.UserId)
+        {
+          await _userIdentityService.LinkAccountAsync(primaryUser.UserId, user);
+        }
+      }
+    }
+  }
+
+  private async Task<string> CreateNewUser(
+    CreateUserIfNotExistsRequest request,
+    string email,
+    CancellationToken cancellationToken
+  )
+  {
+    var slug = await createSlug(request.Name);
+    var userId = Database.Constants.GeneratePrimaryKeyId();
+    var user = new UserEntity
+    {
+      UserId = userId,
+      Email = email,
+      Name = request.Name,
+      Slug = slug,
+      IsAdmin = false,
+    };
+
+    await AddUserAsync(user, cancellationToken);
+    return userId;
   }
 
   private async Task<string> createSlug(string name)
@@ -275,7 +329,7 @@ public class UserService : BaseService, IUserService
     var random = new Random();
 
     // Keep adding a suffix until it sticks
-    while (await GetUserBySlugAsync(slug) is not null)
+    while (await GetUserAsync(slug: slug, bypassCache: true) is not null)
     {
       int randomNumber = random.Next(1, 10001);
       slug = $"{baseSlug}-{randomNumber}";
@@ -327,21 +381,45 @@ public class UserService : BaseService, IUserService
     return await _userRepository.GetAllAsync(predicate, cancellationToken, include);
   }
 
-  public async Task<UserEntity?> GetUserByIdAsync(
+  private async Task<UserEntity?> GetUserByUserIdAsync(
     string userId,
-    CancellationToken cancellationToken = default,
-    Func<IQueryable<UserEntity>, IQueryable<UserEntity>>? include = null
+    Func<IQueryable<UserEntity>, IQueryable<UserEntity>>? include = null,
+    bool bypassCache = false,
+    CancellationToken cancellationToken = default
   )
   {
-    return await _userRepository.GetByIdAsync(userId, cancellationToken, include);
+    if (bypassCache)
+    {
+      return await _userRepository.GetByIdAsync(userId, cancellationToken, include);
+    }
+
+    return await _cache.GetOrCreateAsync(
+      routeKey: RouteCacheKeys.GetUserByUserId,
+      primaryKey: userId,
+      factory: async () =>
+      {
+        return await _userRepository.GetByIdAsync(userId, cancellationToken, include);
+      },
+      ttl: TimeSpan.FromHours(1)
+    );
   }
 
-  public async Task<UserEntity?> GetUserByEmailAsync(
+  private async Task<UserEntity?> GetUserByEmailAsync(
     string? email,
-    CancellationToken cancellationToken = default,
-    Func<IQueryable<UserEntity>, IQueryable<UserEntity>>? include = null
+    Func<IQueryable<UserEntity>, IQueryable<UserEntity>>? include = null,
+    bool bypassCache = false,
+    CancellationToken cancellationToken = default
   )
   {
+    if (bypassCache)
+    {
+      return await _userRepository.FirstOrDefaultAsync(
+        q => q.Email == email,
+        cancellationToken,
+        include
+      );
+    }
+
     return await _cache.GetOrCreateAsync(
       routeKey: RouteCacheKeys.GetUserByEmail,
       primaryKey: email,
@@ -357,12 +435,22 @@ public class UserService : BaseService, IUserService
     );
   }
 
-  public async Task<UserEntity?> GetUserBySlugAsync(
+  private async Task<UserEntity?> GetUserBySlugAsync(
     string? slug,
-    CancellationToken cancellationToken = default,
-    Func<IQueryable<UserEntity>, IQueryable<UserEntity>>? include = null
+    Func<IQueryable<UserEntity>, IQueryable<UserEntity>>? include = null,
+    bool bypassCache = false,
+    CancellationToken cancellationToken = default
   )
   {
+    if (bypassCache)
+    {
+      return await _userRepository.FirstOrDefaultAsync(
+        q => q.Slug == slug,
+        cancellationToken,
+        include
+      );
+    }
+
     return await _cache.GetOrCreateAsync(
       routeKey: RouteCacheKeys.GetUserBySlug,
       primaryKey: slug,
@@ -375,6 +463,35 @@ public class UserService : BaseService, IUserService
         );
       },
       ttl: TimeSpan.FromHours(1)
+    );
+  }
+
+  public async Task<UserEntity?> GetUserAsync(
+    string? userId = null,
+    string? email = null,
+    string? slug = null,
+    Func<IQueryable<UserEntity>, IQueryable<UserEntity>>? include = null,
+    bool bypassCache = false,
+    CancellationToken cancellationToken = default
+  )
+  {
+    if (!string.IsNullOrEmpty(userId))
+    {
+      return await GetUserByUserIdAsync(userId, include, bypassCache, cancellationToken);
+    }
+
+    if (!string.IsNullOrEmpty(email))
+    {
+      return await GetUserByEmailAsync(email, include, bypassCache, cancellationToken);
+    }
+
+    if (!string.IsNullOrEmpty(slug))
+    {
+      return await GetUserBySlugAsync(slug, include, bypassCache, cancellationToken);
+    }
+
+    throw new ArgumentException(
+      "At least one identifier (userId, email, or slug) must be provided."
     );
   }
 

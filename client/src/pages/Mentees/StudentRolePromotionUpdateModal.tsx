@@ -29,7 +29,7 @@ export const StudentRolePromotionUpdateModal = ({
   seasonSlug,
 }: studentRolePromotionUpdateModalProps) => {
   const { data: userResponse } = useGetCurrentUser();
-  const email = userResponse?.responseBody?.user.email ?? '';
+  const userId = userResponse?.responseBody?.user.userId ?? '';
 
   const form = useForm({
     mode: 'uncontrolled',
@@ -45,7 +45,7 @@ export const StudentRolePromotionUpdateModal = ({
       const requestData: UpdateStudentRolePromotionRequest = {
         menteeEnrollmentId: mentee.menteeEnrollmentId,
         seasonSlug,
-        email,
+        userId,
         studentRolePromotion:
           SeasonStudentRolePromotion[
             values.studentRolePromotion as keyof typeof SeasonStudentRolePromotion

@@ -12,7 +12,7 @@ public record CreateProblemAttemptRequest
   public int TimeTakenInMinutes { get; set; }
 
   [Required]
-  public string Email { get; set; } = string.Empty;
+  public string UserId { get; set; } = string.Empty;
 
   public string Notes { get; set; } = string.Empty;
   public string? LeetcodeProblemId { get; set; }
@@ -32,6 +32,6 @@ public class CreateProblemAttemptRequestValidator : AbstractValidator<CreateProb
   {
     RuleFor(c => c.AttemptStartDateUtc).NotEmpty();
     RuleFor(c => c.TimeTakenInMinutes).NotEmpty().GreaterThanOrEqualTo(1);
-    RuleFor(c => c.Email).NotEmpty().EmailAddress();
+    RuleFor(c => c.UserId).NotEmpty();
   }
 }

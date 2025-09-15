@@ -163,7 +163,7 @@ namespace RSPWebAPI.Tests.Tests
       var seasonId = await _seeder.SeedSeasonAsync();
       await _seeder.SeedEnrollmentAsync(seasonId, userId);
 
-      var request = new GetUserEnrollmentsRequest { Email = email };
+      var request = new GetUserEnrollmentsRequest { UserId = userId };
       var enrollResp = await EnrollmentService.GetUserEnrollments(request);
       Assert.NotNull(enrollResp);
       Assert.NotEmpty(enrollResp.Enrollments);
@@ -190,7 +190,7 @@ namespace RSPWebAPI.Tests.Tests
       var request = new GetIsUserEnrolledRequest
       {
         SeasonSlug = _faker.Random.Word(),
-        Email = _faker.Internet.Email().ToLower(),
+        UserId = "random ID",
       };
       var response = await EnrollmentService.GetIsUserEnrolled(request);
       Assert.NotNull(response);
@@ -207,7 +207,7 @@ namespace RSPWebAPI.Tests.Tests
       var seasonId = await _seeder.SeedSeasonAsync(slug);
       await _seeder.SeedEnrollmentAsync(seasonId, userId);
 
-      var request = new GetIsUserEnrolledRequest { SeasonSlug = slug, Email = email };
+      var request = new GetIsUserEnrolledRequest { SeasonSlug = slug, UserId = userId };
       var response = await EnrollmentService.GetIsUserEnrolled(request);
       Assert.NotNull(response);
       Assert.True(response.IsEnrolled);
@@ -219,7 +219,7 @@ namespace RSPWebAPI.Tests.Tests
       var request = new KickStudentRequest
       {
         SeasonSlug = _faker.Random.Word(),
-        Email = _faker.Internet.Email().ToLower(),
+        UserId = await _seeder.SeedUserAsync(_faker.Internet.Email().ToLower()),
         MenteeEnrollmentId = _faker.Random.String2(8),
       };
       await Assert.ThrowsAsync<KeyNotFoundException>(() => EnrollmentService.KickStudent(request));
@@ -231,7 +231,7 @@ namespace RSPWebAPI.Tests.Tests
       var request = new UpdateStudentRolePromotionRequest
       {
         SeasonSlug = _faker.Random.Word(),
-        Email = _faker.Internet.Email().ToLower(),
+        UserId = await _seeder.SeedUserAsync(_faker.Internet.Email().ToLower()),
         MenteeEnrollmentId = _faker.Random.String2(8),
         StudentRolePromotion = SeasonStudentRolePromotion.Novice,
       };

@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useAuth0 } from '@auth0/auth0-react';
 import { Navigate } from 'react-router-dom';
 import { Button, Container, Text, Title } from '@mantine/core';
 import { CreateUserIfNotExistsRequest, useCreateUserIfNotExists } from '@/generated/api/client';
+import { useAuth0User } from '@/shared/hooks/useAuth0User';
 import classes from './Login.module.css';
 
 export default function LoginPage() {
@@ -10,8 +10,8 @@ export default function LoginPage() {
     loginWithRedirect,
     isLoading: isAuth0Loading,
     isAuthenticated: isAuth0Authenticated,
-    user: Auth0User,
-  } = useAuth0();
+    auth0User: Auth0User,
+  } = useAuth0User();
   const hasCreatedUserRef = useRef(false);
   const [isLoading, setIsLoading] = useState(true);
   const { mutateAsync: createUser } = useCreateUserIfNotExists();

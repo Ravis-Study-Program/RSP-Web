@@ -9,7 +9,7 @@ import {
   AdminListUserResponseApiResponse,
   AdminUpdateUserRequest,
   AdminUpdateUserResponseApiResponse,
-  UserEntity,
+  AdminUserDto,
 } from '@/generated/api/client';
 
 const schema = z.object({
@@ -30,6 +30,7 @@ export const AdminUsersUpdateModal = ({
     mode: 'uncontrolled',
     initialValues: {
       name: user.name,
+      userId: user.userId,
       email: user.email,
       isAdmin: user.isAdmin,
       discordId: user.discordId,
@@ -40,6 +41,7 @@ export const AdminUsersUpdateModal = ({
 
   const handleSubmit = async (values: {
     name: string;
+    userId: string;
     email: string;
     isAdmin: boolean;
     discordId?: string | null;
@@ -116,7 +118,7 @@ export const AdminUsersUpdateModal = ({
 };
 
 type AdminUsersUpdateModalProps = {
-  table: MRT_TableInstance<UserEntity>;
+  table: MRT_TableInstance<AdminUserDto>;
   updateUser: UseMutateAsyncFunction<
     AdminUpdateUserResponseApiResponse,
     unknown,
@@ -125,7 +127,7 @@ type AdminUsersUpdateModalProps = {
     },
     unknown
   >;
-  row: MRT_Row<UserEntity>;
+  row: MRT_Row<AdminUserDto>;
   refetchUsers: (
     options?: RefetchOptions
   ) => Promise<QueryObserverResult<AdminListUserResponseApiResponse, unknown>>;

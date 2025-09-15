@@ -9,7 +9,7 @@ public record DeleteProblemAttemptRequest
   public string ProblemAttemptId { get; set; } = string.Empty;
 
   [Required]
-  public string Email { get; set; } = string.Empty;
+  public string UserId { get; set; } = string.Empty;
 }
 
 public record DeleteProblemAttemptResponse { }
@@ -19,6 +19,6 @@ public class DeleteProblemAttemptRequestValidator : AbstractValidator<DeleteProb
   public DeleteProblemAttemptRequestValidator()
   {
     RuleFor(c => c.ProblemAttemptId).NotEmpty();
-    RuleFor(c => c.Email).NotEmpty().EmailAddress();
+    RuleFor(c => c.UserId).NotEmpty();
   }
 }

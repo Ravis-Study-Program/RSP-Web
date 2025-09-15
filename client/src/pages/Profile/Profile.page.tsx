@@ -1,7 +1,6 @@
 import dayjs from 'dayjs';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
 import { useMemo, useState } from 'react';
-import { useAuth0 } from '@auth0/auth0-react';
 import { IconCheck } from '@tabler/icons-react';
 import { useSearchParams } from 'react-router-dom';
 import { Avatar, Card, Grid, Group, SegmentedControl, Text, Timeline } from '@mantine/core';
@@ -16,6 +15,7 @@ import {
   SeasonRoleReverseIndex,
   SeasonStudentRolePromotionReverseIndex,
 } from '@/shared/entities/reverseIndex';
+import { useAuth0User } from '@/shared/hooks/useAuth0User';
 import { useSeasonSlug } from '@/shared/hooks/useSeasonSlug';
 import { useUserAndEnrollment } from '@/shared/hooks/useUserAndEnrollment';
 import { SeasonStudentRolePromotionColors } from '@/shared/utils/colorMappings';
@@ -29,13 +29,13 @@ dayjs.extend(localizedFormat);
 
 export default function ProfilePage() {
   const [searchParams] = useSearchParams();
-  const { user: Auth0User } = useAuth0();
+  const { auth0User } = useAuth0User();
   const slug = searchParams.get('user') || '';
 
   const { seasonSlug } = useSeasonSlug();
-  const { enrollmentId, seasonId, user, role, email } = useUserAndEnrollment(
+  const { enrollmentId, seasonId, user, role, userId } = useUserAndEnrollment(
     seasonSlug,
-    Auth0User?.email || '',
+    auth0User?.email || '',
     slug
   );
   const [section, setSection] = useState<'Leetcode' | 'Mock Interviews'>('Leetcode');
@@ -44,7 +44,7 @@ export default function ProfilePage() {
     isFetching: isFetchingEnrollments,
     isLoading: isLoadingEnrollments,
   } = useGetUserEnrollments({
-    email,
+    userId,
   });
 
   const { data: problemAttemptsResponse, refetch: refetchProblemAttempts } = useListProblemAttempt(
@@ -52,9 +52,9 @@ export default function ProfilePage() {
       SeasonId: seasonId || undefined,
       IncludeCustom: false,
       IncludeLeetcode: true,
-      Emails: [email],
+      UserIds: [userId],
     },
-    { query: { enabled: email !== '' } }
+    { query: { enabled: userId !== '' } }
   );
 
   const { data: mockInterviewsResponse, refetch: refetchMockInterviews } = useListMockInterview(
@@ -63,9 +63,9 @@ export default function ProfilePage() {
       IncludeCustom: true,
       IncludeLeetcode: true,
       IncludeBehavioural: true,
-      Emails: [email],
+      UserIds: [userId],
     },
-    { query: { enabled: email !== '' } }
+    { query: { enabled: userId !== '' } }
   );
 
   const MockInterviewComponent = useMemo(() => {

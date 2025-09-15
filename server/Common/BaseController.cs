@@ -1,6 +1,8 @@
 using System.Net;
 using Microsoft.AspNetCore.Mvc;
+using RSPWebAPI.Database;
 using RSPWebAPI.Shared;
+using static RSPWebAPI.Database.Constants;
 
 namespace RSPWebAPI.Common;
 
@@ -34,8 +36,19 @@ public class BaseController : ControllerBase
     return Ok(new ApiResponse<T> { ResponseBody = responseBody, SuccessMessage = successMessage });
   }
 
+  protected string GetCurrentUserId()
+  {
+    return HttpContext.User.FindFirst($"{Domain}userId")?.Value ?? "invalid user id";
+  }
+
+  protected bool GetCurrentUserIsAdmin()
+  {
+    return HttpContext.User.FindFirst($"{Domain}isAdmin")?.Value == "true";
+  }
+
   protected string? GetCurrentUserEmail()
   {
-    return HttpContext.User.Identity?.Name;
+    // Try custom claim first, then fallback to Identity.Name
+    return HttpContext.User.FindFirst("email")?.Value ?? HttpContext.User.Identity?.Name;
   }
 }

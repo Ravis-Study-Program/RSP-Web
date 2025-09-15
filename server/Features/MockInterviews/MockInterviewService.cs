@@ -5,6 +5,7 @@ using RSPWEBAPI.Common.Cache;
 using RSPWebAPI.Common.Cache;
 using RSPWebAPI.Common.Interfaces;
 using RSPWebAPI.Entities;
+using RSPWebAPI.Extensions;
 using RSPWebAPI.Features.Constants;
 using RSPWebAPI.Features.Enrollments.Interfaces;
 using RSPWebAPI.Features.MockInterviews.Dtos;
@@ -69,7 +70,7 @@ public class MockInterviewService : BaseService, IMockInterviewService
     {
       var existingEnrollment = await _enrollmentService.GetEnrollmentBySeasonId(
         request.SeasonId,
-        request.IntervieweeUserId,
+        userId: request.IntervieweeUserId,
         null,
         cancellationToken,
         q => q.Include(e => e.User)
@@ -96,13 +97,13 @@ public class MockInterviewService : BaseService, IMockInterviewService
       }
     }
 
-    var interviewer = await _userService.GetUserByEmailAsync(
-      request.InterviewerEmail,
-      cancellationToken
+    var interviewer = await _userService.GetUserAsync(
+      userId: request.InterviewerUserId,
+      cancellationToken: cancellationToken
     );
-    var interviewee = await _userService.GetUserByIdAsync(
-      request.IntervieweeUserId,
-      cancellationToken
+    var interviewee = await _userService.GetUserAsync(
+      userId: request.IntervieweeUserId,
+      cancellationToken: cancellationToken
     );
     if (interviewee == null || interviewer == null)
     {
@@ -130,12 +131,12 @@ public class MockInterviewService : BaseService, IMockInterviewService
       async () =>
       {
         await AddMockInterviewAsync(mockInterview, cancellationToken);
-        _cache.Remove(RouteCacheKeys.ListMockInterviews, interviewee.Email);
-        _cache.Remove(RouteCacheKeys.ListMockInterviews, interviewer.Email);
+        _cache.Remove(RouteCacheKeys.ListMockInterviews, interviewee.UserId);
+        _cache.Remove(RouteCacheKeys.ListMockInterviews, interviewer.UserId);
         return new CreateMockInterviewResponse { MockInterviewId = mockInterview.MockInterviewId };
       },
       Messages.MockInterview.CreationError,
-      cancellationToken
+      cancellationToken: cancellationToken
     );
   }
 
@@ -153,7 +154,7 @@ public class MockInterviewService : BaseService, IMockInterviewService
     {
       throw new KeyNotFoundException(Messages.MockInterview.DoesNotExist);
     }
-    if (existingMockInterview.Interviewer.Email != request.Email)
+    if (existingMockInterview.Interviewer.UserId != request.UserId)
     {
       throw new ArgumentException(Messages.MockInterview.DeletionOnlyInterviewerAllowed);
     }
@@ -162,12 +163,12 @@ public class MockInterviewService : BaseService, IMockInterviewService
       async () =>
       {
         await DeleteMockInterviewAsync(existingMockInterview.MockInterviewId, cancellationToken);
-        _cache.Remove(RouteCacheKeys.ListMockInterviews, existingMockInterview.Interviewer.Email);
-        _cache.Remove(RouteCacheKeys.ListMockInterviews, existingMockInterview.Interviewee.Email);
+        _cache.Remove(RouteCacheKeys.ListMockInterviews, existingMockInterview.Interviewer.UserId);
+        _cache.Remove(RouteCacheKeys.ListMockInterviews, existingMockInterview.Interviewee.UserId);
         return new DeleteMockInterviewResponse();
       },
       Messages.MockInterview.DeletionError,
-      cancellationToken
+      cancellationToken: cancellationToken
     );
   }
 
@@ -178,11 +179,11 @@ public class MockInterviewService : BaseService, IMockInterviewService
   {
     var allMockInterviews = new List<MockInterviewEntity>();
 
-    foreach (var email in request.Emails.Distinct())
+    foreach (var userId in request.UserIds.Distinct())
     {
       var modifiedRequest = new ListMockInterviewRequest
       {
-        Emails = new List<string> { email },
+        UserIds = new List<string> { userId },
         SeasonId = request.SeasonId,
         IncludeLeetcode = request.IncludeLeetcode,
         IncludeCustom = request.IncludeCustom,
@@ -191,7 +192,7 @@ public class MockInterviewService : BaseService, IMockInterviewService
 
       var response = await _cache.GetOrCreateAsync(
         routeKey: RouteCacheKeys.ListMockInterviews,
-        primaryKey: email,
+        primaryKey: userId,
         factory: () => _listMockInterview(modifiedRequest, cancellationToken),
         ttl: TimeSpan.FromHours(1)
       );
@@ -215,9 +216,12 @@ public class MockInterviewService : BaseService, IMockInterviewService
     if (request.SeasonId != null)
     {
       // TODO: Parallelize to speed things up
-      foreach (var email in request.Emails)
+      foreach (var userId in request.UserIds)
       {
-        var existingUser = await _userService.GetUserByEmailAsync(email, cancellationToken);
+        var existingUser = await _userService.GetUserAsync(
+          userId: userId,
+          cancellationToken: cancellationToken
+        );
         if (existingUser == null)
         {
           throw new KeyNotFoundException(Messages.User.IdDoesNotExist);
@@ -230,7 +234,7 @@ public class MockInterviewService : BaseService, IMockInterviewService
           cancellationToken,
           q => q.Include(e => e.User)
         );
-        if (existingEnrollment == null || existingEnrollment.User.Email != email)
+        if (existingEnrollment == null || existingEnrollment.User.UserId != userId)
         {
           throw new KeyNotFoundException(Messages.Season.DoesNotExist);
         }
@@ -270,8 +274,8 @@ public class MockInterviewService : BaseService, IMockInterviewService
 
     var mockInterviews = await _mockInterviewRepository.GetAllAsync(
       m =>
-        request.Emails.Contains(m.Interviewer.Email)
-        || request.Emails.Contains(m.Interviewee.Email),
+        request.UserIds.Contains(m.Interviewer.UserId)
+        || request.UserIds.Contains(m.Interviewee.UserId),
       cancellationToken,
       _ => query
     );
@@ -302,7 +306,7 @@ public class MockInterviewService : BaseService, IMockInterviewService
       throw new KeyNotFoundException(Messages.MockInterview.DoesNotExist);
     }
 
-    if (request.InterviewerEmail != existingMockInterview.Interviewer.Email)
+    if (request.InterviewerUserId != existingMockInterview.Interviewer.UserId)
     {
       throw new ArgumentException(Messages.MockInterview.UpdateOnlyInterviewerAllowed);
     }
@@ -325,13 +329,13 @@ public class MockInterviewService : BaseService, IMockInterviewService
       }
     }
 
-    var interviewer = await _userService.GetUserByEmailAsync(
-      request.InterviewerEmail,
-      cancellationToken
+    var interviewer = await _userService.GetUserAsync(
+      userId: request.InterviewerUserId,
+      cancellationToken: cancellationToken
     );
-    var interviewee = await _userService.GetUserByIdAsync(
-      request.IntervieweeUserId,
-      cancellationToken
+    var interviewee = await _userService.GetUserAsync(
+      userId: request.IntervieweeUserId,
+      cancellationToken: cancellationToken
     );
     if (interviewee == null || interviewer == null)
     {
@@ -355,12 +359,12 @@ public class MockInterviewService : BaseService, IMockInterviewService
       async () =>
       {
         await UpdateMockInterviewAsync(existingMockInterview, cancellationToken);
-        _cache.Remove(RouteCacheKeys.ListMockInterviews, interviewee.Email);
-        _cache.Remove(RouteCacheKeys.ListMockInterviews, interviewer.Email);
+        _cache.Remove(RouteCacheKeys.ListMockInterviews, interviewee.UserId);
+        _cache.Remove(RouteCacheKeys.ListMockInterviews, interviewer.UserId);
         return new UpdateMockInterviewResponse();
       },
       Messages.MockInterview.UpdateError,
-      cancellationToken
+      cancellationToken: cancellationToken
     );
   }
 
@@ -550,7 +554,7 @@ public class MockInterviewService : BaseService, IMockInterviewService
   {
     var mockInterview = await _mockInterviewRepository.GetByIdAsync(
       mockInterviewId,
-      cancellationToken
+      cancellationToken: cancellationToken
     );
 
     if (mockInterview == null)
@@ -570,7 +574,7 @@ public class MockInterviewService : BaseService, IMockInterviewService
 
     var existingMockInterview = await _mockInterviewRepository.GetByIdAsync(
       mockInterview.MockInterviewId,
-      cancellationToken
+      cancellationToken: cancellationToken
     );
     if (existingMockInterview == null)
     {

@@ -17,16 +17,13 @@ public interface IUserService
     Func<IQueryable<UserEntity>, IQueryable<UserEntity>>? include = null
   );
 
-  Task<UserEntity?> GetUserByIdAsync(
-    string userId,
-    CancellationToken cancellationToken = default,
-    Func<IQueryable<UserEntity>, IQueryable<UserEntity>>? include = null
-  );
-
-  Task<UserEntity?> GetUserByEmailAsync(
-    string email,
-    CancellationToken cancellationToken = default,
-    Func<IQueryable<UserEntity>, IQueryable<UserEntity>>? include = null
+  Task<UserEntity?> GetUserAsync(
+    string? userId = null,
+    string? email = null,
+    string? slug = null,
+    Func<IQueryable<UserEntity>, IQueryable<UserEntity>>? include = null,
+    bool bypassCache = false,
+    CancellationToken cancellationToken = default
   );
 
   Task<AdminCreateUserResponse> CreateAdminUser(
@@ -50,7 +47,7 @@ public interface IUserService
   );
 
   Task<GetCurrentUserResponse> GetCurrentUser(
-    string? email,
+    string? userId,
     CancellationToken cancellationToken = default
   );
 

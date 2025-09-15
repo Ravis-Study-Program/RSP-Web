@@ -6,7 +6,7 @@ namespace RSPWebAPI.Features.Enrollments.Dtos;
 
 public record GetUserEnrollmentsRequest
 {
-  public string Email { get; set; } = string.Empty;
+  public string UserId { get; set; } = string.Empty;
 }
 
 public record EnrollmentResponseDto

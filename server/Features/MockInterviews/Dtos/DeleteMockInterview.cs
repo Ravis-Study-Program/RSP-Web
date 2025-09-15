@@ -9,7 +9,7 @@ public record DeleteMockInterviewRequest
   public string MockInterviewId { get; set; } = string.Empty;
 
   [Required]
-  public string Email { get; set; } = string.Empty;
+  public string UserId { get; set; } = string.Empty;
 }
 
 public record DeleteMockInterviewResponse { }
@@ -19,6 +19,6 @@ public class DeleteMockInterviewRequestValidator : AbstractValidator<DeleteMockI
   public DeleteMockInterviewRequestValidator()
   {
     RuleFor(c => c.MockInterviewId).NotEmpty();
-    RuleFor(c => c.Email).NotEmpty().EmailAddress();
+    RuleFor(c => c.UserId).NotEmpty();
   }
 }

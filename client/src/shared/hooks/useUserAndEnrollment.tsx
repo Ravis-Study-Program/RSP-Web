@@ -4,32 +4,33 @@ import {
   useGetIsCurrentUserEnrolled,
   useGetUser,
 } from '@/generated/api/client';
+import { useAuth0User } from './useAuth0User';
 
 export const useUserAndEnrollment = (
   seasonSlug: string,
-  email: string | null = null,
+  userId: string | null = null,
   slug: string | null = null
 ) => {
+  const { isAdmin } = useAuth0User();
   const {
     data: currentUserResponse,
     isLoading: isCurrentUserLoading,
     isError: isCurrentUserError,
   } = useGetCurrentUser();
 
-  const currentUserEmail = currentUserResponse?.responseBody?.user?.email ?? null;
-  const userEmail = email ?? currentUserEmail;
+  const currentUserId = currentUserResponse?.responseBody?.user?.userId ?? userId;
 
   // Prioritize slug if available
   const params: GetUserParams = {};
   if (slug != null) {
     params.Slug = slug;
-  } else if (userEmail != null) {
-    params.Email = userEmail;
+  } else if (currentUserId != null) {
+    params.UserId = currentUserId;
   }
 
   // When an email is provided explicitly, enable fetching the user.
   // Otherwise, rely on the current user query.
-  const isUserQueryEnabled = Boolean(email);
+  const isUserQueryEnabled = Boolean(currentUserId);
 
   const {
     data: userResponse,
@@ -41,7 +42,6 @@ export const useUserAndEnrollment = (
   // Prioritize the fetched user if available (when querying with an email);
   // Otherwise, fall back to the current user data.
   const user = userResponse?.responseBody?.user || currentUserResponse?.responseBody?.user;
-  const isAdmin = user?.isAdmin ?? false;
 
   const {
     data: enrollmentsResponse,
@@ -69,6 +69,6 @@ export const useUserAndEnrollment = (
     enrollmentId,
     isLoading,
     isError,
-    email: user?.email || '',
+    userId: user?.userId || '',
   };
 };

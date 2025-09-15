@@ -179,7 +179,7 @@ public class EnrollmentService : BaseService, IEnrollmentService
       async () =>
       {
         var rawEnrollments = await _enrollmentRepository
-          .Table.Where(e => e.User.Email == request.Email)
+          .Table.Where(e => e.User.UserId == request.UserId)
           .Include(e => e.Season)
           .Include(e => e.User)
           .AsNoTracking()
@@ -203,7 +203,7 @@ public class EnrollmentService : BaseService, IEnrollmentService
         {
           var menteesRequest = new GetCurrentUserMenteesListRequest
           {
-            Email = request.Email,
+            UserId = request.UserId,
             SeasonSlug = enrollment.Season.Slug,
           };
 
@@ -282,7 +282,6 @@ public class EnrollmentService : BaseService, IEnrollmentService
           UserId = e.User.UserId,
           Name = e.User.Name,
           Slug = e.User.Slug,
-          Email = e.User.Email,
           ProfileImage = e.User?.ProfileImage,
           Role = filterBySeason ? e.Role : null,
           StudentRolePromotion = filterBySeason ? e.StudentRolePromotion : null,
@@ -301,7 +300,7 @@ public class EnrollmentService : BaseService, IEnrollmentService
   {
     var existingEnrollment = await GetEnrollmentBySeasonSlug(
       request.SeasonSlug,
-      request.Email,
+      request.UserId,
       null,
       cancellationToken
     );
@@ -314,7 +313,7 @@ public class EnrollmentService : BaseService, IEnrollmentService
         EnrollmentId = null,
         SeasonId = null,
         StudentRolePromotion = SeasonStudentRolePromotion.NotApplicable,
-        Email = request.Email,
+        UserId = request.UserId,
       };
     }
 
@@ -325,7 +324,7 @@ public class EnrollmentService : BaseService, IEnrollmentService
       EnrollmentId = existingEnrollment.EnrollmentId,
       SeasonId = existingEnrollment.SeasonId,
       StudentRolePromotion = existingEnrollment.StudentRolePromotion,
-      Email = request.Email,
+      UserId = request.UserId,
     };
   }
 
@@ -336,7 +335,7 @@ public class EnrollmentService : BaseService, IEnrollmentService
   {
     var existingEnrollment = await GetEnrollmentBySeasonSlug(
       request.SeasonSlug,
-      request.Email,
+      request.UserId,
       null,
       cancellationToken
     );
@@ -396,7 +395,7 @@ public class EnrollmentService : BaseService, IEnrollmentService
   {
     var existingEnrollment = await GetEnrollmentBySeasonSlug(
       request.SeasonSlug,
-      request.Email,
+      request.UserId,
       null,
       cancellationToken
     );
@@ -623,7 +622,7 @@ public class EnrollmentService : BaseService, IEnrollmentService
     return await _enrollmentRepository.FirstOrDefaultAsync(
       q =>
         q.Season.Slug == seasonSlug
-        && (email == null || q.User.Email == email)
+        && (email == null || q.User.UserId == email)
         && (role == null || q.Role == role),
       cancellationToken,
       include

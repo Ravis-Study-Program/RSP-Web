@@ -17,14 +17,14 @@ import classes from './Mentees.module.css';
 export default function MenteesPage() {
   const { seasonSlug } = useSeasonSlug();
   const { data: userResponse } = useGetIsCurrentUserEnrolled({ seasonSlug });
-  const email = userResponse?.responseBody?.email ?? '';
-  const { enrollmentId, seasonId } = useUserAndEnrollment(seasonSlug, email);
+  const userId = userResponse?.responseBody?.userId ?? '';
+  const { enrollmentId, seasonId } = useUserAndEnrollment(seasonSlug);
   const [section, setSection] = useState<'Portfolio' | 'Performance'>('Portfolio');
   const [selectedMentees, setSelectedMentees] = useState<string[]>([]);
 
   const { data: mentorshipResponse, refetch: refetchMentorships } = useGetCurrentUserMentees(
-    { SeasonSlug: seasonSlug, Email: email },
-    { query: { enabled: email !== '' && seasonSlug !== '' } }
+    { SeasonSlug: seasonSlug, UserId: userId },
+    { query: { enabled: userId !== '' && seasonSlug !== '' } }
   );
 
   const mentees = mentorshipResponse?.responseBody?.mentorships.map((mentorship) => {
@@ -34,18 +34,17 @@ export default function MenteesPage() {
     };
   });
 
-  const menteesEmails =
-    mentorshipResponse?.responseBody?.mentorships.map((mentorship) => mentorship.menteeEmail) || [];
-
+  // For now, we'll get mentor's own data as we don't have mentee userIds
+  // TODO: This needs to be redesigned to get mentee user IDs properly
   const { data: mockInterviewsResponse, refetch: refetchMockInterviews } = useListMockInterview(
     {
       SeasonId: seasonId || undefined,
       IncludeCustom: true,
       IncludeLeetcode: true,
       IncludeBehavioural: true,
-      Emails: menteesEmails,
+      UserIds: userId ? [userId] : [],
     },
-    { query: { enabled: menteesEmails.length > 0 } }
+    { query: { enabled: userId !== '' && seasonId !== null } }
   );
 
   const { data: problemAttemptsResponse, refetch: refetchProblemAttempts } = useListProblemAttempt(
@@ -53,9 +52,9 @@ export default function MenteesPage() {
       SeasonId: seasonId || undefined,
       IncludeCustom: false,
       IncludeLeetcode: true,
-      Emails: menteesEmails,
+      UserIds: userId ? [userId] : [],
     },
-    { query: { enabled: menteesEmails.length > 0 } }
+    { query: { enabled: userId !== '' && seasonId !== null } }
   );
 
   const PortfolioComponent = useMemo(() => {
@@ -75,8 +74,8 @@ export default function MenteesPage() {
       (problemAttempt) =>
         selectedMentees.length === 0 ||
         selectedMentees.length === 0 ||
-        (problemAttempt.enrollment?.user?.name != null &&
-          selectedMentees.includes(problemAttempt.enrollment?.user?.name.toString()))
+        (problemAttempt.user?.name != null &&
+          selectedMentees.includes(problemAttempt.user?.name.toString()))
     );
 
     return (

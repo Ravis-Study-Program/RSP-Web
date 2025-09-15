@@ -5,7 +5,8 @@ import { useUserAndEnrollment } from './useUserAndEnrollment';
 const mocks = vi.hoisted(() => ({
   useGetCurrentUser: vi.fn(),
   useGetIsUserEnrolled: vi.fn(),
-  useGetUser: vi.fn(), // Added mock for useGetUser
+  useGetUser: vi.fn(),
+  useAuth0User: vi.fn(),
 }));
 
 vi.mock('@/generated/api/client', () => ({
@@ -14,12 +15,20 @@ vi.mock('@/generated/api/client', () => ({
   useGetUser: mocks.useGetUser,
 }));
 
+vi.mock('./useAuth0User', () => ({
+  useAuth0User: mocks.useAuth0User,
+}));
+
 describe('useUserAndEnrollment', () => {
   afterEach(() => {
     vi.clearAllMocks();
   });
 
   it('returns loading state when fetching data', () => {
+    mocks.useAuth0User.mockReturnValue({
+      isAdmin: false,
+    });
+
     mocks.useGetCurrentUser.mockReturnValue({
       data: null,
       isLoading: true,
@@ -50,6 +59,10 @@ describe('useUserAndEnrollment', () => {
   });
 
   it('returns error state when there is an error', () => {
+    mocks.useAuth0User.mockReturnValue({
+      isAdmin: false,
+    });
+
     mocks.useGetCurrentUser.mockReturnValue({
       data: null,
       isLoading: false,
@@ -80,10 +93,19 @@ describe('useUserAndEnrollment', () => {
   });
 
   it('returns user and admin status when data is available', () => {
+    mocks.useAuth0User.mockReturnValue({
+      isAdmin: true,
+    });
+
     mocks.useGetCurrentUser.mockReturnValue({
       data: {
         responseBody: {
-          user: { id: 'test-user-id', isAdmin: true },
+          user: {
+            userId: 'test-user-id',
+            name: 'Test User',
+            slug: 'test-user',
+            email: 'test@example.com',
+          },
         },
       },
       isLoading: false,
@@ -110,16 +132,30 @@ describe('useUserAndEnrollment', () => {
     expect(result.current.isLoading).toBe(false);
     expect(result.current.isError).toBe(false);
     // Fallback to the current user data from useGetCurrentUser
-    expect(result.current.user).toEqual({ id: 'test-user-id', isAdmin: true });
+    expect(result.current.user).toEqual({
+      userId: 'test-user-id',
+      name: 'Test User',
+      slug: 'test-user',
+      email: 'test@example.com',
+    });
     expect(result.current.isAdmin).toBe(true);
     expect(result.current.role).toBeNull();
   });
 
   it('returns role and enrollment ID when enrolled', () => {
+    mocks.useAuth0User.mockReturnValue({
+      isAdmin: false,
+    });
+
     mocks.useGetCurrentUser.mockReturnValue({
       data: {
         responseBody: {
-          user: { id: 'test-user-id', isAdmin: false },
+          user: {
+            userId: 'test-user-id',
+            name: 'Test User',
+            slug: 'test-user',
+            email: 'test@example.com',
+          },
         },
       },
       isLoading: false,
@@ -151,17 +187,31 @@ describe('useUserAndEnrollment', () => {
 
     expect(result.current.isLoading).toBe(false);
     expect(result.current.isError).toBe(false);
-    expect(result.current.user).toEqual({ id: 'test-user-id', isAdmin: false });
+    expect(result.current.user).toEqual({
+      userId: 'test-user-id',
+      name: 'Test User',
+      slug: 'test-user',
+      email: 'test@example.com',
+    });
     expect(result.current.isAdmin).toBe(false);
     expect(result.current.role).toBe('student');
     expect(result.current.enrollmentId).toBe('test-enrollment-id');
   });
 
   it('supports querying with an email', () => {
+    mocks.useAuth0User.mockReturnValue({
+      isAdmin: false,
+    });
+
     mocks.useGetCurrentUser.mockReturnValue({
       data: {
         responseBody: {
-          user: { id: 'test-user-id', isAdmin: false, email: 'user@gmail.com' },
+          user: {
+            userId: 'test-user-id',
+            name: 'Test User',
+            slug: 'test-user',
+            email: 'test@example.com',
+          },
         },
       },
       isLoading: false,
@@ -190,9 +240,10 @@ describe('useUserAndEnrollment', () => {
     expect(result.current.isError).toBe(false);
     // Fallback to the current user data if useGetUser data is not available.
     expect(result.current.user).toEqual({
-      id: 'test-user-id',
-      isAdmin: false,
-      email: 'user@gmail.com',
+      userId: 'test-user-id',
+      name: 'Test User',
+      slug: 'test-user',
+      email: 'test@example.com',
     });
     expect(result.current.isAdmin).toBe(false);
     expect(result.current.role).toBeNull();

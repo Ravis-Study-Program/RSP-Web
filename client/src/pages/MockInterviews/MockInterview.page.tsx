@@ -18,7 +18,7 @@ export default function MockInterviewPage() {
   const { data: userResponse } = useGetIsCurrentUserEnrolled({ seasonSlug });
   const [selectedIsPassResult, setSelectedIsPassResult] = useState<boolean | null>(null);
   const [selectedInterviewers, setSelectedInterviewers] = useState<string[]>([]);
-  const email = userResponse?.responseBody?.email ?? '';
+  const userId = userResponse?.responseBody?.userId ?? '';
   const [selectedMockInterviewsPreset, setSelectedMockInterviewsPreset] = useLocalStorage({
     key: 'mock-interviews-preset',
     defaultValue: MockInterviewsPreset.All,
@@ -30,9 +30,9 @@ export default function MockInterviewPage() {
       IncludeCustom: true,
       IncludeLeetcode: true,
       IncludeBehavioural: true,
-      Emails: [email],
+      UserIds: [userId],
     },
-    { query: { enabled: email !== '' } }
+    { query: { enabled: userId !== '' } }
   );
 
   const resultOptions = [
@@ -44,13 +44,13 @@ export default function MockInterviewPage() {
     ...(mockInterviewsResponse?.responseBody?.mockInterviews || []).map((mockInterview) => {
       return {
         label: mockInterview.interviewer?.name ?? '',
-        value: mockInterview.interviewer?.email ?? '',
+        value: mockInterview.interviewer?.userId ?? '',
       };
     }),
     ...(mockInterviewsResponse?.responseBody?.mockInterviews || []).map((mockInterview) => {
       return {
         label: mockInterview.interviewee?.name ? `${mockInterview.interviewee.name}` : '',
-        value: mockInterview.interviewee?.email ?? '',
+        value: mockInterview.interviewee?.userId ?? '',
       };
     }),
   ];
@@ -71,17 +71,17 @@ export default function MockInterviewPage() {
               selectedIsPassResult)) &&
           (selectedMockInterviewsPreset === MockInterviewsPreset.All ||
             (selectedMockInterviewsPreset === MockInterviewsPreset.ReceivedMocks &&
-              mock.interviewee?.email !== null &&
-              email === mock.interviewee?.email) ||
+              mock.interviewee?.userId !== null &&
+              userId === mock.interviewee?.userId) ||
             (selectedMockInterviewsPreset === MockInterviewsPreset.GivenMocks &&
-              mock.interviewee?.email !== null &&
-              email !== mock.interviewee?.email)) &&
+              mock.interviewee?.userId !== null &&
+              userId !== mock.interviewee?.userId)) &&
           (selectedInterviewers.length === 0 ||
-            (mock.interviewer?.email != null &&
-              selectedInterviewers.includes(mock.interviewer?.email.toString()))))
+            (mock.interviewer?.userId != null &&
+              selectedInterviewers.includes(mock.interviewer?.userId.toString()))))
     );
   }, [
-    email,
+    userId,
     mockInterviewsResponse,
     selectedIsPassResult,
     selectedMockInterviewsPreset,

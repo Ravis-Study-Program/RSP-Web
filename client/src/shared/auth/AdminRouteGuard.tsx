@@ -1,20 +1,13 @@
-import { useAuth0 } from '@auth0/auth0-react';
 import { Outlet } from 'react-router-dom';
-import { useGetCurrentUser } from '@/generated/api/client';
+import { useAuth0User } from '@/shared/hooks/useAuth0User';
 import NotFoundPage from '../../pages/NotFound/NotFound.page';
 
-interface Auth0User {
-  role?: string[];
-}
-
 const AdminRouteGuard = () => {
-  const { isAuthenticated, isLoading } = useAuth0<Auth0User>();
-  const { data, isLoading: isGetCurrentUserLoading } = useGetCurrentUser();
-  const user = data?.responseBody?.user;
+  const { isAuthenticated, isLoading, isAdmin: auth0IsAdmin } = useAuth0User();
 
-  const isAdmin = isAuthenticated && user?.isAdmin;
+  const isAdmin = isAuthenticated && auth0IsAdmin;
 
-  if (isLoading || isGetCurrentUserLoading) {
+  if (isLoading) {
     return null;
   }
 

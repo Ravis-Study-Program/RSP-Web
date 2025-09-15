@@ -61,9 +61,9 @@ export const MockInterviewTable = ({
     isLoading: isLoadingUsers,
   } = useGetEnrollmentUsers();
   const { data: currentUserResponse } = useGetCurrentUser();
-  const currentUserEmail = currentUserResponse?.responseBody?.user.email ?? '';
+  const currentUserId = currentUserResponse?.responseBody?.user.userId ?? '';
   const users = usersResponse?.responseBody?.enrollmentUsers.filter(
-    (u) => u.email !== currentUserEmail
+    (u) => u.userId !== currentUserId
   );
 
   const { mutateAsync: createMockInterview, status: isCreatingMockInterviewStatus } =
@@ -91,7 +91,7 @@ export const MockInterviewTable = ({
       onConfirm: async () => {
         try {
           await deleteMockInterview({
-            data: { mockInterviewId: row.original.mockInterviewId, email: currentUserEmail },
+            data: { mockInterviewId: row.original.mockInterviewId, userId: currentUserId },
           });
           await refetchMockInterviews();
           modals.closeAll();

@@ -56,7 +56,7 @@ export const MockInterviewUpdateModal = ({
   users,
 }: MockInterviewUpdateModalProps) => {
   const { data: currentUserResponse } = useGetCurrentUser();
-  const email = currentUserResponse?.responseBody?.user.email ?? '';
+  const userId = currentUserResponse?.responseBody?.user.userId ?? '';
 
   const behavioural =
     mockInterview.mockInterviewRounds?.filter((m) => m.behaviouralMockInterviewRound != null) || [];
@@ -146,7 +146,7 @@ export const MockInterviewUpdateModal = ({
         timeTakenInMinutes: values.timeTakenInMinutes,
         intervieweeUserId: values.interviewee,
         mockInterviewRounds,
-        interviewerEmail: email,
+        interviewerUserId: userId,
       };
       if (seasonId !== '') {
         requestData.seasonId = seasonId;

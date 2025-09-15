@@ -6,7 +6,7 @@ namespace RSPWebAPI.Features.Users.Dtos;
 public record AdminDeleteUserRequest
 {
   [Required]
-  public string Email { get; set; } = string.Empty;
+  public string UserId { get; set; } = string.Empty;
 }
 
 public record AdminDeleteUserResponse { }
@@ -15,6 +15,6 @@ public class AdminDeleteUserRequestValidator : AbstractValidator<AdminDeleteUser
 {
   public AdminDeleteUserRequestValidator()
   {
-    RuleFor(c => c.Email).NotEmpty().EmailAddress();
+    RuleFor(c => c.UserId).NotEmpty();
   }
 }
