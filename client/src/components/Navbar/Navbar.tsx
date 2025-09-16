@@ -49,6 +49,9 @@ export function Navbar({
   const navigate = useNavigate();
   const pathname = typeof window !== 'undefined' ? window.location.pathname : '';
 
+  console.log(user);
+  
+
   const generalLinks =
     tabs?.general
       ?.filter((item) => !item.hidden)
