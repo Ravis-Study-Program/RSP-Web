@@ -123,7 +123,7 @@ export function Navbar({
           c={computedColorScheme === 'light' ? 'dark' : 'white'}
         >
           <Title order={1} size="h4" ta="center">
-            Ravi's Study Program
+            Ravi's Study Programs
           </Title>
         </Anchor>
         {isAdmin ? (
