@@ -50,6 +50,7 @@ export function Navbar({
   const pathname = typeof window !== 'undefined' ? window.location.pathname : '';
 
   console.log(user);
+  console.log(user?.slug);
   
 
   const generalLinks =
