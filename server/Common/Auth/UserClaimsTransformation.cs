@@ -20,6 +20,9 @@ public class UserClaimsTransformation : IClaimsTransformation
       return principal;
     }
 
+    System.Console.WriteLine("wooo");
+    System.Console.WriteLine(string.Join("\n", principal.Claims.Select(c => $"{c.Type} = {c.Value}")));
+
     // Check if we already have the custom claims
     if (principal.FindFirst($"{Database.Constants.Domain}userId") != null)
     {
