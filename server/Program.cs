@@ -195,8 +195,12 @@ app.UseCors("CorsPolicy");
 
 app.UseHttpsRedirection();
 app.UseAuthentication();
-app.UseSwagger();
-app.UseSwaggerUI();
+
+if (app.Environment.IsDevelopment())
+{
+  app.UseSwagger();
+  app.UseSwaggerUI();
+}
 app.ApplyMigrations();
 app.UseHttpMetrics();
 app.MapMetrics();
