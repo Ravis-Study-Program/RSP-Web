@@ -25,7 +25,7 @@ public class UserIdentityService : IUserIdentityService
 
     var token = await GetManagementTokenAsync();
 
-    _client = new ManagementApiClient(token, new Uri($"{_config.Auth0Domain}/api/v2"));
+    _client = new ManagementApiClient(token, new Uri(_config.Auth0ManagementApiDomain));
     return _client;
   }
 
@@ -37,7 +37,7 @@ public class UserIdentityService : IUserIdentityService
     {
       ClientId = _config.Auth0ClientId,
       ClientSecret = _config.Auth0ClientSecret,
-      Audience = $"{_config.Auth0Domain}/api/v2/",
+      Audience = _config.Auth0ManagementApiDomain,
     };
 
     var tokenResponse = await authClient.GetTokenAsync(tokenRequest);

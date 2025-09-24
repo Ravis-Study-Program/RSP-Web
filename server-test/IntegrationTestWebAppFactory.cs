@@ -124,6 +124,11 @@ public class IntegrationTestWebAppFactory : WebApplicationFactory<Program>, IAsy
     Environment.SetEnvironmentVariable("AUTH0_CLIENT_SECRET", "super-secret-auth0-client-secret");
     Environment.SetEnvironmentVariable("PORT", "4000");
     Environment.SetEnvironmentVariable("ALLOWED_ORIGINS", "http://localhost:3000");
+    Environment.SetEnvironmentVariable(
+      "AUTH0_MANAGEMENT_API_DOMAIN",
+      "http://managementapi.auth0.com"
+    );
+    Environment.SetEnvironmentVariable("AUTH0_CUSTOM_DOMAIN", "http://customdomain.auth0.com");
   }
 }
 
