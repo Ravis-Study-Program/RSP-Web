@@ -119,13 +119,15 @@ builder
   .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
   .AddJwtBearer(options =>
   {
-    options.Authority = config.Auth0Domain;
+    options.Authority = config.Auth0CustomDomain;
     options.Audience = config.Auth0Audience;
     options.TokenValidationParameters = new TokenValidationParameters
     {
       NameClaimType = ClaimTypes.Email,
       ValidateIssuer = true,
+      ValidIssuer = config.Auth0CustomDomain,
       ValidateAudience = true,
+      ValidAudience = config.Auth0Audience,
       ValidateLifetime = true,
       ValidateIssuerSigningKey = true,
     };
@@ -242,6 +244,12 @@ public class AppConfiguration
   public string Auth0Domain =>
     Environment.GetEnvironmentVariable("AUTH0_DOMAIN")
     ?? throw new ArgumentNullException("AUTH0_DOMAIN");
+  public string Auth0ManagementApiDomain =>
+    Environment.GetEnvironmentVariable("AUTH0_MANAGEMENT_API_DOMAIN")
+    ?? throw new ArgumentNullException("AUTH0_MANAGEMENT_API_DOMAIN");
+  public string Auth0CustomDomain =>
+    Environment.GetEnvironmentVariable("AUTH0_CUSTOM_DOMAIN")
+    ?? throw new ArgumentNullException("AUTH0_CUSTOM_DOMAIN");
   public string Auth0Audience =>
     Environment.GetEnvironmentVariable("AUTH0_AUDIENCE")
     ?? throw new ArgumentNullException("AUTH0_AUDIENCE");
@@ -267,6 +275,8 @@ public class AppConfiguration
       "PGUSER",
       "PGPASSWORD",
       "AUTH0_DOMAIN",
+      "AUTH0_MANAGEMENT_API_DOMAIN",
+      "AUTH0_CUSTOM_DOMAIN",
       "AUTH0_AUDIENCE",
       "AUTH0_CLIENT_ID",
       "AUTH0_CLIENT_SECRET",
