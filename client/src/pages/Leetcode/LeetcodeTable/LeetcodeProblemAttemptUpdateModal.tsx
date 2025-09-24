@@ -115,7 +115,7 @@ export const LeetcodeProblemAttemptUpdateModal = ({
           label="Select Leetcode Problem"
           placeholder="Pick a leetcode problem"
           data={leetcodeProblemOptions}
-          filter={createOptionsFilter()}
+          filter={createOptionsFilter({ sort: false })}
           limit={5}
           withAsterisk
           searchable

@@ -18,9 +18,17 @@ import {
   useAdminListUser,
   useAdminUpdateUser,
 } from '@/generated/api/client';
+import {
+  getConfirmModalProps,
+  getErrorNotification,
+  getMantineTablePropsWithBanner,
+  getSuccessNotification,
+  NOTIFICATION_MESSAGES,
+} from '@/shared/constants/mantineTableProps';
+import { CONFIRMATION_MESSAGES } from '@/shared/constants/messages';
+import classes from '@/shared/styles/tableStyles.module.css';
 import { AdminUsersCreateModal } from './AdminUsersCreateModal';
 import { AdminUsersUpdateModal } from './AdminUsersUpdateModal';
-import classes from './AdminUsersTable.module.css';
 
 export const AdminUsersTable = () => {
   const [pageSize, setPageSize] = useLocalStorage({
@@ -50,31 +58,22 @@ export const AdminUsersTable = () => {
       children: (
         <>
           <Title order={3} mt={15} mb={10}>
-            Delete User
+            {CONFIRMATION_MESSAGES.USER.DELETE_TITLE}
           </Title>
-          <Text>Are you sure you want to delete this user? This action cannot be undone.</Text>
+          <Text>{CONFIRMATION_MESSAGES.USER.DELETE_TEXT}</Text>
         </>
       ),
       labels: { confirm: 'Delete', cancel: 'Cancel' },
-      confirmProps: { color: 'red' },
+      ...getConfirmModalProps(),
       onConfirm: async () => {
         try {
           await deleteUser({ data: { userId: row.original.userId } });
           await refetchUsers();
           modals.closeAll();
-          notifications.show({
-            color: 'green',
-            title: 'Success',
-            message: 'User deleted successfully.',
-          });
+          notifications.show(getSuccessNotification(NOTIFICATION_MESSAGES.USER.DELETED));
         } catch (err) {
           const response = (err as any)?.response.data as AdminDeleteUserResponseApiResponse;
-          notifications.show({
-            color: 'red',
-            title: 'Error',
-            autoClose: false,
-            message: response.error?.message,
-          });
+          notifications.show(getErrorNotification(response.error?.message));
         }
       },
     });
@@ -111,24 +110,8 @@ export const AdminUsersTable = () => {
   const table = useMantineReactTable({
     columns,
     data: userResponse?.responseBody?.users ?? [],
-    mantinePaperProps: {
-      className: classes.table,
-    },
+    ...getMantineTablePropsWithBanner(classes.table, isLoadingUsersError),
     createDisplayMode: 'modal',
-    mantineCreateRowModalProps: {
-      closeOnClickOutside: false,
-      withCloseButton: true,
-      closeButtonProps: {
-        className: classes.modalCloseButton,
-      },
-    },
-    mantineEditRowModalProps: {
-      closeOnClickOutside: false,
-      withCloseButton: true,
-      closeButtonProps: {
-        className: classes.modalCloseButton,
-      },
-    },
     onPaginationChange: (updater) => {
       const next = typeof updater === 'function' ? updater(pagination) : updater;
       setPageSize(next.pageSize);
@@ -147,12 +130,6 @@ export const AdminUsersTable = () => {
     },
     positionActionsColumn: 'last',
     getRowId: (row) => row.userId?.toString(),
-    mantineToolbarAlertBannerProps: isLoadingUsersError
-      ? {
-          color: 'red',
-          children: 'Error loading data',
-        }
-      : undefined,
     isMultiSortEvent: () => true,
     renderCreateRowModalContent: ({ table }) => (
       <AdminUsersCreateModal table={table} createUser={createUser} refetchUsers={refetchUsers} />

@@ -20,9 +20,17 @@ import {
   useKickStudent,
   useUpdateStudentRolePromotion,
 } from '@/generated/api/client';
+import {
+  getConfirmModalProps,
+  getErrorNotification,
+  getMantineTablePropsWithBanner,
+  getSuccessNotification,
+  NOTIFICATION_MESSAGES,
+} from '@/shared/constants/mantineTableProps';
+import { CONFIRMATION_MESSAGES } from '@/shared/constants/messages';
 import { useSeasonSlug } from '@/shared/hooks/useSeasonSlug';
+import classes from '@/shared/styles/tableStyles.module.css';
 import { StudentRolePromotionUpdateModal } from './StudentRolePromotionUpdateModal';
-import classes from './MenteesTable.module.css';
 
 export const MenteesTable = ({ refetchMentorships, mentorships }: MenteesTableProps) => {
   const [pageSize, setPageSize] = useLocalStorage({
@@ -48,15 +56,13 @@ export const MenteesTable = ({ refetchMentorships, mentorships }: MenteesTablePr
       children: (
         <>
           <Title order={3} mt={15} mb={10}>
-            Delete Mentee
+            {CONFIRMATION_MESSAGES.MENTEE.DELETE_TITLE}
           </Title>
-          <Text>
-            Are you sure you want to kick this mentee out of RSP? This action cannot be undone.
-          </Text>
+          <Text>{CONFIRMATION_MESSAGES.MENTEE.DELETE_TEXT}</Text>
         </>
       ),
       labels: { confirm: 'Kick Mentee', cancel: 'Cancel' },
-      confirmProps: { color: 'red' },
+      ...getConfirmModalProps(),
       onConfirm: async () => {
         try {
           await kickStudent({
@@ -68,19 +74,10 @@ export const MenteesTable = ({ refetchMentorships, mentorships }: MenteesTablePr
           });
           await refetchMentorships();
           modals.closeAll();
-          notifications.show({
-            color: 'green',
-            title: 'Success',
-            message: 'Mentee deleted successfully.',
-          });
+          notifications.show(getSuccessNotification(NOTIFICATION_MESSAGES.MENTEE.DELETED));
         } catch (err) {
           const response = (err as any)?.response.data as KickStudentResponseApiResponse;
-          notifications.show({
-            color: 'red',
-            title: 'Error',
-            autoClose: false,
-            message: response.error?.message,
-          });
+          notifications.show(getErrorNotification(response.error?.message));
         }
       },
     });
@@ -112,17 +109,8 @@ export const MenteesTable = ({ refetchMentorships, mentorships }: MenteesTablePr
   const table = useMantineReactTable({
     columns,
     data: mentorships || [],
+    ...getMantineTablePropsWithBanner(classes.table, false),
     createDisplayMode: 'modal',
-    mantineEditRowModalProps: {
-      closeOnClickOutside: false,
-      withCloseButton: true,
-      closeButtonProps: {
-        className: classes.modalCloseButton,
-      },
-    },
-    mantinePaperProps: {
-      className: classes.table,
-    },
     onPaginationChange: (updater) => {
       const next = typeof updater === 'function' ? updater(pagination) : updater;
       setPageSize(next.pageSize);
@@ -140,7 +128,6 @@ export const MenteesTable = ({ refetchMentorships, mentorships }: MenteesTablePr
     },
     positionActionsColumn: 'last',
     getRowId: (row) => row.menteeEnrollmentId?.toString(),
-    mantineToolbarAlertBannerProps: undefined,
     isMultiSortEvent: () => true,
     renderEditRowModalContent: ({ table, row }) => (
       <StudentRolePromotionUpdateModal

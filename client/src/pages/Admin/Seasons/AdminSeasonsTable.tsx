@@ -20,9 +20,17 @@ import {
   useAdminListSeason,
   useAdminUpdateSeason,
 } from '@/generated/api/client';
+import {
+  getConfirmModalProps,
+  getErrorNotification,
+  getMantineTablePropsWithBanner,
+  getSuccessNotification,
+  NOTIFICATION_MESSAGES,
+} from '@/shared/constants/mantineTableProps';
+import { CONFIRMATION_MESSAGES } from '@/shared/constants/messages';
+import classes from '@/shared/styles/tableStyles.module.css';
 import { AdminSeasonsCreateModal } from './AdminSeasonsCreateModal';
 import { AdminSeasonsUpdateModal } from './AdminSeasonsUpdateModal';
-import classes from './AdminSeasonsTable.module.css';
 
 export const AdminSeasonsTable = () => {
   const [pageSize, setPageSize] = useLocalStorage({
@@ -52,31 +60,22 @@ export const AdminSeasonsTable = () => {
       children: (
         <>
           <Title order={3} mt={15} mb={10}>
-            Delete Season
+            {CONFIRMATION_MESSAGES.SEASON.DELETE_TITLE}
           </Title>
-          <Text>Are you sure you want to delete this season? This action cannot be undone.</Text>
+          <Text>{CONFIRMATION_MESSAGES.SEASON.DELETE_TEXT}</Text>
         </>
       ),
       labels: { confirm: 'Delete', cancel: 'Cancel' },
-      confirmProps: { color: 'red' },
+      ...getConfirmModalProps(),
       onConfirm: async () => {
         try {
           await deleteSeason({ data: { seasonId: row.original.seasonId! } });
           await refetchSeasons();
           modals.closeAll();
-          notifications.show({
-            color: 'green',
-            title: 'Success',
-            message: 'Season deleted successfully.',
-          });
+          notifications.show(getSuccessNotification(NOTIFICATION_MESSAGES.SEASON.DELETED));
         } catch (err) {
           const response = (err as any)?.response.data as AdminDeleteSeasonResponseApiResponse;
-          notifications.show({
-            color: 'red',
-            title: 'Error',
-            autoClose: false,
-            message: response.error?.message,
-          });
+          notifications.show(getErrorNotification(response.error?.message));
         }
       },
     });
@@ -129,24 +128,8 @@ export const AdminSeasonsTable = () => {
   const table = useMantineReactTable({
     columns,
     data: seasonResponse?.responseBody?.seasons ?? [],
-    mantinePaperProps: {
-      className: classes.table,
-    },
+    ...getMantineTablePropsWithBanner(classes.table, isLoadingSeasonsError),
     createDisplayMode: 'modal',
-    mantineCreateRowModalProps: {
-      closeOnClickOutside: false,
-      withCloseButton: true,
-      closeButtonProps: {
-        className: classes.modalCloseButton,
-      },
-    },
-    mantineEditRowModalProps: {
-      closeOnClickOutside: false,
-      withCloseButton: true,
-      closeButtonProps: {
-        className: classes.modalCloseButton,
-      },
-    },
     onPaginationChange: (updater) => {
       const next = typeof updater === 'function' ? updater(pagination) : updater;
       setPageSize(next.pageSize);
@@ -165,12 +148,6 @@ export const AdminSeasonsTable = () => {
     },
     positionActionsColumn: 'last',
     getRowId: (row) => row.seasonId?.toString(),
-    mantineToolbarAlertBannerProps: isLoadingSeasonsError
-      ? {
-          color: 'red',
-          children: 'Error loading data',
-        }
-      : undefined,
     isMultiSortEvent: () => true,
     renderCreateRowModalContent: ({ table }) => (
       <AdminSeasonsCreateModal

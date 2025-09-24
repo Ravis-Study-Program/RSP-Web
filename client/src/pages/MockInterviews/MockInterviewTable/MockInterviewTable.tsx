@@ -25,10 +25,18 @@ import {
   useListLeetcodeProblems,
   useUpdateMockInterview,
 } from '@/generated/api/client';
+import {
+  getConfirmModalProps,
+  getErrorNotification,
+  getMantineTablePropsWithBanner,
+  getSuccessNotification,
+  NOTIFICATION_MESSAGES,
+} from '@/shared/constants/mantineTableProps';
+import { CONFIRMATION_MESSAGES } from '@/shared/constants/messages';
+import classes from '@/shared/styles/tableStyles.module.css';
 import { MockInterviewScoreColors } from '@/shared/utils/colorMappings';
 import { MockInterviewCreateModal } from './MockInterviewCreateModal';
 import { MockInterviewUpdateModal } from './MockInterviewUpdateModal';
-import classes from './MockInterviewTable.module.css';
 
 export const MockInterviewTable = ({
   refetchMockInterviews,
@@ -78,16 +86,13 @@ export const MockInterviewTable = ({
       children: (
         <>
           <Title order={3} mt={15} mb={10}>
-            Delete Mock Interview
+            {CONFIRMATION_MESSAGES.MOCK_INTERVIEW.DELETE_TITLE}
           </Title>
-          <Text>
-            Are you sure you want to kick this mock interview out of RSP? This action cannot be
-            undone.
-          </Text>
+          <Text>{CONFIRMATION_MESSAGES.MOCK_INTERVIEW.DELETE_TEXT}</Text>
         </>
       ),
       labels: { confirm: 'Delete', cancel: 'Cancel' },
-      confirmProps: { color: 'red' },
+      ...getConfirmModalProps(),
       onConfirm: async () => {
         try {
           await deleteMockInterview({
@@ -95,19 +100,10 @@ export const MockInterviewTable = ({
           });
           await refetchMockInterviews();
           modals.closeAll();
-          notifications.show({
-            color: 'green',
-            title: 'Success',
-            message: 'Mock interview deleted successfully.',
-          });
+          notifications.show(getSuccessNotification(NOTIFICATION_MESSAGES.MOCK_INTERVIEW.DELETED));
         } catch (err) {
           const response = (err as any)?.response.data as DeleteMockInterviewResponseApiResponse;
-          notifications.show({
-            color: 'red',
-            title: 'Error',
-            autoClose: false,
-            message: response.error?.message,
-          });
+          notifications.show(getErrorNotification(response.error?.message));
         }
       },
     });
@@ -186,24 +182,11 @@ export const MockInterviewTable = ({
   const table = useMantineReactTable({
     columns,
     data: mockInterviews ?? [],
-    mantinePaperProps: {
-      className: classes.table,
-    },
+    ...getMantineTablePropsWithBanner(
+      classes.tableNoHover,
+      isLoadingLeetcodeProblemsError || isLoadingUsersError
+    ),
     createDisplayMode: 'modal',
-    mantineCreateRowModalProps: {
-      closeOnClickOutside: false,
-      withCloseButton: true,
-      closeButtonProps: {
-        className: classes.modalCloseButton,
-      },
-    },
-    mantineEditRowModalProps: {
-      closeOnClickOutside: false,
-      withCloseButton: true,
-      closeButtonProps: {
-        className: classes.modalCloseButton,
-      },
-    },
     onPaginationChange: (updater) => {
       const next = typeof updater === 'function' ? updater(pagination) : updater;
       setPageSize(next.pageSize);
@@ -222,7 +205,6 @@ export const MockInterviewTable = ({
     },
     positionActionsColumn: 'last',
     getRowId: (row) => row.mockInterviewId?.toString(),
-    mantineToolbarAlertBannerProps: undefined,
     isMultiSortEvent: () => true,
     renderCreateRowModalContent: ({ table }) =>
       enableEditing && (

@@ -20,6 +20,10 @@
 
 .table {
     padding: var(--mantine-spacing-md);
+}
+
+.tableNoHover {
+    padding: var(--mantine-spacing-md);
     --table-highlight-on-hover-color: none;
     --mrt-row-hover-background-color: none;
 }
@@ -30,16 +34,13 @@
 
 .innerTable {
     border-radius: var(--mantine-radius-md);
-
-    @mixin dark {
-        background-color: var(--mantine-color-dark-6);
-    };
-
-    @mixin light {
-        background-color: var(--mantine-color-gray-0);
-    };
+    background-color: light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-6));
 }
 
-.innerTableHeading  {
+.innerTableHeading {
     border-bottom: calc(0.0625rem * var(--mantine-scale)) solid var(--table-border-color);
+}
+
+.title {
+    color: light-dark(var(--mantine-color-black), var(--mantine-color-white));
 }

@@ -8,7 +8,6 @@ import {
   IconPlant,
   IconPlayCard7,
   IconSchool,
-  IconSettings,
   IconTrophy,
   IconUser,
   IconUsers,
@@ -51,13 +50,6 @@ export function createNonAdminSpotlightActions(
       leftSection: <IconChalkboard size={24} stroke={1.5} />,
     },
     {
-      id: 'settings',
-      label: 'Settings',
-      description: 'Adjust your preferences',
-      onClick: () => navigate('/settings'),
-      leftSection: <IconSettings size={24} stroke={1.5} />,
-    },
-    {
       id: 'profile',
       label: 'Profile',
       description: 'View and edit your profile',
@@ -86,7 +78,6 @@ const noSeasonSelectedTabs: Tabs = {
     { label: 'Graduates', icon: IconSchool, link: '/graduates', hidden: false },
     { label: 'All Leetcode', icon: IconBrandLeetcode, link: '/leetcode', hidden: false },
     { label: 'All Mock Interviews', icon: IconChalkboard, link: '/mock-interviews', hidden: false },
-    { label: 'Settings', icon: IconSettings, link: '/settings', hidden: true },
     { label: 'Profile', icon: IconUser, link: '/profile', hidden: true },
   ],
 };
@@ -98,7 +89,6 @@ const adminNoSeasonSelectedTabs: Tabs = {
     { label: 'Users', icon: IconUsersGroup, link: '/admin/users', hidden: false },
     { label: 'Enrollments', icon: IconSchool, link: '/admin/enrollments', hidden: false },
     { label: 'Mentorships', icon: IconChessKnight, link: '/admin/mentorships', hidden: false },
-    { label: 'Settings', icon: IconSettings, link: '/settings', hidden: true },
     { label: 'Profile', icon: IconUser, link: '/profile', hidden: true },
   ],
 };
@@ -143,13 +133,6 @@ export function createAdminSpotlightActions(
       leftSection: <IconChessKnight size={24} stroke={1.5} />,
     },
     {
-      id: 'settings',
-      label: 'Settings',
-      description: 'Adjust administrator settings',
-      onClick: () => navigate('/settings'),
-      leftSection: <IconSettings size={24} stroke={1.5} />,
-    },
-    {
       id: 'profile',
       label: 'Profile',
       description: 'Edit your administrator profile',
@@ -165,7 +148,6 @@ const getStudentTabs = (seasonSlug: string | null): Tabs => ({
     { label: 'Graduates', icon: IconSchool, link: '/graduates', hidden: false },
     { label: 'All Leetcode', icon: IconBrandLeetcode, link: '/leetcode', hidden: false },
     { label: 'All Mock Interviews', icon: IconChalkboard, link: '/mock-interviews', hidden: false },
-    { label: 'Settings', icon: IconSettings, link: '/settings', hidden: true },
     { label: 'Profile', icon: IconUser, link: '/profile', hidden: true },
   ],
   season: seasonSlug
@@ -223,7 +205,6 @@ const getMentorTabs = (seasonSlug: string | null): Tabs => ({
     { label: 'Graduates', icon: IconSchool, link: '/graduates', hidden: false },
     { label: 'All Leetcode', icon: IconBrandLeetcode, link: '/leetcode', hidden: false },
     { label: 'All Mock Interviews', icon: IconChalkboard, link: '/mock-interviews', hidden: false },
-    { label: 'Settings', icon: IconSettings, link: '/settings', hidden: true },
     { label: 'Profile', icon: IconUser, link: '/profile', hidden: true },
   ],
   season: seasonSlug
@@ -275,7 +256,6 @@ const getCoordinatorTabs = (seasonSlug: string | null): Tabs => ({
     { label: 'Graduates', icon: IconSchool, link: '/graduates', hidden: false },
     { label: 'All Leetcode', icon: IconBrandLeetcode, link: '/leetcode', hidden: false },
     { label: 'All Mock Interviews', icon: IconChalkboard, link: '/mock-interviews', hidden: false },
-    { label: 'Settings', icon: IconSettings, link: '/settings', hidden: true },
     { label: 'Profile', icon: IconUser, link: '/profile', hidden: true },
   ],
   season: seasonSlug
@@ -327,7 +307,6 @@ const getAdminTabs = (seasonSlug: string | null): Tabs => ({
     { label: 'Users', icon: IconUsersGroup, link: '/admin/users', hidden: false },
     { label: 'Enrollments', icon: IconSchool, link: '/admin/enrollments', hidden: false },
     { label: 'Mentorships', icon: IconChessKnight, link: '/admin/mentorships', hidden: false },
-    { label: 'Settings', icon: IconSettings, link: '/settings', hidden: true },
     { label: 'Profile', icon: IconUser, link: '/profile', hidden: true },
   ],
   season: seasonSlug

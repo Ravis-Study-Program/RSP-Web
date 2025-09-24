@@ -22,9 +22,17 @@ import {
   useAdminListUser,
   useAdminUpdateEnrollment,
 } from '@/generated/api/client';
+import {
+  getConfirmModalProps,
+  getErrorNotification,
+  getMantineTablePropsWithBanner,
+  getSuccessNotification,
+  NOTIFICATION_MESSAGES,
+} from '@/shared/constants/mantineTableProps';
+import { CONFIRMATION_MESSAGES } from '@/shared/constants/messages';
+import classes from '@/shared/styles/tableStyles.module.css';
 import { AdminEnrollmentsCreateModal } from './AdminEnrollmentsCreateModal';
 import { AdminEnrollmentsUpdateModal } from './AdminEnrollmentsUpdateModal';
-import classes from './AdminEnrollmentsTable.module.css';
 
 export const AdminEnrollmentsTable = () => {
   const [pageSize, setPageSize] = useLocalStorage({
@@ -69,33 +77,22 @@ export const AdminEnrollmentsTable = () => {
       children: (
         <>
           <Title order={3} mt={15} mb={10}>
-            Delete Enrollment
+            {CONFIRMATION_MESSAGES.ENROLLMENT.DELETE_TITLE}
           </Title>
-          <Text>
-            Are you sure you want to delete this enrollment? This action cannot be undone.
-          </Text>
+          <Text>{CONFIRMATION_MESSAGES.ENROLLMENT.DELETE_TEXT}</Text>
         </>
       ),
       labels: { confirm: 'Delete', cancel: 'Cancel' },
-      confirmProps: { color: 'red' },
+      ...getConfirmModalProps(),
       onConfirm: async () => {
         try {
           await deleteEnrollment({ data: { enrollmentId: row.original.enrollmentId! } });
           await refetchEnrollments();
           modals.closeAll();
-          notifications.show({
-            color: 'green',
-            title: 'Success',
-            message: 'Enrollment deleted successfully.',
-          });
+          notifications.show(getSuccessNotification(NOTIFICATION_MESSAGES.ENROLLMENT.DELETED));
         } catch (err) {
           const response = (err as any)?.response.data as AdminDeleteEnrollmentResponseApiResponse;
-          notifications.show({
-            color: 'red',
-            title: 'Error',
-            autoClose: false,
-            message: response.error?.message,
-          });
+          notifications.show(getErrorNotification(response.error?.message));
         }
       },
     });
@@ -140,24 +137,11 @@ export const AdminEnrollmentsTable = () => {
   const table = useMantineReactTable({
     columns,
     data: enrollmentResponse?.responseBody?.enrollments ?? [],
-    mantinePaperProps: {
-      className: classes.table,
-    },
+    ...getMantineTablePropsWithBanner(
+      classes.table,
+      isLoadingEnrollmentsError || isLoadingSeasonsError || isLoadingUsersError
+    ),
     createDisplayMode: 'modal',
-    mantineCreateRowModalProps: {
-      closeOnClickOutside: false,
-      withCloseButton: true,
-      closeButtonProps: {
-        className: classes.modalCloseButton,
-      },
-    },
-    mantineEditRowModalProps: {
-      closeOnClickOutside: false,
-      withCloseButton: true,
-      closeButtonProps: {
-        className: classes.modalCloseButton,
-      },
-    },
     onPaginationChange: (updater) => {
       const next = typeof updater === 'function' ? updater(pagination) : updater;
       setPageSize(next.pageSize);
@@ -176,12 +160,6 @@ export const AdminEnrollmentsTable = () => {
     },
     positionActionsColumn: 'last',
     getRowId: (row) => row.enrollmentId?.toString(),
-    mantineToolbarAlertBannerProps: isLoadingEnrollmentsError
-      ? {
-          color: 'red',
-          children: 'Error loading data',
-        }
-      : undefined,
     isMultiSortEvent: () => true,
     renderCreateRowModalContent: ({ table }) => (
       <AdminEnrollmentsCreateModal

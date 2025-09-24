@@ -3,7 +3,17 @@ import { QueryObserverResult, RefetchOptions, UseMutateAsyncFunction } from '@ta
 import { zodResolver } from 'mantine-form-zod-resolver';
 import { MRT_TableInstance } from 'mantine-react-table';
 import { z } from 'zod';
-import { Button, Fieldset, Flex, NumberInput, Select, Stack, Title } from '@mantine/core';
+import {
+  Button,
+  Fieldset,
+  Flex,
+  NumberInput,
+  Select,
+  Slider,
+  Stack,
+  Text,
+  Title,
+} from '@mantine/core';
 import { DateTimePicker } from '@mantine/dates';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
@@ -18,6 +28,11 @@ import {
   useGetCurrentUser,
 } from '@/generated/api/client';
 import { createOptionsFilter } from '@/shared/table/globalFilters';
+
+const SCORE_SLIDER_MARKS = Array.from({ length: 10 }, (_, i) => ({
+  value: i + 1,
+  label: String(i + 1),
+}));
 
 const scoreSchema = z
   .number()
@@ -221,13 +236,17 @@ export const MockInterviewCreateModal = ({
           searchable
           error={form.errors.interviewee}
         />
-        <NumberInput
+        <Text size="sm" mt="sm">
+          Behavioural Score
+        </Text>
+        <Slider
           {...form.getInputProps('behaviouralScore')}
-          mt="sm"
-          label="Behavioural Score"
-          placeholder="Enter behavioural score"
-          withAsterisk
-          error={form.errors.behaviouralScore}
+          label={(value) => value}
+          min={0}
+          max={10}
+          step={1}
+          marks={SCORE_SLIDER_MARKS}
+          mb="lg"
         />
         <Fieldset legend="Leetcode Problem 1" mt="sm">
           <Select
@@ -236,51 +255,126 @@ export const MockInterviewCreateModal = ({
             label="Leetcode Problem"
             placeholder="Pick a leetcode problem"
             data={leetcodeProblemOptions}
-            filter={createOptionsFilter()}
+            filter={createOptionsFilter({ sort: false })}
             limit={5}
             withAsterisk
             searchable
             error={form.errors.leetcodeProblem1}
           />
-          <NumberInput
+          <Text size="sm" mt="sm">
+            Confirm Question Score
+          </Text>
+          <Slider
             {...form.getInputProps('confirmQuestion1')}
-            mt="sm"
-            label="Confirm Question Score"
-            placeholder="Enter confirm question score"
-            withAsterisk
-            error={form.errors.confirmQuestion1}
+            label={(value) => value}
+            min={0}
+            max={10}
+            step={1}
+            marks={[
+              { value: 1, label: '1' },
+              { value: 2, label: '2' },
+              { value: 3, label: '3' },
+              { value: 4, label: '4' },
+              { value: 5, label: '5' },
+              { value: 6, label: '6' },
+              { value: 7, label: '7' },
+              { value: 8, label: '8' },
+              { value: 9, label: '9' },
+              { value: 10, label: '10' },
+            ]}
+            mb="lg"
           />
-          <NumberInput
+          <Text size="sm" mt="sm">
+            Algorithm Design Score
+          </Text>
+          <Slider
             {...form.getInputProps('algorithmDesign1')}
-            mt="sm"
-            label="Algorithm Design Score"
-            placeholder="Enter algorithm design score"
-            withAsterisk
-            error={form.errors.algorithmDesign1}
+            label={(value) => value}
+            min={0}
+            max={10}
+            step={1}
+            marks={[
+              { value: 1, label: '1' },
+              { value: 2, label: '2' },
+              { value: 3, label: '3' },
+              { value: 4, label: '4' },
+              { value: 5, label: '5' },
+              { value: 6, label: '6' },
+              { value: 7, label: '7' },
+              { value: 8, label: '8' },
+              { value: 9, label: '9' },
+              { value: 10, label: '10' },
+            ]}
+            mb="lg"
           />
-          <NumberInput
+          <Text size="sm" mt="sm">
+            Complexity Analysis Score
+          </Text>
+          <Slider
             {...form.getInputProps('complexityAnalysis1')}
-            mt="sm"
-            label="Complexity Analysis Score"
-            placeholder="Enter complexity analysis score"
-            withAsterisk
-            error={form.errors.complexityAnalysis1}
+            label={(value) => value}
+            min={0}
+            max={10}
+            step={1}
+            marks={[
+              { value: 1, label: '1' },
+              { value: 2, label: '2' },
+              { value: 3, label: '3' },
+              { value: 4, label: '4' },
+              { value: 5, label: '5' },
+              { value: 6, label: '6' },
+              { value: 7, label: '7' },
+              { value: 8, label: '8' },
+              { value: 9, label: '9' },
+              { value: 10, label: '10' },
+            ]}
+            mb="lg"
           />
-          <NumberInput
+          <Text size="sm" mt="sm">
+            Coding Score
+          </Text>
+          <Slider
             {...form.getInputProps('code1')}
-            mt="sm"
-            label="Coding Score"
-            placeholder="Enter coding score"
-            withAsterisk
-            error={form.errors.code1}
+            label={(value) => value}
+            min={0}
+            max={10}
+            step={1}
+            marks={[
+              { value: 1, label: '1' },
+              { value: 2, label: '2' },
+              { value: 3, label: '3' },
+              { value: 4, label: '4' },
+              { value: 5, label: '5' },
+              { value: 6, label: '6' },
+              { value: 7, label: '7' },
+              { value: 8, label: '8' },
+              { value: 9, label: '9' },
+              { value: 10, label: '10' },
+            ]}
+            mb="lg"
           />
-          <NumberInput
+          <Text size="sm" mt="sm">
+            Testing Score
+          </Text>
+          <Slider
             {...form.getInputProps('test1')}
-            mt="sm"
-            label="Testing Score"
-            placeholder="Enter testing score"
-            withAsterisk
-            error={form.errors.test1}
+            label={(value) => value}
+            min={0}
+            max={10}
+            step={1}
+            marks={[
+              { value: 1, label: '1' },
+              { value: 2, label: '2' },
+              { value: 3, label: '3' },
+              { value: 4, label: '4' },
+              { value: 5, label: '5' },
+              { value: 6, label: '6' },
+              { value: 7, label: '7' },
+              { value: 8, label: '8' },
+              { value: 9, label: '9' },
+              { value: 10, label: '10' },
+            ]}
+            mb="lg"
           />
         </Fieldset>
 
@@ -291,51 +385,126 @@ export const MockInterviewCreateModal = ({
             label="Leetcode Problem"
             placeholder="Pick a leetcode problem"
             data={leetcodeProblemOptions}
-            filter={createOptionsFilter()}
+            filter={createOptionsFilter({ sort: false })}
             limit={5}
             withAsterisk
             searchable
             error={form.errors.leetcodeProblem2}
           />
-          <NumberInput
+          <Text size="sm" mt="sm">
+            Confirm Question Score
+          </Text>
+          <Slider
             {...form.getInputProps('confirmQuestion2')}
-            mt="sm"
-            label="Confirm Question Score"
-            placeholder="Enter confirm question score"
-            withAsterisk
-            error={form.errors.confirmQuestion2}
+            label={(value) => value}
+            min={0}
+            max={10}
+            step={1}
+            marks={[
+              { value: 1, label: '1' },
+              { value: 2, label: '2' },
+              { value: 3, label: '3' },
+              { value: 4, label: '4' },
+              { value: 5, label: '5' },
+              { value: 6, label: '6' },
+              { value: 7, label: '7' },
+              { value: 8, label: '8' },
+              { value: 9, label: '9' },
+              { value: 10, label: '10' },
+            ]}
+            mb="lg"
           />
-          <NumberInput
+          <Text size="sm" mt="sm">
+            Algorithm Design Score
+          </Text>
+          <Slider
             {...form.getInputProps('algorithmDesign2')}
-            mt="sm"
-            label="Algorithm Design Score"
-            placeholder="Enter algorithm design score"
-            withAsterisk
-            error={form.errors.algorithmDesign2}
+            label={(value) => value}
+            min={0}
+            max={10}
+            step={1}
+            marks={[
+              { value: 1, label: '1' },
+              { value: 2, label: '2' },
+              { value: 3, label: '3' },
+              { value: 4, label: '4' },
+              { value: 5, label: '5' },
+              { value: 6, label: '6' },
+              { value: 7, label: '7' },
+              { value: 8, label: '8' },
+              { value: 9, label: '9' },
+              { value: 10, label: '10' },
+            ]}
+            mb="lg"
           />
-          <NumberInput
+          <Text size="sm" mt="sm">
+            Complexity Analysis Score
+          </Text>
+          <Slider
             {...form.getInputProps('complexityAnalysis2')}
-            mt="sm"
-            label="Complexity Analysis Score"
-            placeholder="Enter complexity analysis score"
-            withAsterisk
-            error={form.errors.complexityAnalysis2}
+            label={(value) => value}
+            min={0}
+            max={10}
+            step={1}
+            marks={[
+              { value: 1, label: '1' },
+              { value: 2, label: '2' },
+              { value: 3, label: '3' },
+              { value: 4, label: '4' },
+              { value: 5, label: '5' },
+              { value: 6, label: '6' },
+              { value: 7, label: '7' },
+              { value: 8, label: '8' },
+              { value: 9, label: '9' },
+              { value: 10, label: '10' },
+            ]}
+            mb="lg"
           />
-          <NumberInput
+          <Text size="sm" mt="sm">
+            Coding Score
+          </Text>
+          <Slider
             {...form.getInputProps('code2')}
-            mt="sm"
-            label="Coding Score"
-            placeholder="Enter coding score"
-            withAsterisk
-            error={form.errors.code2}
+            label={(value) => value}
+            min={0}
+            max={10}
+            step={1}
+            marks={[
+              { value: 1, label: '1' },
+              { value: 2, label: '2' },
+              { value: 3, label: '3' },
+              { value: 4, label: '4' },
+              { value: 5, label: '5' },
+              { value: 6, label: '6' },
+              { value: 7, label: '7' },
+              { value: 8, label: '8' },
+              { value: 9, label: '9' },
+              { value: 10, label: '10' },
+            ]}
+            mb="lg"
           />
-          <NumberInput
+          <Text size="sm" mt="sm">
+            Testing Score
+          </Text>
+          <Slider
             {...form.getInputProps('test2')}
-            mt="sm"
-            label="Testing Score"
-            placeholder="Enter testing score"
-            withAsterisk
-            error={form.errors.test2}
+            label={(value) => value}
+            min={0}
+            max={10}
+            step={1}
+            marks={[
+              { value: 1, label: '1' },
+              { value: 2, label: '2' },
+              { value: 3, label: '3' },
+              { value: 4, label: '4' },
+              { value: 5, label: '5' },
+              { value: 6, label: '6' },
+              { value: 7, label: '7' },
+              { value: 8, label: '8' },
+              { value: 9, label: '9' },
+              { value: 10, label: '10' },
+            ]}
+            mb="lg"
           />
         </Fieldset>
 
