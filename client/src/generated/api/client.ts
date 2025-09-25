@@ -969,8 +969,8 @@ export interface ProblemAttemptEntity {
   problemAttemptId: string;
   attemptStartDateUtc: string;
   timeTakenInMinutes: number;
-  /** @minLength 1 */
-  notes: string;
+  /** @nullable */
+  notes?: string | null;
   /** @minLength 1 */
   userId: string;
   /** @nullable */
