@@ -252,7 +252,6 @@ export const LeetcodeTable = ({
           table={table}
           row={row}
           leetcodeProblems={leetcodeProblemsResponse?.responseBody?.leetcodeProblems}
-          enrollmentId={enrollmentId || ''}
           updateProblemAttempt={updateProblemAttempt}
           refetchProblemAttempts={refetchProblemAttempts}
         />

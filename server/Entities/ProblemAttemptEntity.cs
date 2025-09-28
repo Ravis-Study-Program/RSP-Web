@@ -16,8 +16,7 @@ public class ProblemAttemptEntity : ISoftDelete
   [Required]
   public int TimeTakenInMinutes { get; set; }
 
-  [Required]
-  public string Notes { get; set; } = string.Empty;
+  public string? Notes { get; set; }
 
   [Required]
   public string UserId { get; set; } = string.Empty;
@@ -63,11 +62,7 @@ public class ProblemAttemptEntityConfiguration : IEntityTypeConfiguration<Proble
       .HasColumnName("TimeTakenInMinutes")
       .HasColumnType("int")
       .IsRequired();
-    builder
-      .Property(x => x.Notes)
-      .HasColumnName("Notes")
-      .HasColumnType("varchar(10000)")
-      .IsRequired();
+    builder.Property(x => x.Notes).HasColumnName("Notes").HasColumnType("varchar(10000)");
     builder
       .Property(x => x.UserId)
       .HasColumnName("UserId")

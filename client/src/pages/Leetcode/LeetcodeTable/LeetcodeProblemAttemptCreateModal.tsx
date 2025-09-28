@@ -3,7 +3,7 @@ import { QueryObserverResult, RefetchOptions, UseMutateAsyncFunction } from '@ta
 import { zodResolver } from 'mantine-form-zod-resolver';
 import { MRT_TableInstance } from 'mantine-react-table';
 import { z } from 'zod';
-import { Button, Flex, NumberInput, Select, Stack, Textarea, Title } from '@mantine/core';
+import { Button, Flex, NumberInput, Select, Stack, Title } from '@mantine/core';
 import { DateTimePicker } from '@mantine/dates';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
@@ -15,6 +15,7 @@ import {
   ProblemAttemptEntity,
   useGetCurrentUser,
 } from '@/generated/api/client';
+import { CustomRichTextEditor } from '@/shared/components/RichTextEditor';
 import { createOptionsFilter } from '@/shared/table/globalFilters';
 
 const schema = z.object({
@@ -30,7 +31,7 @@ const schema = z.object({
     .max(120, {
       message: 'The maximum amount is 120 minute.',
     }),
-  notes: z.string(),
+  notes: z.string().optional(),
 });
 
 export const LeetcodeProblemAttemptCreateModal = ({
@@ -43,8 +44,12 @@ export const LeetcodeProblemAttemptCreateModal = ({
   const { data: userResponse } = useGetCurrentUser();
   const userId = userResponse?.responseBody?.user.userId ?? '';
 
-  const form = useForm({
-    mode: 'uncontrolled',
+  const form = useForm<{
+    leetcodeProblemId: string;
+    attemptStartDateUtc: string;
+    timeTakenInMinutes: number;
+    notes?: string;
+  }>({
     initialValues: {
       leetcodeProblemId: '',
       attemptStartDateUtc: dayjs().format('YYYY-MM-DD HH:mm'),
@@ -58,7 +63,7 @@ export const LeetcodeProblemAttemptCreateModal = ({
     leetcodeProblemId: string;
     attemptStartDateUtc: string;
     timeTakenInMinutes: number;
-    notes: string;
+    notes?: string;
   }) => {
     try {
       const requestData: CreateProblemAttemptRequest = {
@@ -144,15 +149,12 @@ export const LeetcodeProblemAttemptCreateModal = ({
           withAsterisk
           error={form.errors.timeTakenInMinutes}
         />
-        <Textarea
-          {...form.getInputProps('notes')}
-          mt="sm"
-          label="Notes"
-          autosize
-          minRows={2}
-          maxRows={6}
-          placeholder="Enter notes"
-          error={form.errors.notes}
+        <CustomRichTextEditor
+          content={form.values.notes}
+          onChange={(value) => form.setFieldValue('notes', value || '')}
+          label="Interviewer Notes"
+          error={form.errors.notes?.toString()}
+          maxLength={5000}
         />
         <Flex justify="flex-end">
           <Button type="submit" mt="xl" mb="md">

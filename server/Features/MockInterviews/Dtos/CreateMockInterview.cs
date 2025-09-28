@@ -20,6 +20,8 @@ public record CreateMockInterviewRequest
   [Required]
   public List<MockInterviewRoundDto> MockInterviewRounds { get; set; } = new();
 
+  public string? Notes { get; set; }
+
   public string? SeasonId { get; set; }
 }
 

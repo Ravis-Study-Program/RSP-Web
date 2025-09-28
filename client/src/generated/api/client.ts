@@ -478,6 +478,8 @@ export interface CreateMockInterviewRequest {
   mockInterviewRounds: MockInterviewRoundDto[];
   /** @nullable */
   seasonId?: string | null;
+  /** @nullable */
+  notes?: string | null;
 }
 
 export interface CreateMockInterviewResponse {
@@ -933,6 +935,8 @@ export interface MockInterviewEntity {
   seasonWeek?: SeasonWeekEntity;
   /** @nullable */
   deletedAtUtc?: string | null;
+  /** @nullable */
+  notes?: string | null;
 }
 
 export interface MockInterviewRoundDto {
@@ -969,8 +973,8 @@ export interface ProblemAttemptEntity {
   problemAttemptId: string;
   attemptStartDateUtc: string;
   timeTakenInMinutes: number;
-  /** @minLength 1 */
-  notes: string;
+  /** @nullable */
+  notes?: string | null;
   /** @minLength 1 */
   userId: string;
   /** @nullable */
@@ -1064,6 +1068,8 @@ export interface UpdateMockInterviewRequest {
   mockInterviewRounds: MockInterviewRoundDto[];
   /** @nullable */
   seasonId?: string | null;
+  /** @nullable */
+  notes?: string | null;
 }
 
 export interface UpdateMockInterviewResponse {
