@@ -27,9 +27,10 @@ import {
   MockInterviewRoundDto,
   useGetCurrentUser,
 } from '@/generated/api/client';
+import { CustomRichTextEditor } from '@/shared/components/RichTextEditor';
 import { createOptionsFilter } from '@/shared/table/globalFilters';
 
-const SCORE_SLIDER_MARKS = Array.from({ length: 10 }, (_, i) => ({
+const scoreSliderMarks = Array.from({ length: 10 }, (_, i) => ({
   value: i + 1,
   label: String(i + 1),
 }));
@@ -59,6 +60,7 @@ const schema = z.object({
   complexityAnalysis2: scoreSchema,
   code2: scoreSchema,
   test2: scoreSchema,
+  notes: z.string().optional(),
 });
 
 export const MockInterviewCreateModal = ({
@@ -91,6 +93,7 @@ export const MockInterviewCreateModal = ({
       complexityAnalysis2: 0,
       code2: 0,
       test2: 0,
+      notes: '',
     },
     validate: zodResolver(schema),
   });
@@ -112,6 +115,7 @@ export const MockInterviewCreateModal = ({
     complexityAnalysis2: number;
     code2: number;
     test2: number;
+    notes?: string;
   }) => {
     try {
       const mockInterviewRounds: MockInterviewRoundDto[] = [];
@@ -150,8 +154,9 @@ export const MockInterviewCreateModal = ({
         intervieweeUserId: values.interviewee,
         mockInterviewRounds,
         interviewerUserId: userId,
+        notes: values.notes,
       };
-      if (seasonId !== '') {
+      if (seasonId != null) {
         requestData.seasonId = seasonId;
       }
 
@@ -245,7 +250,7 @@ export const MockInterviewCreateModal = ({
           min={0}
           max={10}
           step={1}
-          marks={SCORE_SLIDER_MARKS}
+          marks={scoreSliderMarks}
           mb="lg"
         />
         <Fieldset legend="Leetcode Problem 1" mt="sm">
@@ -270,18 +275,7 @@ export const MockInterviewCreateModal = ({
             min={0}
             max={10}
             step={1}
-            marks={[
-              { value: 1, label: '1' },
-              { value: 2, label: '2' },
-              { value: 3, label: '3' },
-              { value: 4, label: '4' },
-              { value: 5, label: '5' },
-              { value: 6, label: '6' },
-              { value: 7, label: '7' },
-              { value: 8, label: '8' },
-              { value: 9, label: '9' },
-              { value: 10, label: '10' },
-            ]}
+            marks={scoreSliderMarks}
             mb="lg"
           />
           <Text size="sm" mt="sm">
@@ -293,18 +287,7 @@ export const MockInterviewCreateModal = ({
             min={0}
             max={10}
             step={1}
-            marks={[
-              { value: 1, label: '1' },
-              { value: 2, label: '2' },
-              { value: 3, label: '3' },
-              { value: 4, label: '4' },
-              { value: 5, label: '5' },
-              { value: 6, label: '6' },
-              { value: 7, label: '7' },
-              { value: 8, label: '8' },
-              { value: 9, label: '9' },
-              { value: 10, label: '10' },
-            ]}
+            marks={scoreSliderMarks}
             mb="lg"
           />
           <Text size="sm" mt="sm">
@@ -316,18 +299,7 @@ export const MockInterviewCreateModal = ({
             min={0}
             max={10}
             step={1}
-            marks={[
-              { value: 1, label: '1' },
-              { value: 2, label: '2' },
-              { value: 3, label: '3' },
-              { value: 4, label: '4' },
-              { value: 5, label: '5' },
-              { value: 6, label: '6' },
-              { value: 7, label: '7' },
-              { value: 8, label: '8' },
-              { value: 9, label: '9' },
-              { value: 10, label: '10' },
-            ]}
+            marks={scoreSliderMarks}
             mb="lg"
           />
           <Text size="sm" mt="sm">
@@ -339,18 +311,7 @@ export const MockInterviewCreateModal = ({
             min={0}
             max={10}
             step={1}
-            marks={[
-              { value: 1, label: '1' },
-              { value: 2, label: '2' },
-              { value: 3, label: '3' },
-              { value: 4, label: '4' },
-              { value: 5, label: '5' },
-              { value: 6, label: '6' },
-              { value: 7, label: '7' },
-              { value: 8, label: '8' },
-              { value: 9, label: '9' },
-              { value: 10, label: '10' },
-            ]}
+            marks={scoreSliderMarks}
             mb="lg"
           />
           <Text size="sm" mt="sm">
@@ -362,18 +323,7 @@ export const MockInterviewCreateModal = ({
             min={0}
             max={10}
             step={1}
-            marks={[
-              { value: 1, label: '1' },
-              { value: 2, label: '2' },
-              { value: 3, label: '3' },
-              { value: 4, label: '4' },
-              { value: 5, label: '5' },
-              { value: 6, label: '6' },
-              { value: 7, label: '7' },
-              { value: 8, label: '8' },
-              { value: 9, label: '9' },
-              { value: 10, label: '10' },
-            ]}
+            marks={scoreSliderMarks}
             mb="lg"
           />
         </Fieldset>
@@ -400,18 +350,7 @@ export const MockInterviewCreateModal = ({
             min={0}
             max={10}
             step={1}
-            marks={[
-              { value: 1, label: '1' },
-              { value: 2, label: '2' },
-              { value: 3, label: '3' },
-              { value: 4, label: '4' },
-              { value: 5, label: '5' },
-              { value: 6, label: '6' },
-              { value: 7, label: '7' },
-              { value: 8, label: '8' },
-              { value: 9, label: '9' },
-              { value: 10, label: '10' },
-            ]}
+            marks={scoreSliderMarks}
             mb="lg"
           />
           <Text size="sm" mt="sm">
@@ -423,18 +362,7 @@ export const MockInterviewCreateModal = ({
             min={0}
             max={10}
             step={1}
-            marks={[
-              { value: 1, label: '1' },
-              { value: 2, label: '2' },
-              { value: 3, label: '3' },
-              { value: 4, label: '4' },
-              { value: 5, label: '5' },
-              { value: 6, label: '6' },
-              { value: 7, label: '7' },
-              { value: 8, label: '8' },
-              { value: 9, label: '9' },
-              { value: 10, label: '10' },
-            ]}
+            marks={scoreSliderMarks}
             mb="lg"
           />
           <Text size="sm" mt="sm">
@@ -446,18 +374,7 @@ export const MockInterviewCreateModal = ({
             min={0}
             max={10}
             step={1}
-            marks={[
-              { value: 1, label: '1' },
-              { value: 2, label: '2' },
-              { value: 3, label: '3' },
-              { value: 4, label: '4' },
-              { value: 5, label: '5' },
-              { value: 6, label: '6' },
-              { value: 7, label: '7' },
-              { value: 8, label: '8' },
-              { value: 9, label: '9' },
-              { value: 10, label: '10' },
-            ]}
+            marks={scoreSliderMarks}
             mb="lg"
           />
           <Text size="sm" mt="sm">
@@ -469,18 +386,7 @@ export const MockInterviewCreateModal = ({
             min={0}
             max={10}
             step={1}
-            marks={[
-              { value: 1, label: '1' },
-              { value: 2, label: '2' },
-              { value: 3, label: '3' },
-              { value: 4, label: '4' },
-              { value: 5, label: '5' },
-              { value: 6, label: '6' },
-              { value: 7, label: '7' },
-              { value: 8, label: '8' },
-              { value: 9, label: '9' },
-              { value: 10, label: '10' },
-            ]}
+            marks={scoreSliderMarks}
             mb="lg"
           />
           <Text size="sm" mt="sm">
@@ -492,21 +398,18 @@ export const MockInterviewCreateModal = ({
             min={0}
             max={10}
             step={1}
-            marks={[
-              { value: 1, label: '1' },
-              { value: 2, label: '2' },
-              { value: 3, label: '3' },
-              { value: 4, label: '4' },
-              { value: 5, label: '5' },
-              { value: 6, label: '6' },
-              { value: 7, label: '7' },
-              { value: 8, label: '8' },
-              { value: 9, label: '9' },
-              { value: 10, label: '10' },
-            ]}
+            marks={scoreSliderMarks}
             mb="lg"
           />
         </Fieldset>
+
+        <CustomRichTextEditor
+          content={form.values.notes}
+          onChange={(value) => form.setFieldValue('notes', value || '')}
+          label="Interviewer Notes"
+          error={form.errors.notes?.toString()}
+          maxLength={5000}
+        />
 
         <Flex justify="flex-end">
           <Button type="submit" mt="xl" mb="md">
@@ -533,5 +436,5 @@ type MockInterviewCreateModalProps = {
   ) => Promise<QueryObserverResult<ListMockInterviewResponseApiResponse, unknown>>;
   leetcodeProblems: LeetcodeProblemDto[] | null | undefined;
   users: EnrollmentUserDto[] | null | undefined;
-  seasonId: string;
+  seasonId: string | null;
 };

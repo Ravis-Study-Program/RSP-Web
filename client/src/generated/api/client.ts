@@ -477,6 +477,8 @@ export interface CreateMockInterviewRequest {
   timeTakenInMinutes: number;
   mockInterviewRounds: MockInterviewRoundDto[];
   /** @nullable */
+  notes?: string | null;
+  /** @nullable */
   seasonId?: string | null;
 }
 
@@ -917,6 +919,8 @@ export interface MockInterviewEntity {
   isPass: boolean;
   startDate: string;
   timeTakenInMinutes: number;
+  /** @nullable */
+  notes?: string | null;
   /** @minLength 1 */
   interviewerUserId: string;
   /** @minLength 1 */
@@ -1062,6 +1066,8 @@ export interface UpdateMockInterviewRequest {
   startDate: string;
   timeTakenInMinutes: number;
   mockInterviewRounds: MockInterviewRoundDto[];
+  /** @nullable */
+  notes?: string | null;
   /** @nullable */
   seasonId?: string | null;
 }

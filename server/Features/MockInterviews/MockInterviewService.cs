@@ -124,6 +124,7 @@ public class MockInterviewService : BaseService, IMockInterviewService
       MockInterviewRounds = mockInterviewRounds,
       StartDate = request.StartDate,
       TimeTakenInMinutes = request.TimeTakenInMinutes,
+      Notes = request.Notes,
       SeasonWeekId = seasonWeek?.SeasonWeekId,
     };
 
@@ -353,6 +354,7 @@ public class MockInterviewService : BaseService, IMockInterviewService
     existingMockInterview.SeasonId = request.SeasonId;
     existingMockInterview.StartDate = request.StartDate;
     existingMockInterview.TimeTakenInMinutes = request.TimeTakenInMinutes;
+    existingMockInterview.Notes = request.Notes;
     existingMockInterview.SeasonWeekId = seasonWeek?.SeasonWeekId;
 
     return await ExecuteWithSaveAsync(

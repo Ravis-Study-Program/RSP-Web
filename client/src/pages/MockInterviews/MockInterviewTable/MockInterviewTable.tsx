@@ -212,7 +212,7 @@ export const MockInterviewTable = ({
           table={table}
           users={users}
           leetcodeProblems={leetcodeProblemsResponse?.responseBody?.leetcodeProblems}
-          seasonId={seasonId || ''}
+          seasonId={seasonId}
           createMockInterview={createMockInterview}
           refetchMockInterviews={refetchMockInterviews}
         />
@@ -224,7 +224,6 @@ export const MockInterviewTable = ({
           row={row}
           users={users}
           leetcodeProblems={leetcodeProblemsResponse?.responseBody?.leetcodeProblems}
-          seasonId={seasonId || ''}
           updateMockInterview={updateMockInterview}
           refetchMockInterviews={refetchMockInterviews}
         />

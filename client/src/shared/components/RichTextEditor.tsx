@@ -1,11 +1,12 @@
 import { useEffect } from 'react';
+import CharacterCount from '@tiptap/extension-character-count';
 import Highlight from '@tiptap/extension-highlight';
 import SubScript from '@tiptap/extension-subscript';
 import Superscript from '@tiptap/extension-superscript';
 import TextAlign from '@tiptap/extension-text-align';
 import { useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import { Box, Input } from '@mantine/core';
+import { Box, Input, Text } from '@mantine/core';
 import { Link, RichTextEditor } from '@mantine/tiptap';
 
 interface RichTextEditorProps {
@@ -16,6 +17,7 @@ interface RichTextEditorProps {
   required?: boolean;
   disabled?: boolean;
   minHeight?: number;
+  maxLength?: number;
 }
 
 export function CustomRichTextEditor({
@@ -26,6 +28,7 @@ export function CustomRichTextEditor({
   required = false,
   disabled = false,
   minHeight = 120,
+  maxLength,
 }: RichTextEditorProps) {
   const editor = useEditor({
     shouldRerenderOnTransaction: true,
@@ -36,6 +39,9 @@ export function CustomRichTextEditor({
       SubScript,
       Highlight,
       TextAlign.configure({ types: ['heading', 'paragraph'] }),
+      CharacterCount.configure({
+        limit: maxLength,
+      }),
     ],
     content: content || '',
     onUpdate({ editor }) {
@@ -124,6 +130,11 @@ export function CustomRichTextEditor({
 
         <RichTextEditor.Content />
       </RichTextEditor>
+      {maxLength && (
+        <Text size="xs" c="dimmed" ta="right" mt={5}>
+          {editor.storage.characterCount?.characters() || 0} / {maxLength} characters
+        </Text>
+      )}
       {error && <Input.Error mt={5}>{error}</Input.Error>}
     </Box>
   );

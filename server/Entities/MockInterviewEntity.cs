@@ -19,6 +19,8 @@ public class MockInterviewEntity : ISoftDelete
   [Required]
   public int TimeTakenInMinutes { get; set; }
 
+  public string? Notes { get; set; }
+
   [Required]
   public string InterviewerUserId { get; set; } = string.Empty;
 
@@ -63,6 +65,7 @@ public class MockInterviewEntityConfiguration : IEntityTypeConfiguration<MockInt
       .HasColumnName("TimeTakenInMinutes")
       .HasColumnType("int")
       .IsRequired();
+    builder.Property(x => x.Notes).HasColumnName("Notes").HasColumnType("varchar(10000)");
     builder.Property(x => x.SeasonId).HasColumnName("SeasonId").HasColumnType("varchar(16)");
     builder
       .Property(x => x.SeasonWeekId)

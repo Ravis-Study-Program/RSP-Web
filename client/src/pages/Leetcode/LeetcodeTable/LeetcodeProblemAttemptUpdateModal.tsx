@@ -151,8 +151,9 @@ export const LeetcodeProblemAttemptUpdateModal = ({
         <CustomRichTextEditor
           content={form.values.notes}
           onChange={(value) => form.setFieldValue('notes', value || undefined)}
-          label="Notes"
+          label="Interviewer Notes"
           error={form.errors.notes?.toString()}
+          maxLength={5000}
         />
         <Flex justify="flex-end">
           <Button type="submit" mt="xl" mb="md">

@@ -2572,6 +2572,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@tiptap/extension-character-count@npm:^3.6.1":
+  version: 3.6.1
+  resolution: "@tiptap/extension-character-count@npm:3.6.1"
+  peerDependencies:
+    "@tiptap/extensions": ^3.6.1
+  checksum: 10c0/9afe6e497ce267fb589b4482f26e86dadc48c0698dd8d91a87e79562b4360c82192767df8743a7abd4822710f4c0547295c84acd2663a0f2cf1cd9ebed302f55
+  languageName: node
+  linkType: hard
+
 "@tiptap/extension-code-block@npm:^3.5.3":
   version: 3.5.3
   resolution: "@tiptap/extension-code-block@npm:3.5.3"
@@ -9001,6 +9010,7 @@ __metadata:
     "@testing-library/jest-dom": "npm:^6.5.0"
     "@testing-library/react": "npm:^16.0.1"
     "@testing-library/user-event": "npm:^14.5.2"
+    "@tiptap/extension-character-count": "npm:^3.6.1"
     "@tiptap/extension-highlight": "npm:^3.5.3"
     "@tiptap/extension-link": "npm:^3.5.3"
     "@tiptap/extension-subscript": "npm:^3.5.3"
