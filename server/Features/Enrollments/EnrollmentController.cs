@@ -82,7 +82,7 @@ public class EnrollmentController : BaseController
     CancellationToken cancellationToken = default
   )
   {
-    var request = new GetUserEnrollmentsRequest { UserId = GetCurrentUserId() };
+    var request = new GetUserEnrollmentsRequest { UserId = userId ?? GetCurrentUserId() };
     var result = await _enrollmentService.GetUserEnrollments(request, cancellationToken);
     return OkResponse(result, Messages.Enrollment.Listed);
   }

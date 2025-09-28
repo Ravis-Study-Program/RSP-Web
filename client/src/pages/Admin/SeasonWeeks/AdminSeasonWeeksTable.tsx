@@ -21,9 +21,17 @@ import {
   useAdminListSeasonWeek,
   useAdminUpdateSeasonWeek,
 } from '@/generated/api/client';
+import {
+  getConfirmModalProps,
+  getErrorNotification,
+  getMantineTablePropsWithBanner,
+  getSuccessNotification,
+  NOTIFICATION_MESSAGES,
+} from '@/shared/constants/mantineTableProps';
+import { CONFIRMATION_MESSAGES } from '@/shared/constants/messages';
+import classes from '@/shared/styles/tableStyles.module.css';
 import { AdminSeasonWeeksCreateModal } from './AdminSeasonWeeksCreateModal';
 import { AdminSeasonWeeksUpdateModal } from './AdminSeasonWeeksUpdateModal';
-import classes from './AdminSeasonWeeksTable.module.css';
 
 export const AdminSeasonWeeksTable = () => {
   const [pageSize, setPageSize] = useLocalStorage({
@@ -63,33 +71,22 @@ export const AdminSeasonWeeksTable = () => {
       children: (
         <>
           <Title order={3} mt={15} mb={10}>
-            Delete Season Week
+            {CONFIRMATION_MESSAGES.SEASON_WEEK.DELETE_TITLE}
           </Title>
-          <Text>
-            Are you sure you want to delete this Season Week? This action cannot be undone.
-          </Text>
+          <Text>{CONFIRMATION_MESSAGES.SEASON_WEEK.DELETE_TEXT}</Text>
         </>
       ),
       labels: { confirm: 'Delete', cancel: 'Cancel' },
-      confirmProps: { color: 'red' },
+      ...getConfirmModalProps(),
       onConfirm: async () => {
         try {
           await deleteSeasonWeek({ data: { seasonWeekId: row.original.seasonWeekId! } });
           await refetchSeasonWeeks();
           modals.closeAll();
-          notifications.show({
-            color: 'green',
-            title: 'Success',
-            message: 'SeasonWeek deleted successfully.',
-          });
+          notifications.show(getSuccessNotification(NOTIFICATION_MESSAGES.SEASON_WEEK.DELETED));
         } catch (err) {
           const response = (err as any)?.response.data as AdminDeleteSeasonWeekResponseApiResponse;
-          notifications.show({
-            color: 'red',
-            title: 'Error',
-            autoClose: true,
-            message: response.error?.message,
-          });
+          notifications.show(getErrorNotification(response.error?.message));
         }
       },
     });
@@ -138,24 +135,11 @@ export const AdminSeasonWeeksTable = () => {
   const table = useMantineReactTable({
     columns,
     data: seasonWeekResponse?.responseBody?.seasonWeeks ?? [],
-    mantinePaperProps: {
-      className: classes.table,
-    },
+    ...getMantineTablePropsWithBanner(
+      classes.table,
+      isLoadingSeasonWeeksError || isLoadingSeasonsError
+    ),
     createDisplayMode: 'modal',
-    mantineCreateRowModalProps: {
-      closeOnClickOutside: false,
-      withCloseButton: true,
-      closeButtonProps: {
-        className: classes.modalCloseButton,
-      },
-    },
-    mantineEditRowModalProps: {
-      closeOnClickOutside: false,
-      withCloseButton: true,
-      closeButtonProps: {
-        className: classes.modalCloseButton,
-      },
-    },
     onPaginationChange: (updater) => {
       const next = typeof updater === 'function' ? updater(pagination) : updater;
       setPageSize(next.pageSize);
@@ -178,12 +162,6 @@ export const AdminSeasonWeeksTable = () => {
     },
     positionActionsColumn: 'last',
     getRowId: (row) => row.seasonWeekId?.toString(),
-    mantineToolbarAlertBannerProps: isLoadingSeasonWeeksError
-      ? {
-          color: 'red',
-          children: 'Error loading data',
-        }
-      : undefined,
     isMultiSortEvent: () => true,
     renderCreateRowModalContent: ({ table }) => (
       <AdminSeasonWeeksCreateModal

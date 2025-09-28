@@ -24,7 +24,7 @@ export const createOptionsFilter = ({
     if (fuzzy && search.trim()) {
       const fuse = new Fuse(typedOptions, {
         keys: ['label'],
-        threshold: 0.45,
+        threshold: 0.2,
       });
 
       filtered = fuse.search(search.trim()).map((r) => r.item);

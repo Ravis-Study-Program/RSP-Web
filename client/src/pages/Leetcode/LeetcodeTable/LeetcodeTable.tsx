@@ -23,10 +23,18 @@ import {
   useListLeetcodeProblems,
   useUpdateProblemAttempt,
 } from '@/generated/api/client';
+import {
+  getConfirmModalProps,
+  getErrorNotification,
+  getMantineTablePropsWithBanner,
+  getSuccessNotification,
+  NOTIFICATION_MESSAGES,
+} from '@/shared/constants/mantineTableProps';
+import { CONFIRMATION_MESSAGES } from '@/shared/constants/messages';
 import { LeetcodeProblemDifficultyReverseIndex } from '@/shared/entities/reverseIndex';
+import classes from '@/shared/styles/tableStyles.module.css';
 import { LeetcodeProblemAttemptCreateModal } from './LeetcodeProblemAttemptCreateModal';
 import { LeetcodeProblemAttemptUpdateModal } from './LeetcodeProblemAttemptUpdateModal';
-import classes from './LeetcodeTable.module.css';
 
 export const LeetcodeTable = ({
   refetchProblemAttempts,
@@ -69,15 +77,13 @@ export const LeetcodeTable = ({
       children: (
         <>
           <Title order={3} mt={15} mb={10}>
-            Delete Problem Attempt
+            {CONFIRMATION_MESSAGES.PROBLEM_ATTEMPT.DELETE_TITLE}
           </Title>
-          <Text>
-            Are you sure you want to delete this problem attempt? This action cannot be undone.
-          </Text>
+          <Text>{CONFIRMATION_MESSAGES.PROBLEM_ATTEMPT.DELETE_TEXT}</Text>
         </>
       ),
       labels: { confirm: 'Delete', cancel: 'Cancel' },
-      confirmProps: { color: 'red' },
+      ...getConfirmModalProps(),
       onConfirm: async () => {
         try {
           await deleteProblemAttempt({
@@ -85,19 +91,10 @@ export const LeetcodeTable = ({
           });
           await refetchProblemAttempts();
           modals.closeAll();
-          notifications.show({
-            color: 'green',
-            title: 'Success',
-            message: 'Problem attempt deleted successfully.',
-          });
+          notifications.show(getSuccessNotification(NOTIFICATION_MESSAGES.PROBLEM_ATTEMPT.DELETED));
         } catch (err) {
           const response = (err as any)?.response.data as DeleteProblemAttemptResponseApiResponse;
-          notifications.show({
-            color: 'red',
-            title: 'Error',
-            autoClose: false,
-            message: response.error?.message,
-          });
+          notifications.show(getErrorNotification(response.error?.message));
         }
       },
     });
@@ -218,24 +215,8 @@ export const LeetcodeTable = ({
   const table = useMantineReactTable({
     columns,
     data: problemAttempts ?? [],
-    mantinePaperProps: {
-      className: classes.table,
-    },
+    ...getMantineTablePropsWithBanner(classes.table, isLoadingLeetcodeProblemsError),
     createDisplayMode: 'modal',
-    mantineCreateRowModalProps: {
-      closeOnClickOutside: false,
-      withCloseButton: true,
-      closeButtonProps: {
-        className: classes.modalCloseButton,
-      },
-    },
-    mantineEditRowModalProps: {
-      closeOnClickOutside: false,
-      withCloseButton: true,
-      closeButtonProps: {
-        className: classes.modalCloseButton,
-      },
-    },
     onPaginationChange: (updater) => {
       const next = typeof updater === 'function' ? updater(pagination) : updater;
       setPageSize(next.pageSize);
@@ -254,7 +235,6 @@ export const LeetcodeTable = ({
     },
     positionActionsColumn: 'last',
     getRowId: (row) => row.problemAttemptId?.toString(),
-    mantineToolbarAlertBannerProps: undefined,
     isMultiSortEvent: () => true,
     renderCreateRowModalContent: ({ table }) =>
       enableEditing && (

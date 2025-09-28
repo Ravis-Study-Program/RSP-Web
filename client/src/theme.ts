@@ -25,6 +25,16 @@ export const theme = createTheme({
           width: '100%',
           background: 'none',
         },
+        body: {
+          padding: 'var(--mantine-spacing-xl)',
+        },
+      },
+    },
+    Textarea: {
+      styles: {
+        input: {
+          paddingTop: 'var(--mantine-spacing-xs)',
+        },
       },
     },
   },

@@ -20,9 +20,17 @@ import {
   useAdminListSeason,
   useAdminUpdateMentorship,
 } from '@/generated/api/client';
+import {
+  getConfirmModalProps,
+  getErrorNotification,
+  getMantineTablePropsWithBanner,
+  getSuccessNotification,
+  NOTIFICATION_MESSAGES,
+} from '@/shared/constants/mantineTableProps';
+import { CONFIRMATION_MESSAGES } from '@/shared/constants/messages';
+import classes from '@/shared/styles/tableStyles.module.css';
 import { AdminMentorshipsCreateModal } from './AdminMentorshipsCreateModal';
 import { AdminMentorshipsUpdateModal } from './AdminMentorshipsUpdateModal';
-import classes from './AdminMentorshipsTable.module.css';
 
 export const AdminMentorshipsTable = () => {
   const [pageSize, setPageSize] = useLocalStorage({
@@ -67,33 +75,22 @@ export const AdminMentorshipsTable = () => {
       children: (
         <>
           <Title order={3} mt={15} mb={10}>
-            Delete Mentorship
+            {CONFIRMATION_MESSAGES.MENTORSHIP.DELETE_TITLE}
           </Title>
-          <Text>
-            Are you sure you want to delete this mentorship? This action cannot be undone.
-          </Text>
+          <Text>{CONFIRMATION_MESSAGES.MENTORSHIP.DELETE_TEXT}</Text>
         </>
       ),
       labels: { confirm: 'Delete', cancel: 'Cancel' },
-      confirmProps: { color: 'red' },
+      ...getConfirmModalProps(),
       onConfirm: async () => {
         try {
           await deleteMentorship({ data: { mentorshipId: row.original.mentorshipId! } });
           await refetchMentorships();
           modals.closeAll();
-          notifications.show({
-            color: 'green',
-            title: 'Success',
-            message: 'Mentorship deleted successfully.',
-          });
+          notifications.show(getSuccessNotification(NOTIFICATION_MESSAGES.MENTORSHIP.DELETED));
         } catch (err) {
           const response = (err as any)?.response.data as AdminDeleteMentorshipResponseApiResponse;
-          notifications.show({
-            color: 'red',
-            title: 'Error',
-            autoClose: false,
-            message: response.error?.message,
-          });
+          notifications.show(getErrorNotification(response.error?.message));
         }
       },
     });
@@ -120,24 +117,11 @@ export const AdminMentorshipsTable = () => {
   const table = useMantineReactTable({
     columns,
     data: mentorshipResponse?.responseBody?.mentorships ?? [],
-    mantinePaperProps: {
-      className: classes.table,
-    },
+    ...getMantineTablePropsWithBanner(
+      classes.table,
+      isLoadingMentorshipsError || isLoadingEnrollmentsError || isLoadingSeasonsError
+    ),
     createDisplayMode: 'modal',
-    mantineCreateRowModalProps: {
-      closeOnClickOutside: false,
-      withCloseButton: true,
-      closeButtonProps: {
-        className: classes.modalCloseButton,
-      },
-    },
-    mantineEditRowModalProps: {
-      closeOnClickOutside: false,
-      withCloseButton: true,
-      closeButtonProps: {
-        className: classes.modalCloseButton,
-      },
-    },
     onPaginationChange: (updater) => {
       const next = typeof updater === 'function' ? updater(pagination) : updater;
       setPageSize(next.pageSize);
@@ -156,12 +140,6 @@ export const AdminMentorshipsTable = () => {
     },
     positionActionsColumn: 'last',
     getRowId: (row) => row.mentorshipId?.toString(),
-    mantineToolbarAlertBannerProps: isLoadingMentorshipsError
-      ? {
-          color: 'red',
-          children: 'Error loading data',
-        }
-      : undefined,
     isMultiSortEvent: () => true,
     renderCreateRowModalContent: ({ table }) => (
       <AdminMentorshipsCreateModal
