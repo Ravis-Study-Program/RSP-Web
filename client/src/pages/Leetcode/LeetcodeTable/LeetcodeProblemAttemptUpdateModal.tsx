@@ -3,7 +3,7 @@ import { QueryObserverResult, RefetchOptions, UseMutateAsyncFunction } from '@ta
 import { zodResolver } from 'mantine-form-zod-resolver';
 import { MRT_Row, MRT_TableInstance } from 'mantine-react-table';
 import { z } from 'zod';
-import { Button, Flex, NumberInput, Select, Stack, Textarea, Title } from '@mantine/core';
+import { Button, Flex, NumberInput, Select, Stack, Title } from '@mantine/core';
 import { DateTimePicker } from '@mantine/dates';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
@@ -15,6 +15,7 @@ import {
   UpdateProblemAttemptResponseApiResponse,
   useGetCurrentUser,
 } from '@/generated/api/client';
+import { CustomRichTextEditor } from '@/shared/components/RichTextEditor';
 import { createOptionsFilter } from '@/shared/table/globalFilters';
 
 const schema = z.object({
@@ -30,7 +31,7 @@ const schema = z.object({
     .max(120, {
       message: 'The maximum amount is 120 minute.',
     }),
-  notes: z.string(),
+  notes: z.string().optional(),
 });
 
 export const LeetcodeProblemAttemptUpdateModal = ({
@@ -39,13 +40,16 @@ export const LeetcodeProblemAttemptUpdateModal = ({
   updateProblemAttempt,
   refetchProblemAttempts,
   leetcodeProblems,
-  enrollmentId,
 }: LeetcodeProblemAttemptUpdateModalProps) => {
   const { data: userResponse } = useGetCurrentUser();
   const userId = userResponse?.responseBody?.user.userId ?? '';
 
-  const form = useForm({
-    mode: 'uncontrolled',
+  const form = useForm<{
+    leetcodeProblemId: string | null | undefined;
+    attemptStartDateUtc: string;
+    timeTakenInMinutes: number;
+    notes?: string | null;
+  }>({
     initialValues: {
       leetcodeProblemId: problemAttempt.leetcodeProblemId,
       attemptStartDateUtc: dayjs(problemAttempt.attemptStartDateUtc).format('YYYY-MM-DD HH:mm'),
@@ -59,7 +63,7 @@ export const LeetcodeProblemAttemptUpdateModal = ({
     leetcodeProblemId: string | null | undefined;
     attemptStartDateUtc: string;
     timeTakenInMinutes: number;
-    notes: string;
+    notes?: string | null;
   }) => {
     try {
       const requestData: UpdateProblemAttemptRequest = {
@@ -67,10 +71,8 @@ export const LeetcodeProblemAttemptUpdateModal = ({
         userId,
         attemptStartDateUtc: dayjs(values.attemptStartDateUtc).toISOString(),
         problemAttemptId: problemAttempt.problemAttemptId,
+        enrollmentId: problemAttempt.enrollmentId, // Use the existing enrollmentId from the problem attempt
       };
-      if (enrollmentId !== '') {
-        requestData.enrollmentId = enrollmentId;
-      }
 
       await updateProblemAttempt({ data: requestData });
       await refetchProblemAttempts();
@@ -146,15 +148,12 @@ export const LeetcodeProblemAttemptUpdateModal = ({
           withAsterisk
           error={form.errors.timeTakenInMinutes}
         />
-        <Textarea
-          {...form.getInputProps('notes')}
-          mt="sm"
-          label="Notes"
-          autosize
-          minRows={2}
-          maxRows={6}
-          placeholder="Enter notes"
-          error={form.errors.notes}
+        <CustomRichTextEditor
+          content={form.values.notes}
+          onChange={(value) => form.setFieldValue('notes', value || undefined)}
+          label="Interviewer Notes"
+          error={form.errors.notes?.toString()}
+          maxLength={5000}
         />
         <Flex justify="flex-end">
           <Button type="submit" mt="xl" mb="md">
@@ -181,5 +180,4 @@ type LeetcodeProblemAttemptUpdateModalProps = {
     options?: RefetchOptions
   ) => Promise<QueryObserverResult<ListProblemAttemptResponseApiResponse, unknown>>;
   leetcodeProblems: LeetcodeProblemDto[] | null | undefined;
-  enrollmentId: string;
 };
