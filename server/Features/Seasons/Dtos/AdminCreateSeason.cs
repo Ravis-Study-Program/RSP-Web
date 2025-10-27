@@ -23,6 +23,12 @@ public record AdminCreateSeasonRequest
 
   [Required]
   public string ImageUrl { get; set; } = string.Empty;
+
+  [Required]
+  public string ResourcesUrl { get; set; } = string.Empty;
+
+  [Required]
+  public bool IsDataBackFilled { get; set; }
 }
 
 public record AdminCreateSeasonResponse
@@ -44,5 +50,6 @@ public class AdminCreateSeasonRequestValidator : AbstractValidator<AdminCreateSe
       .WithMessage(Messages.Common.EndDateMustBeGreaterThanStartDate);
     RuleFor(c => c.Location).NotEmpty();
     RuleFor(c => c.ImageUrl).NotEmpty();
+    RuleFor(c => c.ResourcesUrl).NotEmpty();
   }
 }

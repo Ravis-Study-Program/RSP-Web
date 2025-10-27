@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import { useMemo, useState } from 'react';
-import { IconEdit, IconTrash } from '@tabler/icons-react';
+import { IconEdit, IconExternalLink, IconInfoCircle, IconTrash } from '@tabler/icons-react';
 import { QueryObserverResult, RefetchOptions } from '@tanstack/react-query';
 import {
   MantineReactTable,
@@ -133,7 +133,21 @@ export const MockInterviewTable = ({
         accessorFn: (row) => dayjs(row.startDate).format('D MMM YYYY HH:mm'),
         Cell: ({ row }) => {
           const startFormatted = dayjs(row.original.startDate).format('D MMM YYYY HH:mm');
-          return <Text size="sm">{startFormatted}</Text>;
+          const isDataBackFilled = row.original.season?.isDataBackFilled;
+
+          return (
+            <Flex align="center" gap="xs">
+              <Text size="sm">{startFormatted}</Text>
+              {isDataBackFilled && (
+                <Tooltip
+                  label="This data was backfilled based on historical records"
+                  position="top"
+                >
+                  <IconInfoCircle size={14} style={{ color: 'var(--mantine-color-blue-6)' }} />
+                </Tooltip>
+              )}
+            </Flex>
+          );
         },
       },
       ...(enrollmentColumn ? [enrollmentColumn] : []),
@@ -299,7 +313,20 @@ const LeetcodeMockInterviewRoundsInnerTable = ({ rounds }: InnerMockInterviewTab
 
     return (
       <Table.Tr key={index}>
-        <Table.Td>{leetcodeMock.leetcodeProblem?.problem?.title || ''}</Table.Td>
+        <Table.Td>
+          <Anchor
+            href={leetcodeMock.leetcodeProblem?.problem?.link}
+            target="_blank"
+            inherit
+            className={classes.title}
+            underline="always"
+          >
+            <Flex align="center" gap="xs">
+              <Text size="sm">{leetcodeMock.leetcodeProblem?.problem?.title || ''}</Text>
+              <IconExternalLink size={12} style={{ flexShrink: 0, opacity: 0.7 }} />
+            </Flex>
+          </Anchor>
+        </Table.Td>
         <Table.Td>
           <ScoreText score={leetcodeMock.confirmQuestionScore} />
         </Table.Td>

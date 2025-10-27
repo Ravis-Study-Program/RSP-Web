@@ -1,4 +1,5 @@
 import {
+  IconBookmark,
   IconBrandLeetcode,
   IconCalendarMonth,
   IconChalkboard,
@@ -64,6 +65,7 @@ export interface TabItem {
   link?: string;
   links?: TabItem[];
   hidden?: boolean;
+  isExternal?: boolean;
 }
 
 export interface Tabs {
@@ -141,7 +143,7 @@ export function createAdminSpotlightActions(
   ];
 }
 
-const getStudentTabs = (seasonSlug: string | null): Tabs => ({
+const getStudentTabs = (seasonSlug: string | null, resourcesUrl?: string): Tabs => ({
   general: [
     { label: 'Seasons', icon: IconCalendarMonth, link: '/seasons', hidden: false },
     { label: 'Graduates', icon: IconSchool, link: '/graduates', hidden: false },
@@ -185,6 +187,17 @@ const getStudentTabs = (seasonSlug: string | null): Tabs => ({
               link: `/seasons/${seasonSlug}/users`,
               hidden: false,
             },
+            ...(resourcesUrl
+              ? [
+                  {
+                    label: 'Resources',
+                    icon: IconBookmark,
+                    link: resourcesUrl,
+                    hidden: false,
+                    isExternal: true,
+                  },
+                ]
+              : []),
           ],
           hidden: false,
         },
@@ -192,7 +205,7 @@ const getStudentTabs = (seasonSlug: string | null): Tabs => ({
     : [],
 });
 
-const getMentorTabs = (seasonSlug: string | null): Tabs => ({
+const getMentorTabs = (seasonSlug: string | null, resourcesUrl?: string): Tabs => ({
   general: [
     { label: 'Seasons', icon: IconCalendarMonth, link: '/seasons', hidden: false },
     { label: 'Graduates', icon: IconSchool, link: '/graduates', hidden: false },
@@ -230,6 +243,17 @@ const getMentorTabs = (seasonSlug: string | null): Tabs => ({
               link: `/seasons/${seasonSlug}/mentees`,
               hidden: false,
             },
+            ...(resourcesUrl
+              ? [
+                  {
+                    label: 'Resources',
+                    icon: IconBookmark,
+                    link: resourcesUrl,
+                    hidden: false,
+                    isExternal: true,
+                  },
+                ]
+              : []),
           ],
           hidden: false,
         },
@@ -237,7 +261,7 @@ const getMentorTabs = (seasonSlug: string | null): Tabs => ({
     : [],
 });
 
-const getCoordinatorTabs = (seasonSlug: string | null): Tabs => ({
+const getCoordinatorTabs = (seasonSlug: string | null, resourcesUrl?: string): Tabs => ({
   general: [
     { label: 'Seasons', icon: IconCalendarMonth, link: '/seasons', hidden: false },
     { label: 'Graduates', icon: IconSchool, link: '/graduates', hidden: false },
@@ -275,6 +299,17 @@ const getCoordinatorTabs = (seasonSlug: string | null): Tabs => ({
               link: `/seasons/${seasonSlug}/mentors`,
               hidden: false,
             },
+            ...(resourcesUrl
+              ? [
+                  {
+                    label: 'Resources',
+                    icon: IconBookmark,
+                    link: resourcesUrl,
+                    hidden: false,
+                    isExternal: true,
+                  },
+                ]
+              : []),
           ],
           hidden: false,
         },
@@ -282,7 +317,7 @@ const getCoordinatorTabs = (seasonSlug: string | null): Tabs => ({
     : [],
 });
 
-const getAdminTabs = (seasonSlug: string | null): Tabs => ({
+const getAdminTabs = (seasonSlug: string | null, resourcesUrl?: string): Tabs => ({
   general: [
     { label: 'Seasons', icon: IconCalendarMonth, link: '/admin/seasons', hidden: false },
     { label: 'Users', icon: IconUsersGroup, link: '/admin/users', hidden: false },
@@ -316,18 +351,34 @@ const getAdminTabs = (seasonSlug: string | null): Tabs => ({
           link: `/seasons/${seasonSlug}/mentors`,
           hidden: false,
         },
+        ...(resourcesUrl
+          ? [
+              {
+                label: 'Resources',
+                icon: IconBookmark,
+                link: resourcesUrl,
+                hidden: false,
+                isExternal: true,
+              },
+            ]
+          : []),
       ]
     : [],
 });
 
-export const getTabs = (seasonSlug: string | null, isAdmin: boolean, role: SeasonRole | null) => {
+export const getTabs = (
+  seasonSlug: string | null,
+  isAdmin: boolean,
+  role: SeasonRole | null,
+  resourcesUrl?: string
+) => {
   let tabs: Tabs = noSeasonSelectedTabs;
 
   if (isAdmin) {
     tabs =
       seasonSlug === null || seasonSlug === ''
         ? adminNoSeasonSelectedTabs
-        : getAdminTabs(seasonSlug);
+        : getAdminTabs(seasonSlug, resourcesUrl);
     return tabs;
   }
 
@@ -337,13 +388,13 @@ export const getTabs = (seasonSlug: string | null, isAdmin: boolean, role: Seaso
 
   switch (role) {
     case SeasonRole.Student:
-      tabs = getStudentTabs(seasonSlug);
+      tabs = getStudentTabs(seasonSlug, resourcesUrl);
       break;
     case SeasonRole.Mentor:
-      tabs = getMentorTabs(seasonSlug);
+      tabs = getMentorTabs(seasonSlug, resourcesUrl);
       break;
     case SeasonRole.Coordinator:
-      tabs = getCoordinatorTabs(seasonSlug);
+      tabs = getCoordinatorTabs(seasonSlug, resourcesUrl);
       break;
   }
 
@@ -354,9 +405,10 @@ export const lookupTabByLink = (
   link: string,
   seasonSlug: string | null,
   isAdmin: boolean,
-  role: SeasonRole | null
+  role: SeasonRole | null,
+  resourcesUrl?: string
 ): TabItem | undefined => {
-  const tabs = getTabs(seasonSlug, isAdmin, role);
+  const tabs = getTabs(seasonSlug, isAdmin, role, resourcesUrl);
   const allTabs = [...tabs.general, ...(tabs.season || [])];
 
   // Search through link and links if applicable

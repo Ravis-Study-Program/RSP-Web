@@ -1,11 +1,11 @@
 import { Outlet } from 'react-router-dom';
-import { useAuth0User } from '@/shared/hooks/useAuth0User';
+import { useGetCurrentUser } from '@/generated/api/client';
 import NotFoundPage from '../../pages/NotFound/NotFound.page';
 
 const AdminRouteGuard = () => {
-  const { isAuthenticated, isLoading, isAdmin: auth0IsAdmin } = useAuth0User();
+  const { data: currentUserResponse, isLoading } = useGetCurrentUser();
 
-  const isAdmin = isAuthenticated && auth0IsAdmin;
+  const isAdmin = currentUserResponse?.responseBody?.user?.isAdmin || false;
 
   if (isLoading) {
     return null;

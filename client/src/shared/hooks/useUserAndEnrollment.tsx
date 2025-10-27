@@ -4,14 +4,12 @@ import {
   useGetIsCurrentUserEnrolled,
   useGetUser,
 } from '@/generated/api/client';
-import { useAuth0User } from './useAuth0User';
 
 export const useUserAndEnrollment = (
   seasonSlug: string,
   userId: string | null = null,
   slug: string | null = null
 ) => {
-  const { isAdmin } = useAuth0User();
   const {
     data: currentUserResponse,
     isLoading: isCurrentUserLoading,
@@ -63,7 +61,7 @@ export const useUserAndEnrollment = (
 
   return {
     user,
-    isAdmin,
+    isAdmin: user?.isAdmin || false,
     seasonId,
     role,
     enrollmentId,

@@ -72,6 +72,9 @@ export interface AdminCreateSeasonRequest {
   location: string;
   /** @minLength 1 */
   imageUrl: string;
+  /** @minLength 1 */
+  resourcesUrl: string;
+  isDataBackFilled: boolean;
 }
 
 export interface AdminCreateSeasonResponse {
@@ -372,6 +375,9 @@ export interface AdminUpdateSeasonRequest {
   location: string;
   /** @minLength 1 */
   imageUrl: string;
+  /** @minLength 1 */
+  resourcesUrl: string;
+  isDataBackFilled: boolean;
 }
 
 export interface AdminUpdateSeasonResponse {
@@ -645,6 +651,8 @@ export interface EnrollmentResponseDto {
   numStudentsInSeason?: number;
   numMentorsInSeason?: number;
   numMenteesInSeason?: number;
+  /** @minLength 1 */
+  seasonResourcesUrl: string;
 }
 
 export interface EnrollmentUserDto {
@@ -1018,6 +1026,9 @@ export interface SeasonEntity {
   location: string;
   /** @minLength 1 */
   imageUrl: string;
+  /** @minLength 1 */
+  resourcesUrl: string;
+  isDataBackFilled: boolean;
   /** @nullable */
   deletedAtUtc?: string | null;
 }

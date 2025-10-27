@@ -7,6 +7,7 @@ import { Avatar, Card, Grid, Group, SegmentedControl, Text, Timeline } from '@ma
 import {
   EnrollmentResponseDto,
   SeasonRole,
+  useGetCurrentUser,
   useGetUserEnrollments,
   useListMockInterview,
   useListProblemAttempt,
@@ -15,7 +16,6 @@ import {
   SeasonRoleReverseIndex,
   SeasonStudentRolePromotionReverseIndex,
 } from '@/shared/entities/reverseIndex';
-import { useAuth0User } from '@/shared/hooks/useAuth0User';
 import { useSeasonSlug } from '@/shared/hooks/useSeasonSlug';
 import { useUserAndEnrollment } from '@/shared/hooks/useUserAndEnrollment';
 import { SeasonStudentRolePromotionColors } from '@/shared/utils/colorMappings';
@@ -29,13 +29,13 @@ dayjs.extend(localizedFormat);
 
 export default function ProfilePage() {
   const [searchParams] = useSearchParams();
-  const { auth0User } = useAuth0User();
+  const { data: currentUserResponse } = useGetCurrentUser();
   const slug = searchParams.get('user') || '';
 
   const { seasonSlug } = useSeasonSlug();
   const { enrollmentId, seasonId, user, role, userId } = useUserAndEnrollment(
     seasonSlug,
-    auth0User?.email || '',
+    currentUserResponse?.responseBody?.user?.userId || null,
     slug
   );
   const [section, setSection] = useState<'Leetcode' | 'Mock Interviews'>('Leetcode');

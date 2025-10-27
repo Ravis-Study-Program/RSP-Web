@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import { useMemo, useState } from 'react';
-import { IconEdit, IconTrash } from '@tabler/icons-react';
+import { IconEdit, IconExternalLink, IconInfoCircle, IconTrash } from '@tabler/icons-react';
 import { QueryObserverResult, RefetchOptions } from '@tanstack/react-query';
 import {
   MantineReactTable,
@@ -152,7 +152,21 @@ export const LeetcodeTable = ({
         accessorFn: (row) => row.attemptStartDateUtc,
         Cell: ({ row }) => {
           const startFormatted = dayjs(row.original.attemptStartDateUtc).format('D MMM YYYY HH:mm');
-          return startFormatted;
+          const isDataBackFilled = row.original.enrollment?.season?.isDataBackFilled;
+
+          return (
+            <Flex align="center" gap="xs">
+              <Text size="sm">{startFormatted}</Text>
+              {isDataBackFilled && (
+                <Tooltip
+                  label="This data was backfilled based on historical records"
+                  position="top"
+                >
+                  <IconInfoCircle size={14} style={{ color: 'var(--mantine-color-blue-6)' }} />
+                </Tooltip>
+              )}
+            </Flex>
+          );
         },
       },
       ...(enrollmentColumn ? [enrollmentColumn] : []),
@@ -173,7 +187,10 @@ export const LeetcodeTable = ({
             className={classes.title}
             underline="always"
           >
-            {row.original.leetcodeProblem?.problem?.title}
+            <Flex align="center" gap="xs">
+              <Text size="sm">{row.original.leetcodeProblem?.problem?.title}</Text>
+              <IconExternalLink size={12} style={{ flexShrink: 0, opacity: 0.7 }} />
+            </Flex>
           </Anchor>
         ),
       },

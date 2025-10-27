@@ -48,31 +48,58 @@ interface LinksGroupProps {
   links?: TabItem[];
   link?: string;
   activeLink?: string;
+  isExternal?: boolean;
 }
 
-export function LinksGroup({ label, links, link, icon: Icon, activeLink }: LinksGroupProps) {
+export function LinksGroup({
+  label,
+  links,
+  link,
+  icon: Icon,
+  activeLink,
+  isExternal,
+}: LinksGroupProps) {
   const hasLinks = Array.isArray(links);
 
   const [opened, setOpened] = useState(false);
 
-  const items = (hasLinks ? links.filter((item) => !item.hidden) : []).map((innerLink) => (
-    <Anchor
-      component={Link}
-      className={`${classes.innerLink} ${activeLink === innerLink.link ? classes.activeLink : ''}`}
-      to={innerLink.link || ''}
-      key={innerLink.label}
-      onMouseEnter={() => innerLink.link && preloadRoute(innerLink.link)}
-    >
-      <Box style={{ display: 'flex', alignItems: 'center' }}>
-        <ThemeIcon variant="transparent" className={classes.icon} size={32}>
-          <innerLink.icon size={22} />
-        </ThemeIcon>
-        <Text ml="sm" size="sm" fw={500}>
-          {innerLink.label}
-        </Text>
-      </Box>
-    </Anchor>
-  ));
+  const items = (hasLinks ? links.filter((item) => !item.hidden) : []).map((innerLink) =>
+    innerLink.isExternal ? (
+      <Anchor
+        href={innerLink.link}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={`${classes.innerLink} ${activeLink === innerLink.link ? classes.activeLink : ''}`}
+        key={innerLink.label}
+      >
+        <Box style={{ display: 'flex', alignItems: 'center' }}>
+          <ThemeIcon variant="transparent" className={classes.icon} size={32}>
+            <innerLink.icon size={22} />
+          </ThemeIcon>
+          <Text ml="sm" size="sm" fw={500}>
+            {innerLink.label}
+          </Text>
+        </Box>
+      </Anchor>
+    ) : (
+      <Anchor
+        component={Link}
+        to={innerLink.link || ''}
+        className={`${classes.innerLink} ${activeLink === innerLink.link ? classes.activeLink : ''}`}
+        key={innerLink.label}
+        onMouseEnter={() => innerLink.link && preloadRoute(innerLink.link)}
+      >
+        <Box style={{ display: 'flex', alignItems: 'center' }}>
+          <ThemeIcon variant="transparent" className={classes.icon} size={32}>
+            <innerLink.icon size={22} />
+          </ThemeIcon>
+          <Text ml="sm" size="sm" fw={500}>
+            {innerLink.label}
+          </Text>
+        </Box>
+      </Anchor>
+    )
+  );
 
   const button = (
     <>
@@ -107,13 +134,27 @@ export function LinksGroup({ label, links, link, icon: Icon, activeLink }: Links
     return button;
   }
 
+  if (isExternal) {
+    return (
+      <Anchor
+        href={link}
+        target="_blank"
+        rel="noopener noreferrer"
+        key={link}
+        className={`${classes.link} ${activeLink === link ? classes.activeLink : ''}`}
+      >
+        {button}
+      </Anchor>
+    );
+  }
+
   return (
     <Anchor
       component={Link}
       to={link}
       key={link}
       className={`${classes.link} ${activeLink === link ? classes.activeLink : ''}`}
-      onMouseEnter={() => preloadRoute(link)}
+      onMouseEnter={() => link && preloadRoute(link)}
     >
       {button}
     </Anchor>

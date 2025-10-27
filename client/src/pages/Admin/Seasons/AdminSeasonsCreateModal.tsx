@@ -3,7 +3,7 @@ import { QueryObserverResult, RefetchOptions, UseMutateAsyncFunction } from '@ta
 import { zodResolver } from 'mantine-form-zod-resolver';
 import { MRT_TableInstance } from 'mantine-react-table';
 import { z } from 'zod';
-import { Button, Flex, Select, Stack, TextInput, Title } from '@mantine/core';
+import { Button, Checkbox, Flex, Select, Stack, TextInput, Title } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
@@ -36,6 +36,8 @@ const schema = z
     endDateInclusiveUtc: z.string().min(1),
     location: z.string().min(1),
     imageUrl: z.string().min(1),
+    resourcesUrl: z.string().min(1),
+    isDataBackFilled: z.boolean(),
   })
   .refine(
     (data) => {
@@ -63,6 +65,8 @@ export const AdminSeasonsCreateModal = ({
       endDateInclusiveUtc: dayjs().format('YYYY-MM-DD HH:mm'),
       location: '',
       imageUrl: '',
+      resourcesUrl: '',
+      isDataBackFilled: false,
     },
     validate: zodResolver(schema),
   });
@@ -74,12 +78,19 @@ export const AdminSeasonsCreateModal = ({
     endDateInclusiveUtc: string;
     location: string;
     imageUrl: string;
+    resourcesUrl: string;
+    isDataBackFilled: boolean;
   }) => {
     try {
       const requestData: AdminCreateSeasonRequest = {
-        ...values,
+        name: values.name,
+        slug: values.slug,
         startDateInclusiveUtc: dayjs(values.startDateInclusiveUtc).toISOString(),
         endDateInclusiveUtc: dayjs(values.endDateInclusiveUtc).toISOString(),
+        location: values.location,
+        imageUrl: values.imageUrl,
+        resourcesUrl: values.resourcesUrl,
+        isDataBackFilled: values.isDataBackFilled,
       };
 
       await createSeason({ data: requestData });
@@ -163,6 +174,26 @@ export const AdminSeasonsCreateModal = ({
           data={Object.keys(locationImages)}
           filter={createOptionsFilter()}
           onChange={handleLocationChange}
+        />
+        <TextInput
+          {...form.getInputProps('imageUrl')}
+          mt="sm"
+          label="Image URL"
+          placeholder="Enter image URL (will be auto-filled based on location)"
+          withAsterisk
+        />
+        <TextInput
+          {...form.getInputProps('resourcesUrl')}
+          mt="sm"
+          label="Resources URL"
+          placeholder="Enter resources URL"
+          withAsterisk
+        />
+        <Checkbox
+          {...form.getInputProps('isDataBackFilled', { type: 'checkbox' })}
+          mt="sm"
+          label="Is Data Backfilled"
+          description="Check if this season's data has been backfilled"
         />
         <Flex justify="flex-end">
           <Button type="submit" mt="xl" mb="md">

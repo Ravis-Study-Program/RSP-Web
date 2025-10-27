@@ -6,7 +6,6 @@ const mocks = vi.hoisted(() => ({
   useGetCurrentUser: vi.fn(),
   useGetIsUserEnrolled: vi.fn(),
   useGetUser: vi.fn(),
-  useAuth0User: vi.fn(),
 }));
 
 vi.mock('@/generated/api/client', () => ({
@@ -15,20 +14,12 @@ vi.mock('@/generated/api/client', () => ({
   useGetUser: mocks.useGetUser,
 }));
 
-vi.mock('./useAuth0User', () => ({
-  useAuth0User: mocks.useAuth0User,
-}));
-
 describe('useUserAndEnrollment', () => {
   afterEach(() => {
     vi.clearAllMocks();
   });
 
   it('returns loading state when fetching data', () => {
-    mocks.useAuth0User.mockReturnValue({
-      isAdmin: false,
-    });
-
     mocks.useGetCurrentUser.mockReturnValue({
       data: null,
       isLoading: true,
@@ -59,10 +50,6 @@ describe('useUserAndEnrollment', () => {
   });
 
   it('returns error state when there is an error', () => {
-    mocks.useAuth0User.mockReturnValue({
-      isAdmin: false,
-    });
-
     mocks.useGetCurrentUser.mockReturnValue({
       data: null,
       isLoading: false,
@@ -93,10 +80,6 @@ describe('useUserAndEnrollment', () => {
   });
 
   it('returns user and admin status when data is available', () => {
-    mocks.useAuth0User.mockReturnValue({
-      isAdmin: true,
-    });
-
     mocks.useGetCurrentUser.mockReturnValue({
       data: {
         responseBody: {
@@ -105,6 +88,7 @@ describe('useUserAndEnrollment', () => {
             name: 'Test User',
             slug: 'test-user',
             email: 'test@example.com',
+            isAdmin: true,
           },
         },
       },
@@ -137,16 +121,13 @@ describe('useUserAndEnrollment', () => {
       name: 'Test User',
       slug: 'test-user',
       email: 'test@example.com',
+      isAdmin: true,
     });
     expect(result.current.isAdmin).toBe(true);
     expect(result.current.role).toBeNull();
   });
 
   it('returns role and enrollment ID when enrolled', () => {
-    mocks.useAuth0User.mockReturnValue({
-      isAdmin: false,
-    });
-
     mocks.useGetCurrentUser.mockReturnValue({
       data: {
         responseBody: {
@@ -155,6 +136,7 @@ describe('useUserAndEnrollment', () => {
             name: 'Test User',
             slug: 'test-user',
             email: 'test@example.com',
+            isAdmin: false,
           },
         },
       },
@@ -192,6 +174,7 @@ describe('useUserAndEnrollment', () => {
       name: 'Test User',
       slug: 'test-user',
       email: 'test@example.com',
+      isAdmin: false,
     });
     expect(result.current.isAdmin).toBe(false);
     expect(result.current.role).toBe('student');
@@ -199,10 +182,6 @@ describe('useUserAndEnrollment', () => {
   });
 
   it('supports querying with an email', () => {
-    mocks.useAuth0User.mockReturnValue({
-      isAdmin: false,
-    });
-
     mocks.useGetCurrentUser.mockReturnValue({
       data: {
         responseBody: {
@@ -211,6 +190,7 @@ describe('useUserAndEnrollment', () => {
             name: 'Test User',
             slug: 'test-user',
             email: 'test@example.com',
+            isAdmin: false,
           },
         },
       },
@@ -244,6 +224,7 @@ describe('useUserAndEnrollment', () => {
       name: 'Test User',
       slug: 'test-user',
       email: 'test@example.com',
+      isAdmin: false,
     });
     expect(result.current.isAdmin).toBe(false);
     expect(result.current.role).toBeNull();

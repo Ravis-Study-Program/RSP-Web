@@ -25,6 +25,12 @@ public record AdminUpdateSeasonRequest
 
   [Required]
   public string ImageUrl { get; set; } = string.Empty;
+
+  [Required]
+  public string ResourcesUrl { get; set; } = string.Empty;
+
+  [Required]
+  public bool IsDataBackFilled { get; set; }
 }
 
 public record AdminUpdateSeasonResponse { }
@@ -40,5 +46,6 @@ public class AdminUpdateSeasonRequestValidator : AbstractValidator<AdminUpdateSe
     RuleFor(c => c.EndDateInclusiveUtc).NotEmpty();
     RuleFor(c => c.Location).NotEmpty();
     RuleFor(c => c.ImageUrl).NotEmpty();
+    RuleFor(c => c.ResourcesUrl).NotEmpty();
   }
 }

@@ -8,7 +8,7 @@ import {
   useMantineReactTable,
 } from 'mantine-react-table';
 import { Link } from 'react-router-dom';
-import { ActionIcon, Anchor, Button, Flex, Text, Title, Tooltip } from '@mantine/core';
+import { ActionIcon, Anchor, Badge, Button, Flex, Text, Title, Tooltip } from '@mantine/core';
 import { useLocalStorage } from '@mantine/hooks';
 import { modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
@@ -120,6 +120,55 @@ export const AdminSeasonsTable = () => {
       {
         accessorKey: 'location',
         header: 'Location',
+      },
+      {
+        accessorKey: 'imageUrl',
+        header: 'Image URL',
+        Cell: ({ row }) => {
+          const url = row.original.imageUrl;
+          if (!url) {
+            return (
+              <Text size="sm" c="dimmed">
+                -
+              </Text>
+            );
+          }
+          return (
+            <Anchor href={url} target="_blank" size="sm">
+              {url.length > 30 ? `${url.substring(0, 30)}...` : url}
+            </Anchor>
+          );
+        },
+      },
+      {
+        accessorKey: 'resourcesUrl',
+        header: 'Resources URL',
+        Cell: ({ row }) => {
+          const url = row.original.resourcesUrl;
+          if (!url) {
+            return (
+              <Text size="sm" c="dimmed">
+                -
+              </Text>
+            );
+          }
+          return (
+            <Anchor href={url} target="_blank" size="sm">
+              {url.length > 30 ? `${url.substring(0, 30)}...` : url}
+            </Anchor>
+          );
+        },
+      },
+      {
+        accessorKey: 'isDataBackFilled',
+        header: 'Backfilled',
+        Cell: ({ row }) => {
+          return (
+            <Badge color={row.original.isDataBackFilled ? 'green' : 'gray'} size="sm">
+              {row.original.isDataBackFilled ? 'Yes' : 'No'}
+            </Badge>
+          );
+        },
       },
     ],
     []
