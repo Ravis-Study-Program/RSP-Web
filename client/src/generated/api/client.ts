@@ -477,9 +477,9 @@ export interface CreateMockInterviewRequest {
   timeTakenInMinutes: number;
   mockInterviewRounds: MockInterviewRoundDto[];
   /** @nullable */
-  seasonId?: string | null;
-  /** @nullable */
   notes?: string | null;
+  /** @nullable */
+  seasonId?: string | null;
 }
 
 export interface CreateMockInterviewResponse {
@@ -919,6 +919,8 @@ export interface MockInterviewEntity {
   isPass: boolean;
   startDate: string;
   timeTakenInMinutes: number;
+  /** @nullable */
+  notes?: string | null;
   /** @minLength 1 */
   interviewerUserId: string;
   /** @minLength 1 */
@@ -935,8 +937,6 @@ export interface MockInterviewEntity {
   seasonWeek?: SeasonWeekEntity;
   /** @nullable */
   deletedAtUtc?: string | null;
-  /** @nullable */
-  notes?: string | null;
 }
 
 export interface MockInterviewRoundDto {
@@ -1067,9 +1067,9 @@ export interface UpdateMockInterviewRequest {
   timeTakenInMinutes: number;
   mockInterviewRounds: MockInterviewRoundDto[];
   /** @nullable */
-  seasonId?: string | null;
-  /** @nullable */
   notes?: string | null;
+  /** @nullable */
+  seasonId?: string | null;
 }
 
 export interface UpdateMockInterviewResponse {

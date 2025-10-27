@@ -1,33 +1,59 @@
+import { useState } from 'react';
 import { IconChevronRight } from '@tabler/icons-react';
 import { Link } from 'react-router-dom';
 import { Anchor, Box, Collapse, Group, Text, ThemeIcon, UnstyledButton } from '@mantine/core';
-import { useLocalStorage } from '@mantine/hooks';
 import { TabItem } from '../Navbar/NavbarRoutes';
 import classes from './NavbarLinksGroup.module.css';
+
+const preloadRoute = (path: string) => {
+  switch (path) {
+    case '/seasons':
+      import('../../pages/Seasons/Seasons.page');
+      break;
+    case '/profile':
+      import('../../pages/Profile/Profile.page');
+      break;
+    case '/settings':
+      import('../../pages/Settings/Settings.page');
+      break;
+    case '/graduates':
+      import('../../pages/Graduates/Graduates.page');
+      break;
+    case '/leetcode':
+      import('../../pages/Leetcode/Leetcode.page');
+      break;
+    case '/mock-interviews':
+      import('../../pages/MockInterviews/MockInterview.page');
+      break;
+    default:
+      if (path.includes('/seasons/')) {
+        if (path.includes('/overview')) {
+          import('../../pages/Seasons/SeasonsOverview.page');
+        } else if (path.includes('/users')) {
+          import('../../pages/SeasonUsers/SeasonUsers.page');
+        } else if (path.includes('/mentees')) {
+          import('../../pages/Mentees/Mentees.page');
+        } else if (path.includes('/leetcode')) {
+          import('../../pages/Leetcode/Leetcode.page');
+        } else if (path.includes('/mock-interviews')) {
+          import('../../pages/MockInterviews/MockInterview.page');
+        }
+      }
+  }
+};
 
 interface LinksGroupProps {
   icon: React.FC<any>;
   label: string;
-  initiallyOpened: boolean;
   links?: TabItem[];
   link?: string;
   activeLink?: string;
 }
 
-export function LinksGroup({
-  label,
-  initiallyOpened = false,
-  links,
-  link,
-  icon: Icon,
-  activeLink,
-}: LinksGroupProps) {
+export function LinksGroup({ label, links, link, icon: Icon, activeLink }: LinksGroupProps) {
   const hasLinks = Array.isArray(links);
 
-  const [opened, setOpened] = useLocalStorage({
-    key: `navbar-group-${label}-opened`,
-    defaultValue: initiallyOpened,
-  });
+  const [opened, setOpened] = useState(false);
 
   const items = (hasLinks ? links.filter((item) => !item.hidden) : []).map((innerLink) => (
     <Anchor
@@ -35,6 +61,7 @@ export function LinksGroup({
       className={`${classes.innerLink} ${activeLink === innerLink.link ? classes.activeLink : ''}`}
       to={innerLink.link || ''}
       key={innerLink.label}
+      onMouseEnter={() => innerLink.link && preloadRoute(innerLink.link)}
     >
       <Box style={{ display: 'flex', alignItems: 'center' }}>
         <ThemeIcon variant="transparent" className={classes.icon} size={32}>
@@ -86,6 +113,7 @@ export function LinksGroup({
       to={link}
       key={link}
       className={`${classes.link} ${activeLink === link ? classes.activeLink : ''}`}
+      onMouseEnter={() => preloadRoute(link)}
     >
       {button}
     </Anchor>

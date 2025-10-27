@@ -75,22 +75,16 @@ export function Navbar({
           item.link = undefined;
 
           // Explicitly disable active link
-          return (
-            <LinksGroup initiallyOpened={false} activeLink={pathname} {...item} key={item.label} />
-          );
+          return <LinksGroup activeLink={pathname} {...item} key={item.label} />;
         }
 
-        return (
-          <LinksGroup initiallyOpened={false} activeLink={pathname} {...item} key={item.label} />
-        );
+        return <LinksGroup activeLink={pathname} {...item} key={item.label} />;
       }) ?? [];
 
   const seasonLinks =
     tabs?.season
       ?.filter((item) => !item.hidden)
-      ?.map((item) => (
-        <LinksGroup initiallyOpened activeLink={pathname} {...item} key={item.label} />
-      )) ?? [];
+      ?.map((item) => <LinksGroup activeLink={pathname} {...item} key={item.label} />) ?? [];
 
   const adminSpotlightActions = createAdminSpotlightActions(navigate);
   const nonAdminSpotlightActions = createNonAdminSpotlightActions(navigate);

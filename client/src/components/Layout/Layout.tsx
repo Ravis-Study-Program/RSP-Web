@@ -70,10 +70,6 @@ export function Layout() {
     return breadcrumbLinks;
   };
 
-  if (isLoadingEnrollments || isFetchingEnrollments) {
-    return null;
-  }
-
   return (
     <AppShell
       layout="alt"
@@ -106,7 +102,7 @@ export function Layout() {
           </Anchor>
         </Group>
         <Navbar
-          isLoading={isLoading}
+          isLoading={isLoading || isLoadingEnrollments}
           user={user}
           isAdmin={isAdmin}
           tabs={tabs}
