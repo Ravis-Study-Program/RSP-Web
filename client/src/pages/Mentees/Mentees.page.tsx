@@ -2,13 +2,15 @@ import { useMemo, useState } from 'react';
 import { Flex, Group, MultiSelect, SegmentedControl, Text } from '@mantine/core';
 import {
   useGetCurrentUserMentees,
+  useGetEnrollmentUsers,
   useGetIsCurrentUserEnrolled,
+  useGetSeasonWeeksBySeasonSlug,
   useListMockInterview,
   useListProblemAttempt,
 } from '@/generated/api/client';
 import { useSeasonSlug } from '@/shared/hooks/useSeasonSlug';
 import { useUserAndEnrollment } from '@/shared/hooks/useUserAndEnrollment';
-import { createOptionsFilter } from '@/shared/table/globalFilters';
+import { createOptionsFilter, getSeasonWeeks } from '@/shared/table/globalFilters';
 import { LeetcodeTable } from '../Leetcode/LeetcodeTable/LeetcodeTable';
 import { MockInterviewTable } from '../MockInterviews/MockInterviewTable/MockInterviewTable';
 import { MenteesTable } from './MenteesTable';
@@ -21,10 +23,21 @@ export default function MenteesPage() {
   const { enrollmentId, seasonId } = useUserAndEnrollment(seasonSlug);
   const [section, setSection] = useState<'Portfolio' | 'Performance'>('Portfolio');
   const [selectedMentees, setSelectedMentees] = useState<string[]>([]);
+  const [selectedSeasonWeeks, setSelectedSeasonWeeks] = useState<string[]>([]);
 
   const { data: mentorshipResponse, refetch: refetchMentorships } = useGetCurrentUserMentees(
     { SeasonSlug: seasonSlug, UserId: userId },
     { query: { enabled: userId !== '' && seasonSlug !== '' } }
+  );
+
+  const { data: enrollmentUsersResponse } = useGetEnrollmentUsers(
+    { SeasonSlug: seasonSlug },
+    { query: { enabled: seasonSlug !== '' } }
+  );
+
+  const { data: seasonWeeksResponse } = useGetSeasonWeeksBySeasonSlug(
+    { SeasonSlug: seasonSlug },
+    { query: { enabled: seasonSlug !== '' } }
   );
 
   const mentees = mentorshipResponse?.responseBody?.mentorships.map((mentorship) => {
@@ -34,17 +47,29 @@ export default function MenteesPage() {
     };
   });
 
-  // For now, we'll get mentor's own data as we don't have mentee userIds
-  // TODO: This needs to be redesigned to get mentee user IDs properly
+  const seasonWeeksOptions = getSeasonWeeks(seasonWeeksResponse?.responseBody?.seasonWeeks || []);
+
+  const getMenteeUserIds = useMemo(() => {
+    const enrollmentUsers = enrollmentUsersResponse?.responseBody?.enrollmentUsers || [];
+    const mentorships = mentorshipResponse?.responseBody?.mentorships || [];
+
+    const selectedMenteeNames =
+      selectedMentees.length === 0 ? mentorships.map((m) => m.menteeName) : selectedMentees;
+
+    return enrollmentUsers
+      .filter((user) => selectedMenteeNames.includes(user.name))
+      .map((user) => user.userId);
+  }, [mentorshipResponse, enrollmentUsersResponse, selectedMentees]);
+
   const { data: mockInterviewsResponse, refetch: refetchMockInterviews } = useListMockInterview(
     {
       SeasonId: seasonId || undefined,
       IncludeCustom: true,
       IncludeLeetcode: true,
       IncludeBehavioural: true,
-      UserIds: userId ? [userId] : [],
+      UserIds: getMenteeUserIds,
     },
-    { query: { enabled: userId !== '' && seasonId !== null } }
+    { query: { enabled: getMenteeUserIds.length > 0 && seasonId !== null } }
   );
 
   const { data: problemAttemptsResponse, refetch: refetchProblemAttempts } = useListProblemAttempt(
@@ -52,9 +77,9 @@ export default function MenteesPage() {
       SeasonId: seasonId || undefined,
       IncludeCustom: false,
       IncludeLeetcode: true,
-      UserIds: userId ? [userId] : [],
+      UserIds: getMenteeUserIds,
     },
-    { query: { enabled: userId !== '' && seasonId !== null } }
+    { query: { enabled: getMenteeUserIds.length > 0 && seasonId !== null } }
   );
 
   const PortfolioComponent = useMemo(() => {
@@ -72,10 +97,14 @@ export default function MenteesPage() {
   const LeetcodeComponent = useMemo(() => {
     const problemAttempts = (problemAttemptsResponse?.responseBody?.problemAttempts || []).filter(
       (problemAttempt) =>
-        selectedMentees.length === 0 ||
-        selectedMentees.length === 0 ||
-        (problemAttempt.user?.name != null &&
-          selectedMentees.includes(problemAttempt.user?.name.toString()))
+        // Mentees filter
+        (selectedMentees.length === 0 ||
+          (problemAttempt.user?.name != null &&
+            selectedMentees.includes(problemAttempt.user?.name.toString()))) &&
+        // Season weeks filter
+        (selectedSeasonWeeks.length === 0 ||
+          (problemAttempt.seasonWeekId != null &&
+            selectedSeasonWeeks.includes(problemAttempt.seasonWeekId.toString())))
     );
 
     return (
@@ -88,15 +117,24 @@ export default function MenteesPage() {
         showCategory
       />
     );
-  }, [refetchProblemAttempts, problemAttemptsResponse, selectedMentees, enrollmentId]);
+  }, [
+    refetchProblemAttempts,
+    problemAttemptsResponse,
+    selectedMentees,
+    selectedSeasonWeeks,
+    enrollmentId,
+  ]);
 
   const MockInterviewComponent = useMemo(() => {
     const mocks = (mockInterviewsResponse?.responseBody?.mockInterviews || []).filter(
       (mock) =>
-        selectedMentees.length === 0 ||
-        selectedMentees.length === 0 ||
-        (mock.interviewee?.name != null &&
-          selectedMentees.includes(mock.interviewee?.name.toString()))
+        // Mentees filter
+        (selectedMentees.length === 0 ||
+          (mock.interviewee?.name != null &&
+            selectedMentees.includes(mock.interviewee?.name.toString()))) &&
+        // Season weeks filter
+        (selectedSeasonWeeks.length === 0 ||
+          (mock.seasonWeekId != null && selectedSeasonWeeks.includes(mock.seasonWeekId.toString())))
     );
 
     return (
@@ -107,7 +145,13 @@ export default function MenteesPage() {
         enableEditing={false}
       />
     );
-  }, [refetchMockInterviews, mockInterviewsResponse, selectedMentees, seasonId]);
+  }, [
+    refetchMockInterviews,
+    mockInterviewsResponse,
+    selectedMentees,
+    selectedSeasonWeeks,
+    seasonId,
+  ]);
 
   const PerformanceComponent = (
     <>
@@ -154,6 +198,22 @@ export default function MenteesPage() {
               setSelectedMentees(values as string[]);
             }}
           />
+          {section === 'Performance' && (
+            <MultiSelect
+              classNames={{ inputField: classes.inputField }}
+              label="Season Week"
+              placeholder="Pick value(s)"
+              data={seasonWeeksOptions}
+              filter={createOptionsFilter()}
+              miw={150}
+              searchable
+              nothingFoundMessage="Nothing found..."
+              value={selectedSeasonWeeks}
+              onChange={(values) => {
+                setSelectedSeasonWeeks(values as string[]);
+              }}
+            />
+          )}
         </Group>
       </Flex>
       {section === 'Portfolio' ? PortfolioComponent : null}

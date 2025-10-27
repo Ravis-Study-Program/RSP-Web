@@ -23,7 +23,6 @@ const MenteesPage = lazy(() => import('./pages/Mentees/Mentees.page'));
 const MockInterviewPage = lazy(() => import('./pages/MockInterviews/MockInterview.page'));
 const NotFoundPage = lazy(() => import('./pages/NotFound/NotFound.page'));
 const ProfilePage = lazy(() => import('./pages/Profile/Profile.page'));
-const ResourcesPage = lazy(() => import('./pages/Resources/Resources.page'));
 const SeasonUsersPage = lazy(() => import('./pages/SeasonUsers/SeasonUsers.page'));
 const SeasonsPage = lazy(() => import('./pages/Seasons/Seasons.page'));
 const SeasonsOverviewPage = lazy(() => import('./pages/Seasons/SeasonsOverview.page'));
@@ -117,11 +116,6 @@ const routes = (
             path: 'mock-interviews',
             title: 'Season Mock Interviews | RSP',
             element: <MockInterviewPage />,
-          })}
-          {createRouteMeta({
-            path: 'resources',
-            title: 'Season Resources | RSP',
-            element: <ResourcesPage />,
           })}
           {createRouteMeta({ path: 'profile', title: 'Profile | RSP', element: <ProfilePage /> })}
         </Route>

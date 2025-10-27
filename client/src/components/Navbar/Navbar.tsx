@@ -89,7 +89,7 @@ export function Navbar({
     tabs?.season
       ?.filter((item) => !item.hidden)
       ?.map((item) => (
-        <LinksGroup initiallyOpened activeLink={pathname} {...item} key={item.label} />
+        <LinksGroup initiallyOpened={false} activeLink={pathname} {...item} key={item.label} />
       )) ?? [];
 
   const adminSpotlightActions = createAdminSpotlightActions(navigate);
