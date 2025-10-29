@@ -8,7 +8,6 @@ import {
   MRT_Row,
   useMantineReactTable,
 } from 'mantine-react-table';
-import { Link } from 'react-router-dom';
 import { ActionIcon, Anchor, Box, Button, Flex, Table, Text, Title, Tooltip } from '@mantine/core';
 import { useLocalStorage } from '@mantine/hooks';
 import { modals } from '@mantine/modals';
@@ -25,6 +24,7 @@ import {
   useListLeetcodeProblems,
   useUpdateMockInterview,
 } from '@/generated/api/client';
+import { LeetcodeDifficultyText } from '@/shared/components/LeetcodeDifficultyText';
 import {
   getConfirmModalProps,
   getErrorNotification,
@@ -130,7 +130,7 @@ export const MockInterviewTable = ({
       {
         header: 'Date',
         id: 'startDate',
-        accessorFn: (row) => dayjs(row.startDate).format('D MMM YYYY HH:mm'),
+        accessorFn: (row) => new Date(row.startDate),
         Cell: ({ row }) => {
           const startFormatted = dayjs(row.original.startDate).format('D MMM YYYY HH:mm');
           const isDataBackFilled = row.original.season?.isDataBackFilled;
@@ -153,8 +153,8 @@ export const MockInterviewTable = ({
       ...(enrollmentColumn ? [enrollmentColumn] : []),
       ...(seasonWeekColumn ? [seasonWeekColumn] : []),
       {
-        header: 'Time Taken (mins)',
-        accessorFn: (row) => row.timeTakenInMinutes,
+        header: 'Duration',
+        accessorFn: (row) => `${row.timeTakenInMinutes} mins`,
       },
       {
         header: 'Interviewer',
@@ -213,7 +213,7 @@ export const MockInterviewTable = ({
       sorting: [
         {
           id: 'startDate',
-          desc: false,
+          desc: true,
         },
       ],
     },
@@ -249,8 +249,10 @@ export const MockInterviewTable = ({
 
       return (
         <Flex gap={20} direction="column">
-          <LeetcodeMockInterviewRoundsInnerTable rounds={leetcodeRounds} />
-          <CustomMockInterviewRoundsInnerTable rounds={customRounds} />
+          {leetcodeRounds.length > 0 && (
+            <LeetcodeMockInterviewRoundsInnerTable rounds={leetcodeRounds} />
+          )}
+          {customRounds.length > 0 && <CustomMockInterviewRoundsInnerTable rounds={customRounds} />}
         </Flex>
       );
     },
@@ -328,6 +330,11 @@ const LeetcodeMockInterviewRoundsInnerTable = ({ rounds }: InnerMockInterviewTab
           </Anchor>
         </Table.Td>
         <Table.Td>
+          <LeetcodeDifficultyText
+            difficulty={leetcodeMock.leetcodeProblem?.leetcodeProblemDifficulty}
+          />
+        </Table.Td>
+        <Table.Td>
           <ScoreText score={leetcodeMock.confirmQuestionScore} />
         </Table.Td>
         <Table.Td>
@@ -355,6 +362,7 @@ const LeetcodeMockInterviewRoundsInnerTable = ({ rounds }: InnerMockInterviewTab
       <Table.Thead className={classes.innerTableHeading}>
         <Table.Tr>
           <Table.Th>Leetcode Problem</Table.Th>
+          <Table.Th>Difficulty</Table.Th>
           <Table.Th>Confirm Question</Table.Th>
           <Table.Th>Algorithm Design</Table.Th>
           <Table.Th>Complexity Analysis</Table.Th>
@@ -378,12 +386,31 @@ const CustomMockInterviewRoundsInnerTable = ({ rounds }: InnerMockInterviewTable
     return (
       <Table.Tr key={index}>
         <Table.Td>
-          <Text size="sm">{customMock.content}</Text>
+          <Box
+            style={{ fontSize: '14px' }}
+            dangerouslySetInnerHTML={{ __html: customMock.content || '' }}
+          />
         </Table.Td>
         <Table.Td>
-          <Anchor component={Link} size="sm" fw={500} to={customMock.link}>
-            Link
+          <Anchor
+            href={customMock.link || ''}
+            target="_blank"
+            size="sm"
+            fw={500}
+            style={{
+              maxWidth: '200px',
+              display: 'block',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
+            title={customMock.link || ''}
+          >
+            {customMock.link}
           </Anchor>
+        </Table.Td>
+        <Table.Td>
+          <ScoreText score={customMock.score} />
         </Table.Td>
       </Table.Tr>
     );
@@ -397,8 +424,9 @@ const CustomMockInterviewRoundsInnerTable = ({ rounds }: InnerMockInterviewTable
     <Table horizontalSpacing="md" verticalSpacing="sm" className={classes.innerTable}>
       <Table.Thead className={classes.innerTableHeading}>
         <Table.Tr>
-          <Table.Th>Custom Problem</Table.Th>
+          <Table.Th>Custom Problem Content</Table.Th>
           <Table.Th>Link</Table.Th>
+          <Table.Th>Score</Table.Th>
         </Table.Tr>
       </Table.Thead>
       <Table.Tbody>{tableRows}</Table.Tbody>

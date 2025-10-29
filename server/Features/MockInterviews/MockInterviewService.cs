@@ -66,7 +66,7 @@ public class MockInterviewService : BaseService, IMockInterviewService
   {
     SeasonWeekEntity? seasonWeek = null;
     string? seasonId = null;
-    if (request.SeasonId != null)
+    if (!string.IsNullOrEmpty(request.SeasonId))
     {
       var existingEnrollment = await _enrollmentService.GetEnrollmentBySeasonId(
         request.SeasonId,
@@ -214,7 +214,7 @@ public class MockInterviewService : BaseService, IMockInterviewService
   )
   {
     var query = _mockInterviewRepository.Table;
-    if (request.SeasonId != null)
+    if (!string.IsNullOrEmpty(request.SeasonId))
     {
       // TODO: Parallelize to speed things up
       foreach (var userId in request.UserIds)
@@ -313,7 +313,7 @@ public class MockInterviewService : BaseService, IMockInterviewService
     }
 
     SeasonWeekEntity? seasonWeek = null;
-    if (request.SeasonId != null)
+    if (!string.IsNullOrEmpty(request.SeasonId))
     {
       var currentDate = request.StartDate;
       var seasonWeeks = await _seasonWeekService.GetAllSeasonWeeksAsync(
@@ -375,57 +375,149 @@ public class MockInterviewService : BaseService, IMockInterviewService
     ICollection<MockInterviewRoundEntity> existingRounds
   )
   {
+    var updatedRounds = new List<MockInterviewRoundEntity>();
+
     foreach (var newRound in newMockInterviewRounds)
     {
-      // Find the corresponding tracked entity based on the ID.
-      var trackedRound = existingRounds.FirstOrDefault(r =>
-        r.MockInterviewRoundId == newRound.MockInterviewRoundId
-      );
-
-      if (trackedRound == null)
+      MockInterviewRoundEntity? trackedRound = null;
+      
+      // Only try to find existing round if we have an ID
+      if (!string.IsNullOrEmpty(newRound.MockInterviewRoundId))
       {
-        continue;
+        // Find the corresponding tracked entity based on the ID and type compatibility
+        trackedRound = existingRounds.FirstOrDefault(r =>
+          r.MockInterviewRoundId == newRound.MockInterviewRoundId && CanUpdateRoundType(r, newRound)
+        );
       }
 
-      // Update Behavioral Round values
-      if (newRound.BehaviouralMockInterviewRound != null)
+      if (trackedRound != null)
       {
-        trackedRound.BehaviouralMockInterviewRound.BehavioralScore = newRound
-          .BehaviouralMockInterviewRound
-          .BehavioralScore;
+        // Update existing round of the same type
+        UpdateExistingRound(trackedRound, newRound);
+        updatedRounds.Add(trackedRound);
       }
-
-      // Update Leetcode Round values
-      if (newRound.LeetcodeMockInterviewRound != null)
+      else
       {
-        trackedRound.LeetcodeMockInterviewRound.LeetcodeProblemId = newRound
-          .LeetcodeMockInterviewRound
-          .LeetcodeProblemId;
-        trackedRound.LeetcodeMockInterviewRound.ConfirmQuestionScore = newRound
-          .LeetcodeMockInterviewRound
-          .ConfirmQuestionScore;
-        trackedRound.LeetcodeMockInterviewRound.AlgorithmDesignScore = newRound
-          .LeetcodeMockInterviewRound
-          .AlgorithmDesignScore;
-        trackedRound.LeetcodeMockInterviewRound.ComplexityAnalysisScore = newRound
-          .LeetcodeMockInterviewRound
-          .ComplexityAnalysisScore;
-        trackedRound.LeetcodeMockInterviewRound.CodingScore = newRound
-          .LeetcodeMockInterviewRound
-          .CodingScore;
-        trackedRound.LeetcodeMockInterviewRound.TestingScore = newRound
-          .LeetcodeMockInterviewRound
-          .TestingScore;
-      }
-
-      // Update Custom Round values
-      if (newRound.CustomMockInterviewRound != null)
-      {
-        trackedRound.CustomMockInterviewRound.Score = newRound.CustomMockInterviewRound.Score;
-        trackedRound.CustomMockInterviewRound.Link = newRound.CustomMockInterviewRound.Link;
-        trackedRound.CustomMockInterviewRound.Content = newRound.CustomMockInterviewRound.Content;
+        // Create new round (either completely new or replacing an incompatible type)
+        var newRoundEntity = CreateNewRound(newRound);
+        updatedRounds.Add(newRoundEntity);
       }
     }
+
+    // Clear existing rounds and replace with updated rounds
+    existingRounds.Clear();
+    foreach (var round in updatedRounds)
+    {
+      existingRounds.Add(round);
+    }
+  }
+
+  private static bool CanUpdateRoundType(MockInterviewRoundEntity existing, MockInterviewRoundDto newRound)
+  {
+    // Check if the round type matches what we're trying to update
+    if (newRound.BehaviouralMockInterviewRound != null)
+      return existing.BehaviouralMockInterviewRound != null;
+    
+    if (newRound.LeetcodeMockInterviewRound != null)
+      return existing.LeetcodeMockInterviewRound != null;
+    
+    if (newRound.CustomMockInterviewRound != null)
+      return existing.CustomMockInterviewRound != null;
+
+    return false;
+  }
+
+  private static void UpdateExistingRound(MockInterviewRoundEntity existing, MockInterviewRoundDto newRound)
+  {
+    // Update Behavioral Round values
+    if (newRound.BehaviouralMockInterviewRound != null && existing.BehaviouralMockInterviewRound != null)
+    {
+      existing.BehaviouralMockInterviewRound.BehavioralScore = newRound
+        .BehaviouralMockInterviewRound
+        .BehavioralScore;
+    }
+
+    // Update Leetcode Round values
+    if (newRound.LeetcodeMockInterviewRound != null && existing.LeetcodeMockInterviewRound != null)
+    {
+      existing.LeetcodeMockInterviewRound.LeetcodeProblemId = newRound
+        .LeetcodeMockInterviewRound
+        .LeetcodeProblemId;
+      existing.LeetcodeMockInterviewRound.ConfirmQuestionScore = newRound
+        .LeetcodeMockInterviewRound
+        .ConfirmQuestionScore;
+      existing.LeetcodeMockInterviewRound.AlgorithmDesignScore = newRound
+        .LeetcodeMockInterviewRound
+        .AlgorithmDesignScore;
+      existing.LeetcodeMockInterviewRound.ComplexityAnalysisScore = newRound
+        .LeetcodeMockInterviewRound
+        .ComplexityAnalysisScore;
+      existing.LeetcodeMockInterviewRound.CodingScore = newRound
+        .LeetcodeMockInterviewRound
+        .CodingScore;
+      existing.LeetcodeMockInterviewRound.TestingScore = newRound
+        .LeetcodeMockInterviewRound
+        .TestingScore;
+    }
+
+    // Update Custom Round values
+    if (newRound.CustomMockInterviewRound != null && existing.CustomMockInterviewRound != null)
+    {
+      existing.CustomMockInterviewRound.Score = newRound.CustomMockInterviewRound.Score;
+      existing.CustomMockInterviewRound.Link = newRound.CustomMockInterviewRound.Link;
+      existing.CustomMockInterviewRound.Content = newRound.CustomMockInterviewRound.Content;
+    }
+  }
+
+  private static MockInterviewRoundEntity CreateNewRound(MockInterviewRoundDto roundDto)
+  {
+    var mockInterviewRound = new MockInterviewRoundEntity
+    {
+      MockInterviewRoundId = !string.IsNullOrEmpty(roundDto.MockInterviewRoundId) 
+        ? roundDto.MockInterviewRoundId 
+        : Database.Constants.GeneratePrimaryKeyId(),
+      IsReviewedByInterviewee = false,
+      IntervieweeComment = "",
+    };
+
+    // Add BehaviouralMockInterviewRound if present
+    if (roundDto.BehaviouralMockInterviewRound != null)
+    {
+      mockInterviewRound.BehaviouralMockInterviewRound = new BehaviouralMockInterviewRoundEntity
+      {
+        BehaviouralMockInterviewRoundId = Database.Constants.GeneratePrimaryKeyId(),
+        BehavioralScore = roundDto.BehaviouralMockInterviewRound.BehavioralScore,
+      };
+    }
+
+    // Add LeetcodeMockInterviewRound if present
+    if (roundDto.LeetcodeMockInterviewRound != null)
+    {
+      mockInterviewRound.LeetcodeMockInterviewRound = new LeetcodeMockInterviewRoundEntity
+      {
+        LeetcodeMockInterviewRoundId = Database.Constants.GeneratePrimaryKeyId(),
+        ConfirmQuestionScore = roundDto.LeetcodeMockInterviewRound.ConfirmQuestionScore,
+        AlgorithmDesignScore = roundDto.LeetcodeMockInterviewRound.AlgorithmDesignScore,
+        ComplexityAnalysisScore = roundDto.LeetcodeMockInterviewRound.ComplexityAnalysisScore,
+        CodingScore = roundDto.LeetcodeMockInterviewRound.CodingScore,
+        TestingScore = roundDto.LeetcodeMockInterviewRound.TestingScore,
+        LeetcodeProblemId = roundDto.LeetcodeMockInterviewRound.LeetcodeProblemId,
+      };
+    }
+
+    // Add CustomMockInterviewRound if present
+    if (roundDto.CustomMockInterviewRound != null)
+    {
+      mockInterviewRound.CustomMockInterviewRound = new CustomMockInterviewRoundEntity
+      {
+        CustomMockInterviewRoundId = Database.Constants.GeneratePrimaryKeyId(),
+        Content = roundDto.CustomMockInterviewRound.Content,
+        Score = roundDto.CustomMockInterviewRound.Score,
+        Link = roundDto.CustomMockInterviewRound.Link,
+      };
+    }
+
+    return mockInterviewRound;
   }
 
   public (string, List<MockInterviewRoundEntity>) GenerateMockInterviewRounds(
@@ -501,28 +593,25 @@ public class MockInterviewService : BaseService, IMockInterviewService
       if (round.LeetcodeMockInterviewRound != null)
       {
         var r = round.LeetcodeMockInterviewRound;
-        numList.AddRange(
-          new List<int>
-          {
-            r.ConfirmQuestionScore,
-            r.AlgorithmDesignScore,
-            r.ComplexityAnalysisScore,
-            r.CodingScore,
-            r.TestingScore,
-          }
-        );
+        numList.AddRange([
+          r.ConfirmQuestionScore,
+          r.AlgorithmDesignScore,
+          r.ComplexityAnalysisScore,
+          r.CodingScore,
+          r.TestingScore,
+        ]);
       }
 
       if (round.BehaviouralMockInterviewRound != null)
       {
         var r = round.BehaviouralMockInterviewRound;
-        numList.AddRange(new List<int> { r.BehavioralScore });
+        numList.AddRange([r.BehavioralScore]);
       }
 
       if (round.CustomMockInterviewRound != null)
       {
         var r = round.CustomMockInterviewRound;
-        numList.AddRange(new List<int> { r.Score });
+        numList.AddRange([r.Score]);
       }
     }
 
@@ -559,10 +648,7 @@ public class MockInterviewService : BaseService, IMockInterviewService
       cancellationToken: cancellationToken
     );
 
-    if (mockInterview == null)
-    {
-      throw new KeyNotFoundException(Messages.MockInterview.DoesNotExist);
-    }
+    ArgumentNullException.ThrowIfNull(mockInterview, Messages.MockInterview.DoesNotExist);
 
     _mockInterviewRepository.Delete(mockInterview, cancellationToken);
   }
@@ -578,10 +664,7 @@ public class MockInterviewService : BaseService, IMockInterviewService
       mockInterview.MockInterviewId,
       cancellationToken: cancellationToken
     );
-    if (existingMockInterview == null)
-    {
-      throw new KeyNotFoundException(Messages.MockInterview.DoesNotExist);
-    }
+    ArgumentNullException.ThrowIfNull(existingMockInterview, Messages.MockInterview.DoesNotExist);
 
     _mockInterviewRepository.Update(mockInterview, cancellationToken);
   }
