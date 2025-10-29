@@ -7,29 +7,20 @@ import {
   MRT_Row,
   useMantineReactTable,
 } from 'mantine-react-table';
-import { ActionIcon, Flex, Text, Title, Tooltip } from '@mantine/core';
+import { ActionIcon, Flex, Tooltip } from '@mantine/core';
 import { useLocalStorage } from '@mantine/hooks';
 import { modals } from '@mantine/modals';
-import { notifications } from '@mantine/notifications';
 import {
   GetCurrentUserMenteesListResponseApiResponse,
-  KickStudentResponseApiResponse,
   MentorshipResponse,
   SeasonStudentRolePromotion,
-  useGetCurrentUser,
   useKickStudent,
   useUpdateStudentRolePromotion,
 } from '@/generated/api/client';
-import {
-  getConfirmModalProps,
-  getErrorNotification,
-  getMantineTablePropsWithBanner,
-  getSuccessNotification,
-  NOTIFICATION_MESSAGES,
-} from '@/shared/constants/mantineTableProps';
-import { CONFIRMATION_MESSAGES } from '@/shared/constants/messages';
+import { getMantineTablePropsWithBanner } from '@/shared/constants/mantineTableProps';
 import { useSeasonSlug } from '@/shared/hooks/useSeasonSlug';
 import classes from '@/shared/styles/tableStyles.module.css';
+import { KickStudentModal } from './KickStudentModal';
 import { StudentRolePromotionUpdateModal } from './StudentRolePromotionUpdateModal';
 
 export const MenteesTable = ({ refetchMentorships, mentorships }: MenteesTableProps) => {
@@ -45,41 +36,24 @@ export const MenteesTable = ({ refetchMentorships, mentorships }: MenteesTablePr
   });
 
   const { seasonSlug } = useSeasonSlug();
-  const { data: userResponse } = useGetCurrentUser();
-  const userId = userResponse?.responseBody?.user.userId ?? '';
   const { mutateAsync: kickStudent, status: isKickingStudentStatus } = useKickStudent();
   const { mutateAsync: updateStudentRolePromotion, status: isUpdatingStudentRolePromotionStatus } =
     useUpdateStudentRolePromotion();
 
-  const openKickMenteeConfirmModal = (row: MRT_Row<MentorshipResponse>) => {
-    modals.openConfirmModal({
+  const openKickMenteeModal = (row: MRT_Row<MentorshipResponse>) => {
+    modals.open({
+      title: 'Kick Student',
       children: (
-        <>
-          <Title order={3} mt={15} mb={10}>
-            {CONFIRMATION_MESSAGES.MENTEE.DELETE_TITLE}
-          </Title>
-          <Text>{CONFIRMATION_MESSAGES.MENTEE.DELETE_TEXT}</Text>
-        </>
+        <KickStudentModal
+          row={row}
+          kickStudent={kickStudent}
+          refetchMentorships={refetchMentorships}
+          seasonSlug={seasonSlug}
+          onClose={() => modals.closeAll()}
+        />
       ),
-      labels: { confirm: 'Kick Mentee', cancel: 'Cancel' },
-      ...getConfirmModalProps(),
-      onConfirm: async () => {
-        try {
-          await kickStudent({
-            data: {
-              seasonSlug,
-              menteeEnrollmentId: row.original.menteeEnrollmentId,
-              userId,
-            },
-          });
-          await refetchMentorships();
-          modals.closeAll();
-          notifications.show(getSuccessNotification(NOTIFICATION_MESSAGES.MENTEE.DELETED));
-        } catch (err) {
-          const response = (err as any)?.response.data as KickStudentResponseApiResponse;
-          notifications.show(getErrorNotification(response.error?.message));
-        }
-      },
+      size: 'lg',
+      centered: true,
     });
   };
 
@@ -146,7 +120,7 @@ export const MenteesTable = ({ refetchMentorships, mentorships }: MenteesTablePr
           </ActionIcon>
         </Tooltip>
         <Tooltip label="Delete">
-          <ActionIcon variant="subtle" color="red" onClick={() => openKickMenteeConfirmModal(row)}>
+          <ActionIcon variant="subtle" color="red" onClick={() => openKickMenteeModal(row)}>
             <IconTrash />
           </ActionIcon>
         </Tooltip>

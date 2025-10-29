@@ -27,6 +27,7 @@ public class ApplicationDbContext : DbContext
   public virtual DbSet<SeasonEntity> Seasons { get; set; }
   public virtual DbSet<UserEntity> Users { get; set; }
   public virtual DbSet<SeasonWeekEntity> SeasonWeeks { get; set; }
+  public virtual DbSet<KickStudentEventEntity> KickStudentEvents { get; set; }
 
   protected override void OnModelCreating(ModelBuilder modelBuilder)
   {
@@ -68,6 +69,9 @@ public class ApplicationDbContext : DbContext
     modelBuilder.Entity<SeasonEntity>().HasQueryFilter(x => x.DeletedAtUtc.HasValue == false);
     modelBuilder.Entity<UserEntity>().HasQueryFilter(x => x.DeletedAtUtc.HasValue == false);
     modelBuilder.Entity<SeasonWeekEntity>().HasQueryFilter(x => x.DeletedAtUtc.HasValue == false);
+    modelBuilder
+      .Entity<KickStudentEventEntity>()
+      .HasQueryFilter(x => x.DeletedAtUtc.HasValue == false);
 
     base.OnModelCreating(modelBuilder);
   }

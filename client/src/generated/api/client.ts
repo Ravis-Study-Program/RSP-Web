@@ -644,6 +644,8 @@ export interface EnrollmentResponseDto {
   /** @minLength 1 */
   seasonSlug: string;
   /** @minLength 1 */
+  seasonResourcesUrl: string;
+  /** @minLength 1 */
   userId: string;
   /** @minLength 1 */
   userName: string;
@@ -651,8 +653,6 @@ export interface EnrollmentResponseDto {
   numStudentsInSeason?: number;
   numMentorsInSeason?: number;
   numMenteesInSeason?: number;
-  /** @minLength 1 */
-  seasonResourcesUrl: string;
 }
 
 export interface EnrollmentUserDto {
@@ -781,6 +781,8 @@ export interface KickStudentRequest {
   seasonSlug: string;
   /** @minLength 1 */
   userId: string;
+  /** @minLength 1 */
+  kickReason: string;
 }
 
 export interface KickStudentResponse {

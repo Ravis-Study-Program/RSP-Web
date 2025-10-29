@@ -14,10 +14,12 @@ namespace RSPWebAPI.Features.Enrollments;
 public class EnrollmentService : BaseService, IEnrollmentService
 {
   private readonly IRepository<EnrollmentEntity> _enrollmentRepository;
+  private readonly IRepository<KickStudentEventEntity> _kickStudentEventRepository;
   private readonly Lazy<IMentorshipService> _mentorshipService;
 
   public EnrollmentService(
     IRepository<EnrollmentEntity> seasonRepository,
+    IRepository<KickStudentEventEntity> kickStudentEventRepository,
     IUnitOfWork unitOfWork,
     ILogger<EnrollmentService> logger,
     Lazy<IMentorshipService> mentorshipService
@@ -25,6 +27,7 @@ public class EnrollmentService : BaseService, IEnrollmentService
     : base(unitOfWork, logger)
   {
     _enrollmentRepository = seasonRepository;
+    _kickStudentEventRepository = kickStudentEventRepository;
     _mentorshipService = mentorshipService;
   }
 
@@ -368,7 +371,7 @@ public class EnrollmentService : BaseService, IEnrollmentService
 
     if (
       !IsSeasonRoleValid(
-        existingEnrollment.Role,
+        studentEnrollment.Role,
         new List<SeasonRole> { SeasonRole.Student },
         out errorMessage
       )
@@ -377,13 +380,24 @@ public class EnrollmentService : BaseService, IEnrollmentService
       throw new ArgumentException(errorMessage);
     }
 
-    // TODO: ensure mentorship integrity if the mentor is kicking the student out
-
     return await ExecuteWithSaveAsync(
-      () =>
+      async () =>
       {
+        var kickStudentEvent = new KickStudentEventEntity
+        {
+          KickStudentEventId = Database.Constants.GeneratePrimaryKeyId(),
+          KickedAtUtc = DateTime.UtcNow,
+          MentorId = existingEnrollment.UserId,
+          StudentId = studentEnrollment.UserId,
+          SeasonId = studentEnrollment.SeasonId,
+          KickReason = request.KickReason,
+        };
+
+        await _kickStudentEventRepository.AddAsync(kickStudentEvent, cancellationToken);
+
         _enrollmentRepository.Delete(studentEnrollment, cancellationToken);
-        return Task.FromResult(new KickStudentResponse());
+        
+        return new KickStudentResponse();
       },
       Messages.Student.KickError,
       cancellationToken
