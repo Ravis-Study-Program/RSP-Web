@@ -25,12 +25,17 @@ export function Layout() {
   const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
   const { seasonSlug, pathSegments } = useSeasonSlug();
   const { user, isAdmin, role, isLoading } = useUserAndEnrollment(seasonSlug);
-  const tabs = getTabs(seasonSlug, isAdmin, role);
   const {
     data: enrollmentsResponse,
     isFetching: isFetchingEnrollments,
     isLoading: isLoadingEnrollments,
   } = useGetUserEnrollments();
+
+  const resourcesUrl = enrollmentsResponse?.responseBody?.enrollments?.find(
+    (enrollment) => enrollment.seasonSlug === seasonSlug
+  )?.seasonResourcesUrl;
+
+  const tabs = getTabs(seasonSlug, isAdmin, role, resourcesUrl);
 
   const getBreadcrumbLinks = () => {
     if (isLoading || isLoadingEnrollments || isFetchingEnrollments) {
@@ -41,7 +46,7 @@ export function Layout() {
     let currentPath = '';
     for (let i = 0; i < pathSegments.length; i++) {
       currentPath += `/${pathSegments[i]}`;
-      const tab = lookupTabByLink(currentPath, seasonSlug, isAdmin, role);
+      const tab = lookupTabByLink(currentPath, seasonSlug, isAdmin, role, resourcesUrl);
       if (tab) {
         breadcrumbs.push(tab);
       }

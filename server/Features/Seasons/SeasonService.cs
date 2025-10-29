@@ -42,6 +42,8 @@ public class SeasonService : BaseService, ISeasonService
       EndDateInclusiveUtc = request.EndDateInclusiveUtc,
       Location = request.Location,
       ImageUrl = request.ImageUrl,
+      ResourcesUrl = request.ResourcesUrl,
+      IsDataBackFilled = request.IsDataBackFilled,
     };
 
     return await ExecuteWithSaveAsync(
@@ -110,6 +112,8 @@ public class SeasonService : BaseService, ISeasonService
     existingSeason.EndDateInclusiveUtc = request.EndDateInclusiveUtc;
     existingSeason.Location = request.Location;
     existingSeason.ImageUrl = request.ImageUrl;
+    existingSeason.ResourcesUrl = request.ResourcesUrl;
+    existingSeason.IsDataBackFilled = request.IsDataBackFilled;
 
     return await ExecuteWithSaveAsync(
       async () =>

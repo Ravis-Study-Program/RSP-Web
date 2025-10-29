@@ -27,6 +27,13 @@ public class SeasonEntity : ISoftDelete
 
   [Required]
   public string ImageUrl { get; set; } = string.Empty;
+
+  [Required]
+  public string ResourcesUrl { get; set; } = string.Empty;
+
+  [Required]
+  public bool IsDataBackFilled { get; set; }
+
   public DateTime? DeletedAtUtc { get; set; }
 }
 
@@ -68,6 +75,15 @@ public class SeasonEntityConfiguration : IEntityTypeConfiguration<SeasonEntity>
       .Property(x => x.ImageUrl)
       .HasColumnName("ImageUrl")
       .HasColumnType("varchar(255)")
+      .IsRequired();
+    builder
+      .Property(x => x.ResourcesUrl)
+      .HasColumnName("ResourcesUrl")
+      .HasColumnType("varchar(255)")
+      .IsRequired();
+    builder
+      .Property(x => x.IsDataBackFilled)
+      .HasColumnName("IsDataBackFilled")
       .IsRequired();
     builder
       .Property(x => x.DeletedAtUtc)
