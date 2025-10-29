@@ -14,7 +14,6 @@ import { modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
 import {
   DeleteProblemAttemptResponseApiResponse,
-  LeetcodeProblemDifficulty,
   ListProblemAttemptResponseApiResponse,
   ProblemAttemptEntity,
   useCreateProblemAttempt,
@@ -23,6 +22,7 @@ import {
   useListLeetcodeProblems,
   useUpdateProblemAttempt,
 } from '@/generated/api/client';
+import { LeetcodeDifficultyText } from '@/shared/components/LeetcodeDifficultyText';
 import {
   getConfirmModalProps,
   getErrorNotification,
@@ -173,8 +173,8 @@ export const LeetcodeTable = ({
       ...(seasonWeekColumn ? [seasonWeekColumn] : []),
       ...(authorColumn ? [authorColumn] : []),
       {
-        header: 'Time Taken (mins)',
-        accessorFn: (row) => row.timeTakenInMinutes,
+        header: 'Duration',
+        accessorFn: (row) => `${row.timeTakenInMinutes} mins`,
       },
       {
         header: 'Title',
@@ -200,29 +200,11 @@ export const LeetcodeTable = ({
           const difficulty = row.leetcodeProblem?.leetcodeProblemDifficulty;
           return difficulty != null ? LeetcodeProblemDifficultyReverseIndex[difficulty] : '';
         },
-        Cell: ({ row }) => {
-          const difficulty = row.original.leetcodeProblem?.leetcodeProblemDifficulty;
-
-          let textClass = '';
-          switch (difficulty) {
-            case LeetcodeProblemDifficulty.Easy:
-              textClass = classes.textGreen;
-              break;
-            case LeetcodeProblemDifficulty.Medium:
-              textClass = classes.textYellow;
-              break;
-            case LeetcodeProblemDifficulty.Hard:
-              textClass = classes.textRed;
-              break;
-            default:
-          }
-
-          return (
-            <Text size="sm" className={textClass}>
-              {difficulty != null && LeetcodeProblemDifficultyReverseIndex[difficulty]}
-            </Text>
-          );
-        },
+        Cell: ({ row }) => (
+          <LeetcodeDifficultyText
+            difficulty={row.original.leetcodeProblem?.leetcodeProblemDifficulty}
+          />
+        ),
       },
       ...(categoryColumn ? [categoryColumn] : []),
     ],

@@ -545,20 +545,20 @@ export interface CreateUserIfNotExistsResponseApiResponse {
 }
 
 export interface CustomMockInterviewRoundDto {
-  /** @minLength 1 */
-  content: string;
-  /** @minLength 1 */
-  link: string;
+  /** @nullable */
+  content?: string | null;
+  /** @nullable */
+  link?: string | null;
   score: number;
 }
 
 export interface CustomMockInterviewRoundEntity {
   /** @minLength 1 */
   customMockInterviewRoundId: string;
-  /** @minLength 1 */
-  content: string;
-  /** @minLength 1 */
-  link: string;
+  /** @nullable */
+  content?: string | null;
+  /** @nullable */
+  link?: string | null;
   score: number;
   /** @nullable */
   deletedAtUtc?: string | null;

@@ -41,10 +41,8 @@ public record BehaviouralMockInterviewRoundDto
 
 public record CustomMockInterviewRoundDto
 {
-  [Required]
   public string Content { get; set; } = string.Empty;
 
-  [Required]
   public string Link { get; set; } = string.Empty;
 
   [Required]

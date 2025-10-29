@@ -1,4 +1,5 @@
 import dayjs from 'dayjs';
+import { useEffect, useState } from 'react';
 import { QueryObserverResult, RefetchOptions, UseMutateAsyncFunction } from '@tanstack/react-query';
 import { zodResolver } from 'mantine-form-zod-resolver';
 import { MRT_Row, MRT_TableInstance } from 'mantine-react-table';
@@ -8,10 +9,12 @@ import {
   Fieldset,
   Flex,
   NumberInput,
+  SegmentedControl,
   Select,
   Slider,
   Stack,
   Text,
+  TextInput,
   Title,
 } from '@mantine/core';
 import { DateTimePicker } from '@mantine/dates';
@@ -30,9 +33,9 @@ import {
 import { CustomRichTextEditor } from '@/shared/components/RichTextEditor';
 import { createOptionsFilter } from '@/shared/table/globalFilters';
 
-const scoreSliderMarks = Array.from({ length: 10 }, (_, i) => ({
-  value: i + 1,
-  label: String(i + 1),
+const scoreSliderMarks = Array.from({ length: 11 }, (_, i) => ({
+  value: i,
+  label: String(i),
 }));
 
 const scoreSchema = z
@@ -40,7 +43,8 @@ const scoreSchema = z
   .min(0, { message: 'The minimum score is 0' })
   .max(10, { message: 'The maximum score is 10' });
 
-const schema = z.object({
+const baseSchema = z.object({
+  mockInterviewId: z.string(),
   startDate: z.string().min(1),
   timeTakenInMinutes: z
     .number()
@@ -48,6 +52,10 @@ const schema = z.object({
     .max(120, { message: 'The maximum amount is 120 minute.' }),
   interviewee: z.string().min(1),
   behaviouralScore: scoreSchema,
+  notes: z.string().optional(),
+});
+
+const leetcodeSchema = baseSchema.extend({
   leetcodeProblem1: z.string().min(1),
   confirmQuestion1: scoreSchema,
   algorithmDesign1: scoreSchema,
@@ -60,7 +68,12 @@ const schema = z.object({
   complexityAnalysis2: scoreSchema,
   code2: scoreSchema,
   test2: scoreSchema,
-  notes: z.string().optional(),
+});
+
+const customSchema = baseSchema.extend({
+  customContent: z.string().optional(),
+  customLink: z.string().url({ message: 'Please enter a valid URL' }).optional().or(z.literal('')),
+  customScore: scoreSchema,
 });
 
 export const MockInterviewUpdateModal = ({
@@ -74,89 +87,122 @@ export const MockInterviewUpdateModal = ({
   const { data: currentUserResponse } = useGetCurrentUser();
   const userId = currentUserResponse?.responseBody?.user.userId ?? '';
 
-  const behavioural =
-    mockInterview.mockInterviewRounds?.filter((m) => m.behaviouralMockInterviewRound != null) || [];
-  const behaviouralRound = behavioural[0].behaviouralMockInterviewRound;
-  const leetcodeRounds =
-    mockInterview.mockInterviewRounds?.filter((m) => m.leetcodeMockInterviewRound != null) || [];
-  const leetcodeRound1 = leetcodeRounds[0].leetcodeMockInterviewRound;
-  const leetcodeRound2 = leetcodeRounds[1].leetcodeMockInterviewRound;
+  // Determine interview type based on existing rounds
+  const rounds = mockInterview.mockInterviewRounds || [];
+  const behavioural = rounds.filter((m) => m.behaviouralMockInterviewRound != null);
+  const leetcodeRounds = rounds.filter((m) => m.leetcodeMockInterviewRound != null);
+  const customRounds = rounds.filter((m) => m.customMockInterviewRound != null);
 
-  const form = useForm({
-    mode: 'uncontrolled',
-    initialValues: {
+  const initialInterviewType: 'leetcode' | 'custom' =
+    customRounds.length > 0 ? 'custom' : 'leetcode';
+  const [interviewType, setInterviewType] = useState<'leetcode' | 'custom'>(initialInterviewType);
+
+  const behaviouralRound = behavioural[0]?.behaviouralMockInterviewRound;
+  const leetcodeRound1 = leetcodeRounds[0]?.leetcodeMockInterviewRound;
+  const leetcodeRound2 = leetcodeRounds[1]?.leetcodeMockInterviewRound;
+  const customRound = customRounds[0]?.customMockInterviewRound;
+
+  const getInitialValues = () => {
+    const baseValues = {
       mockInterviewId: mockInterview.mockInterviewId,
       startDate: dayjs(mockInterview.startDate).format('YYYY-MM-DD HH:mm'),
       timeTakenInMinutes: mockInterview.timeTakenInMinutes,
       interviewee: mockInterview.intervieweeUserId ?? '',
       behaviouralScore: behaviouralRound?.behavioralScore ?? 0,
-      leetcodeProblem1: leetcodeRound1?.leetcodeProblemId ?? '',
-      confirmQuestion1: leetcodeRound1?.confirmQuestionScore ?? 0,
-      algorithmDesign1: leetcodeRound1?.algorithmDesignScore ?? 0,
-      complexityAnalysis1: leetcodeRound1?.complexityAnalysisScore ?? 0,
-      code1: leetcodeRound1?.codingScore ?? 0,
-      test1: leetcodeRound1?.testingScore ?? 0,
-      leetcodeProblem2: leetcodeRound2?.leetcodeProblemId ?? '',
-      confirmQuestion2: leetcodeRound2?.confirmQuestionScore ?? 0,
-      algorithmDesign2: leetcodeRound2?.algorithmDesignScore ?? 0,
-      complexityAnalysis2: leetcodeRound2?.complexityAnalysisScore ?? 0,
-      code2: leetcodeRound2?.codingScore ?? 0,
-      test2: leetcodeRound2?.testingScore ?? 0,
       notes: mockInterview.notes ?? '',
-    },
-    validate: zodResolver(schema),
+    };
+
+    if (interviewType === 'leetcode') {
+      return {
+        ...baseValues,
+        leetcodeProblem1: leetcodeRound1?.leetcodeProblemId ?? '',
+        confirmQuestion1: leetcodeRound1?.confirmQuestionScore ?? 0,
+        algorithmDesign1: leetcodeRound1?.algorithmDesignScore ?? 0,
+        complexityAnalysis1: leetcodeRound1?.complexityAnalysisScore ?? 0,
+        code1: leetcodeRound1?.codingScore ?? 0,
+        test1: leetcodeRound1?.testingScore ?? 0,
+        leetcodeProblem2: leetcodeRound2?.leetcodeProblemId ?? '',
+        confirmQuestion2: leetcodeRound2?.confirmQuestionScore ?? 0,
+        algorithmDesign2: leetcodeRound2?.algorithmDesignScore ?? 0,
+        complexityAnalysis2: leetcodeRound2?.complexityAnalysisScore ?? 0,
+        code2: leetcodeRound2?.codingScore ?? 0,
+        test2: leetcodeRound2?.testingScore ?? 0,
+      };
+    }
+
+    return {
+      ...baseValues,
+      customContent: customRound?.content ?? '',
+      customLink: customRound?.link ?? '',
+      customScore: customRound?.score ?? 0,
+    };
+  };
+
+  const form = useForm({
+    mode: 'uncontrolled',
+    initialValues: getInitialValues(),
+    validate: zodResolver(interviewType === 'leetcode' ? leetcodeSchema : customSchema),
   });
 
-  const handleSubmit = async (values: {
-    mockInterviewId: string;
-    startDate: string;
-    timeTakenInMinutes: number;
-    interviewee: string;
-    behaviouralScore: number;
-    leetcodeProblem1: string;
-    confirmQuestion1: number;
-    algorithmDesign1: number;
-    complexityAnalysis1: number;
-    code1: number;
-    test1: number;
-    leetcodeProblem2: string;
-    confirmQuestion2: number;
-    algorithmDesign2: number;
-    complexityAnalysis2: number;
-    code2: number;
-    test2: number;
-    notes?: string;
-  }) => {
+  useEffect(() => {
+    form.clearErrors();
+    form.setValues(getInitialValues());
+  }, [interviewType]);
+
+  const handleSubmit = async (values: any) => {
     try {
       const mockInterviewRounds: MockInterviewRoundDto[] = [];
+
+      // Behavioural round (always included)
       mockInterviewRounds.push({
         mockInterviewRoundId: behavioural[0]?.mockInterviewRoundId,
         behaviouralMockInterviewRound: {
           behavioralScore: values.behaviouralScore,
         },
       });
-      mockInterviewRounds.push({
-        mockInterviewRoundId: leetcodeRounds[0]?.mockInterviewRoundId,
-        leetcodeMockInterviewRound: {
-          leetcodeProblemId: values.leetcodeProblem1,
-          confirmQuestionScore: values.confirmQuestion1,
-          algorithmDesignScore: values.algorithmDesign1,
-          complexityAnalysisScore: values.complexityAnalysis1,
-          codingScore: values.code1,
-          testingScore: values.test1,
-        },
-      });
-      mockInterviewRounds.push({
-        mockInterviewRoundId: leetcodeRounds[1]?.mockInterviewRoundId,
-        leetcodeMockInterviewRound: {
-          leetcodeProblemId: values.leetcodeProblem2,
-          confirmQuestionScore: values.confirmQuestion2,
-          algorithmDesignScore: values.algorithmDesign2,
-          complexityAnalysisScore: values.complexityAnalysis2,
-          codingScore: values.code2,
-          testingScore: values.test2,
-        },
-      });
+
+      if (interviewType === 'leetcode') {
+        // Leetcode Problem 1
+        mockInterviewRounds.push({
+          mockInterviewRoundId: leetcodeRounds[0]?.mockInterviewRoundId,
+          leetcodeMockInterviewRound: {
+            leetcodeProblemId: values.leetcodeProblem1,
+            confirmQuestionScore: values.confirmQuestion1,
+            algorithmDesignScore: values.algorithmDesign1,
+            complexityAnalysisScore: values.complexityAnalysis1,
+            codingScore: values.code1,
+            testingScore: values.test1,
+          },
+        });
+        // Leetcode Problem 2
+        mockInterviewRounds.push({
+          mockInterviewRoundId: leetcodeRounds[1]?.mockInterviewRoundId,
+          leetcodeMockInterviewRound: {
+            leetcodeProblemId: values.leetcodeProblem2,
+            confirmQuestionScore: values.confirmQuestion2,
+            algorithmDesignScore: values.algorithmDesign2,
+            complexityAnalysisScore: values.complexityAnalysis2,
+            codingScore: values.code2,
+            testingScore: values.test2,
+          },
+        });
+      } else {
+        // Custom problem
+        const customRound: MockInterviewRoundDto = {
+          customMockInterviewRound: {
+            content: values.customContent,
+            link: values.customLink,
+            score: values.customScore,
+          },
+        };
+
+        // Only include ID if there's an existing custom round
+        if (customRounds[0]?.mockInterviewRoundId) {
+          customRound.mockInterviewRoundId = customRounds[0].mockInterviewRoundId;
+        }
+
+        mockInterviewRounds.push(customRound);
+      }
 
       const requestData: UpdateMockInterviewRequest = {
         mockInterviewId: values.mockInterviewId,
@@ -210,7 +256,7 @@ export const MockInterviewUpdateModal = ({
   return (
     <Stack>
       <Title order={3} mt={15}>
-        Add Mock Interview
+        Update Mock Interview
       </Title>
       <form onSubmit={form.onSubmit(handleSubmit)}>
         <DateTimePicker
@@ -250,6 +296,15 @@ export const MockInterviewUpdateModal = ({
           searchable
           error={form.errors.interviewee}
         />
+
+        <CustomRichTextEditor
+          content={form.values.notes}
+          onChange={(value) => form.setFieldValue('notes', value || '')}
+          label="Interviewer Notes"
+          error={form.errors.notes?.toString()}
+          maxLength={5000}
+        />
+
         <Text size="sm" mt="sm">
           Behavioural Score
         </Text>
@@ -262,163 +317,234 @@ export const MockInterviewUpdateModal = ({
           marks={scoreSliderMarks}
           mb="lg"
         />
-        <Fieldset legend="Leetcode Problem 1" mt="sm">
-          <Select
-            {...form.getInputProps('leetcodeProblem1')}
-            mt="sm"
-            label="Leetcode Problem"
-            placeholder="Pick a leetcode problem"
-            data={leetcodeProblemOptions}
-            filter={createOptionsFilter({ sort: false })}
-            limit={5}
-            withAsterisk
-            searchable
-            error={form.errors.leetcodeProblem1}
-          />
-          <Text size="sm" mt="sm">
-            Confirm Question Score
-          </Text>
-          <Slider
-            {...form.getInputProps('confirmQuestion1')}
-            label={(value) => value}
-            min={0}
-            max={10}
-            step={1}
-            marks={scoreSliderMarks}
-            mb="lg"
-          />
-          <Text size="sm" mt="sm">
-            Algorithm Design Score
-          </Text>
-          <Slider
-            {...form.getInputProps('algorithmDesign1')}
-            label={(value) => value}
-            min={0}
-            max={10}
-            step={1}
-            marks={scoreSliderMarks}
-            mb="lg"
-          />
-          <Text size="sm" mt="sm">
-            Complexity Analysis Score
-          </Text>
-          <Slider
-            {...form.getInputProps('complexityAnalysis1')}
-            label={(value) => value}
-            min={0}
-            max={10}
-            step={1}
-            marks={scoreSliderMarks}
-            mb="lg"
-          />
-          <Text size="sm" mt="sm">
-            Coding Score
-          </Text>
-          <Slider
-            {...form.getInputProps('code1')}
-            label={(value) => value}
-            min={0}
-            max={10}
-            step={1}
-            marks={scoreSliderMarks}
-            mb="lg"
-          />
-          <Text size="sm" mt="sm">
-            Testing Score
-          </Text>
-          <Slider
-            {...form.getInputProps('test1')}
-            label={(value) => value}
-            min={0}
-            max={10}
-            step={1}
-            marks={scoreSliderMarks}
-            mb="lg"
-          />
-        </Fieldset>
 
-        <Fieldset legend="Leetcode Problem 2" mt="sm">
-          <Select
-            {...form.getInputProps('leetcodeProblem2')}
-            mt="sm"
-            label="Leetcode Problem"
-            placeholder="Pick a leetcode problem"
-            data={leetcodeProblemOptions}
-            filter={createOptionsFilter({ sort: false })}
-            limit={5}
-            withAsterisk
-            searchable
-            error={form.errors.leetcodeProblem2}
-          />
-          <Text size="sm" mt="sm">
-            Confirm Question Score
-          </Text>
-          <Slider
-            {...form.getInputProps('confirmQuestion2')}
-            label={(value) => value}
-            min={0}
-            max={10}
-            step={1}
-            marks={scoreSliderMarks}
-            mb="lg"
-          />
-          <Text size="sm" mt="sm">
-            Algorithm Design Score
-          </Text>
-          <Slider
-            {...form.getInputProps('algorithmDesign2')}
-            label={(value) => value}
-            min={0}
-            max={10}
-            step={1}
-            marks={scoreSliderMarks}
-            mb="lg"
-          />
-          <Text size="sm" mt="sm">
-            Complexity Analysis Score
-          </Text>
-          <Slider
-            {...form.getInputProps('complexityAnalysis2')}
-            label={(value) => value}
-            min={0}
-            max={10}
-            step={1}
-            marks={scoreSliderMarks}
-            mb="lg"
-          />
-          <Text size="sm" mt="sm">
-            Coding Score
-          </Text>
-          <Slider
-            {...form.getInputProps('code2')}
-            label={(value) => value}
-            min={0}
-            max={10}
-            step={1}
-            marks={scoreSliderMarks}
-            mb="lg"
-          />
-          <Text size="sm" mt="sm">
-            Testing Score
-          </Text>
-          <Slider
-            {...form.getInputProps('test2')}
-            label={(value) => value}
-            min={0}
-            max={10}
-            step={1}
-            marks={scoreSliderMarks}
-            mb="lg"
-          />
-        </Fieldset>
+        <SegmentedControl
+          value={interviewType}
+          onChange={(value) => {
+            const newType = value as 'leetcode' | 'custom';
+            setInterviewType(newType);
 
-        <CustomRichTextEditor
-          content={form.values.notes}
-          onChange={(value) => form.setFieldValue('notes', value || '')}
-          label="Interviewer Notes"
-          error={form.errors.notes?.toString()}
-          maxLength={5000}
+            // Reset form with new type's initial values while preserving common fields
+            const baseValues = {
+              mockInterviewId: form.values.mockInterviewId,
+              startDate: form.values.startDate,
+              timeTakenInMinutes: form.values.timeTakenInMinutes,
+              interviewee: form.values.interviewee,
+              behaviouralScore: form.values.behaviouralScore,
+              notes: form.values.notes,
+            };
+
+            if (newType === 'leetcode') {
+              form.setValues({
+                ...baseValues,
+                leetcodeProblem1: leetcodeRound1?.leetcodeProblemId ?? '',
+                confirmQuestion1: leetcodeRound1?.confirmQuestionScore ?? 0,
+                algorithmDesign1: leetcodeRound1?.algorithmDesignScore ?? 0,
+                complexityAnalysis1: leetcodeRound1?.complexityAnalysisScore ?? 0,
+                code1: leetcodeRound1?.codingScore ?? 0,
+                test1: leetcodeRound1?.testingScore ?? 0,
+                leetcodeProblem2: leetcodeRound2?.leetcodeProblemId ?? '',
+                confirmQuestion2: leetcodeRound2?.confirmQuestionScore ?? 0,
+                algorithmDesign2: leetcodeRound2?.algorithmDesignScore ?? 0,
+                complexityAnalysis2: leetcodeRound2?.complexityAnalysisScore ?? 0,
+                code2: leetcodeRound2?.codingScore ?? 0,
+                test2: leetcodeRound2?.testingScore ?? 0,
+              });
+            } else {
+              form.setValues({
+                ...baseValues,
+                customContent: customRound?.content ?? '',
+                customLink: customRound?.link ?? '',
+                customScore: customRound?.score ?? 0,
+              });
+            }
+          }}
+          data={[
+            { label: 'Standard Leetcode Mock', value: 'leetcode' },
+            { label: 'Custom Mock', value: 'custom' },
+          ]}
+          mt="md"
         />
+
+        {interviewType === 'leetcode' ? (
+          <>
+            <Fieldset mt="sm">
+              <Select
+                {...form.getInputProps('leetcodeProblem1')}
+                mt="sm"
+                label="Leetcode Problem 1"
+                placeholder="Pick a leetcode problem"
+                data={leetcodeProblemOptions}
+                filter={createOptionsFilter({ sort: false })}
+                limit={5}
+                withAsterisk
+                searchable
+                error={form.errors.leetcodeProblem1}
+              />
+              <Text size="sm" mt="sm">
+                Confirm Question Score
+              </Text>
+              <Slider
+                {...form.getInputProps('confirmQuestion1')}
+                label={(value) => value}
+                min={0}
+                max={10}
+                step={1}
+                marks={scoreSliderMarks}
+                mb="lg"
+              />
+              <Text size="sm" mt="sm">
+                Algorithm Design Score
+              </Text>
+              <Slider
+                {...form.getInputProps('algorithmDesign1')}
+                label={(value) => value}
+                min={0}
+                max={10}
+                step={1}
+                marks={scoreSliderMarks}
+                mb="lg"
+              />
+              <Text size="sm" mt="sm">
+                Complexity Analysis Score
+              </Text>
+              <Slider
+                {...form.getInputProps('complexityAnalysis1')}
+                label={(value) => value}
+                min={0}
+                max={10}
+                step={1}
+                marks={scoreSliderMarks}
+                mb="lg"
+              />
+              <Text size="sm" mt="sm">
+                Coding Score
+              </Text>
+              <Slider
+                {...form.getInputProps('code1')}
+                label={(value) => value}
+                min={0}
+                max={10}
+                step={1}
+                marks={scoreSliderMarks}
+                mb="lg"
+              />
+              <Text size="sm" mt="sm">
+                Testing Score
+              </Text>
+              <Slider
+                {...form.getInputProps('test1')}
+                label={(value) => value}
+                min={0}
+                max={10}
+                step={1}
+                marks={scoreSliderMarks}
+                mb="lg"
+              />
+              <Select
+                {...form.getInputProps('leetcodeProblem2')}
+                mt="sm"
+                label="Leetcode Problem 2"
+                placeholder="Pick a leetcode problem"
+                data={leetcodeProblemOptions}
+                filter={createOptionsFilter({ sort: false })}
+                limit={5}
+                withAsterisk
+                searchable
+                error={form.errors.leetcodeProblem2}
+              />
+              <Text size="sm" mt="sm">
+                Confirm Question Score
+              </Text>
+              <Slider
+                {...form.getInputProps('confirmQuestion2')}
+                label={(value) => value}
+                min={0}
+                max={10}
+                step={1}
+                marks={scoreSliderMarks}
+                mb="lg"
+              />
+              <Text size="sm" mt="sm">
+                Algorithm Design Score
+              </Text>
+              <Slider
+                {...form.getInputProps('algorithmDesign2')}
+                label={(value) => value}
+                min={0}
+                max={10}
+                step={1}
+                marks={scoreSliderMarks}
+                mb="lg"
+              />
+              <Text size="sm" mt="sm">
+                Complexity Analysis Score
+              </Text>
+              <Slider
+                {...form.getInputProps('complexityAnalysis2')}
+                label={(value) => value}
+                min={0}
+                max={10}
+                step={1}
+                marks={scoreSliderMarks}
+                mb="lg"
+              />
+              <Text size="sm" mt="sm">
+                Coding Score
+              </Text>
+              <Slider
+                {...form.getInputProps('code2')}
+                label={(value) => value}
+                min={0}
+                max={10}
+                step={1}
+                marks={scoreSliderMarks}
+                mb="lg"
+              />
+              <Text size="sm" mt="sm">
+                Testing Score
+              </Text>
+              <Slider
+                {...form.getInputProps('test2')}
+                label={(value) => value}
+                min={0}
+                max={10}
+                step={1}
+                marks={scoreSliderMarks}
+                mb="lg"
+              />
+            </Fieldset>
+          </>
+        ) : (
+          <Fieldset mt="sm">
+            <CustomRichTextEditor
+              content={(form.values as any).customContent || ''}
+              onChange={(value) => form.setFieldValue('customContent', value || '')}
+              label="Problem Content"
+              error={form.errors.customContent?.toString()}
+              maxLength={10000}
+            />
+            <TextInput
+              {...form.getInputProps('customLink')}
+              mt="sm"
+              label="Problem Link"
+              placeholder="https://example.com/problem-link"
+              error={form.errors.customLink}
+            />
+            <Text size="sm" mt="sm">
+              Custom Problem Score
+            </Text>
+            <Slider
+              {...form.getInputProps('customScore')}
+              label={(value) => value}
+              min={0}
+              max={10}
+              step={1}
+              marks={scoreSliderMarks}
+              mb="lg"
+            />
+          </Fieldset>
+        )}
 
         <Flex justify="flex-end">
           <Button type="submit" mt="xl" mb="md">
