@@ -42,7 +42,6 @@ export const MenteesTable = ({ refetchMentorships, mentorships }: MenteesTablePr
 
   const openKickMenteeModal = (row: MRT_Row<MentorshipResponse>) => {
     modals.open({
-      title: 'Kick Student',
       children: (
         <KickStudentModal
           row={row}
