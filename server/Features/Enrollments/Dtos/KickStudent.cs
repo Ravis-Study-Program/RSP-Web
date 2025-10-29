@@ -13,6 +13,9 @@ public record KickStudentRequest
 
   [Required]
   public string UserId { get; set; } = string.Empty;
+
+  [Required]
+  public string KickReason { get; set; } = string.Empty;
 }
 
 public record KickStudentResponse { }
@@ -24,5 +27,6 @@ public class KickStudentRequestValidator : AbstractValidator<KickStudentRequest>
     RuleFor(c => c.MenteeEnrollmentId).NotEmpty();
     RuleFor(c => c.SeasonSlug).NotEmpty();
     RuleFor(c => c.UserId).NotEmpty();
+    RuleFor(c => c.KickReason).NotEmpty().WithMessage("Kick reason is required.");
   }
 }
