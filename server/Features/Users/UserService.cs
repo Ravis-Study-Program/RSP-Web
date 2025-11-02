@@ -106,7 +106,7 @@ public class UserService : BaseService, IUserService
     return await ExecuteWithSaveAsync(
       async () =>
       {
-        var users = await _userRepository.Table.AsNoTracking().IgnoreQueryFilters().ToListAsync(cancellationToken);
+        var users = await _userRepository.Table.AsNoTracking().IgnoreQueryFilters().Where(x => x.DeletedAtUtc.HasValue == false).ToListAsync(cancellationToken);
         var adminUsers = users
           .Select(u => new AdminUserDto
           {
