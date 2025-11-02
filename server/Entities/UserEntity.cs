@@ -21,6 +21,9 @@ public class UserEntity : ISoftDelete
   public bool IsAdmin { get; set; }
 
   [Required]
+  public bool IsTestUser { get; set; }
+
+  [Required]
   public string Name { get; set; } = string.Empty;
 
   [Required]
@@ -55,6 +58,7 @@ public class UserEntityConfiguration : IEntityTypeConfiguration<UserEntity>
       .HasColumnType("varchar(100)")
       .IsRequired();
     builder.Property(x => x.IsAdmin).HasColumnName("IsAdmin").IsRequired();
+    builder.Property(x => x.IsTestUser).HasColumnName("IsTestUser").IsRequired();
     builder.Property(x => x.Name).HasColumnName("Name").HasColumnType("varchar(100)").IsRequired();
     builder.Property(x => x.Slug).HasColumnName("Slug").HasColumnType("varchar(100)").IsRequired();
     builder

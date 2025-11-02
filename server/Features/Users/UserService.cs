@@ -58,6 +58,7 @@ public class UserService : BaseService, IUserService
       Name = request.Name,
       ProfileImage = request.ProfileImage,
       IsAdmin = request.IsAdmin,
+      IsTestUser = request.IsTestUser,
       Slug = slug,
     };
 
@@ -105,7 +106,7 @@ public class UserService : BaseService, IUserService
     return await ExecuteWithSaveAsync(
       async () =>
       {
-        var users = await GetAllUsersAsync(null, cancellationToken);
+        var users = await _userRepository.Table.AsNoTracking().IgnoreQueryFilters().ToListAsync(cancellationToken);
         var adminUsers = users
           .Select(u => new AdminUserDto
           {
@@ -113,6 +114,7 @@ public class UserService : BaseService, IUserService
             DiscordId = u.DiscordId,
             Email = u.Email,
             IsAdmin = u.IsAdmin,
+            IsTestUser = u.IsTestUser,
             Name = u.Name,
             Slug = u.Slug,
             ProfileImage = u.ProfileImage,
@@ -146,6 +148,7 @@ public class UserService : BaseService, IUserService
     existingUser.Email = request.Email;
     existingUser.ProfileImage = request.ProfileImage;
     existingUser.IsAdmin = request.IsAdmin;
+    existingUser.IsTestUser = request.IsTestUser;
 
     return await ExecuteWithSaveAsync(
       async () =>
@@ -316,6 +319,7 @@ public class UserService : BaseService, IUserService
       Name = request.Name,
       Slug = slug,
       IsAdmin = false,
+      IsTestUser = false,
     };
 
     await AddUserAsync(user, cancellationToken);

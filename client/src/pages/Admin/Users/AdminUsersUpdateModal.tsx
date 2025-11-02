@@ -16,8 +16,9 @@ const schema = z.object({
   name: z.string().min(1),
   email: z.string().email().min(1),
   isAdmin: z.boolean(),
-  discordId: z.string(),
-  profileImage: z.string().url().or(z.literal('')).optional(),
+  isTestUser: z.boolean(),
+  discordId: z.string().nullable().optional(),
+  profileImage: z.string().url().or(z.literal('')).nullable().optional(),
 });
 
 export const AdminUsersUpdateModal = ({
@@ -33,6 +34,7 @@ export const AdminUsersUpdateModal = ({
       userId: user.userId,
       email: user.email,
       isAdmin: user.isAdmin,
+      isTestUser: user.isTestUser,
       discordId: user.discordId,
       profileImage: user.profileImage,
     },
@@ -44,6 +46,7 @@ export const AdminUsersUpdateModal = ({
     userId: string;
     email: string;
     isAdmin: boolean;
+    isTestUser: boolean;
     discordId?: string | null;
     profileImage?: string | null;
   }) => {
@@ -106,6 +109,11 @@ export const AdminUsersUpdateModal = ({
           {...form.getInputProps('isAdmin', { type: 'checkbox' })}
           mt="sm"
           label="I like this user to be an admin"
+        />
+        <Checkbox
+          {...form.getInputProps('isTestUser', { type: 'checkbox' })}
+          mt="sm"
+          label="Mark this user as a test user"
         />
         <Flex justify="flex-end">
           <Button type="submit" mt="xl" mb="md">

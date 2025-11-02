@@ -115,6 +115,7 @@ export interface AdminCreateUserRequest {
   /** @minLength 1 */
   name: string;
   isAdmin: boolean;
+  isTestUser: boolean;
   /** @nullable */
   profileImage?: string | null;
   /** @nullable */
@@ -424,6 +425,7 @@ export interface AdminUpdateUserRequest {
   /** @nullable */
   profileImage?: string | null;
   isAdmin: boolean;
+  isTestUser: boolean;
 }
 
 export interface AdminUpdateUserResponse {
@@ -445,6 +447,7 @@ export interface AdminUserDto {
   /** @minLength 1 */
   email: string;
   isAdmin: boolean;
+  isTestUser: boolean;
   /** @minLength 1 */
   name: string;
   /** @minLength 1 */
@@ -1151,6 +1154,7 @@ export interface UserEntity {
   /** @nullable */
   discordId?: string | null;
   isAdmin: boolean;
+  isTestUser: boolean;
   /** @minLength 1 */
   name: string;
   /** @minLength 1 */

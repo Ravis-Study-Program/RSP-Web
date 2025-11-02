@@ -14,8 +14,11 @@ public record AdminCreateUserRequest
   [Required]
   public bool IsAdmin { get; set; } = false;
 
-  public string ProfileImage { get; set; } = string.Empty;
-  public string DiscordId { get; set; } = string.Empty;
+  [Required]
+  public bool IsTestUser { get; set; } = false;
+
+  public string? ProfileImage { get; set; }
+  public string? DiscordId { get; set; }
 }
 
 public record AdminCreateUserResponse

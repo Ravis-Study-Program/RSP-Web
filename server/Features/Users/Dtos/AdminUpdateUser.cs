@@ -20,6 +20,9 @@ public record AdminUpdateUserRequest
 
   [Required]
   public bool IsAdmin { get; set; }
+
+  [Required]
+  public bool IsTestUser { get; set; }
 }
 
 public record AdminUpdateUserResponse { }

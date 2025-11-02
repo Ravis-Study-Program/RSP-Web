@@ -67,7 +67,7 @@ public class ApplicationDbContext : DbContext
       .Entity<ProblemAttemptEntity>()
       .HasQueryFilter(x => x.DeletedAtUtc.HasValue == false);
     modelBuilder.Entity<SeasonEntity>().HasQueryFilter(x => x.DeletedAtUtc.HasValue == false);
-    modelBuilder.Entity<UserEntity>().HasQueryFilter(x => x.DeletedAtUtc.HasValue == false);
+    modelBuilder.Entity<UserEntity>().HasQueryFilter(x => x.DeletedAtUtc.HasValue == false && !x.IsTestUser);
     modelBuilder.Entity<SeasonWeekEntity>().HasQueryFilter(x => x.DeletedAtUtc.HasValue == false);
     modelBuilder
       .Entity<KickStudentEventEntity>()

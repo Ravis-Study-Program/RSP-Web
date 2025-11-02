@@ -16,6 +16,9 @@ public record AdminUserDto
   public bool IsAdmin { get; set; }
 
   [Required]
+  public bool IsTestUser { get; set; }
+
+  [Required]
   public string Name { get; set; } = string.Empty;
 
   [Required]
