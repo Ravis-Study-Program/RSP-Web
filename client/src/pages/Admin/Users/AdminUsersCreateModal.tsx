@@ -16,8 +16,9 @@ const schema = z.object({
   name: z.string().min(1),
   email: z.string().email().min(1),
   isAdmin: z.boolean(),
-  discordId: z.string(),
-  profileImage: z.string().url().or(z.literal('')).optional(),
+  isTestUser: z.boolean(),
+  discordId: z.string().nullable().optional(),
+  profileImage: z.string().url().or(z.literal('')).nullable().optional(),
 });
 
 export const AdminUsersCreateModal = ({
@@ -31,8 +32,9 @@ export const AdminUsersCreateModal = ({
       name: '',
       email: '',
       isAdmin: false,
-      discordId: '',
-      profileImage: '',
+      isTestUser: false,
+      discordId: undefined,
+      profileImage: undefined,
     },
     validate: zodResolver(schema),
   });
@@ -41,8 +43,9 @@ export const AdminUsersCreateModal = ({
     name: string;
     email: string;
     isAdmin: boolean;
-    discordId: string;
-    profileImage: string;
+    isTestUser: boolean;
+    discordId?: string;
+    profileImage?: string;
   }) => {
     try {
       const requestData: AdminCreateUserRequest = values;
@@ -100,6 +103,11 @@ export const AdminUsersCreateModal = ({
           {...form.getInputProps('isAdmin', { type: 'checkbox' })}
           mt="sm"
           label="I like this user to be an admin"
+        />
+        <Checkbox
+          {...form.getInputProps('isTestUser', { type: 'checkbox' })}
+          mt="sm"
+          label="Mark this user as a test user"
         />
         <Flex justify="flex-end">
           <Button type="submit" mt="xl" mb="md">

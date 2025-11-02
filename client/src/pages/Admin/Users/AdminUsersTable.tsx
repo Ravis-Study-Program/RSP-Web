@@ -96,6 +96,12 @@ export const AdminUsersTable = () => {
         Cell: ({ row }) => (row.original.isAdmin ? 'Yes' : 'No'),
       },
       {
+        accessorKey: 'isTestUser',
+        header: 'Is Test User',
+        accessorFn: (row) => (row.isTestUser ? 'Yes' : 'No'),
+        Cell: ({ row }) => (row.original.isTestUser ? 'Yes' : 'No'),
+      },
+      {
         accessorKey: 'discordId',
         header: 'Discord ID',
       },

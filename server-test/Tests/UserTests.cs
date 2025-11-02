@@ -81,6 +81,7 @@ public class UserTests : BaseIntegrationTest, IAsyncLifetime
       ProfileImage = _faker.Image.PicsumUrl(),
       DiscordId = _faker.Random.AlphaNumeric(8),
       IsAdmin = false,
+      IsTestUser = false,
     };
 
     var updateResponse = await UserService.UpdateAdminUser(updateRequest);
@@ -227,5 +228,48 @@ public class UserTests : BaseIntegrationTest, IAsyncLifetime
     var currentUser = currentUserResponse.User;
     Assert.NotNull(currentUser);
     Assert.Equal(userId, currentUser!.UserId);
+  }
+
+  [Fact]
+  public async Task ListAdminUser_Includes_TestUsers_Excludes_DeletedUsers()
+  {
+    var regularUserRequest = new AdminCreateUserRequest
+    {
+      Email = _faker.Internet.Email().ToLower(),
+      Name = _faker.Name.FullName(),
+      IsAdmin = false,
+      IsTestUser = false,
+    };
+    var regularUserResponse = await UserService.CreateAdminUser(regularUserRequest);
+    Assert.NotNull(regularUserResponse.UserId);
+
+    var testUserRequest = new AdminCreateUserRequest
+    {
+      Email = _faker.Internet.Email().ToLower(),
+      Name = _faker.Name.FullName(),
+      IsAdmin = false,
+      IsTestUser = true,
+    };
+    var testUserResponse = await UserService.CreateAdminUser(testUserRequest);
+    Assert.NotNull(testUserResponse.UserId);
+
+    var toDeleteUserRequest = new AdminCreateUserRequest
+    {
+      Email = _faker.Internet.Email().ToLower(),
+      Name = _faker.Name.FullName(),
+      IsAdmin = false,
+      IsTestUser = false,
+    };
+    var toDeleteUserResponse = await UserService.CreateAdminUser(toDeleteUserRequest);
+    Assert.NotNull(toDeleteUserResponse.UserId);
+
+    var deleteRequest = new AdminDeleteUserRequest { UserId = toDeleteUserResponse.UserId };
+    await UserService.DeleteAdminUser(deleteRequest);
+
+    var users = await _seeder.GetAllUsersAsync();
+
+    Assert.Contains(users, u => u.UserId == regularUserResponse.UserId);
+    Assert.Contains(users, u => u.UserId == testUserResponse.UserId && u.IsTestUser);
+    Assert.DoesNotContain(users, u => u.UserId == toDeleteUserResponse.UserId);
   }
 }
