@@ -20,6 +20,7 @@ const GraduatesPage = lazy(() => import('./pages/Graduates/Graduates.page'));
 const LeetcodePage = lazy(() => import('./pages/Leetcode/Leetcode.page'));
 const LoginPage = lazy(() => import('./pages/Login/Login.page'));
 const MenteesPage = lazy(() => import('./pages/Mentees/Mentees.page'));
+const MentorsPage = lazy(() => import('./pages/Mentors/Mentors.page'));
 const MockInterviewPage = lazy(() => import('./pages/MockInterviews/MockInterview.page'));
 const NotFoundPage = lazy(() => import('./pages/NotFound/NotFound.page'));
 const ProfilePage = lazy(() => import('./pages/Profile/Profile.page'));
@@ -105,7 +106,7 @@ const routes = (
           {createRouteMeta({
             path: 'mentors',
             title: 'Season Mentors | RSP',
-            element: <MenteesPage />,
+            element: <SeasonRoleViewRouter coordinatorView={<MentorsPage />} />,
           })}
           {createRouteMeta({
             path: 'leetcode',

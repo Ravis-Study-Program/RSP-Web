@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using Microsoft.EntityFrameworkCore;
 using RSPWebAPI.Common;
 using RSPWebAPI.Common.Interfaces;
 using RSPWebAPI.Entities;
@@ -11,15 +12,21 @@ namespace RSPWebAPI.Features.Seasons;
 public class SeasonService : BaseService, ISeasonService
 {
   private readonly IRepository<SeasonEntity> _seasonRepository;
+  private readonly IRepository<EnrollmentEntity> _enrollmentRepository;
+  private readonly IRepository<MentorshipEntity> _mentorshipRepository;
 
   public SeasonService(
     IRepository<SeasonEntity> seasonRepository,
+    IRepository<EnrollmentEntity> enrollmentRepository,
+    IRepository<MentorshipEntity> mentorshipRepository,
     IUnitOfWork unitOfWork,
     ILogger<SeasonService> logger
   )
     : base(unitOfWork, logger)
   {
     _seasonRepository = seasonRepository;
+    _enrollmentRepository = enrollmentRepository;
+    _mentorshipRepository = mentorshipRepository;
   }
 
   public async Task<AdminCreateSeasonResponse> CreateAdminSeason(
@@ -137,7 +144,7 @@ public class SeasonService : BaseService, ISeasonService
 
     await _seasonRepository.AddAsync(season, cancellationToken);
   }
-
+ 
   public async Task DeleteSeasonAsync(
     string seasonId,
     CancellationToken cancellationToken = default
@@ -198,6 +205,59 @@ public class SeasonService : BaseService, ISeasonService
       cancellationToken,
       include
     );
+  }
+
+  public async Task<GetMentorAssignmentsResponse> GetMentorAssignments(
+    string seasonSlug,
+    GetMentorAssignmentsRequest request,
+    CancellationToken cancellationToken = default
+  )
+  {
+    // Get the season by slug
+    var season = await GetSeasonBySlugAsync(seasonSlug, cancellationToken);
+    if (season == null)
+    {
+      throw new KeyNotFoundException(Messages.Season.DoesNotExist);
+    }
+
+    // Get all student enrollments for this season
+    var studentEnrollments = await _enrollmentRepository.GetAllAsync(
+      e => e.SeasonId == season.SeasonId && e.Role == SeasonRole.Student,
+      cancellationToken,
+      q => q.Include(e => e.User)
+    );
+
+    // Get all mentorships for this season
+    var mentorships = await _mentorshipRepository.GetAllAsync(
+      m => m.MentorEnrollment.SeasonId == season.SeasonId,
+      cancellationToken,
+      q => q.Include(m => m.MentorEnrollment)
+           .ThenInclude(e => e.User)
+           .Include(m => m.MenteeEnrollment)
+    );
+
+    // Create mentor assignments DTO
+    var assignments = studentEnrollments.Select(studentEnrollment =>
+    {
+      // Find mentorship for this student
+      var mentorship = mentorships.FirstOrDefault(m => 
+        m.MenteeEnrollmentId == studentEnrollment.EnrollmentId);
+
+      return new MentorAssignmentDto
+      {
+        StudentId = studentEnrollment.UserId,
+        StudentName = studentEnrollment.User.Name,
+        EnrollmentId = studentEnrollment.EnrollmentId,
+        StudentRolePromotion = studentEnrollment.StudentRolePromotion,
+        MentorId = mentorship?.MentorEnrollment.UserId,
+        MentorName = mentorship?.MentorEnrollment.User.Name
+      };
+    }).ToList();
+
+    return new GetMentorAssignmentsResponse
+    {
+      Assignments = assignments
+    };
   }
 
   #endregion

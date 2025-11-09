@@ -744,6 +744,22 @@ export interface GetIsUserEnrolledResponseApiResponse {
   responseBody?: GetIsUserEnrolledResponse;
 }
 
+export interface GetMentorAssignmentsRequest {
+  [key: string]: unknown;
+}
+
+export interface GetMentorAssignmentsResponse {
+  /** @nullable */
+  assignments?: MentorAssignmentDto[] | null;
+}
+
+export interface GetMentorAssignmentsResponseApiResponse {
+  error?: ApiError;
+  /** @nullable */
+  successMessage?: string | null;
+  responseBody?: GetMentorAssignmentsResponse;
+}
+
 export interface GetSeasonWeeksBySeasonSlugResponse {
   seasonWeeks: SeasonWeekEntity[];
 }
@@ -904,6 +920,20 @@ export interface ListProblemAttemptResponseApiResponse {
   /** @nullable */
   successMessage?: string | null;
   responseBody?: ListProblemAttemptResponse;
+}
+
+export interface MentorAssignmentDto {
+  /** @nullable */
+  studentId?: string | null;
+  /** @nullable */
+  studentName?: string | null;
+  /** @nullable */
+  enrollmentId?: string | null;
+  studentRolePromotion?: SeasonStudentRolePromotion;
+  /** @nullable */
+  mentorId?: string | null;
+  /** @nullable */
+  mentorName?: string | null;
 }
 
 export interface MentorshipResponse {
@@ -1224,6 +1254,10 @@ export type ListProblemAttemptParams = {
 
 export type AdminListSeasonParams = {
   request?: AdminListSeasonRequest;
+};
+
+export type GetMentorAssignmentsParams = {
+  request?: GetMentorAssignmentsRequest;
 };
 
 export type AdminListSeasonWeekParams = {
@@ -4066,6 +4100,149 @@ export const useAdminUpdateSeason = <TError = unknown, TContext = unknown>(optio
 
   return useMutation(mutationOptions);
 };
+
+export const getMentorAssignments = (
+  seasonSlug: string,
+  params?: GetMentorAssignmentsParams,
+  options?: SecondParameter<typeof CustomAxiosInstance>,
+  signal?: AbortSignal
+) => {
+  return CustomAxiosInstance<GetMentorAssignmentsResponseApiResponse>(
+    {
+      url: `http://localhost:4000/api/v1/seasons/${seasonSlug}/mentor-assignments`,
+      method: 'GET',
+      params,
+      signal,
+    },
+    options
+  );
+};
+
+export const getGetMentorAssignmentsQueryKey = (
+  seasonSlug: string,
+  params?: GetMentorAssignmentsParams
+) => {
+  return [
+    `http://localhost:4000/api/v1/seasons/${seasonSlug}/mentor-assignments`,
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getGetMentorAssignmentsQueryOptions = <
+  TData = Awaited<ReturnType<typeof getMentorAssignments>>,
+  TError = unknown,
+>(
+  seasonSlug: string,
+  params?: GetMentorAssignmentsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getMentorAssignments>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetMentorAssignmentsQueryKey(seasonSlug, params);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getMentorAssignments>>> = ({ signal }) =>
+    getMentorAssignments(seasonSlug, params, requestOptions, signal);
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!seasonSlug,
+    staleTime: Infinity,
+    ...queryOptions,
+  } as UseQueryOptions<Awaited<ReturnType<typeof getMentorAssignments>>, TError, TData> & {
+    queryKey: DataTag<QueryKey, TData>;
+  };
+};
+
+export type GetMentorAssignmentsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getMentorAssignments>>
+>;
+export type GetMentorAssignmentsQueryError = unknown;
+
+export function useGetMentorAssignments<
+  TData = Awaited<ReturnType<typeof getMentorAssignments>>,
+  TError = unknown,
+>(
+  seasonSlug: string,
+  params: undefined | GetMentorAssignmentsParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getMentorAssignments>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getMentorAssignments>>,
+          TError,
+          Awaited<ReturnType<typeof getMentorAssignments>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+export function useGetMentorAssignments<
+  TData = Awaited<ReturnType<typeof getMentorAssignments>>,
+  TError = unknown,
+>(
+  seasonSlug: string,
+  params?: GetMentorAssignmentsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getMentorAssignments>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getMentorAssignments>>,
+          TError,
+          Awaited<ReturnType<typeof getMentorAssignments>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+export function useGetMentorAssignments<
+  TData = Awaited<ReturnType<typeof getMentorAssignments>>,
+  TError = unknown,
+>(
+  seasonSlug: string,
+  params?: GetMentorAssignmentsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getMentorAssignments>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+
+export function useGetMentorAssignments<
+  TData = Awaited<ReturnType<typeof getMentorAssignments>>,
+  TError = unknown,
+>(
+  seasonSlug: string,
+  params?: GetMentorAssignmentsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getMentorAssignments>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof CustomAxiosInstance>;
+  }
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
+  const queryOptions = getGetMentorAssignmentsQueryOptions(seasonSlug, params, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData>;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
 
 export const adminCreateSeasonWeek = (
   adminCreateSeasonWeekRequest: AdminCreateSeasonWeekRequest,
