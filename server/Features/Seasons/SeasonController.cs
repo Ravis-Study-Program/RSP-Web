@@ -72,5 +72,19 @@ public class SeasonController : BaseController
     return OkResponse(result, Messages.Season.Updated);
   }
 
+  [HttpGet]
+  [ServiceFilter(typeof(AuthAttribute))]
+  [Route("{seasonSlug}/mentor-assignments")]
+  [ActionName("GetMentorAssignments")]
+  public async Task<ActionResult<ApiResponse<GetMentorAssignmentsResponse>>> GetMentorAssignments(
+    string seasonSlug,
+    [FromQuery] GetMentorAssignmentsRequest request,
+    CancellationToken cancellationToken = default
+  )
+  {
+    var result = await _seasonService.GetMentorAssignments(seasonSlug, request, cancellationToken);
+    return OkResponse(result, Messages.Season.Listed);
+  }
+
   #endregion
 }

@@ -48,4 +48,10 @@ public interface ISeasonService
     AdminUpdateSeasonRequest request,
     CancellationToken cancellationToken = default
   );
+
+  Task<GetMentorAssignmentsResponse> GetMentorAssignments(
+    string seasonSlug,
+    GetMentorAssignmentsRequest request,
+    CancellationToken cancellationToken = default
+  );
 }
