@@ -10,6 +10,7 @@ import { ActionIcon, Button, Flex, Text, Title, Tooltip } from '@mantine/core';
 import { useLocalStorage } from '@mantine/hooks';
 import { modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
+import { ProfileLink } from '@/components/ProfileLink/ProfileLink';
 import {
   AdminDeleteUserResponseApiResponse,
   AdminUserDto,
@@ -84,6 +85,9 @@ export const AdminUsersTable = () => {
       {
         accessorKey: 'name',
         header: 'Name',
+        Cell: ({ row }) => {
+          return <ProfileLink userName={row.original.name} userSlug={row.original.slug} />;
+        },
       },
       {
         accessorKey: 'email',

@@ -1,4 +1,5 @@
 using RSPWebAPI.Entities;
+using System.ComponentModel.DataAnnotations;
 
 namespace RSPWebAPI.Features.Seasons.Dtos;
 
@@ -9,15 +10,30 @@ public class GetMentorAssignmentsRequest
 
 public class GetMentorAssignmentsResponse
 {
+  [Required]
   public required List<MentorAssignmentDto> Assignments { get; set; }
 }
 
 public class MentorAssignmentDto
 {
-  public required string StudentId { get; set; }
-  public required string StudentName { get; set; }
-  public required string EnrollmentId { get; set; }
-  public required SeasonStudentRolePromotion StudentRolePromotion { get; set; }
+  [Required]
+  public string StudentId { get; set; } = string.Empty;
+
+  [Required]
+  public string StudentName { get; set; } = string.Empty;
+
+  [Required]
+  public string StudentSlug { get; set; } = string.Empty;
+
+  [Required]
+  public string EnrollmentId { get; set; } = string.Empty;
+
+  [Required]
+  public SeasonStudentRolePromotion StudentRolePromotion { get; set; }
+
   public string? MentorId { get; set; }
+
   public string? MentorName { get; set; }
+  
+  public string? MentorSlug { get; set; }
 }

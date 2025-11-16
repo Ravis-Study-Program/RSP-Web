@@ -1,8 +1,9 @@
 import { useMemo, useState } from 'react';
 import { Flex, Group, MultiSelect, Select } from '@mantine/core';
 import { useLocalStorage } from '@mantine/hooks';
-import { useGetIsCurrentUserEnrolled, useListMockInterview } from '@/generated/api/client';
+import { useListMockInterview } from '@/generated/api/client';
 import { useSeasonSlug } from '@/shared/hooks/useSeasonSlug';
+import { useUserAndEnrollment } from '@/shared/hooks/useUserAndEnrollment';
 import { createOptionsFilter } from '@/shared/table/globalFilters';
 import { MockInterviewTable } from './MockInterviewTable/MockInterviewTable';
 import classes from './MockInterview.module.css';
@@ -15,10 +16,9 @@ export enum MockInterviewsPreset {
 
 export default function MockInterviewPage() {
   const { seasonSlug } = useSeasonSlug();
-  const { data: userResponse } = useGetIsCurrentUserEnrolled({ seasonSlug });
+  const { userId, seasonId } = useUserAndEnrollment(seasonSlug);
   const [selectedIsPassResult, setSelectedIsPassResult] = useState<boolean | null>(null);
   const [selectedInterviewers, setSelectedInterviewers] = useState<string[]>([]);
-  const userId = userResponse?.responseBody?.userId ?? '';
   const [selectedMockInterviewsPreset, setSelectedMockInterviewsPreset] = useLocalStorage({
     key: 'mock-interviews-preset',
     defaultValue: MockInterviewsPreset.All,
@@ -26,7 +26,7 @@ export default function MockInterviewPage() {
 
   const { data: mockInterviewsResponse, refetch: refetchMockInterviews } = useListMockInterview(
     {
-      SeasonId: userResponse?.responseBody?.seasonId || undefined,
+      SeasonId: seasonId || undefined,
       IncludeCustom: true,
       IncludeLeetcode: true,
       IncludeBehavioural: true,
@@ -82,6 +82,7 @@ export default function MockInterviewPage() {
     );
   }, [
     userId,
+    seasonId,
     mockInterviewsResponse,
     selectedIsPassResult,
     selectedMockInterviewsPreset,
@@ -150,7 +151,7 @@ export default function MockInterviewPage() {
       <MockInterviewTable
         refetchMockInterviews={refetchMockInterviews}
         mockInterviews={filteredMockInterviews}
-        seasonId={userResponse?.responseBody?.seasonId || ''}
+        seasonId={seasonId || ''}
         enableEditing
       />
     </>

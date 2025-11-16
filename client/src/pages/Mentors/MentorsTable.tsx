@@ -9,6 +9,7 @@ import {
 import { ActionIcon, Flex, Tooltip } from '@mantine/core';
 import { useLocalStorage } from '@mantine/hooks';
 import { modals } from '@mantine/modals';
+import { ProfileLink } from '@/components/ProfileLink/ProfileLink';
 import {
   MentorAssignmentDto,
   SeasonStudentRolePromotion,
@@ -73,12 +74,22 @@ export const MentorsTable = ({
       {
         accessorKey: 'studentName',
         header: 'Student Name',
+        Cell: ({ row }) => {
+          return (
+            <ProfileLink userName={row.original.studentName} userSlug={row.original.studentSlug} />
+          );
+        },
       },
       {
         accessorKey: 'mentorName',
         header: 'Mentor',
         accessorFn: (row) => {
           return row.mentorName || 'Unassigned';
+        },
+        Cell: ({ row }) => {
+          return (
+            <ProfileLink userName={row.original.mentorName} userSlug={row.original.mentorSlug} />
+          );
         },
       },
       {

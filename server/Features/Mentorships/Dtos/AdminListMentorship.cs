@@ -33,7 +33,13 @@ public record MentorshipResponse
   public string MentorName { get; set; } = string.Empty;
 
   [Required]
+  public string MentorSlug { get; set; } = string.Empty;
+
+  [Required]
   public string MenteeEnrollmentId { get; set; } = string.Empty;
+
+  [Required]
+  public string MenteeSlug { get; set; } = string.Empty;
 
   [Required]
   public string MenteeName { get; set; } = string.Empty;

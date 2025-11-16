@@ -12,6 +12,7 @@ import { ActionIcon, Anchor, Box, Button, Flex, Table, Text, Title, Tooltip } fr
 import { useLocalStorage } from '@mantine/hooks';
 import { modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
+import { ProfileLink } from '@/components/ProfileLink/ProfileLink';
 import {
   DeleteMockInterviewResponseApiResponse,
   ListMockInterviewResponseApiResponse,
@@ -159,10 +160,26 @@ export const MockInterviewTable = ({
       {
         header: 'Interviewer',
         accessorFn: (row) => row.interviewer?.name || 'Error',
+        Cell: ({ row }) => {
+          return (
+            <ProfileLink
+              userName={row.original.interviewer?.name}
+              userSlug={row.original.interviewer?.slug}
+            />
+          );
+        },
       },
       {
         header: 'Interviewee',
         accessorFn: (row) => (row.interviewee?.name ? `${row.interviewee.name}` : 'Error'),
+        Cell: ({ row }) => {
+          return (
+            <ProfileLink
+              userName={row.original.interviewee?.name}
+              userSlug={row.original.interviewee?.slug}
+            />
+          );
+        },
       },
       {
         header: 'Result',

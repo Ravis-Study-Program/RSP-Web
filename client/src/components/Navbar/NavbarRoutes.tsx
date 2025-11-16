@@ -4,6 +4,7 @@ import {
   IconCalendarMonth,
   IconChalkboard,
   IconChessKnight,
+  IconDiamond,
   IconLayoutDashboard,
   IconPlant,
   IconPlayCard7,
@@ -295,7 +296,7 @@ const getCoordinatorTabs = (seasonSlug: string | null, resourcesUrl?: string): T
             },
             {
               label: 'Mentors',
-              icon: IconBrandLeetcode,
+              icon: IconDiamond,
               link: `/seasons/${seasonSlug}/mentors`,
               hidden: false,
             },
@@ -347,7 +348,7 @@ const getAdminTabs = (seasonSlug: string | null, resourcesUrl?: string): Tabs =>
         },
         {
           label: 'Mentors',
-          icon: IconUsers,
+          icon: IconDiamond,
           link: `/seasons/${seasonSlug}/mentors`,
           hidden: false,
         },

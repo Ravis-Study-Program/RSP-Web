@@ -182,8 +182,11 @@ public class MentorshipService : BaseService, IMentorshipService
             SeasonSlug = m.MentorEnrollment.Season.Slug,
             MentorEnrollmentId = m.MentorEnrollmentId,
             MentorName = m.MentorEnrollment.User.Name,
+            MentorSlug = m.MentorEnrollment.User.Slug,
             MenteeEnrollmentId = m.MenteeEnrollmentId,
             MenteeName = m.MenteeEnrollment.User.Name,
+        MenteeSlug = m.MenteeEnrollment.User.Slug,
+
           })
           .ToList();
         return new AdminListMentorshipResponse { Mentorships = formattedMentorships };
@@ -297,8 +300,10 @@ public class MentorshipService : BaseService, IMentorshipService
         SeasonSlug = m.MentorEnrollment.Season.Slug,
         MentorEnrollmentId = m.MentorEnrollmentId,
         MentorName = m.MentorEnrollment.User.Name,
+        MentorSlug = m.MentorEnrollment.User.Slug,
         MenteeEnrollmentId = m.MenteeEnrollmentId,
         MenteeName = m.MenteeEnrollment.User.Name,
+        MenteeSlug = m.MenteeEnrollment.User.Slug,
         StudentRolePromotion = m.MenteeEnrollment.StudentRolePromotion,
       })
       .ToList();

@@ -10,6 +10,7 @@ import {
 import { ActionIcon, Flex, Tooltip } from '@mantine/core';
 import { useLocalStorage } from '@mantine/hooks';
 import { modals } from '@mantine/modals';
+import { ProfileLink } from '@/components/ProfileLink/ProfileLink';
 import {
   GetCurrentUserMenteesListResponseApiResponse,
   MentorshipResponse,
@@ -61,6 +62,11 @@ export const MenteesTable = ({ refetchMentorships, mentorships }: MenteesTablePr
       {
         accessorKey: 'menteeName',
         header: 'Name',
+        Cell: ({ row }) => {
+          return (
+            <ProfileLink userName={row.original.menteeName} userSlug={row.original.menteeSlug} />
+          );
+        },
       },
       {
         accessorKey: 'studentRolePromotion',

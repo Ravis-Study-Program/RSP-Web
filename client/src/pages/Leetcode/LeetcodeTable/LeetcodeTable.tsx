@@ -12,6 +12,7 @@ import { ActionIcon, Anchor, Button, Flex, Pill, Text, Title, Tooltip } from '@m
 import { useLocalStorage } from '@mantine/hooks';
 import { modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
+import { ProfileLink } from '@/components/ProfileLink/ProfileLink';
 import {
   DeleteProblemAttemptResponseApiResponse,
   ListProblemAttemptResponseApiResponse,
@@ -120,6 +121,14 @@ export const LeetcodeTable = ({
     ? {
         header: 'Author',
         accessorFn: (row) => row.enrollment?.user?.name || 'No User',
+        Cell: ({ row }) => {
+          return (
+            <ProfileLink
+              userName={row.original.enrollment?.user?.name}
+              userSlug={row.original.enrollment?.user?.slug}
+            />
+          );
+        },
       }
     : null;
 

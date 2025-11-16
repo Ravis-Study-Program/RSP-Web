@@ -10,6 +10,7 @@ import { ActionIcon, Button, Flex, Text, Title, Tooltip } from '@mantine/core';
 import { useLocalStorage } from '@mantine/hooks';
 import { modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
+import { ProfileLink } from '@/components/ProfileLink/ProfileLink';
 import {
   AdminDeleteMentorshipResponseApiResponse,
   MentorshipResponse,
@@ -105,10 +106,20 @@ export const AdminMentorshipsTable = () => {
       {
         header: 'Mentor',
         accessorFn: (row) => row.mentorName,
+        Cell: ({ row }) => {
+          return (
+            <ProfileLink userName={row.original.mentorName} userSlug={row.original.mentorSlug} />
+          );
+        },
       },
       {
         header: 'Mentee',
         accessorFn: (row) => row.menteeName,
+        Cell: ({ row }) => {
+          return (
+            <ProfileLink userName={row.original.menteeName} userSlug={row.original.menteeSlug} />
+          );
+        },
       },
     ],
     []

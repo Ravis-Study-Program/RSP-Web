@@ -247,10 +247,12 @@ public class SeasonService : BaseService, ISeasonService
       {
         StudentId = studentEnrollment.UserId,
         StudentName = studentEnrollment.User.Name,
+        StudentSlug = studentEnrollment.User.Slug,
         EnrollmentId = studentEnrollment.EnrollmentId,
         StudentRolePromotion = studentEnrollment.StudentRolePromotion,
         MentorId = mentorship?.MentorEnrollment.UserId,
-        MentorName = mentorship?.MentorEnrollment.User.Name
+        MentorName = mentorship?.MentorEnrollment.User.Name,
+MentorSlug=mentorship?.MentorEnrollment.User.Slug
       };
     }).ToList();
 

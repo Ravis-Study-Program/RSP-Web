@@ -38,9 +38,6 @@ export default function LeetcodePage() {
 
   const { data: currentUserResponse } = useGetCurrentUser();
   const userId = currentUserResponse?.responseBody?.user.userId ?? '';
-
-  // TODO: Handle error and loading states using skeleton
-  // TODO: Add Custom Problems support
   const { data: userResponse } = useGetIsCurrentUserEnrolled({ seasonSlug });
 
   const { data: problemAttemptsResponse, refetch: refetchProblemAttempts } = useListProblemAttempt(
