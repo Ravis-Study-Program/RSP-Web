@@ -91,7 +91,6 @@ namespace RSPWebAPI.Tests.Tests
         EnrollmentId = enrollmentId,
         LeetcodeProblemId = null,
         CustomProblemId = null,
-        AttemptStartDateUtc = DateTime.UtcNow.AddDays(2),
         TimeTakenInMinutes = 20,
         Notes = _faker.Lorem.Sentence(),
       };
@@ -118,7 +117,6 @@ namespace RSPWebAPI.Tests.Tests
       {
         UserId = user2Id,
         EnrollmentId = enrollmentId,
-        AttemptStartDateUtc = DateTime.UtcNow,
         TimeTakenInMinutes = 30,
       };
       await Assert.ThrowsAsync<KeyNotFoundException>(
@@ -156,8 +154,6 @@ namespace RSPWebAPI.Tests.Tests
       {
         ProblemAttemptId = attemptId,
         EnrollmentId = existing!.EnrollmentId,
-        AttemptStartDateUtc = DateTime.UtcNow.AddDays(5),
-        TimeTakenInMinutes = 99,
         Notes = _faker.Lorem.Sentence(),
         LeetcodeProblemId = null,
         CustomProblemId = null,
@@ -168,8 +164,6 @@ namespace RSPWebAPI.Tests.Tests
 
       var updated = await ProblemAttemptService.GetProblemAttemptByIdAsync(attemptId);
       Assert.NotNull(updated);
-      Assert.Equal(updateRequest.AttemptStartDateUtc, updated!.AttemptStartDateUtc);
-      Assert.Equal(updateRequest.TimeTakenInMinutes, updated.TimeTakenInMinutes);
       Assert.Equal(updateRequest.Notes, updated.Notes);
     }
 

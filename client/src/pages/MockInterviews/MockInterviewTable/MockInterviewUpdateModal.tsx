@@ -1,4 +1,3 @@
-import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
 import { QueryObserverResult, RefetchOptions, UseMutateAsyncFunction } from '@tanstack/react-query';
 import { zodResolver } from 'mantine-form-zod-resolver';
@@ -8,7 +7,6 @@ import {
   Button,
   Fieldset,
   Flex,
-  NumberInput,
   SegmentedControl,
   Select,
   Slider,
@@ -17,7 +15,6 @@ import {
   TextInput,
   Title,
 } from '@mantine/core';
-import { DateTimePicker } from '@mantine/dates';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import {
@@ -45,11 +42,6 @@ const scoreSchema = z
 
 const baseSchema = z.object({
   mockInterviewId: z.string(),
-  startDate: z.string().min(1),
-  timeTakenInMinutes: z
-    .number()
-    .min(1, { message: 'The minimum amount is 1 minute' })
-    .max(120, { message: 'The maximum amount is 120 minute.' }),
   interviewee: z.string().min(1),
   behaviouralScore: scoreSchema,
   notes: z.string().optional(),
@@ -105,8 +97,6 @@ export const MockInterviewUpdateModal = ({
   const getInitialValues = () => {
     const baseValues = {
       mockInterviewId: mockInterview.mockInterviewId,
-      startDate: dayjs(mockInterview.startDate).format('YYYY-MM-DD HH:mm'),
-      timeTakenInMinutes: mockInterview.timeTakenInMinutes,
       interviewee: mockInterview.intervieweeUserId ?? '',
       behaviouralScore: behaviouralRound?.behavioralScore ?? 0,
       notes: mockInterview.notes ?? '',
@@ -206,8 +196,6 @@ export const MockInterviewUpdateModal = ({
 
       const requestData: UpdateMockInterviewRequest = {
         mockInterviewId: values.mockInterviewId,
-        startDate: dayjs(values.startDate).toISOString(),
-        timeTakenInMinutes: values.timeTakenInMinutes,
         seasonId: mockInterview.seasonId,
         intervieweeUserId: values.interviewee,
         mockInterviewRounds,
@@ -246,44 +234,12 @@ export const MockInterviewUpdateModal = ({
       label: user.name,
     })) || [];
 
-  const daysBeforeToday = (days: number) => {
-    const today = new Date();
-    const resultDate = new Date();
-    resultDate.setDate(today.getDate() - days);
-    return dayjs(resultDate).format('YYYY-MM-DD HH:mm');
-  };
-
   return (
     <Stack>
       <Title order={3} mt={15}>
         Update Mock Interview
       </Title>
       <form onSubmit={form.onSubmit(handleSubmit)}>
-        <DateTimePicker
-          {...form.getInputProps('startDate')}
-          mt="sm"
-          label="Date"
-          placeholder="Pick a start date"
-          valueFormat="YYYY-MM-DD HH:mm"
-          minDate={daysBeforeToday(3)}
-          maxDate={new Date()}
-          withAsterisk
-          highlightToday
-          clearable
-          error={form.errors.startDate}
-          timePickerProps={{
-            withDropdown: true,
-            popoverProps: { withinPortal: false },
-          }}
-        />
-        <NumberInput
-          {...form.getInputProps('timeTakenInMinutes')}
-          mt="sm"
-          label="Time Taken In Minutes"
-          placeholder="Enter time taken in seconds to complete problem"
-          withAsterisk
-          error={form.errors.timeTakenInMinutes}
-        />
         <Select
           {...form.getInputProps('interviewee')}
           mt="sm"
@@ -327,8 +283,6 @@ export const MockInterviewUpdateModal = ({
             // Reset form with new type's initial values while preserving common fields
             const baseValues = {
               mockInterviewId: form.values.mockInterviewId,
-              startDate: form.values.startDate,
-              timeTakenInMinutes: form.values.timeTakenInMinutes,
               interviewee: form.values.interviewee,
               behaviouralScore: form.values.behaviouralScore,
               notes: form.values.notes,

@@ -1,10 +1,8 @@
-import dayjs from 'dayjs';
 import { QueryObserverResult, RefetchOptions, UseMutateAsyncFunction } from '@tanstack/react-query';
 import { zodResolver } from 'mantine-form-zod-resolver';
 import { MRT_Row, MRT_TableInstance } from 'mantine-react-table';
 import { z } from 'zod';
-import { Button, Flex, NumberInput, Select, Stack, Title } from '@mantine/core';
-import { DateTimePicker } from '@mantine/dates';
+import { Button, Flex, Select, Stack, Title } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import {
@@ -22,15 +20,6 @@ const schema = z.object({
   leetcodeProblemId: z.string().min(1, {
     message: 'Leetcode must not be empty',
   }),
-  attemptStartDateUtc: z.string().min(1),
-  timeTakenInMinutes: z
-    .number()
-    .min(1, {
-      message: 'The minimum amount is 1 minute.',
-    })
-    .max(120, {
-      message: 'The maximum amount is 120 minute.',
-    }),
   notes: z.string().optional(),
 });
 
@@ -46,14 +35,10 @@ export const LeetcodeProblemAttemptUpdateModal = ({
 
   const form = useForm<{
     leetcodeProblemId: string | null | undefined;
-    attemptStartDateUtc: string;
-    timeTakenInMinutes: number;
     notes?: string | null;
   }>({
     initialValues: {
       leetcodeProblemId: problemAttempt.leetcodeProblemId,
-      attemptStartDateUtc: dayjs(problemAttempt.attemptStartDateUtc).format('YYYY-MM-DD HH:mm'),
-      timeTakenInMinutes: problemAttempt.timeTakenInMinutes,
       notes: problemAttempt.notes,
     },
     validate: zodResolver(schema),
@@ -61,15 +46,12 @@ export const LeetcodeProblemAttemptUpdateModal = ({
 
   const handleSubmit = async (values: {
     leetcodeProblemId: string | null | undefined;
-    attemptStartDateUtc: string;
-    timeTakenInMinutes: number;
     notes?: string | null;
   }) => {
     try {
       const requestData: UpdateProblemAttemptRequest = {
         ...values,
         userId,
-        attemptStartDateUtc: dayjs(values.attemptStartDateUtc).toISOString(),
         problemAttemptId: problemAttempt.problemAttemptId,
         enrollmentId: problemAttempt.enrollmentId, // Use the existing enrollmentId from the problem attempt
       };
@@ -99,13 +81,6 @@ export const LeetcodeProblemAttemptUpdateModal = ({
       label: leetcodeProblem.title,
     })) || [];
 
-  const daysBeforeToday = (days: number) => {
-    const today = new Date();
-    const resultDate = new Date();
-    resultDate.setDate(today.getDate() - days);
-    return dayjs(resultDate).format('YYYY-MM-DD HH:mm');
-  };
-
   return (
     <Stack>
       <Title order={3} mt={15}>
@@ -122,31 +97,6 @@ export const LeetcodeProblemAttemptUpdateModal = ({
           withAsterisk
           searchable
           error={form.errors.leetcodeProblemId}
-        />
-        <DateTimePicker
-          {...form.getInputProps('attemptStartDateUtc')}
-          mt="sm"
-          label="Attempt Start Date"
-          placeholder="Pick a start date"
-          valueFormat="YYYY-MM-DD HH:mm"
-          minDate={daysBeforeToday(3)}
-          maxDate={new Date()}
-          withAsterisk
-          highlightToday
-          clearable
-          error={form.errors.attemptStartDateUtc}
-          timePickerProps={{
-            withDropdown: true,
-            popoverProps: { withinPortal: false },
-          }}
-        />
-        <NumberInput
-          {...form.getInputProps('timeTakenInMinutes')}
-          mt="sm"
-          label="Time Taken In Minutes"
-          placeholder="Enter time taken in seconds to complete problem"
-          withAsterisk
-          error={form.errors.timeTakenInMinutes}
         />
         <CustomRichTextEditor
           content={form.values.notes}

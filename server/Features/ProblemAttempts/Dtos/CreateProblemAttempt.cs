@@ -6,9 +6,6 @@ namespace RSPWebAPI.Features.ProblemAttempts.Dtos;
 public record CreateProblemAttemptRequest
 {
   [Required]
-  public DateTime AttemptStartDateUtc { get; set; }
-
-  [Required]
   public int TimeTakenInMinutes { get; set; }
 
   [Required]
@@ -30,7 +27,6 @@ public class CreateProblemAttemptRequestValidator : AbstractValidator<CreateProb
 {
   public CreateProblemAttemptRequestValidator()
   {
-    RuleFor(c => c.AttemptStartDateUtc).NotEmpty();
     RuleFor(c => c.TimeTakenInMinutes).NotEmpty().GreaterThanOrEqualTo(1);
     RuleFor(c => c.UserId).NotEmpty();
   }

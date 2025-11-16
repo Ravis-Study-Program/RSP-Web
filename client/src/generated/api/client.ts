@@ -482,7 +482,6 @@ export interface CreateMockInterviewRequest {
   interviewerUserId: string;
   /** @minLength 1 */
   intervieweeUserId: string;
-  startDate: string;
   timeTakenInMinutes: number;
   mockInterviewRounds: MockInterviewRoundDto[];
   /** @nullable */
@@ -504,7 +503,6 @@ export interface CreateMockInterviewResponseApiResponse {
 }
 
 export interface CreateProblemAttemptRequest {
-  attemptStartDateUtc: string;
   timeTakenInMinutes: number;
   /** @minLength 1 */
   userId: string;
@@ -1118,8 +1116,6 @@ export interface UpdateMockInterviewRequest {
   interviewerUserId: string;
   /** @minLength 1 */
   intervieweeUserId: string;
-  startDate: string;
-  timeTakenInMinutes: number;
   mockInterviewRounds: MockInterviewRoundDto[];
   /** @nullable */
   notes?: string | null;
@@ -1141,8 +1137,6 @@ export interface UpdateMockInterviewResponseApiResponse {
 export interface UpdateProblemAttemptRequest {
   /** @minLength 1 */
   problemAttemptId: string;
-  attemptStartDateUtc: string;
-  timeTakenInMinutes: number;
   /** @minLength 1 */
   userId: string;
   /** @nullable */
