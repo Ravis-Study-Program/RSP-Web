@@ -1,0 +1,8 @@
+.chartContainer {
+  margin-bottom: var(--mantine-spacing-xl);
+  padding: var(--mantine-spacing-xl);
+  padding-bottom: var(--mantine-spacing-sm);
+  border: rem(2px) solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
+  border-radius: var(--mantine-radius-md);
+  height: 100%;
+}

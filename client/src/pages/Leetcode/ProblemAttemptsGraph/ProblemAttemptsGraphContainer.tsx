@@ -1,9 +1,9 @@
 import { Container, Flex, Switch, Text, useComputedColorScheme } from '@mantine/core';
 import { useLocalStorage } from '@mantine/hooks';
 import { ProblemAttemptEntity } from '@/generated/api/client';
+import classes from '@/shared/styles/chartContainer.module.css';
 import { LeetcodeGraphPreset } from '../Leetcode.page';
 import { LeetcodeScatterChart } from './ProblemAttemptsGraphUtils';
-import classes from './ProblemAttemptsGraphContainer.module.css';
 
 export const ProblemAttemptsGraphContainer = ({
   problemAttempts,
@@ -46,7 +46,7 @@ export const ProblemAttemptsGraphContainer = ({
   ) {
     return (
       <>
-        <Container bg={bgColor} fluid className={classes.graphContainer}>
+        <Container bg={bgColor} fluid className={classes.chartContainer}>
           <Flex justify="space-between" mb={20}>
             <Text fw={600} size="md">
               {graphTitle()}

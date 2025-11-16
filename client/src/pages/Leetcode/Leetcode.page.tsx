@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
-import { Flex, Group, MultiSelect, Select } from '@mantine/core';
+import { Flex, Grid, Group, MultiSelect, Select } from '@mantine/core';
 import { useLocalStorage } from '@mantine/hooks';
+import { LeetcodeDifficultyChart } from '@/components/LeetcodeDifficultyChart/LeetcodeDifficultyChart';
 import {
   useGetCurrentUser,
   useGetIsCurrentUserEnrolled,
@@ -163,10 +164,20 @@ export default function LeetcodePage() {
           />
         </Group>
       </Flex>
-      <ProblemAttemptsGraphContainer
-        problemAttempts={filteredProblemAttempts}
-        graphPreset={selectedGraphPreset}
-      />
+      <Grid gutter="md" mb="md">
+        <Grid.Col span={{ base: 12, md: 3 }}>
+          <LeetcodeDifficultyChart
+            problemAttempts={problemAttemptsResponse?.responseBody?.problemAttempts}
+          />
+        </Grid.Col>
+        <Grid.Col span={{ base: 12, md: 9 }}>
+          <ProblemAttemptsGraphContainer
+            problemAttempts={filteredProblemAttempts}
+            graphPreset={selectedGraphPreset}
+          />
+        </Grid.Col>
+      </Grid>
+
       <LeetcodeTable
         refetchProblemAttempts={refetchProblemAttempts}
         problemAttempts={filteredProblemAttempts}

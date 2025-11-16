@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import { IconCheck } from '@tabler/icons-react';
 import { useSearchParams } from 'react-router-dom';
 import { Avatar, Card, Grid, Group, SegmentedControl, Text, Timeline } from '@mantine/core';
+import { LeetcodeDifficultyChart } from '@/components/LeetcodeDifficultyChart/LeetcodeDifficultyChart';
 import {
   EnrollmentResponseDto,
   SeasonRole,
@@ -82,10 +83,19 @@ export default function ProfilePage() {
   const LeetcodeComponent = useMemo(() => {
     return (
       <>
-        <ProblemAttemptsGraphContainer
-          problemAttempts={problemAttemptsResponse?.responseBody?.problemAttempts}
-          graphPreset={LeetcodeGraphPreset.ScatterChart}
-        />
+        <Grid gutter="md" mb="md">
+          <Grid.Col span={{ base: 12, md: 3 }}>
+            <LeetcodeDifficultyChart
+              problemAttempts={problemAttemptsResponse?.responseBody?.problemAttempts}
+            />
+          </Grid.Col>
+          <Grid.Col span={{ base: 12, md: 9 }}>
+            <ProblemAttemptsGraphContainer
+              problemAttempts={problemAttemptsResponse?.responseBody?.problemAttempts}
+              graphPreset={LeetcodeGraphPreset.ScatterChart}
+            />
+          </Grid.Col>
+        </Grid>
         <LeetcodeTable
           refetchProblemAttempts={refetchProblemAttempts}
           problemAttempts={problemAttemptsResponse?.responseBody?.problemAttempts}

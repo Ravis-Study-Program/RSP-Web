@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Flex, Group, MultiSelect, SegmentedControl, Text } from '@mantine/core';
+import { LeetcodeDifficultyChart } from '@/components/LeetcodeDifficultyChart/LeetcodeDifficultyChart';
 import {
   useGetCurrentUserMentees,
   useGetEnrollmentUsers,
@@ -108,14 +109,17 @@ export default function MenteesPage() {
     );
 
     return (
-      <LeetcodeTable
-        refetchProblemAttempts={refetchProblemAttempts}
-        problemAttempts={problemAttempts}
-        enrollmentId={enrollmentId || ''}
-        enableEditing={false}
-        showAuthor
-        showCategory
-      />
+      <>
+        <LeetcodeDifficultyChart problemAttempts={problemAttempts} />
+        <LeetcodeTable
+          refetchProblemAttempts={refetchProblemAttempts}
+          problemAttempts={problemAttempts}
+          enrollmentId={enrollmentId || ''}
+          enableEditing={false}
+          showAuthor
+          showCategory
+        />
+      </>
     );
   }, [
     refetchProblemAttempts,
