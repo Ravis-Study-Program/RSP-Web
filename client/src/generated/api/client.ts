@@ -652,6 +652,8 @@ export interface EnrollmentResponseDto {
   userId: string;
   /** @minLength 1 */
   userName: string;
+  /** @minLength 1 */
+  userSlug: string;
   studentRolePromotion: SeasonStudentRolePromotion;
   numStudentsInSeason?: number;
   numMentorsInSeason?: number;
@@ -749,8 +751,7 @@ export interface GetMentorAssignmentsRequest {
 }
 
 export interface GetMentorAssignmentsResponse {
-  /** @nullable */
-  assignments?: MentorAssignmentDto[] | null;
+  assignments: MentorAssignmentDto[];
 }
 
 export interface GetMentorAssignmentsResponseApiResponse {
@@ -923,17 +924,21 @@ export interface ListProblemAttemptResponseApiResponse {
 }
 
 export interface MentorAssignmentDto {
-  /** @nullable */
-  studentId?: string | null;
-  /** @nullable */
-  studentName?: string | null;
-  /** @nullable */
-  enrollmentId?: string | null;
-  studentRolePromotion?: SeasonStudentRolePromotion;
+  /** @minLength 1 */
+  studentId: string;
+  /** @minLength 1 */
+  studentName: string;
+  /** @minLength 1 */
+  studentSlug: string;
+  /** @minLength 1 */
+  enrollmentId: string;
+  studentRolePromotion: SeasonStudentRolePromotion;
   /** @nullable */
   mentorId?: string | null;
   /** @nullable */
   mentorName?: string | null;
+  /** @nullable */
+  mentorSlug?: string | null;
 }
 
 export interface MentorshipResponse {
@@ -950,7 +955,11 @@ export interface MentorshipResponse {
   /** @minLength 1 */
   mentorName: string;
   /** @minLength 1 */
+  mentorSlug: string;
+  /** @minLength 1 */
   menteeEnrollmentId: string;
+  /** @minLength 1 */
+  menteeSlug: string;
   /** @minLength 1 */
   menteeName: string;
   studentRolePromotion: SeasonStudentRolePromotion;

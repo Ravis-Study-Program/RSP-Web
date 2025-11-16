@@ -125,6 +125,7 @@ public class EnrollmentService : BaseService, IEnrollmentService
             SeasonResourcesUrl = e.Season.ResourcesUrl,
             UserId = e.UserId,
             UserName = e.User.Name,
+            UserSlug=e.User.Slug,
             StudentRolePromotion = e.StudentRolePromotion,
           })
           .OrderBy(e => e.SeasonName)
@@ -239,6 +240,7 @@ public class EnrollmentService : BaseService, IEnrollmentService
               SeasonResourcesUrl = e.Season.ResourcesUrl,
               UserId = e.User.UserId,
               UserName = e.User.Name,
+              UserSlug=e.User.Slug,
               Role = e.Role,
               StudentRolePromotion = e.StudentRolePromotion,
               NumStudentsInSeason = userCount,

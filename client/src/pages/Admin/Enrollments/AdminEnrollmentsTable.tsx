@@ -10,6 +10,7 @@ import { ActionIcon, Button, Flex, Text, Title, Tooltip } from '@mantine/core';
 import { useLocalStorage } from '@mantine/hooks';
 import { modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
+import { ProfileLink } from '@/components/ProfileLink/ProfileLink';
 import {
   AdminDeleteEnrollmentResponseApiResponse,
   EnrollmentResponseDto,
@@ -107,6 +108,9 @@ export const AdminEnrollmentsTable = () => {
       {
         accessorKey: 'userName',
         header: 'User',
+        Cell: ({ row }) => {
+          return <ProfileLink userName={row.original.userName} userSlug={row.original.userSlug} />;
+        },
       },
       {
         header: 'Role',

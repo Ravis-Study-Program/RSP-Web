@@ -45,6 +45,9 @@ public record EnrollmentResponseDto
   public string UserName { get; set; } = string.Empty;
 
   [Required]
+  public string UserSlug { get; set; } = string.Empty;
+
+  [Required]
   public SeasonStudentRolePromotion StudentRolePromotion { get; set; }
 
   public int NumStudentsInSeason { get; set; }

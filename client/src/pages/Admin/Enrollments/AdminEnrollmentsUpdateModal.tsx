@@ -146,7 +146,6 @@ export const AdminEnrollmentsUpdateModal = ({
           label="Select Student Role Promotion"
           placeholder="Pick a student role promotion"
           data={studentRolePromotionOptions}
-          filter={createOptionsFilter()}
           withAsterisk
           mt="sm"
           searchable

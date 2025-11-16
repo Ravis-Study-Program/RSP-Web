@@ -14,7 +14,6 @@ import {
   useGetCurrentUser,
 } from '@/generated/api/client';
 import { SeasonStudentRolePromotionReverseIndex } from '@/shared/entities/reverseIndex';
-import { createOptionsFilter } from '@/shared/table/globalFilters';
 
 const schema = z.object({
   name: z.string(),
@@ -70,12 +69,12 @@ export const StudentRolePromotionUpdateModal = ({
     }
   };
 
-  const studentRolePromotionOptions = Object.entries(SeasonStudentRolePromotion).map(
-    ([key, _]) => ({
+  const studentRolePromotionOptions = Object.entries(SeasonStudentRolePromotion)
+    .filter(([, value]) => value !== SeasonStudentRolePromotion.NotApplicable)
+    .map(([key]) => ({
       value: key,
       label: key,
-    })
-  );
+    }));
 
   return (
     <Stack>
@@ -89,7 +88,6 @@ export const StudentRolePromotionUpdateModal = ({
           label="Select Student Role Promotion"
           placeholder="Pick a student role promotion"
           data={studentRolePromotionOptions}
-          filter={createOptionsFilter()}
           withAsterisk
           mt="sm"
           searchable
