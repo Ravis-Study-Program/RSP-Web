@@ -103,7 +103,6 @@ namespace RSPWebAPI.Tests.Tests
         InterviewerUserId = user2Id,
         IntervieweeUserId = user1Id,
         SeasonId = seasonId,
-        StartDate = DateTime.UtcNow,
       };
       await Assert.ThrowsAsync<KeyNotFoundException>(
         () => MockInterviewService.CreateMockInterview(request)
@@ -128,8 +127,6 @@ namespace RSPWebAPI.Tests.Tests
         SeasonId = existing.SeasonId,
         IntervieweeUserId = newUserId,
         InterviewerUserId = userId,
-        StartDate = DateTime.UtcNow.AddDays(2),
-        TimeTakenInMinutes = 90,
         MockInterviewRounds = new(),
       };
 
@@ -139,7 +136,7 @@ namespace RSPWebAPI.Tests.Tests
       var afterUpdate = await MockInterviewService.GetMockInterviewByIdAsync(mockInterviewId);
       Assert.NotNull(afterUpdate);
       Assert.Equal(newUserId, afterUpdate.IntervieweeUserId);
-      Assert.Equal(90, afterUpdate.TimeTakenInMinutes);
+      Assert.Equal(existing.TimeTakenInMinutes, afterUpdate.TimeTakenInMinutes);
     }
 
     [Fact]

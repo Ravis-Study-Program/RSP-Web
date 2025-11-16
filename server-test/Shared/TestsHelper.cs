@@ -64,6 +64,8 @@ public class TestDataSeeder
     _leetcodeProblemRecommendationRepository = leetcodeProblemRecommendationRepository;
   }
 
+  public DateTime startDate = DateTime.UtcNow.AddDays(-7);
+
   public async Task<string> SeedUserAsync(
     string? emailOverride = null,
     bool? isAdminOverride = null
@@ -90,8 +92,8 @@ public class TestDataSeeder
     DateTime? endDateOverride = null
   )
   {
-    var startDate = startDateOverride ?? DateTime.UtcNow;
-    var endDate = endDateOverride ?? startDate.AddDays(7 * 6);
+    var startDate = startDateOverride ?? DateTime.UtcNow.AddDays(-1);
+    var endDate = endDateOverride ?? startDate.AddDays(7 * 6 + 2);
 
     var request = new AdminCreateSeasonRequest
     {
@@ -115,8 +117,8 @@ public class TestDataSeeder
     {
       SeasonId = seasonId,
       WeekNumber = weekNumber,
-      StartDate = DateTime.UtcNow.AddDays(weekNumber * 7),
-      EndDate = DateTime.UtcNow.AddDays((weekNumber + 1) * 7),
+      StartDate = startDate.AddDays(weekNumber * 7),
+      EndDate = startDate.AddDays((weekNumber + 1) * 7),
     };
 
     var response = await _seasonWeekService.CreateAdminSeasonWeek(request);
@@ -290,13 +292,12 @@ public class TestDataSeeder
     string interviewerEmail,
     string? enrollmentId = null,
     string? intervieweeUserId = null,
-    DateTime? startDate = null,
     int? timeTakenInMinutes = null,
     List<MockInterviewRoundDto>? rounds = null
   )
   {
     var interviewer = await _userService.GetUserAsync(email: interviewerEmail);
-    var seasonId = await SeedSeasonAsync(null, DateTime.UtcNow, DateTime.UtcNow.AddDays(4 * 7));
+    var seasonId = await SeedSeasonAsync(null, startDate, startDate.AddDays(4 * 7 + 1));
     Assert.NotNull(interviewer);
 
     if (string.IsNullOrWhiteSpace(intervieweeUserId))
@@ -320,7 +321,6 @@ public class TestDataSeeder
       InterviewerUserId = interviewer.UserId,
       IntervieweeUserId = intervieweeUserId,
       SeasonId = seasonId,
-      StartDate = startDate ?? DateTime.UtcNow,
       TimeTakenInMinutes = timeTakenInMinutes ?? _faker.Random.Int(10, 60),
       MockInterviewRounds = rounds ?? new List<MockInterviewRoundDto>(),
     };
@@ -333,7 +333,7 @@ public class TestDataSeeder
 
   public async Task<string> SeedSeasonAndSeasonWeeks()
   {
-    var seasonId = await SeedSeasonAsync(null, DateTime.UtcNow, DateTime.UtcNow.AddDays(4 * 7));
+    var seasonId = await SeedSeasonAsync(null, startDate.AddDays(-7), startDate.AddDays(4 * 7 + 1));
     for (var i = 0; i <= 2; i++)
     {
       await SeedSeasonWeekAsync(seasonId, i);
@@ -350,7 +350,7 @@ public class TestDataSeeder
   {
     if (seasonId == null)
     {
-      seasonId = await SeedSeasonAsync(null, DateTime.UtcNow, DateTime.UtcNow.AddDays(4 * 7));
+      seasonId = await SeedSeasonAsync(null, startDate, startDate.AddDays(4 * 7 + 1));
       for (var i = 0; i <= 2; i++)
       {
         await SeedSeasonWeekAsync(seasonId, i);
