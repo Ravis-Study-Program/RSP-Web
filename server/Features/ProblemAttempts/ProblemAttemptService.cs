@@ -69,6 +69,7 @@ public class ProblemAttemptService : BaseService, IProblemAttemptService
   )
   {
     SeasonWeekEntity? seasonWeek = null;
+    var attemptStartDate = DateTime.UtcNow.AddMinutes(-request.TimeTakenInMinutes);
     if (request.EnrollmentId != null)
     {
       var existingEnrollment = await _enrollmentService.GetEnrollmentByIdAsync(
@@ -81,11 +82,10 @@ public class ProblemAttemptService : BaseService, IProblemAttemptService
         throw new KeyNotFoundException(Messages.Enrollment.DoesNotExist);
       }
 
-      var currentDate = request.AttemptStartDateUtc;
       var seasonWeeks = await _seasonWeekService.GetAllSeasonWeeksAsync(
         q =>
-          q.StartDate <= currentDate
-          && q.EndDate >= currentDate
+          q.StartDate <= attemptStartDate
+          && q.EndDate >= attemptStartDate
           && q.SeasonId == existingEnrollment.SeasonId,
         cancellationToken
       );
@@ -114,7 +114,7 @@ public class ProblemAttemptService : BaseService, IProblemAttemptService
     var problemAttempt = new ProblemAttemptEntity
     {
       ProblemAttemptId = Database.Constants.GeneratePrimaryKeyId(),
-      AttemptStartDateUtc = request.AttemptStartDateUtc,
+      AttemptStartDateUtc = attemptStartDate,
       TimeTakenInMinutes = request.TimeTakenInMinutes,
       LeetcodeProblemId = request.LeetcodeProblemId,
       CustomProblemId = request.CustomProblemId,
@@ -285,13 +285,13 @@ public class ProblemAttemptService : BaseService, IProblemAttemptService
     }
 
     SeasonWeekEntity? seasonWeek = null;
+    var attemptStartDate = existingProblemAttempt.AttemptStartDateUtc;
     if (request.EnrollmentId != null)
     {
-      var currentDate = request.AttemptStartDateUtc;
       var seasonWeeks = await _seasonWeekService.GetAllSeasonWeeksAsync(
         q =>
-          q.StartDate <= currentDate
-          && q.EndDate >= currentDate
+          q.StartDate <= attemptStartDate
+          && q.EndDate >= attemptStartDate
           && q.SeasonId == existingProblemAttempt.Enrollment.SeasonId,
         cancellationToken
       );
@@ -308,8 +308,6 @@ public class ProblemAttemptService : BaseService, IProblemAttemptService
       request.CustomProblemId = null;
     }
 
-    existingProblemAttempt.AttemptStartDateUtc = request.AttemptStartDateUtc;
-    existingProblemAttempt.TimeTakenInMinutes = request.TimeTakenInMinutes;
     existingProblemAttempt.LeetcodeProblemId = request.LeetcodeProblemId;
     existingProblemAttempt.CustomProblemId = request.CustomProblemId;
     existingProblemAttempt.Notes = request.Notes;

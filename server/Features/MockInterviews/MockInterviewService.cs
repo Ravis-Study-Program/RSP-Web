@@ -66,6 +66,7 @@ public class MockInterviewService : BaseService, IMockInterviewService
   {
     SeasonWeekEntity? seasonWeek = null;
     string? seasonId = null;
+    var startDate = DateTime.UtcNow.AddMinutes(-request.TimeTakenInMinutes);
     if (!string.IsNullOrEmpty(request.SeasonId))
     {
       var existingEnrollment = await _enrollmentService.GetEnrollmentBySeasonId(
@@ -82,11 +83,10 @@ public class MockInterviewService : BaseService, IMockInterviewService
 
       seasonId = existingEnrollment.SeasonId;
 
-      var currentDate = request.StartDate;
       var seasonWeeks = await _seasonWeekService.GetAllSeasonWeeksAsync(
         q =>
-          q.StartDate <= currentDate
-          && q.EndDate >= currentDate
+          q.StartDate <= startDate
+          && q.EndDate >= startDate
           && q.SeasonId == existingEnrollment.SeasonId,
         cancellationToken
       );
@@ -122,7 +122,7 @@ public class MockInterviewService : BaseService, IMockInterviewService
       IntervieweeUserId = interviewee.UserId,
       SeasonId = seasonId,
       MockInterviewRounds = mockInterviewRounds,
-      StartDate = request.StartDate,
+      StartDate = startDate,
       TimeTakenInMinutes = request.TimeTakenInMinutes,
       Notes = request.Notes,
       SeasonWeekId = seasonWeek?.SeasonWeekId,
@@ -313,13 +313,13 @@ public class MockInterviewService : BaseService, IMockInterviewService
     }
 
     SeasonWeekEntity? seasonWeek = null;
+    var startDate = existingMockInterview.StartDate;
     if (!string.IsNullOrEmpty(request.SeasonId))
     {
-      var currentDate = request.StartDate;
       var seasonWeeks = await _seasonWeekService.GetAllSeasonWeeksAsync(
         q =>
-          q.StartDate <= currentDate
-          && q.EndDate >= currentDate
+          q.StartDate <= startDate
+          && q.EndDate >= startDate
           && q.SeasonId == existingMockInterview.SeasonId,
         cancellationToken
       );
@@ -352,8 +352,6 @@ public class MockInterviewService : BaseService, IMockInterviewService
     existingMockInterview.InterviewerUserId = interviewer.UserId;
     existingMockInterview.IntervieweeUserId = interviewee.UserId;
     existingMockInterview.SeasonId = request.SeasonId;
-    existingMockInterview.StartDate = request.StartDate;
-    existingMockInterview.TimeTakenInMinutes = request.TimeTakenInMinutes;
     existingMockInterview.Notes = request.Notes;
     existingMockInterview.SeasonWeekId = seasonWeek?.SeasonWeekId;
 

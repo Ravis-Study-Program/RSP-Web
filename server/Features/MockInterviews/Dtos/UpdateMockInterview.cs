@@ -14,11 +14,6 @@ public record UpdateMockInterviewRequest
   [Required]
   public string IntervieweeUserId { get; set; } = string.Empty;
 
-  [Required]
-  public DateTime StartDate { get; set; }
-
-  [Required]
-  public int TimeTakenInMinutes { get; set; }
 
   [Required]
   public List<MockInterviewRoundDto> MockInterviewRounds { get; set; } = new();
@@ -37,8 +32,6 @@ public class UpdateMockInterviewRequestValidator : AbstractValidator<UpdateMockI
     RuleFor(c => c.MockInterviewId).NotEmpty();
     RuleFor(c => c.IntervieweeUserId).NotEmpty();
     RuleFor(c => c.InterviewerUserId).NotEmpty();
-    RuleFor(c => c.StartDate).NotEmpty();
-    RuleFor(c => c.TimeTakenInMinutes).NotEmpty().GreaterThan(0);
     RuleFor(c => c.MockInterviewRounds).NotEmpty();
   }
 }

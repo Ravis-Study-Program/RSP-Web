@@ -44,7 +44,6 @@ const scoreSchema = z
   .max(10, { message: 'The maximum score is 10' });
 
 const baseSchema = z.object({
-  startDate: z.string().min(1),
   timeTakenInMinutes: z
     .number()
     .min(1, { message: 'The minimum amount is 1 minute' })
@@ -89,7 +88,6 @@ export const MockInterviewCreateModal = ({
 
   const getInitialValues = () => {
     const baseValues = {
-      startDate: dayjs().format('YYYY-MM-DD HH:mm'),
       timeTakenInMinutes: 0,
       interviewee: '',
       behaviouralScore: 0,
@@ -178,7 +176,6 @@ export const MockInterviewCreateModal = ({
       }
 
       const requestData: CreateMockInterviewRequest = {
-        startDate: dayjs(values.startDate).toISOString(),
         timeTakenInMinutes: values.timeTakenInMinutes,
         intervieweeUserId: values.interviewee,
         mockInterviewRounds,
@@ -220,36 +217,12 @@ export const MockInterviewCreateModal = ({
       label: user.name,
     })) || [];
 
-  const daysBeforeToday = (days: number) => {
-    const today = new Date();
-    const resultDate = new Date();
-    resultDate.setDate(today.getDate() - days);
-    return dayjs(resultDate).format('YYYY-MM-DD HH:mm');
-  };
-
   return (
     <Stack>
       <Title order={3} mt={15}>
         Add Mock Interview
       </Title>
       <form onSubmit={form.onSubmit(handleSubmit)}>
-        <DateTimePicker
-          {...form.getInputProps('startDate')}
-          mt="sm"
-          label="Date"
-          placeholder="Pick a start date"
-          valueFormat="YYYY-MM-DD HH:mm"
-          minDate={daysBeforeToday(3)}
-          maxDate={new Date()}
-          withAsterisk
-          highlightToday
-          clearable
-          error={form.errors.startDate}
-          timePickerProps={{
-            withDropdown: true,
-            popoverProps: { withinPortal: false },
-          }}
-        />
         <NumberInput
           {...form.getInputProps('timeTakenInMinutes')}
           mt="sm"
@@ -300,7 +273,6 @@ export const MockInterviewCreateModal = ({
 
             // Reset form with new type's initial values
             const baseValues = {
-              startDate: form.values.startDate,
               timeTakenInMinutes: form.values.timeTakenInMinutes,
               interviewee: form.values.interviewee,
               behaviouralScore: form.values.behaviouralScore,

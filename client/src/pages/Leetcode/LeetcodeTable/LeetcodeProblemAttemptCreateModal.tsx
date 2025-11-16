@@ -22,7 +22,6 @@ const schema = z.object({
   leetcodeProblemId: z.string().min(1, {
     message: 'Leetcode must not be empty',
   }),
-  attemptStartDateUtc: z.string().min(1),
   timeTakenInMinutes: z
     .number()
     .min(1, {
@@ -46,13 +45,11 @@ export const LeetcodeProblemAttemptCreateModal = ({
 
   const form = useForm<{
     leetcodeProblemId: string;
-    attemptStartDateUtc: string;
     timeTakenInMinutes: number;
     notes?: string;
   }>({
     initialValues: {
       leetcodeProblemId: '',
-      attemptStartDateUtc: dayjs().format('YYYY-MM-DD HH:mm'),
       timeTakenInMinutes: 0,
       notes: '',
     },
@@ -61,7 +58,6 @@ export const LeetcodeProblemAttemptCreateModal = ({
 
   const handleSubmit = async (values: {
     leetcodeProblemId: string;
-    attemptStartDateUtc: string;
     timeTakenInMinutes: number;
     notes?: string;
   }) => {
@@ -69,7 +65,6 @@ export const LeetcodeProblemAttemptCreateModal = ({
       const requestData: CreateProblemAttemptRequest = {
         ...values,
         userId,
-        attemptStartDateUtc: dayjs(values.attemptStartDateUtc).toISOString(),
       };
       if (enrollmentId !== '') {
         requestData.enrollmentId = enrollmentId;
@@ -100,13 +95,6 @@ export const LeetcodeProblemAttemptCreateModal = ({
       label: leetcodeProblem.title,
     })) || [];
 
-  const daysBeforeToday = (days: number) => {
-    const today = new Date();
-    const resultDate = new Date();
-    resultDate.setDate(today.getDate() - days);
-    return resultDate;
-  };
-
   return (
     <Stack>
       <Title order={3} mt={15}>
@@ -123,23 +111,6 @@ export const LeetcodeProblemAttemptCreateModal = ({
           withAsterisk
           searchable
           error={form.errors.leetcodeProblemId}
-        />
-        <DateTimePicker
-          {...form.getInputProps('attemptStartDateUtc')}
-          mt="sm"
-          label="Attempt Start Date"
-          placeholder="Pick a start date"
-          valueFormat="YYYY-MM-DD HH:mm"
-          minDate={daysBeforeToday(3)}
-          maxDate={new Date()}
-          withAsterisk
-          highlightToday
-          clearable
-          error={form.errors.attemptStartDateUtc}
-          timePickerProps={{
-            withDropdown: true,
-            popoverProps: { withinPortal: false },
-          }}
         />
         <NumberInput
           {...form.getInputProps('timeTakenInMinutes')}

@@ -8,11 +8,6 @@ public record UpdateProblemAttemptRequest
   [Required]
   public string ProblemAttemptId { get; set; } = string.Empty;
 
-  [Required]
-  public DateTime AttemptStartDateUtc { get; set; }
-
-  [Required]
-  public int TimeTakenInMinutes { get; set; }
 
   [Required]
   public string UserId { get; set; } = string.Empty;
@@ -30,8 +25,6 @@ public class UpdateProblemAttemptRequestValidator : AbstractValidator<UpdateProb
   public UpdateProblemAttemptRequestValidator()
   {
     RuleFor(c => c.ProblemAttemptId).NotEmpty();
-    RuleFor(c => c.AttemptStartDateUtc).NotEmpty();
-    RuleFor(c => c.TimeTakenInMinutes).NotEmpty().GreaterThanOrEqualTo(1);
     RuleFor(c => c.UserId).NotEmpty();
   }
 }
