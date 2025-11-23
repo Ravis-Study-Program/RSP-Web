@@ -76,6 +76,8 @@ public class DummyDataService : BaseService, IDummyDataService
     var users = new List<UserEntity>();
     for (var i = 0; i < total; i++)
     {
+      var name = faker.Name.FullName();
+      var slug = $"{name.ToLower().Replace(" ", "-")}-{faker.Random.AlphaNumeric(6)}";
       users.Add(
         new UserEntity
         {
@@ -83,7 +85,8 @@ public class DummyDataService : BaseService, IDummyDataService
           DiscordId = faker.Random.AlphaNumeric(8),
           Email = faker.Internet.Email().ToLower(),
           IsAdmin = false,
-          Name = faker.Name.FullName(),
+          Name = name,
+          Slug = slug,
           ProfileImage = faker.Image.PicsumUrl(width: 300, height: 300),
           DeletedAtUtc = null,
         }
