@@ -560,6 +560,7 @@ export interface CustomMockInterviewRoundEntity {
   content?: string | null;
   /** @nullable */
   link?: string | null;
+  isReviewed: boolean;
   score: number;
   /** @nullable */
   deletedAtUtc?: string | null;
@@ -834,6 +835,7 @@ export interface LeetcodeMockInterviewRoundEntity {
   complexityAnalysisScore: number;
   codingScore: number;
   testingScore: number;
+  isReviewed: boolean;
   leetcodeProblem?: LeetcodeProblemEntity;
   /** @nullable */
   deletedAtUtc?: string | null;
@@ -1109,6 +1111,22 @@ export interface SeasonWeekEntity {
   deletedAtUtc?: string | null;
 }
 
+export interface UpdateCustomMockInterviewRoundReviewRequest {
+  /** @minLength 1 */
+  customMockInterviewRoundId: string;
+  isReviewed: boolean;
+  /** @nullable */
+  userId?: string | null;
+}
+
+export interface UpdateLeetcodeMockInterviewRoundReviewRequest {
+  /** @minLength 1 */
+  leetcodeMockInterviewRoundId: string;
+  isReviewed: boolean;
+  /** @nullable */
+  userId?: string | null;
+}
+
 export interface UpdateMockInterviewRequest {
   /** @minLength 1 */
   mockInterviewId: string;
@@ -1132,6 +1150,18 @@ export interface UpdateMockInterviewResponseApiResponse {
   /** @nullable */
   successMessage?: string | null;
   responseBody?: UpdateMockInterviewResponse;
+}
+
+export interface UpdateMockInterviewRoundReviewResponse {
+  /** @nullable */
+  message?: string | null;
+}
+
+export interface UpdateMockInterviewRoundReviewResponseApiResponse {
+  error?: ApiError;
+  /** @nullable */
+  successMessage?: string | null;
+  responseBody?: UpdateMockInterviewRoundReviewResponse;
 }
 
 export interface UpdateProblemAttemptRequest {
@@ -3413,6 +3443,166 @@ export const useUpdateMockInterview = <TError = unknown, TContext = unknown>(opt
   TContext
 > => {
   const mutationOptions = getUpdateMockInterviewMutationOptions(options);
+
+  return useMutation(mutationOptions);
+};
+
+export const updateCustomMockInterviewRoundReview = (
+  updateCustomMockInterviewRoundReviewRequest: UpdateCustomMockInterviewRoundReviewRequest,
+  options?: SecondParameter<typeof CustomAxiosInstance>
+) => {
+  return CustomAxiosInstance<UpdateMockInterviewRoundReviewResponseApiResponse>(
+    {
+      url: `http://localhost:4000/api/v1/mock-interviews/update-custom-round-review`,
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      data: updateCustomMockInterviewRoundReviewRequest,
+    },
+    options
+  );
+};
+
+export const getUpdateCustomMockInterviewRoundReviewMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updateCustomMockInterviewRoundReview>>,
+    TError,
+    { data: UpdateCustomMockInterviewRoundReviewRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof updateCustomMockInterviewRoundReview>>,
+  TError,
+  { data: UpdateCustomMockInterviewRoundReviewRequest },
+  TContext
+> => {
+  const mutationKey = ['updateCustomMockInterviewRoundReview'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof updateCustomMockInterviewRoundReview>>,
+    { data: UpdateCustomMockInterviewRoundReviewRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return updateCustomMockInterviewRoundReview(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type UpdateCustomMockInterviewRoundReviewMutationResult = NonNullable<
+  Awaited<ReturnType<typeof updateCustomMockInterviewRoundReview>>
+>;
+export type UpdateCustomMockInterviewRoundReviewMutationBody =
+  UpdateCustomMockInterviewRoundReviewRequest;
+export type UpdateCustomMockInterviewRoundReviewMutationError = unknown;
+
+export const useUpdateCustomMockInterviewRoundReview = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updateCustomMockInterviewRoundReview>>,
+    TError,
+    { data: UpdateCustomMockInterviewRoundReviewRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof updateCustomMockInterviewRoundReview>>,
+  TError,
+  { data: UpdateCustomMockInterviewRoundReviewRequest },
+  TContext
+> => {
+  const mutationOptions = getUpdateCustomMockInterviewRoundReviewMutationOptions(options);
+
+  return useMutation(mutationOptions);
+};
+
+export const updateLeetcodeMockInterviewRoundReview = (
+  updateLeetcodeMockInterviewRoundReviewRequest: UpdateLeetcodeMockInterviewRoundReviewRequest,
+  options?: SecondParameter<typeof CustomAxiosInstance>
+) => {
+  return CustomAxiosInstance<UpdateMockInterviewRoundReviewResponseApiResponse>(
+    {
+      url: `http://localhost:4000/api/v1/mock-interviews/update-leetcode-round-review`,
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      data: updateLeetcodeMockInterviewRoundReviewRequest,
+    },
+    options
+  );
+};
+
+export const getUpdateLeetcodeMockInterviewRoundReviewMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updateLeetcodeMockInterviewRoundReview>>,
+    TError,
+    { data: UpdateLeetcodeMockInterviewRoundReviewRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof updateLeetcodeMockInterviewRoundReview>>,
+  TError,
+  { data: UpdateLeetcodeMockInterviewRoundReviewRequest },
+  TContext
+> => {
+  const mutationKey = ['updateLeetcodeMockInterviewRoundReview'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof updateLeetcodeMockInterviewRoundReview>>,
+    { data: UpdateLeetcodeMockInterviewRoundReviewRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return updateLeetcodeMockInterviewRoundReview(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type UpdateLeetcodeMockInterviewRoundReviewMutationResult = NonNullable<
+  Awaited<ReturnType<typeof updateLeetcodeMockInterviewRoundReview>>
+>;
+export type UpdateLeetcodeMockInterviewRoundReviewMutationBody =
+  UpdateLeetcodeMockInterviewRoundReviewRequest;
+export type UpdateLeetcodeMockInterviewRoundReviewMutationError = unknown;
+
+export const useUpdateLeetcodeMockInterviewRoundReview = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updateLeetcodeMockInterviewRoundReview>>,
+    TError,
+    { data: UpdateLeetcodeMockInterviewRoundReviewRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof updateLeetcodeMockInterviewRoundReview>>,
+  TError,
+  { data: UpdateLeetcodeMockInterviewRoundReviewRequest },
+  TContext
+> => {
+  const mutationOptions = getUpdateLeetcodeMockInterviewRoundReviewMutationOptions(options);
 
   return useMutation(mutationOptions);
 };

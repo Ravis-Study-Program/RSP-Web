@@ -28,6 +28,7 @@ export const NOTIFICATION_MESSAGES = {
     CREATED: 'Mock interview created successfully.',
     UPDATED: 'Mock interview updated successfully.',
     DELETED: 'Mock interview deleted successfully.',
+    REVIEW_UPDATED: 'Review status updated successfully.',
   },
   PROBLEM_ATTEMPT: {
     CREATED: 'Problem attempt created successfully.',

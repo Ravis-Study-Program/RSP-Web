@@ -153,6 +153,17 @@ public sealed class MockInterviewMessages : EntityMessages
     "The interviewer or interviewee could not be found.";
   public string OutOfSeasonDateRange =
     "The mock interview date falls outside the season's date range.";
+  
+  // Round review messages
+  public string RoundReviewUpdated = "Review status updated successfully";
+  public string CustomRoundReviewUpdated = "Custom round review status updated successfully";
+  public string LeetcodeRoundReviewUpdated = "Leetcode round review status updated successfully";
+  public string OnlyIntervieweeCanUpdateReview = "Only the interviewee can update the review status";
+  public string CustomRoundNotFound = "Custom mock interview round not found";
+  public string LeetcodeRoundNotFound = "Leetcode mock interview round not found";
+  public string RoundUpdateError = "Error updating mock interview round review status";
+  public string CustomRoundUpdateError = "Error updating custom mock interview round review status";
+  public string LeetcodeRoundUpdateError = "Error updating leetcode mock interview round review status";
 }
 
 public sealed class SeasonWeekMessages : EntityMessages

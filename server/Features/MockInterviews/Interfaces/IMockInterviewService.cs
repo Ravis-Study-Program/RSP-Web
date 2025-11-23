@@ -53,4 +53,14 @@ public interface IMockInterviewService
     UpdateMockInterviewRequest request,
     CancellationToken cancellationToken = default
   );
+
+  Task<UpdateMockInterviewRoundReviewResponse> UpdateCustomMockInterviewRoundReview(
+    UpdateCustomMockInterviewRoundReviewRequest request,
+    CancellationToken cancellationToken = default
+  );
+
+  Task<UpdateMockInterviewRoundReviewResponse> UpdateLeetcodeMockInterviewRoundReview(
+    UpdateLeetcodeMockInterviewRoundReviewRequest request,
+    CancellationToken cancellationToken = default
+  );
 }

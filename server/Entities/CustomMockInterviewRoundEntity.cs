@@ -15,6 +15,9 @@ public class CustomMockInterviewRoundEntity : ISoftDelete
   public string Link { get; set; } = string.Empty;
 
   [Required]
+  public bool IsReviewed { get; set; }
+
+  [Required]
   public int Score { get; set; }
   public DateTime? DeletedAtUtc { get; set; }
 }
@@ -40,6 +43,10 @@ public class CustomMockInterviewRoundConfiguration
       .HasColumnType("varchar(10000)");
     builder.Property(x => x.Link).HasColumnName("Link").HasColumnType("varchar(255)");
     builder.Property(x => x.Score).HasColumnName("Score").HasColumnType("int").IsRequired();
+    builder
+      .Property(x => x.IsReviewed)
+      .HasColumnName("IsReviewed")
+      .IsRequired();
     builder
       .Property(x => x.DeletedAtUtc)
       .HasColumnName("DeletedAtUtc")

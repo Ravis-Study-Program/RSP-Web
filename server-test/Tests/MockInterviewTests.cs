@@ -1,14 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Bogus;
 using RSPWebAPI.Common.Interfaces;
+using RSPWebAPI.Database;
 using RSPWebAPI.Entities;
 using RSPWebAPI.Features.Constants;
 using RSPWebAPI.Features.Enrollments.Interfaces;
 using RSPWebAPI.Features.Mentorships.Interfaces;
-using RSPWebAPI.Features.MockInterviews;
 using RSPWebAPI.Features.MockInterviews.Dtos;
 using RSPWebAPI.Features.MockInterviews.Interfaces;
 using RSPWebAPI.Features.ProblemAttempts.Interfaces;
@@ -205,6 +201,138 @@ namespace RSPWebAPI.Tests.Tests
       Assert.NotNull(listResp);
       Assert.NotNull(listResp.MockInterviews);
       Assert.NotEmpty(listResp.MockInterviews);
+    }
+
+    [Fact]
+    public async Task UpdateCustomMockInterviewRoundReview_Succeeds()
+    {
+      var interviewerEmail = _faker.Internet.Email().ToLower();
+      var intervieweeUserId = await _seeder.SeedUserAsync();
+      
+      var (_, customRoundId) = await _seeder.SeedMockInterviewWithCustomRoundAsync(
+        interviewerEmail, 
+        intervieweeUserId
+      );
+
+      var request = new UpdateCustomMockInterviewRoundReviewRequest
+      {
+        CustomMockInterviewRoundId = customRoundId,
+        IsReviewed = true,
+        UserId = intervieweeUserId
+      };
+
+      var result = await MockInterviewService.UpdateCustomMockInterviewRoundReview(request);
+      
+      Assert.NotNull(result);
+      Assert.Equal(Messages.MockInterview.RoundReviewUpdated, result.Message);
+    }
+
+    [Fact]
+    public async Task UpdateCustomMockInterviewRoundReview_Fails_When_Wrong_User()
+    {
+      var interviewerEmail = _faker.Internet.Email().ToLower();
+      var intervieweeUserId = await _seeder.SeedUserAsync();
+      var wrongUserId = await _seeder.SeedUserAsync();
+      
+      var (_, customRoundId) = await _seeder.SeedMockInterviewWithCustomRoundAsync(
+        interviewerEmail, 
+        intervieweeUserId
+      );
+
+      var request = new UpdateCustomMockInterviewRoundReviewRequest
+      {
+        CustomMockInterviewRoundId = customRoundId,
+        IsReviewed = true,
+        UserId = wrongUserId
+      };
+
+      await Assert.ThrowsAsync<UnauthorizedAccessException>(
+        () => MockInterviewService.UpdateCustomMockInterviewRoundReview(request)
+      );
+    }
+
+    [Fact]
+    public async Task UpdateCustomMockInterviewRoundReview_Fails_When_Round_Not_Found()
+    {
+      var userId = await _seeder.SeedUserAsync();
+      var nonExistentRoundId = Constants.GeneratePrimaryKeyId();
+
+      var request = new UpdateCustomMockInterviewRoundReviewRequest
+      {
+        CustomMockInterviewRoundId = nonExistentRoundId,
+        IsReviewed = true,
+        UserId = userId
+      };
+
+      await Assert.ThrowsAsync<KeyNotFoundException>(
+        () => MockInterviewService.UpdateCustomMockInterviewRoundReview(request)
+      );
+    }
+
+    [Fact]
+    public async Task UpdateLeetcodeMockInterviewRoundReview_Succeeds()
+    {
+      var interviewerEmail = _faker.Internet.Email().ToLower();
+      var intervieweeUserId = await _seeder.SeedUserAsync();
+      
+      var (_, leetcodeRoundId) = await _seeder.SeedMockInterviewWithLeetcodeRoundAsync(
+        interviewerEmail, 
+        intervieweeUserId
+      );
+
+      var request = new UpdateLeetcodeMockInterviewRoundReviewRequest
+      {
+        LeetcodeMockInterviewRoundId = leetcodeRoundId,
+        IsReviewed = true,
+        UserId = intervieweeUserId
+      };
+
+      var result = await MockInterviewService.UpdateLeetcodeMockInterviewRoundReview(request);
+      
+      Assert.NotNull(result);
+      Assert.Equal(Messages.MockInterview.RoundReviewUpdated, result.Message);
+    }
+
+    [Fact]
+    public async Task UpdateLeetcodeMockInterviewRoundReview_Fails_When_Wrong_User()
+    {
+      var interviewerEmail = _faker.Internet.Email().ToLower();
+      var intervieweeUserId = await _seeder.SeedUserAsync();
+      var wrongUserId = await _seeder.SeedUserAsync();
+      
+      var (_, leetcodeRoundId) = await _seeder.SeedMockInterviewWithLeetcodeRoundAsync(
+        interviewerEmail, 
+        intervieweeUserId
+      );
+
+      var request = new UpdateLeetcodeMockInterviewRoundReviewRequest
+      {
+        LeetcodeMockInterviewRoundId = leetcodeRoundId,
+        IsReviewed = true,
+        UserId = wrongUserId
+      };
+
+      await Assert.ThrowsAsync<UnauthorizedAccessException>(
+        () => MockInterviewService.UpdateLeetcodeMockInterviewRoundReview(request)
+      );
+    }
+
+    [Fact]
+    public async Task UpdateLeetcodeMockInterviewRoundReview_Fails_When_Round_Not_Found()
+    {
+      var userId = await _seeder.SeedUserAsync();
+      var nonExistentRoundId = Constants.GeneratePrimaryKeyId();
+
+      var request = new UpdateLeetcodeMockInterviewRoundReviewRequest
+      {
+        LeetcodeMockInterviewRoundId = nonExistentRoundId,
+        IsReviewed = true,
+        UserId = userId
+      };
+
+      await Assert.ThrowsAsync<KeyNotFoundException>(
+        () => MockInterviewService.UpdateLeetcodeMockInterviewRoundReview(request)
+      );
     }
   }
 }
