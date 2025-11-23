@@ -19,12 +19,16 @@ public class MockInterviewService : BaseService, IMockInterviewService
 {
   private readonly IEnrollmentService _enrollmentService;
   private readonly IRepository<MockInterviewEntity> _mockInterviewRepository;
+  private readonly IRepository<CustomMockInterviewRoundEntity> _customMockInterviewRoundRepository;
+  private readonly IRepository<LeetcodeMockInterviewRoundEntity> _leetcodeMockInterviewRoundRepository;
   private readonly ISeasonWeekService _seasonWeekService;
   private readonly IRequestCache _cache;
   private readonly IUserService _userService;
 
   public MockInterviewService(
     IRepository<MockInterviewEntity> mockInterviewRepository,
+    IRepository<CustomMockInterviewRoundEntity> customMockInterviewRoundRepository,
+    IRepository<LeetcodeMockInterviewRoundEntity> leetcodeMockInterviewRoundRepository,
     ISeasonWeekService seasonWeekService,
     IUserService userService,
     IEnrollmentService enrollmentService,
@@ -35,6 +39,8 @@ public class MockInterviewService : BaseService, IMockInterviewService
     : base(unitOfWork, logger)
   {
     _mockInterviewRepository = mockInterviewRepository;
+    _customMockInterviewRoundRepository = customMockInterviewRoundRepository;
+    _leetcodeMockInterviewRoundRepository = leetcodeMockInterviewRoundRepository;
     _seasonWeekService = seasonWeekService;
     _userService = userService;
     _enrollmentService = enrollmentService;
@@ -665,6 +671,122 @@ public class MockInterviewService : BaseService, IMockInterviewService
     ArgumentNullException.ThrowIfNull(existingMockInterview, Messages.MockInterview.DoesNotExist);
 
     _mockInterviewRepository.Update(mockInterview, cancellationToken);
+  }
+
+  public async Task<UpdateMockInterviewRoundReviewResponse> UpdateCustomMockInterviewRoundReview(
+    UpdateCustomMockInterviewRoundReviewRequest request,
+    CancellationToken cancellationToken = default
+  )
+  {
+      var customRound = await _customMockInterviewRoundRepository.GetByIdAsync(
+        request.CustomMockInterviewRoundId,
+        cancellationToken
+      );
+      if (customRound == null)
+      {
+        throw new KeyNotFoundException(Messages.MockInterview.CustomRoundNotFound);
+      }
+
+      var mockInterview = await GetMockInterviewForCustomRound(request.CustomMockInterviewRoundId, cancellationToken);
+      if (mockInterview == null)
+      {
+        throw new KeyNotFoundException(Messages.MockInterview.DoesNotExist);
+      }
+
+      if (mockInterview.IntervieweeUserId != request.UserId)
+      {
+        throw new UnauthorizedAccessException(Messages.MockInterview.OnlyIntervieweeCanUpdateReview);
+      }
+
+    return await ExecuteWithSaveAsync(
+      () =>
+      {
+        customRound.IsReviewed = request.IsReviewed;
+        _customMockInterviewRoundRepository.Update(customRound, cancellationToken);
+
+        _cache.Remove(RouteCacheKeys.ListMockInterviews, mockInterview.IntervieweeUserId);
+        _cache.Remove(RouteCacheKeys.ListMockInterviews, mockInterview.InterviewerUserId);
+
+        return Task.FromResult(new UpdateMockInterviewRoundReviewResponse
+        {
+          Message = Messages.MockInterview.RoundReviewUpdated
+        });
+      },
+      Messages.MockInterview.CustomRoundUpdateError,
+      cancellationToken: cancellationToken
+    );
+  }
+
+  public async Task<UpdateMockInterviewRoundReviewResponse> UpdateLeetcodeMockInterviewRoundReview(
+    UpdateLeetcodeMockInterviewRoundReviewRequest request,
+    CancellationToken cancellationToken = default
+  )
+  {
+    var leetcodeRound = await _leetcodeMockInterviewRoundRepository.GetByIdAsync(
+      request.LeetcodeMockInterviewRoundId,
+      cancellationToken
+    );
+    if (leetcodeRound == null)
+    {
+      throw new KeyNotFoundException(Messages.MockInterview.LeetcodeRoundNotFound);
+    }
+
+    var mockInterview = await GetMockInterviewForLeetcodeRound(request.LeetcodeMockInterviewRoundId, cancellationToken);
+    if (mockInterview == null)
+    {
+      throw new KeyNotFoundException(Messages.MockInterview.DoesNotExist);
+    }
+
+    if (mockInterview.IntervieweeUserId != request.UserId)
+    {
+      throw new UnauthorizedAccessException(Messages.MockInterview.OnlyIntervieweeCanUpdateReview);
+    }
+
+    return await ExecuteWithSaveAsync(
+      () =>
+      {
+        leetcodeRound.IsReviewed = request.IsReviewed;
+        _leetcodeMockInterviewRoundRepository.Update(leetcodeRound, cancellationToken);
+        
+        _cache.Remove(RouteCacheKeys.ListMockInterviews, mockInterview.IntervieweeUserId);
+        _cache.Remove(RouteCacheKeys.ListMockInterviews, mockInterview.InterviewerUserId);
+
+        return Task.FromResult(new UpdateMockInterviewRoundReviewResponse
+        {
+          Message = Messages.MockInterview.RoundReviewUpdated
+        });
+      },
+      Messages.MockInterview.LeetcodeRoundUpdateError,
+      cancellationToken: cancellationToken
+    );
+  }
+
+  private async Task<MockInterviewEntity?> GetMockInterviewForCustomRound(
+    string customRoundId,
+    CancellationToken cancellationToken
+  )
+  {
+    var mockInterviews = await _mockInterviewRepository.GetAllAsync(
+      mi => mi.MockInterviewRounds.Any(r => r.CustomMockInterviewRoundId == customRoundId),
+      cancellationToken,
+      include: q => q.Include(mi => mi.MockInterviewRounds)
+    );
+
+    return mockInterviews.FirstOrDefault();
+  }
+
+  private async Task<MockInterviewEntity?> GetMockInterviewForLeetcodeRound(
+    string leetcodeRoundId,
+    CancellationToken cancellationToken
+  )
+  {
+    var mockInterviews = await _mockInterviewRepository.GetAllAsync(
+      mi => mi.MockInterviewRounds.Any(r => r.LeetcodeMockInterviewRoundId == leetcodeRoundId),
+      cancellationToken,
+      include: q => q.Include(mi => mi.MockInterviewRounds)
+    );
+
+    return mockInterviews.FirstOrDefault();
   }
 
   #endregion

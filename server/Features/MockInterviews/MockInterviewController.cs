@@ -72,5 +72,33 @@ public class MockInterviewController : BaseController
     return OkResponse(result, Messages.MockInterview.Updated);
   }
 
+  [HttpPut]
+  [ServiceFilter(typeof(AuthAttribute))]
+  [Route("update-custom-round-review")]
+  [ActionName("UpdateCustomMockInterviewRoundReview")]
+  public async Task<ActionResult<ApiResponse<UpdateMockInterviewRoundReviewResponse>>> UpdateCustomMockInterviewRoundReview(
+    UpdateCustomMockInterviewRoundReviewRequest request,
+    CancellationToken cancellationToken = default
+  )
+  {
+    request.UserId = GetCurrentUserId();
+    var result = await _mockInterviewService.UpdateCustomMockInterviewRoundReview(request, cancellationToken);
+    return OkResponse(result, Messages.MockInterview.CustomRoundReviewUpdated);
+  }
+
+  [HttpPut]
+  [ServiceFilter(typeof(AuthAttribute))]
+  [Route("update-leetcode-round-review")]
+  [ActionName("UpdateLeetcodeMockInterviewRoundReview")]
+  public async Task<ActionResult<ApiResponse<UpdateMockInterviewRoundReviewResponse>>> UpdateLeetcodeMockInterviewRoundReview(
+    UpdateLeetcodeMockInterviewRoundReviewRequest request,
+    CancellationToken cancellationToken = default
+  )
+  {
+    request.UserId = GetCurrentUserId();
+    var result = await _mockInterviewService.UpdateLeetcodeMockInterviewRoundReview(request, cancellationToken);
+    return OkResponse(result, Messages.MockInterview.LeetcodeRoundReviewUpdated);
+  }
+
   #endregion
 }

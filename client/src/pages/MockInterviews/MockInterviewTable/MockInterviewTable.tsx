@@ -8,7 +8,18 @@ import {
   MRT_Row,
   useMantineReactTable,
 } from 'mantine-react-table';
-import { ActionIcon, Anchor, Box, Button, Flex, Table, Text, Title, Tooltip } from '@mantine/core';
+import {
+  ActionIcon,
+  Anchor,
+  Box,
+  Button,
+  Flex,
+  Switch,
+  Table,
+  Text,
+  Title,
+  Tooltip,
+} from '@mantine/core';
 import { useLocalStorage } from '@mantine/hooks';
 import { modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
@@ -18,11 +29,14 @@ import {
   ListMockInterviewResponseApiResponse,
   MockInterviewEntity,
   MockInterviewRoundEntity,
+  UpdateMockInterviewRoundReviewResponseApiResponse,
   useCreateMockInterview,
   useDeleteMockInterview,
   useGetCurrentUser,
   useGetEnrollmentUsers,
   useListLeetcodeProblems,
+  useUpdateCustomMockInterviewRoundReview,
+  useUpdateLeetcodeMockInterviewRoundReview,
   useUpdateMockInterview,
 } from '@/generated/api/client';
 import { LeetcodeDifficultyText } from '@/shared/components/LeetcodeDifficultyText';
@@ -267,9 +281,17 @@ export const MockInterviewTable = ({
       return (
         <Flex gap={20} direction="column">
           {leetcodeRounds.length > 0 && (
-            <LeetcodeMockInterviewRoundsInnerTable rounds={leetcodeRounds} />
+            <LeetcodeMockInterviewRoundsInnerTable
+              rounds={leetcodeRounds}
+              refetchMockInterviews={refetchMockInterviews}
+            />
           )}
-          {customRounds.length > 0 && <CustomMockInterviewRoundsInnerTable rounds={customRounds} />}
+          {customRounds.length > 0 && (
+            <CustomMockInterviewRoundsInnerTable
+              rounds={customRounds}
+              refetchMockInterviews={refetchMockInterviews}
+            />
+          )}
         </Flex>
       );
     },
@@ -322,7 +344,31 @@ type MockInterviewTableProps = {
   enableEditing: boolean;
 };
 
-const LeetcodeMockInterviewRoundsInnerTable = ({ rounds }: InnerMockInterviewTableProps) => {
+const LeetcodeMockInterviewRoundsInnerTable = ({
+  rounds,
+  refetchMockInterviews,
+}: InnerMockInterviewTableProps) => {
+  const { mutateAsync: updateLeetcodeReview } = useUpdateLeetcodeMockInterviewRoundReview();
+
+  const handleReviewToggle = async (roundId: string, newIsReviewed: boolean) => {
+    try {
+      await updateLeetcodeReview({
+        data: {
+          leetcodeMockInterviewRoundId: roundId,
+          isReviewed: newIsReviewed,
+        },
+      });
+      await refetchMockInterviews();
+      notifications.show(
+        getSuccessNotification(NOTIFICATION_MESSAGES.MOCK_INTERVIEW.REVIEW_UPDATED)
+      );
+    } catch (err) {
+      const response = (err as any)?.response
+        .data as UpdateMockInterviewRoundReviewResponseApiResponse;
+      notifications.show(getErrorNotification(response.error?.message));
+    }
+  };
+
   const tableRows = rounds.map((r, index) => {
     if (r.leetcodeMockInterviewRound == null) {
       return null;
@@ -366,6 +412,19 @@ const LeetcodeMockInterviewRoundsInnerTable = ({ rounds }: InnerMockInterviewTab
         <Table.Td>
           <ScoreText score={leetcodeMock.testingScore} />
         </Table.Td>
+        <Table.Td>
+          <Switch
+            checked={leetcodeMock.isReviewed === true}
+            onChange={(event) =>
+              handleReviewToggle(
+                leetcodeMock.leetcodeMockInterviewRoundId,
+                event.currentTarget.checked
+              )
+            }
+            label="Reviewed"
+            size="sm"
+          />
+        </Table.Td>
       </Table.Tr>
     );
   });
@@ -385,6 +444,7 @@ const LeetcodeMockInterviewRoundsInnerTable = ({ rounds }: InnerMockInterviewTab
           <Table.Th>Complexity Analysis</Table.Th>
           <Table.Th>Code</Table.Th>
           <Table.Th>Test</Table.Th>
+          <Table.Th>Reviewed</Table.Th>
         </Table.Tr>
       </Table.Thead>
       <Table.Tbody>{tableRows}</Table.Tbody>
@@ -392,7 +452,31 @@ const LeetcodeMockInterviewRoundsInnerTable = ({ rounds }: InnerMockInterviewTab
   );
 };
 
-const CustomMockInterviewRoundsInnerTable = ({ rounds }: InnerMockInterviewTableProps) => {
+const CustomMockInterviewRoundsInnerTable = ({
+  rounds,
+  refetchMockInterviews,
+}: InnerMockInterviewTableProps) => {
+  const { mutateAsync: updateCustomReview } = useUpdateCustomMockInterviewRoundReview();
+
+  const handleReviewToggle = async (roundId: string, newIsReviewed: boolean) => {
+    try {
+      await updateCustomReview({
+        data: {
+          customMockInterviewRoundId: roundId,
+          isReviewed: newIsReviewed,
+        },
+      });
+      await refetchMockInterviews();
+      notifications.show(
+        getSuccessNotification(NOTIFICATION_MESSAGES.MOCK_INTERVIEW.REVIEW_UPDATED)
+      );
+    } catch (err) {
+      const response = (err as any)?.response
+        .data as UpdateMockInterviewRoundReviewResponseApiResponse;
+      notifications.show(getErrorNotification(response.error?.message));
+    }
+  };
+
   const tableRows = rounds.map((r, index) => {
     if (r.customMockInterviewRound == null) {
       return null;
@@ -429,6 +513,16 @@ const CustomMockInterviewRoundsInnerTable = ({ rounds }: InnerMockInterviewTable
         <Table.Td>
           <ScoreText score={customMock.score} />
         </Table.Td>
+        <Table.Td>
+          <Switch
+            checked={customMock.isReviewed}
+            onChange={(event) =>
+              handleReviewToggle(customMock.customMockInterviewRoundId, event.currentTarget.checked)
+            }
+            label="Reviewed"
+            size="sm"
+          />
+        </Table.Td>
       </Table.Tr>
     );
   });
@@ -444,6 +538,7 @@ const CustomMockInterviewRoundsInnerTable = ({ rounds }: InnerMockInterviewTable
           <Table.Th>Custom Problem Content</Table.Th>
           <Table.Th>Link</Table.Th>
           <Table.Th>Score</Table.Th>
+          <Table.Th>Reviewed</Table.Th>
         </Table.Tr>
       </Table.Thead>
       <Table.Tbody>{tableRows}</Table.Tbody>
@@ -453,6 +548,9 @@ const CustomMockInterviewRoundsInnerTable = ({ rounds }: InnerMockInterviewTable
 
 type InnerMockInterviewTableProps = {
   rounds: MockInterviewRoundEntity[];
+  refetchMockInterviews: (
+    options?: RefetchOptions
+  ) => Promise<QueryObserverResult<ListMockInterviewResponseApiResponse, unknown>>;
 };
 
 const ScoreText = ({ score }: ScoreTextProps) => {

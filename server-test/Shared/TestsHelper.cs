@@ -269,7 +269,7 @@ public class TestDataSeeder
 
     var attempt = new ProblemAttemptEntity
     {
-      ProblemAttemptId = Database.Constants.GeneratePrimaryKeyId(),
+      ProblemAttemptId = Constants.GeneratePrimaryKeyId(),
       AttemptStartDateUtc = DateTime.UtcNow,
       TimeTakenInMinutes = _faker.Random.Int(1, 60),
       LeetcodeProblemId = leetcodeProblemId,
@@ -286,6 +286,146 @@ public class TestDataSeeder
     await _dbContext.SaveChangesAsync();
 
     return attempt.ProblemAttemptId;
+  }
+
+  public async Task<(string mockInterviewId, string customRoundId)> SeedMockInterviewWithCustomRoundAsync(
+    string interviewerEmail,
+    string? intervieweeUserId = null
+  )
+  {
+    // Ensure interviewer exists
+    var interviewer = await _userService.GetUserAsync(email: interviewerEmail);
+    if (interviewer == null)
+    {
+      await SeedUserAsync(interviewerEmail);
+      interviewer = await _userService.GetUserAsync(email: interviewerEmail);
+    }
+    var seasonId = await SeedSeasonAsync(null, startDate, startDate.AddDays(4 * 7 + 1));
+    Assert.NotNull(interviewer);
+
+    if (string.IsNullOrWhiteSpace(intervieweeUserId))
+    {
+      intervieweeUserId = await SeedUserAsync();
+    }
+
+    await SeedEnrollmentAsync(seasonId, intervieweeUserId);
+    for (var i = 0; i <= 2; i++)
+    {
+      await SeedSeasonWeekAsync(seasonId, i);
+    }
+
+    var customRoundId = Constants.GeneratePrimaryKeyId();
+    var rounds = new List<MockInterviewRoundDto>
+    {
+      new MockInterviewRoundDto
+      {
+        MockInterviewRoundId = customRoundId,
+        CustomMockInterviewRound = new CustomMockInterviewRoundDto
+        {
+          Content = _faker.Lorem.Paragraph(),
+          Link = _faker.Internet.Url(),
+          Score = _faker.Random.Int(1, 10)
+        }
+      }
+    };
+
+    var request = new CreateMockInterviewRequest
+    {
+      InterviewerUserId = interviewer.UserId,
+      IntervieweeUserId = intervieweeUserId,
+      SeasonId = seasonId,
+      TimeTakenInMinutes = _faker.Random.Int(10, 60),
+      MockInterviewRounds = rounds,
+    };
+
+    var response = await _mockInterviewService.CreateMockInterview(request);
+    Assert.NotNull(response.MockInterviewId);
+
+    // Get the created mock interview to find the actual custom round ID
+    var createdMockInterview = await _mockInterviewService.GetMockInterviewByIdAsync(
+      response.MockInterviewId,
+      include: q => q.Include(mi => mi.MockInterviewRounds)
+        .ThenInclude(r => r.CustomMockInterviewRound)
+    );
+    Assert.NotNull(createdMockInterview);
+    var actualCustomRoundId = createdMockInterview.MockInterviewRounds
+      .FirstOrDefault(r => r.CustomMockInterviewRound != null)?
+      .CustomMockInterviewRound?.CustomMockInterviewRoundId;
+    Assert.NotNull(actualCustomRoundId);
+
+    return (response.MockInterviewId, actualCustomRoundId);
+  }
+
+  public async Task<(string mockInterviewId, string leetcodeRoundId)> SeedMockInterviewWithLeetcodeRoundAsync(
+    string interviewerEmail,
+    string? intervieweeUserId = null
+  )
+  {
+    // Ensure interviewer exists
+    var interviewer = await _userService.GetUserAsync(email: interviewerEmail);
+    if (interviewer == null)
+    {
+      await SeedUserAsync(interviewerEmail);
+      interviewer = await _userService.GetUserAsync(email: interviewerEmail);
+    }
+    var seasonId = await SeedSeasonAsync(null, startDate, startDate.AddDays(4 * 7 + 1));
+    var leetcodeProblemId = await SeedLeetcodeProblemAsync();
+    Assert.NotNull(interviewer);
+
+    if (string.IsNullOrWhiteSpace(intervieweeUserId))
+    {
+      intervieweeUserId = await SeedUserAsync();
+    }
+
+    await SeedEnrollmentAsync(seasonId, intervieweeUserId);
+    for (var i = 0; i <= 2; i++)
+    {
+      await SeedSeasonWeekAsync(seasonId, i);
+    }
+
+    var leetcodeRoundId = Constants.GeneratePrimaryKeyId();
+    var rounds = new List<MockInterviewRoundDto>
+    {
+      new MockInterviewRoundDto
+      {
+        MockInterviewRoundId = leetcodeRoundId,
+        LeetcodeMockInterviewRound = new LeetcodeMockInterviewRoundDto
+        {
+          ConfirmQuestionScore = _faker.Random.Int(1, 10),
+          AlgorithmDesignScore = _faker.Random.Int(1, 10),
+          ComplexityAnalysisScore = _faker.Random.Int(1, 10),
+          CodingScore = _faker.Random.Int(1, 10),
+          TestingScore = _faker.Random.Int(1, 10),
+          LeetcodeProblemId = leetcodeProblemId
+        }
+      }
+    };
+
+    var request = new CreateMockInterviewRequest
+    {
+      InterviewerUserId = interviewer.UserId,
+      IntervieweeUserId = intervieweeUserId,
+      SeasonId = seasonId,
+      TimeTakenInMinutes = _faker.Random.Int(10, 60),
+      MockInterviewRounds = rounds,
+    };
+
+    var response = await _mockInterviewService.CreateMockInterview(request);
+    Assert.NotNull(response.MockInterviewId);
+
+    // Get the created mock interview to find the actual leetcode round ID
+    var createdMockInterview = await _mockInterviewService.GetMockInterviewByIdAsync(
+      response.MockInterviewId,
+      include: q => q.Include(mi => mi.MockInterviewRounds)
+        .ThenInclude(r => r.LeetcodeMockInterviewRound)
+    );
+    Assert.NotNull(createdMockInterview);
+    var actualLeetcodeRoundId = createdMockInterview.MockInterviewRounds
+      .FirstOrDefault(r => r.LeetcodeMockInterviewRound != null)?
+      .LeetcodeMockInterviewRound?.LeetcodeMockInterviewRoundId;
+    Assert.NotNull(actualLeetcodeRoundId);
+
+    return (response.MockInterviewId, actualLeetcodeRoundId);
   }
 
   public async Task<string> SeedMockInterviewAsync(

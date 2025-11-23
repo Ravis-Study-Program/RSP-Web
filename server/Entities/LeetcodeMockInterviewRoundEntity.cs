@@ -28,6 +28,9 @@ public class LeetcodeMockInterviewRoundEntity : ISoftDelete
   [Required]
   public int TestingScore { get; set; }
 
+  [Required]
+  public bool IsReviewed { get; set; }
+
   // Navigation
   public LeetcodeProblemEntity LeetcodeProblem { get; set; } = null!;
   public DateTime? DeletedAtUtc { get; set; }
@@ -77,6 +80,10 @@ public class LeetcodeMockInterviewRoundEntityConfiguration
       .Property(x => x.TestingScore)
       .HasColumnName("TestingScore")
       .HasColumnType("int")
+      .IsRequired();
+    builder
+      .Property(x => x.IsReviewed)
+      .HasColumnName("IsReviewed")
       .IsRequired();
     builder
       .Property(x => x.DeletedAtUtc)
