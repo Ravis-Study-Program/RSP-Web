@@ -22,6 +22,7 @@ public class UserController : BaseController
   #region Routes
 
   [HttpPost]
+  [ServiceFilter(typeof(AdminAuthAttribute))]
   [Route("admin/create")]
   [ActionName("AdminCreateUser")]
   public async Task<ActionResult<ApiResponse<AdminCreateUserResponse>>> AdminCreateUser(
@@ -34,6 +35,7 @@ public class UserController : BaseController
   }
 
   [HttpDelete]
+  [ServiceFilter(typeof(AdminAuthAttribute))]
   [Route("admin/delete")]
   [ActionName("AdminDeleteUser")]
   public async Task<ActionResult<ApiResponse<AdminDeleteUserResponse>>> AdminDeleteUser(
@@ -46,6 +48,7 @@ public class UserController : BaseController
   }
 
   [HttpGet]
+  [ServiceFilter(typeof(AdminAuthAttribute))]
   [Route("admin/get")]
   [ActionName("AdminListUser")]
   public async Task<ActionResult<ApiResponse<AdminListUserResponse>>> AdminListUser(
@@ -58,6 +61,7 @@ public class UserController : BaseController
   }
 
   [HttpPut]
+  [ServiceFilter(typeof(AdminAuthAttribute))]
   [Route("admin/update")]
   [ActionName("AdminUpdateUser")]
   public async Task<ActionResult<ApiResponse<AdminUpdateUserResponse>>> AdminUpdateUser(
