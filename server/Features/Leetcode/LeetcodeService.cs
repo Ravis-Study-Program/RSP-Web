@@ -226,11 +226,15 @@ public class LeetcodeService : BaseService, ILeetcodeService
     CancellationToken cancellationToken = default
   )
   {
+    // Build cache key with pagination/filter/sort parameters
+    var cacheKey =
+      $"p{request.Page}-ps{request.PageSize}-d{request.Difficulty ?? "all"}-c{request.Category ?? "all"}-s{request.SortBy ?? "title"}-o{request.SortOrder ?? "asc"}-q{request.SearchTerm ?? "none"}";
+
     var response = await _cache.GetOrCreateAsync(
       routeKey: RouteCacheKeys.ListLeetcodeProblems,
-      primaryKey: null,
+      primaryKey: cacheKey,
       factory: () => _listLeetcodeProblems(request, cancellationToken),
-      ttl: TimeSpan.FromDays(1)
+      ttl: TimeSpan.FromHours(6)
     );
 
     if (response == null)
@@ -246,13 +250,68 @@ public class LeetcodeService : BaseService, ILeetcodeService
     CancellationToken cancellationToken = default
   )
   {
-    var leetcodeProblems = await GetAllLeetcodeProblemsAsync(
-      null,
-      cancellationToken,
-      q => q.Include(l => l.Problem).Include(l => l.LeetcodeProblemCategories)
+    // Build a custom query with filters applied via IQueryable
+    // Question is this efficient, is denormalization needed?
+    Func<IQueryable<LeetcodeProblemEntity>, IQueryable<LeetcodeProblemEntity>> includeAndFilter = q =>
+    {
+      // Include related data
+      q = q.Include(l => l.Problem).Include(l => l.LeetcodeProblemCategories);
+
+      // Apply difficulty filter
+      if (!string.IsNullOrEmpty(request.Difficulty))
+      {
+        var difficulty = Enum.Parse<LeetcodeProblemDifficulty>(request.Difficulty);
+        q = q.Where(l => l.LeetcodeProblemDifficulty == difficulty);
+      }
+
+      // Apply category filter
+      if (!string.IsNullOrEmpty(request.Category))
+      {
+        var categoryFilter = request.Category;
+        q = q.Where(l => l.LeetcodeProblemCategories.Any(c => c.Name == categoryFilter));
+      }
+
+      // Apply search term filter
+      if (!string.IsNullOrEmpty(request.SearchTerm))
+      {
+        var searchTerm = request.SearchTerm.ToLower();
+        q = q.Where(l => l.Problem.Title.ToLower().Contains(searchTerm));
+      }
+
+      return q;
+    };
+
+    // Build orderBy function
+    Func<IQueryable<LeetcodeProblemEntity>, IOrderedQueryable<LeetcodeProblemEntity>>? orderBy =
+      null;
+
+    if (request.SortBy == "title")
+    {
+      orderBy =
+        request.SortOrder == "desc"
+          ? q => q.OrderByDescending(l => l.Problem.Title)
+          : q => q.OrderBy(l => l.Problem.Title);
+    }
+    else if (request.SortBy == "difficulty")
+    {
+      orderBy =
+        request.SortOrder == "desc"
+          ? q => q.OrderByDescending(l => l.LeetcodeProblemDifficulty)
+          : q => q.OrderBy(l => l.LeetcodeProblemDifficulty);
+    }
+
+    // Use GetPagedAsync for pagination
+    var (items, totalCount) = await _leetcodeProblemRepository.GetPagedAsync(
+      page: request.Page,
+      pageSize: request.PageSize,
+      predicate: null,
+      orderBy: orderBy,
+      include: includeAndFilter,
+      cancellationToken: cancellationToken
     );
-    var formattedLeetcodeProblems = leetcodeProblems
-      .OrderBy(x => x.LeetcodeNumber)
+
+    // Map to DTOs
+    var formattedLeetcodeProblems = items
       .Select(l => new LeetcodeProblemDto
       {
         LeetcodeProblemId = l.LeetcodeProblemId,
@@ -266,6 +325,14 @@ public class LeetcodeService : BaseService, ILeetcodeService
       })
       .ToList();
 
-    return new ListLeetcodeProblemsResponse { LeetcodeProblems = formattedLeetcodeProblems };
+    // Create paginated response
+    var pagedResponse = RSPWebAPI.Shared.PagedResponse<LeetcodeProblemDto>.Create(
+      formattedLeetcodeProblems,
+      totalCount,
+      request.Page,
+      request.PageSize
+    );
+
+    return new ListLeetcodeProblemsResponse { Result = pagedResponse };
   }
 }
