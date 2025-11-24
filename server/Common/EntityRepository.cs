@@ -79,6 +79,47 @@ public class EntityRepository<TEntity> : IRepository<TEntity>
       : await query.Where(predicate).FirstOrDefaultAsync(cancellationToken);
   }
 
+  public async Task<(IList<TEntity> Items, int TotalCount)> GetPagedAsync(
+    int page,
+    int pageSize,
+    Expression<Func<TEntity, bool>>? predicate = null,
+    Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
+    Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null,
+    CancellationToken cancellationToken = default
+  )
+  {
+    IQueryable<TEntity> query = TableNoTracking;
+
+    // Apply includes for related data
+    if (include != null)
+    {
+      query = include(query);
+    }
+
+    // Apply filtering
+    if (predicate != null)
+    {
+      query = query.Where(predicate);
+    }
+
+    // Get total count BEFORE pagination
+    var totalCount = await query.CountAsync(cancellationToken);
+
+    // Apply sorting
+    if (orderBy != null)
+    {
+      query = orderBy(query);
+    }
+
+    // Apply pagination
+    var items = await query
+      .Skip((page - 1) * pageSize)
+      .Take(pageSize)
+      .ToListAsync(cancellationToken);
+
+    return (items, totalCount);
+  }
+
   public async Task AddAsync(TEntity entity, CancellationToken cancellationToken = default)
   {
     ArgumentNullException.ThrowIfNull(entity);

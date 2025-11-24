@@ -27,6 +27,25 @@ public interface IRepository<TEntity>
     Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null
   );
 
+  /// <summary>
+  /// Gets a paginated result with filtering and sorting support
+  /// </summary>
+  /// <param name="page">Page number (1-based)</param>
+  /// <param name="pageSize">Number of items per page</param>
+  /// <param name="predicate">Optional filter predicate</param>
+  /// <param name="orderBy">Optional ordering function</param>
+  /// <param name="include">Optional related data to include</param>
+  /// <param name="cancellationToken">Cancellation token</param>
+  /// <returns>Tuple of (items, totalCount)</returns>
+  Task<(IList<TEntity> Items, int TotalCount)> GetPagedAsync(
+    int page,
+    int pageSize,
+    Expression<Func<TEntity, bool>>? predicate = null,
+    Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
+    Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null,
+    CancellationToken cancellationToken = default
+  );
+
   Task AddAsync(TEntity entity, CancellationToken cancellationToken = default);
   Task AddRangeAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default);
 
