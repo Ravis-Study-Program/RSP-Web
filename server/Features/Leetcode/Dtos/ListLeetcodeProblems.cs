@@ -1,70 +1,14 @@
 using System.ComponentModel.DataAnnotations;
-using FluentValidation;
 using RSPWebAPI.Entities;
-using RSPWebAPI.Shared;
 
 namespace RSPWebAPI.Features.Leetcode.Dtos;
 
-public record ListLeetcodeProblemsRequest : PagedRequest
-{
-  /// <summary>
-  /// Filter by difficulty level (Easy, Medium, Hard)
-  /// </summary>
-  public string? Difficulty { get; set; }
-
-  /// <summary>
-  /// Filter by category name
-  /// </summary>
-  public string? Category { get; set; }
-
-  /// <summary>
-  /// Search term to filter by title
-  /// </summary>
-  public string? SearchTerm { get; set; }
-
-  /// <summary>
-  /// Field to sort by (e.g., "title", "difficulty")
-  /// </summary>
-  public string? SortBy { get; set; } = "title";
-
-  /// <summary>
-  /// Sort order: "asc" or "desc"
-  /// </summary>
-  public string? SortOrder { get; set; } = "asc";
-}
-
-public class ListLeetcodeProblemsRequestValidator : AbstractValidator<ListLeetcodeProblemsRequest>
-{
-  public ListLeetcodeProblemsRequestValidator()
-  {
-    Include(new PagedRequestValidator());
-
-    RuleFor(x => x.Difficulty)
-      .Must(d => d == null || new[] { "Easy", "Medium", "Hard" }.Contains(d))
-      .When(x => !string.IsNullOrEmpty(x.Difficulty))
-      .WithMessage("Difficulty must be Easy, Medium, or Hard");
-
-    RuleFor(x => x.SortBy)
-      .Must(s => s == null || new[] { "title", "difficulty" }.Contains(s))
-      .When(x => !string.IsNullOrEmpty(x.SortBy))
-      .WithMessage("SortBy must be either 'title' or 'difficulty'");
-
-    RuleFor(x => x.SortOrder)
-      .Must(o => o == null || new[] { "asc", "desc" }.Contains(o))
-      .When(x => !string.IsNullOrEmpty(x.SortOrder))
-      .WithMessage("SortOrder must be either 'asc' or 'desc'");
-  }
-}
+public record ListLeetcodeProblemsRequest { }
 
 public class ListLeetcodeProblemsResponse
 {
   [Required]
-  public PagedResponse<LeetcodeProblemDto> Result { get; set; } = PagedResponse<LeetcodeProblemDto>.Create(
-    new List<LeetcodeProblemDto>(),
-    0,
-    1,
-    10
-  );
+  public IList<LeetcodeProblemDto> LeetcodeProblems { get; set; } = new List<LeetcodeProblemDto>();
 }
 
 public record LeetcodeProblemDto
