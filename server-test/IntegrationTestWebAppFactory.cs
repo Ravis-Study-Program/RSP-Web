@@ -13,6 +13,7 @@ using Respawn;
 using RSPWebAPI.Clients.Interfaces;
 using RSPWebAPI.Common.Cache;
 using RSPWebAPI.Database;
+using RSPWebAPI.Database.Interceptors
 using RSPWebAPI.Features.Enrollments;
 using RSPWebAPI.Features.Enrollments.Interfaces;
 using RSPWebAPI.Features.LeetcodeProblemRecommendations;
@@ -91,7 +92,11 @@ public class IntegrationTestWebAppFactory : WebApplicationFactory<Program>, IAsy
       services.RemoveDbContext<ApplicationDbContext>();
       services.AddDbContext<ApplicationDbContext>(options =>
       {
-        options.UseNpgsql(_container.GetConnectionString());
+        options.UseNpgsql(_container.GetConnectionString())
+          .AddInterceptors(
+            new SoftDeleteInterceptor(),
+            new AuditableEntityInterceptor()
+          );
       });
 
       // Mocks
