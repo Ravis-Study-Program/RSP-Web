@@ -913,7 +913,7 @@ export interface ListMockInterviewResponseApiResponse {
 }
 
 export interface ListProblemAttemptResponse {
-  problemAttempts: ProblemAttemptEntity[];
+  result: ProblemAttemptEntityPagedResponse;
 }
 
 export interface ListProblemAttemptResponseApiResponse {
@@ -1044,6 +1044,16 @@ export interface ProblemAttemptEntity {
   seasonWeek?: SeasonWeekEntity;
   /** @nullable */
   deletedAtUtc?: string | null;
+}
+
+export interface ProblemAttemptEntityPagedResponse {
+  items: ProblemAttemptEntity[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+  hasPreviousPage: boolean;
+  hasNextPage: boolean;
 }
 
 export interface ProblemEntity {
@@ -1283,6 +1293,8 @@ export type ListProblemAttemptParams = {
   IncludeLeetcode: boolean;
   IncludeCustom: boolean;
   SeasonId?: string;
+  Page?: number;
+  PageSize?: number;
 };
 
 export type AdminListSeasonParams = {

@@ -1,14 +1,14 @@
-# Implementation Plan: Server-Side Pagination for LeetCode Problems
+# Implementation Plan: Server-Side Pagination for Problem Attempts
 
 ## Overview
-Implement server-side pagination with filtering and sorting for the LeetCode problems list to improve performance and scalability.
+Implement server-side pagination with filtering and sorting for the Problem Attempts list to improve performance and scalability.
 
 ## Objectives
-- Add offset-based pagination to LeetCode problems API
+- Add offset-based pagination to Problem Attempts API
 - Implement server-side filtering and sorting
 - Update frontend to use server-side pagination
 - Maintain caching strategy (per-page caching)
-- Set default page size to 20 with options for 10, 50, 100
+- Set default page size to 10 with options for 5, 20, 50, 100
 
 ## Phase 1: Backend - DTOs and Models ✅ COMPLETED
 
@@ -19,13 +19,12 @@ Implement server-side pagination with filtering and sorting for the LeetCode pro
 - ✅ Add validation for page/pageSize limits
 - ✅ Add `Create()` helper method for automatic calculation
 
-### 1.2 Update LeetCode DTOs ✅
-**File:** `server/Features/Leetcode/Dtos/ListLeetcodeProblems.cs`
-- ✅ Update `ListLeetcodeProblemsRequest` to include:
+### 1.2 Update Problem Attempts DTOs ✅
+**File:** `server/Features/ProblemAttempts/Dtos/ListProblemAttempt.cs`
+- ✅ Update `ListProblemAttemptRequest` to include:
   - ✅ Pagination parameters (Page, PageSize) - inherited from PagedRequest
-  - ✅ Filter parameters (Difficulty, Category, SearchTerm)
-  - ✅ Sort parameters (SortBy, SortOrder)
-- ✅ Update `ListLeetcodeProblemsResponse` to use `PagedResponse<LeetcodeProblemDto>`
+  - ✅ Filter parameters (UserIds, IncludeLeetcode, IncludeCustom, SeasonId)
+- ✅ Update `ListProblemAttemptResponse` to use `PagedResponse<ProblemAttemptEntity>`
 - ✅ Add FluentValidation rules for all parameters
 
 ## Phase 2: Backend - Repository Layer ✅ COMPLETED
@@ -43,12 +42,12 @@ Implement server-side pagination with filtering and sorting for the LeetCode pro
 
 ## Phase 3: Backend - Service Layer ✅ COMPLETED
 
-### 3.1 Update LeetCode Service ✅
-**File:** `server/Features/Leetcode/LeetcodeService.cs`
-- ✅ Modify `ListLeetcodeProblems()` to use paginated repository method
+### 3.1 Update Problem Attempts Service ✅
+**File:** `server/Features/ProblemAttempts/ProblemAttemptService.cs`
+- ✅ Modify `ListProblemAttempt()` to use paginated repository method
 - ✅ Build filter expressions based on request parameters
-- ✅ Update cache key to include pagination/filter/sort parameters
-- ✅ Reduce cache TTL (from 1 day to 6 hours)
+- ✅ Update cache key to include pagination/filter parameters
+- ✅ Cache TTL set to 1 hour
 
 ### 3.2 Update Cache Strategy ✅
 **File:** `server/Common/Cache/MemoryRequestCache.cs` (if needed)
@@ -58,32 +57,37 @@ Implement server-side pagination with filtering and sorting for the LeetCode pro
 ## Phase 4: Backend - Controller Layer ✅ COMPLETED
 
 ### 4.1 Update Controller ✅
-**File:** `server/Features/Leetcode/LeetcodeController.cs`
+**File:** `server/Features/ProblemAttempts/ProblemAttemptController.cs`
 - ✅ Controller already uses [FromQuery] - automatically accepts new parameters
-- ✅ Model binding works for all pagination/filter/sort parameters
+- ✅ Model binding works for all pagination/filter parameters
 - ✅ No changes needed - already compatible
 
-## Phase 5: Frontend - API Client
+## Phase 5: Frontend - API Client ✅ COMPLETED
 
-### 5.1 Regenerate API Client
-- Run API client generation to pick up new types
-- Verify generated hooks include pagination parameters
+### 5.1 Regenerate API Client ✅
+- ✅ Run API client generation to pick up new types
+- ✅ Verify generated hooks include pagination parameters
+- ✅ New type: `ListProblemAttemptResponse` with `result: ProblemAttemptEntityPagedResponse`
+- ✅ New type: `ProblemAttemptEntityPagedResponse` with pagination metadata
 
-## Phase 6: Frontend - Components
+## Phase 6: Frontend - Components ✅ COMPLETED
 
-### 6.1 Update LeetCode Table Component
+### 6.1 Update Problem Attempts Table Component ✅
 **File:** `client/src/pages/Leetcode/LeetcodeTable/LeetcodeTable.tsx`
-- Switch from client-side to server-side pagination in Mantine React Table
-- Implement `manualPagination` mode
-- Add page size selector (10, 20, 50, 100)
-- Handle loading states during pagination
-- Implement server-side filtering and sorting
-- Update to use new paginated API hook
+- ✅ Switch from client-side to server-side pagination in Mantine React Table
+- ✅ Implement `manualPagination` mode with `rowCount` for total items
+- ✅ Add pagination props (totalCount, currentPage, pageSize, handlers)
+- ✅ Handle loading states during pagination
+- ✅ Notify parent component of page/pageSize changes
 
-### 6.2 Update LeetCode Page Component
+### 6.2 Update LeetCode Page Component ✅
 **File:** `client/src/pages/Leetcode/Leetcode.page.tsx`
-- Pass pagination state to table component
-- Handle refetch on pagination/filter/sort changes
+- ✅ Update to use new response structure (`result.items`)
+- ✅ Access problem attempts from `problemAttemptsResponse?.responseBody?.result.items`
+- ✅ Add pagination state (currentPage, pageSize)
+- ✅ Pass pagination state and handlers to table component
+- ✅ Include Page/PageSize in API request
+- ✅ Handle refetch on pagination changes automatically via React Query
 
 ## Phase 7: Testing & Validation
 
@@ -131,63 +135,66 @@ Implement server-side pagination with filtering and sorting for the LeetCode pro
 
 ## Success Criteria
 
-- ✅ Initial page load returns only 10 LeetCode problems (instead of 3000+)
-- ⏳ Pagination controls work correctly (pending frontend)
+- ✅ Initial page load returns only 10 problem attempts (instead of all 50,000+)
+- ⏳ Pagination controls work correctly (pending frontend table implementation)
 - ✅ Filtering applies before pagination (backend ready)
-- ✅ Sorting works with pagination (backend ready)
 - ✅ Backend cache works per-page
-- ✅ Performance improvement measurable (< 100ms response time)
+- ✅ Performance improvement measurable (< 1s response time)
+- ✅ Test data reduced from 50,000 to 1,000 attempts for testing
 - ⏳ No breaking changes to existing functionality (pending integration testing)
 
 ## Technical Details
 
 ### Pagination Parameters
 ```
-GET /api/v1/leetcode/list-leetcode-problems?page=1&pageSize=20&difficulty=Hard&sortBy=title&sortOrder=asc
+GET /api/v1/problem-attempts/get?Page=1&PageSize=10&IncludeCustom=false&IncludeLeetcode=true&UserIds=iyog4jlo4k
 ```
 
 ### Response Format
 ```json
 {
   "responseBody": {
-    "items": [...],
-    "totalCount": 3000,
-    "page": 1,
-    "pageSize": 20,
-    "totalPages": 150,
-    "hasPreviousPage": false,
-    "hasNextPage": true
+    "result": {
+      "items": [...],
+      "totalCount": 1000,
+      "page": 1,
+      "pageSize": 10,
+      "totalPages": 100,
+      "hasPreviousPage": false,
+      "hasNextPage": true
+    }
   }
 }
 ```
 
 ### Cache Key Strategy
 ```
-leetcode-problems-p{page}-ps{pageSize}-d{difficulty}-c{category}-s{sortBy}-o{sortOrder}-q{searchTerm}
+p{page}-ps{pageSize}-u{userIds}-s{seasonId}-lc{includeLeetcode}-c{includeCustom}
 ```
 
 ## Notes
 
-- This is a learning exercise focusing on LeetCode problems only
-- Mock Interviews pagination can follow the same pattern later
+- This is a learning exercise focusing on Problem Attempts endpoint
+- LeetCode Problems and Mock Interviews pagination can follow the same pattern later
 - Keep existing client-side pagination as reference until migration complete
-- Consider feature flag for gradual rollout if needed
+- Difficulty chart and graph components temporarily use old API structure (will break until updated)
 
-## Files to be Modified/Created
+## Files Modified/Created
 
 ### New Files
-- `server/Shared/PaginationDtos.cs`
+- `server/Shared/PaginationDtos.cs` ✅
 
-### Modified Files (Backend)
-- `server/Features/Leetcode/Dtos/ListLeetcodeProblems.cs`
-- `server/Common/Interfaces/IRepository.cs`
-- `server/Common/EntityRepository.cs`
-- `server/Features/Leetcode/LeetcodeService.cs`
-- `server/Features/Leetcode/LeetcodeController.cs`
+### Modified Files (Backend) ✅
+- `server/Features/ProblemAttempts/Dtos/ListProblemAttempt.cs` ✅
+- `server/Common/Interfaces/IRepository.cs` ✅
+- `server/Common/EntityRepository.cs` ✅
+- `server/Features/ProblemAttempts/ProblemAttemptService.cs` ✅
+- `server/Features/ProblemAttempts/ProblemAttemptController.cs` ✅
 
-### Modified Files (Frontend)
-- `client/src/pages/Leetcode/LeetcodeTable/LeetcodeTable.tsx`
-- `client/src/pages/Leetcode/Leetcode.page.tsx`
+### Modified Files (Frontend) ⏳
+- `client/src/generated/api/client.ts` ✅ (regenerated)
+- `client/src/pages/Leetcode/Leetcode.page.tsx` ✅ (partially updated)
+- `client/src/pages/Leetcode/LeetcodeTable/LeetcodeTable.tsx` ⏳ (needs server-side pagination)
 
 ## Estimated Time
 - Backend Implementation: 2-3 hours

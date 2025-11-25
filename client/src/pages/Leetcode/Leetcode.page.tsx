@@ -36,17 +36,25 @@ export default function LeetcodePage() {
     key: 'leetcode-graph-preset',
     defaultValue: LeetcodeGraphPreset.ScatterChart,
   });
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
   const { data: currentUserResponse } = useGetCurrentUser();
   const userId = currentUserResponse?.responseBody?.user.userId ?? '';
   const { data: userResponse } = useGetIsCurrentUserEnrolled({ seasonSlug });
 
-  const { data: problemAttemptsResponse, refetch: refetchProblemAttempts } = useListProblemAttempt(
+  const {
+    data: problemAttemptsResponse,
+    refetch: refetchProblemAttempts,
+    isLoading: isLoadingProblemAttempts,
+  } = useListProblemAttempt(
     {
       SeasonId: userResponse?.responseBody?.seasonId || undefined,
       IncludeCustom: !isLeetcode,
       IncludeLeetcode: isLeetcode,
       UserIds: [userId],
+      Page: currentPage,
+      PageSize: pageSize,
     },
     { query: { enabled: userId !== '' } }
   );
@@ -61,11 +69,11 @@ export default function LeetcodePage() {
   const seasonWeeksOptions = getSeasonWeeks(seasonWeeksResponse?.responseBody?.seasonWeeks || []);
   const leetcodeDifficultyOptions = getLeetcodeDifficulties();
   const leetcodeCategoryOptions = getLeetcodeCategories(
-    problemAttemptsResponse?.responseBody?.problemAttempts || []
+    problemAttemptsResponse?.responseBody?.result.items || []
   );
 
   const filteredProblemAttempts = useMemo(() => {
-    const attempts = problemAttemptsResponse?.responseBody?.problemAttempts || [];
+    const attempts = problemAttemptsResponse?.responseBody?.result.items || [];
     return attempts.filter(
       (attempt) =>
         // If no filters are applied, include all attempts
@@ -185,6 +193,12 @@ export default function LeetcodePage() {
         enableEditing
         showAuthor={false}
         showCategory
+        totalCount={problemAttemptsResponse?.responseBody?.result.totalCount || 0}
+        currentPage={currentPage}
+        pageSize={pageSize}
+        onPageChange={setCurrentPage}
+        onPageSizeChange={setPageSize}
+        isLoadingAttempts={isLoadingProblemAttempts}
       />
     </>
   );
