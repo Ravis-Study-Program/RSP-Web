@@ -49,10 +49,11 @@ export default function LeetcodePage() {
   const userId = currentUserResponse?.responseBody?.user.userId ?? '';
   const { data: userResponse } = useGetIsCurrentUserEnrolled({ seasonSlug });
 
+  // Paginated data for table
   const {
-    data: problemAttemptsResponse,
+    data: paginatedAttemptsResponse,
     refetch: refetchProblemAttempts,
-    isLoading: isLoadingProblemAttempts,
+    isLoading: isLoadingPaginatedAttempts,
   } = useListProblemAttempt(
     {
       SeasonId: userResponse?.responseBody?.seasonId || undefined,
@@ -61,6 +62,21 @@ export default function LeetcodePage() {
       UserIds: [userId],
       Page: currentPage,
       PageSize: pageSize,
+    },
+    { query: { enabled: userId !== '' } }
+  );
+
+  // All data for dashboards (no pagination)
+  const {
+    data: allAttemptsResponse,
+    isLoading: isLoadingAllAttempts,
+  } = useListProblemAttempt(
+    {
+      SeasonId: userResponse?.responseBody?.seasonId || undefined,
+      IncludeCustom: !isLeetcode,
+      IncludeLeetcode: isLeetcode,
+      UserIds: [userId],
+      // No Page/PageSize to get all data
     },
     { query: { enabled: userId !== '' } }
   );
@@ -75,11 +91,12 @@ export default function LeetcodePage() {
   const seasonWeeksOptions = getSeasonWeeks(seasonWeeksResponse?.responseBody?.seasonWeeks || []);
   const leetcodeDifficultyOptions = getLeetcodeDifficulties();
   const leetcodeCategoryOptions = getLeetcodeCategories(
-    problemAttemptsResponse?.responseBody?.result.items || []
+    paginatedAttemptsResponse?.responseBody?.result?.items || []
   );
 
-  const filteredProblemAttempts = useMemo(() => {
-    const attempts = problemAttemptsResponse?.responseBody?.result.items || [];
+  // Filtered paginated attempts for table
+  const filteredPaginatedAttempts = useMemo(() => {
+    const attempts = paginatedAttemptsResponse?.responseBody?.result?.items || [];
     return attempts.filter(
       (attempt) =>
         // If no filters are applied, include all attempts
@@ -104,7 +121,40 @@ export default function LeetcodePage() {
               false)))
     );
   }, [
-    problemAttemptsResponse,
+    paginatedAttemptsResponse,
+    selectedSeasonWeeks,
+    selectedLeetcodeDifficulties,
+    selectedLeetcodeCategories,
+  ]);
+
+  // Filtered all attempts for dashboards (pie chart and scatter graph)
+  const filteredAllAttempts = useMemo(() => {
+    const attempts = allAttemptsResponse?.responseBody?.problemAttempts || [];
+    return attempts.filter(
+      (attempt) =>
+        // If no filters are applied, include all attempts
+        (selectedSeasonWeeks.length === 0 &&
+          selectedLeetcodeDifficulties.length === 0 &&
+          selectedLeetcodeCategories.length === 0) ||
+        // Season Weeks Filter
+        ((selectedSeasonWeeks.length === 0 ||
+          (attempt.seasonWeekId != null &&
+            selectedSeasonWeeks.includes(attempt.seasonWeekId.toString()))) &&
+          // Difficulty Filter
+          (selectedLeetcodeDifficulties.length === 0 ||
+            (attempt.leetcodeProblem?.leetcodeProblemDifficulty != null &&
+              selectedLeetcodeDifficulties.includes(
+                attempt.leetcodeProblem.leetcodeProblemDifficulty.toString()
+              ))) &&
+          // Categories Filter
+          (selectedLeetcodeCategories.length === 0 ||
+            (attempt.leetcodeProblem?.leetcodeProblemCategories?.some((category) =>
+              selectedLeetcodeCategories.includes(category.leetcodeProblemCategoryId)
+            ) ??
+              false)))
+    );
+  }, [
+    allAttemptsResponse,
     selectedSeasonWeeks,
     selectedLeetcodeDifficulties,
     selectedLeetcodeCategories,
@@ -181,12 +231,12 @@ export default function LeetcodePage() {
       <Grid gutter="md" mb="md">
         <Grid.Col span={{ base: 12, md: 3 }}>
           <LeetcodeDifficultyChart
-            problemAttempts={problemAttemptsResponse?.responseBody?.problemAttempts}
+            problemAttempts={allAttemptsResponse?.responseBody?.problemAttempts}
           />
         </Grid.Col>
         <Grid.Col span={{ base: 12, md: 9 }}>
           <ProblemAttemptsGraphContainer
-            problemAttempts={filteredProblemAttempts}
+            problemAttempts={filteredAllAttempts}
             graphPreset={selectedGraphPreset}
           />
         </Grid.Col>
@@ -194,17 +244,17 @@ export default function LeetcodePage() {
 
       <LeetcodeTable
         refetchProblemAttempts={refetchProblemAttempts}
-        problemAttempts={filteredProblemAttempts}
+        problemAttempts={filteredPaginatedAttempts}
         enrollmentId={userResponse?.responseBody?.enrollmentId || ''}
         enableEditing
         showAuthor={false}
         showCategory
-        totalCount={problemAttemptsResponse?.responseBody?.result.totalCount || 0}
+        totalCount={paginatedAttemptsResponse?.responseBody?.result?.totalCount || 0}
         currentPage={currentPage}
         pageSize={pageSize}
         onPageChange={setCurrentPage}
         onPageSizeChange={setPageSize}
-        isLoadingAttempts={isLoadingProblemAttempts}
+        isLoadingAttempts={isLoadingPaginatedAttempts}
       />
     </>
   );

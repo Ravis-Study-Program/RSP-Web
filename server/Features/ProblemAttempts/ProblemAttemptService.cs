@@ -171,10 +171,12 @@ public class ProblemAttemptService : BaseService, IProblemAttemptService
     CancellationToken cancellationToken = default
   )
   {
-    // Build cache key with pagination parameters
+    // Build cache key - differentiate between paginated and non-paginated requests
     var userIdsKey = string.Join("-", request.UserIds.Distinct().OrderBy(x => x));
+    var isPaginated = request.Page.HasValue && request.PageSize.HasValue;
+    var paginationKey = isPaginated ? $"p{request.Page}-ps{request.PageSize}" : "all";
     var cacheKey =
-      $"p{request.Page}-ps{request.PageSize}-u{userIdsKey}-s{request.SeasonId ?? "all"}-lc{request.IncludeLeetcode}-c{request.IncludeCustom}";
+      $"{paginationKey}-u{userIdsKey}-s{request.SeasonId ?? "all"}-lc{request.IncludeLeetcode}-c{request.IncludeCustom}";
 
     var response = await _cache.GetOrCreateAsync(
       routeKey: RouteCacheKeys.ListProblemAttempts,
@@ -255,24 +257,44 @@ public class ProblemAttemptService : BaseService, IProblemAttemptService
       return query;
     };
 
-    // Use GetPagedAsync for pagination
-    var (items, totalCount) = await _problemAttemptRepository.GetPagedAsync(
-      page: request.Page,
-      pageSize: request.PageSize,
-      predicate: p => request.UserIds.Contains(p.User.UserId),
-      orderBy: q => q.OrderByDescending(p => p.AttemptStartDateUtc),
-      include: includeFunc,
-      cancellationToken: cancellationToken
-    );
+    // Check if pagination is requested
+    var isPaginated = request.Page.HasValue && request.PageSize.HasValue;
 
-    var pagedResponse = RSPWebAPI.Shared.PagedResponse<ProblemAttemptEntity>.Create(
-      items.ToList(),
-      totalCount,
-      request.Page,
-      request.PageSize
-    );
+    if (isPaginated)
+    {
+      // Use GetPagedAsync for pagination
+      var (items, totalCount) = await _problemAttemptRepository.GetPagedAsync(
+        page: request.Page!.Value,
+        pageSize: request.PageSize!.Value,
+        predicate: p => request.UserIds.Contains(p.User.UserId),
+        orderBy: q => q.OrderByDescending(p => p.AttemptStartDateUtc),
+        include: includeFunc,
+        cancellationToken: cancellationToken
+      );
 
-    return new ListProblemAttemptResponse { Result = pagedResponse };
+      var pagedResponse = RSPWebAPI.Shared.PagedResponse<ProblemAttemptEntity>.Create(
+        items.ToList(),
+        totalCount,
+        request.Page.Value,
+        request.PageSize.Value
+      );
+
+      return new ListProblemAttemptResponse { Result = pagedResponse };
+    }
+    else
+    {
+      // Return all results without pagination
+      var allAttempts = await GetAllProblemAttemptsAsync(
+        predicate: p => request.UserIds.Contains(p.User.UserId),
+        cancellationToken: cancellationToken,
+        include: includeFunc
+      );
+
+      // Sort by attempt date descending
+      var sortedAttempts = allAttempts.OrderByDescending(p => p.AttemptStartDateUtc).ToList();
+
+      return new ListProblemAttemptResponse { ProblemAttempts = sortedAttempts };
+    }
   }
 
   public async Task<UpdateProblemAttemptResponse> UpdateProblemAttempt(
