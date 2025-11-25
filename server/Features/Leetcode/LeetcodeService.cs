@@ -230,7 +230,7 @@ public class LeetcodeService : BaseService, ILeetcodeService
       routeKey: RouteCacheKeys.ListLeetcodeProblems,
       primaryKey: "all",
       factory: () => _listLeetcodeProblems(request, cancellationToken),
-      ttl: TimeSpan.FromHours(6)
+      ttl: TimeSpan.FromDays(1)
     );
 
     if (response == null)
@@ -251,13 +251,14 @@ public class LeetcodeService : BaseService, ILeetcodeService
       return q.Include(l => l.Problem).Include(l => l.LeetcodeProblemCategories);
     };
 
-    var leetcodeProblems = await _leetcodeProblemRepository.GetAllAsync(
+    var leetcodeProblems = await GetAllLeetcodeProblemsAsync(
       predicate: null,
       cancellationToken,
       include
     );
 
     var formattedLeetcodeProblems = leetcodeProblems
+      .OrderBy(l => l.LeetcodeNumber)
       .Select(l => new LeetcodeProblemDto
       {
         LeetcodeProblemId = l.LeetcodeProblemId,
