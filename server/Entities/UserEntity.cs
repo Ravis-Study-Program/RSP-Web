@@ -6,7 +6,7 @@ using RSPWebAPI.Entities.Interfaces;
 
 namespace RSPWebAPI.Entities;
 
-public class UserEntity : ISoftDelete
+public class UserEntity : IBaseEntity, ISoftDelete
 {
   [Required]
   public string UserId { get; set; } = string.Empty;
@@ -30,6 +30,13 @@ public class UserEntity : ISoftDelete
   public string Slug { get; set; } = string.Empty;
 
   public string? ProfileImage { get; set; }
+
+  [Required]
+  public DateTime CreatedAtUtc { get; set; }
+
+  [Required]
+  public DateTime UpdatedAtUtc { get; set; }
+
   public DateTime? DeletedAtUtc { get; set; }
 }
 
@@ -65,6 +72,16 @@ public class UserEntityConfiguration : IEntityTypeConfiguration<UserEntity>
       .Property(x => x.ProfileImage)
       .HasColumnName("ProfileImage")
       .HasColumnType("varchar(255)");
+    builder
+      .Property(x => x.CreatedAtUtc)
+      .HasColumnName("CreatedAtUtc")
+      .HasColumnType("timestamptz")
+      .IsRequired();
+    builder
+      .Property(x => x.UpdatedAtUtc)
+      .HasColumnName("UpdatedAtUtc")
+      .HasColumnType("timestamptz")
+      .IsRequired();
     builder
       .Property(x => x.DeletedAtUtc)
       .HasColumnName("DeletedAtUtc")
