@@ -182,7 +182,7 @@ public class ProblemAttemptService : BaseService, IProblemAttemptService
       routeKey: RouteCacheKeys.ListProblemAttempts,
       primaryKey: cacheKey,
       factory: () => _listProblemAttempt(request, cancellationToken),
-      ttl: TimeSpan.FromHours(1)
+      ttl: TimeSpan.FromDays(1)
     );
 
     if (response == null)
