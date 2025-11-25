@@ -36,8 +36,14 @@ export default function LeetcodePage() {
     key: 'leetcode-graph-preset',
     defaultValue: LeetcodeGraphPreset.ScatterChart,
   });
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
+  const [currentPage, setCurrentPage] = useLocalStorage({
+    key: 'current-page',
+    defaultValue: 1,
+  });
+  const [pageSize, setPageSize] = useLocalStorage({
+    key: 'page-size',
+    defaultValue: 10,
+  });
 
   const { data: currentUserResponse } = useGetCurrentUser();
   const userId = currentUserResponse?.responseBody?.user.userId ?? '';
