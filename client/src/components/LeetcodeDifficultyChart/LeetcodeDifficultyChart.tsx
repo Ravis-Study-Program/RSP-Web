@@ -17,6 +17,12 @@ interface ChartData {
 export const LeetcodeDifficultyChart = ({ problemAttempts }: LeetcodeDifficultyChartProps) => {
   const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
   const bgColor = computedColorScheme === 'light' ? 'white' : 'dark';
+  const totalProblems = problemAttempts?.length || 0;
+
+  const makePercentage = (value: number) => {
+    return Number(((value / totalProblems) * 100).toFixed(1));
+  };
+
   const chartData: ChartData[] = useMemo(() => {
     if (!problemAttempts || problemAttempts.length === 0) {
       return [];
@@ -58,8 +64,6 @@ export const LeetcodeDifficultyChart = ({ problemAttempts }: LeetcodeDifficultyC
     ].filter((item) => item.value > 0);
   }, [problemAttempts]);
 
-  const totalProblems = chartData.reduce((sum, item) => sum + item.value, 0);
-
   return (
     <Container bg={bgColor} fluid className={chartClasses.chartContainer}>
       <Text fw={600} size="md" mb={20}>
@@ -67,7 +71,16 @@ export const LeetcodeDifficultyChart = ({ problemAttempts }: LeetcodeDifficultyC
       </Text>
       <Center h="calc(100% - 100px)">
         {totalProblems > 0 && (
-          <PieChart data={chartData} withTooltip withLabels strokeWidth={2} size={200} />
+          <PieChart data={chartData} 
+              withLabelsLine={false} 
+              labelsPosition="inside" 
+              withTooltip 
+              withLabels 
+              labelsType="percent" 
+              strokeWidth={2} 
+              size={200} 
+              formatter={(value: number) => `${makePercentage(value)}%`} 
+          />
         )}
       </Center>
       <Text c="dimmed" size="xs" ta="center" mt="md">
