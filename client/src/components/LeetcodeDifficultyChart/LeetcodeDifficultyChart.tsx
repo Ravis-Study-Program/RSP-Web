@@ -17,11 +17,10 @@ interface ChartData {
 export const LeetcodeDifficultyChart = ({ problemAttempts }: LeetcodeDifficultyChartProps) => {
   const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
   const bgColor = computedColorScheme === 'light' ? 'white' : 'dark';
-  const totalProblems = problemAttempts?.length || 0;
+  const totalProblems = problemAttempts?.length ?? 0;
 
-  const makePercentage = (value: number) => {
-    return Number(((value / totalProblems) * 100).toFixed(1));
-  };
+  const toPercent = (count: number) =>
+    Number(((count / totalProblems) * 100).toFixed(1));
 
   const chartData: ChartData[] = useMemo(() => {
     if (!problemAttempts || problemAttempts.length === 0) {
@@ -48,17 +47,17 @@ export const LeetcodeDifficultyChart = ({ problemAttempts }: LeetcodeDifficultyC
     return [
       {
         name: 'Easy',
-        value: difficultyCounts.Easy,
+        value: toPercent(difficultyCounts.Easy),
         color: 'var(--mantine-color-green-6)',
       },
       {
         name: 'Medium',
-        value: difficultyCounts.Medium,
+        value: toPercent(difficultyCounts.Medium),
         color: 'var(--mantine-color-yellow-6)',
       },
       {
         name: 'Hard',
-        value: difficultyCounts.Hard,
+        value: toPercent(difficultyCounts.Hard),
         color: 'var(--mantine-color-red-6)',
       },
     ].filter((item) => item.value > 0);
@@ -71,15 +70,14 @@ export const LeetcodeDifficultyChart = ({ problemAttempts }: LeetcodeDifficultyC
       </Text>
       <Center h="calc(100% - 100px)">
         {totalProblems > 0 && (
-          <PieChart data={chartData} 
-              withLabelsLine={false} 
-              labelsPosition="inside" 
-              withTooltip 
-              withLabels 
-              labelsType="percent" 
-              strokeWidth={2} 
-              size={200} 
-              formatter={(value: number) => `${makePercentage(value)}%`} 
+          <PieChart data={chartData}
+            withLabelsLine={false}
+            labelsPosition="inside"
+            withTooltip
+            withLabels
+            labelsType="percent"
+            strokeWidth={2}
+            size={200}
           />
         )}
       </Center>
