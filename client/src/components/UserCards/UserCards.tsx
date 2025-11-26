@@ -28,7 +28,7 @@ export function useFilterUsers(users: EnrollmentUserDto[] = []) {
   const filtered = useMemo(() => {
     return users.filter((user) => {
       const nameMatch =
-        selectedNames.length === 0 || (user.name != null && selectedNames.includes(user.name));
+        selectedNames.length === 0 || (user.userId != null && selectedNames.includes(user.userId));
 
       const roleMatch =
         selectedRoles.length === 0 || (user.role != null && selectedRoles.includes(user.role));
