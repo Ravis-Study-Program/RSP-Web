@@ -114,7 +114,7 @@ export const LeetcodeProblemAttemptCreateModal = ({
           {...form.getInputProps('timeTakenInMinutes')}
           mt="sm"
           label="Time Taken In Minutes"
-          placeholder="Enter time taken in seconds to complete problem"
+          placeholder="Enter time taken in minutes to complete problem"
           withAsterisk
           error={form.errors.timeTakenInMinutes}
         />

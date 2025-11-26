@@ -5,7 +5,7 @@ using RSPWebAPI.Entities.Interfaces;
 
 namespace RSPWebAPI.Entities;
 
-public class ProblemAttemptEntity : ISoftDelete
+public class ProblemAttemptEntity : IBaseEntity, ISoftDelete
 {
   [Required]
   public string ProblemAttemptId { get; set; } = string.Empty;
@@ -35,6 +35,13 @@ public class ProblemAttemptEntity : ISoftDelete
   public CustomProblemEntity CustomProblem { get; set; } = null!;
   public EnrollmentEntity Enrollment { get; set; } = null!;
   public SeasonWeekEntity SeasonWeek { get; set; } = null!;
+
+  [Required]
+  public DateTime CreatedAtUtc { get; set; }
+
+  [Required]
+  public DateTime UpdatedAtUtc { get; set; }
+
   public DateTime? DeletedAtUtc { get; set; }
 }
 
@@ -84,6 +91,16 @@ public class ProblemAttemptEntityConfiguration : IEntityTypeConfiguration<Proble
       .Property(x => x.SeasonWeekId)
       .HasColumnName("SeasonWeekId")
       .HasColumnType("varchar(16)");
+    builder
+      .Property(x => x.CreatedAtUtc)
+      .HasColumnName("CreatedAtUtc")
+      .HasColumnType("timestamptz")
+      .IsRequired();
+    builder
+      .Property(x => x.UpdatedAtUtc)
+      .HasColumnName("UpdatedAtUtc")
+      .HasColumnType("timestamptz")
+      .IsRequired();
     builder
       .Property(x => x.DeletedAtUtc)
       .HasColumnName("DeletedAtUtc")

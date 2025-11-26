@@ -5,13 +5,20 @@ using RSPWebAPI.Entities.Interfaces;
 
 namespace RSPWebAPI.Entities;
 
-public class BehaviouralMockInterviewRoundEntity : ISoftDelete
+public class BehaviouralMockInterviewRoundEntity : IBaseEntity, ISoftDelete
 {
   [Required]
   public string BehaviouralMockInterviewRoundId { get; set; } = string.Empty;
 
   [Required]
   public int BehavioralScore { get; set; }
+
+  [Required]
+  public DateTime CreatedAtUtc { get; set; }
+
+  [Required]
+  public DateTime UpdatedAtUtc { get; set; }
+
   public DateTime? DeletedAtUtc { get; set; }
 }
 
@@ -34,6 +41,16 @@ public class BehaviouralMockInterviewRoundEntityConfiguration
       .Property(x => x.BehavioralScore)
       .HasColumnName("BehavioralScore")
       .HasColumnType("int")
+      .IsRequired();
+    builder
+      .Property(x => x.CreatedAtUtc)
+      .HasColumnName("CreatedAtUtc")
+      .HasColumnType("timestamptz")
+      .IsRequired();
+    builder
+      .Property(x => x.UpdatedAtUtc)
+      .HasColumnName("UpdatedAtUtc")
+      .HasColumnType("timestamptz")
       .IsRequired();
     builder
       .Property(x => x.DeletedAtUtc)
