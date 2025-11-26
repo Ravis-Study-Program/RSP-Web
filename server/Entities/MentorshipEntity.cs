@@ -5,7 +5,7 @@ using RSPWebAPI.Entities.Interfaces;
 
 namespace RSPWebAPI.Entities;
 
-public class MentorshipEntity : ISoftDelete
+public class MentorshipEntity : IBaseEntity, ISoftDelete
 {
   [Required]
   public string MentorshipId { get; set; } = string.Empty;
@@ -19,6 +19,13 @@ public class MentorshipEntity : ISoftDelete
   // Navigation
   public EnrollmentEntity MentorEnrollment { get; set; } = null!;
   public EnrollmentEntity MenteeEnrollment { get; set; } = null!;
+
+  [Required]
+  public DateTime CreatedAtUtc { get; set; }
+
+  [Required]
+  public DateTime UpdatedAtUtc { get; set; }
+
   public DateTime? DeletedAtUtc { get; set; }
 }
 
@@ -49,6 +56,16 @@ public class MentorshipEntityConfiguration : IEntityTypeConfiguration<Mentorship
       .Property(x => x.MenteeEnrollmentId)
       .HasColumnName("MenteeEnrollmentId")
       .HasColumnType("varchar(16)")
+      .IsRequired();
+    builder
+      .Property(x => x.CreatedAtUtc)
+      .HasColumnName("CreatedAtUtc")
+      .HasColumnType("timestamptz")
+      .IsRequired();
+    builder
+      .Property(x => x.UpdatedAtUtc)
+      .HasColumnName("UpdatedAtUtc")
+      .HasColumnType("timestamptz")
       .IsRequired();
     builder
       .Property(x => x.DeletedAtUtc)

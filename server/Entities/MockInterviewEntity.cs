@@ -5,7 +5,7 @@ using RSPWebAPI.Entities.Interfaces;
 
 namespace RSPWebAPI.Entities;
 
-public class MockInterviewEntity : ISoftDelete
+public class MockInterviewEntity : IBaseEntity, ISoftDelete
 {
   [Required]
   public string MockInterviewId { get; set; } = string.Empty;
@@ -37,6 +37,13 @@ public class MockInterviewEntity : ISoftDelete
   public SeasonEntity Season { get; set; } = null!;
   public ICollection<MockInterviewRoundEntity> MockInterviewRounds { get; set; } = null!;
   public SeasonWeekEntity SeasonWeek { get; set; } = null!;
+
+  [Required]
+  public DateTime CreatedAtUtc { get; set; }
+
+  [Required]
+  public DateTime UpdatedAtUtc { get; set; }
+
   public DateTime? DeletedAtUtc { get; set; }
 }
 
@@ -80,6 +87,16 @@ public class MockInterviewEntityConfiguration : IEntityTypeConfiguration<MockInt
       .Property(x => x.IntervieweeUserId)
       .HasColumnName("IntervieweeUserId")
       .HasColumnType("varchar(16)")
+      .IsRequired();
+    builder
+      .Property(x => x.CreatedAtUtc)
+      .HasColumnName("CreatedAtUtc")
+      .HasColumnType("timestamptz")
+      .IsRequired();
+    builder
+      .Property(x => x.UpdatedAtUtc)
+      .HasColumnName("UpdatedAtUtc")
+      .HasColumnType("timestamptz")
       .IsRequired();
     builder
       .Property(x => x.DeletedAtUtc)

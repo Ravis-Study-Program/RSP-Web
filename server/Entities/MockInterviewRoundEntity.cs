@@ -6,7 +6,7 @@ using RSPWebAPI.Entities.Interfaces;
 
 namespace RSPWebAPI.Entities;
 
-public class MockInterviewRoundEntity : ISoftDelete
+public class MockInterviewRoundEntity : IBaseEntity, ISoftDelete
 {
   [Required]
   public string MockInterviewRoundId { get; set; } = string.Empty;
@@ -31,6 +31,13 @@ public class MockInterviewRoundEntity : ISoftDelete
   public BehaviouralMockInterviewRoundEntity BehaviouralMockInterviewRound { get; set; } = null!;
   public LeetcodeMockInterviewRoundEntity LeetcodeMockInterviewRound { get; set; } = null!;
   public CustomMockInterviewRoundEntity CustomMockInterviewRound { get; set; } = null!;
+
+  [Required]
+  public DateTime CreatedAtUtc { get; set; }
+
+  [Required]
+  public DateTime UpdatedAtUtc { get; set; }
+
   public DateTime? DeletedAtUtc { get; set; }
 }
 
@@ -75,6 +82,16 @@ public class MockInterviewRoundEntityConfiguration
       .Property(x => x.CustomMockInterviewRoundId)
       .HasColumnName("CustomMockInterviewRoundId")
       .HasColumnType("varchar(16)");
+    builder
+      .Property(x => x.CreatedAtUtc)
+      .HasColumnName("CreatedAtUtc")
+      .HasColumnType("timestamptz")
+      .IsRequired();
+    builder
+      .Property(x => x.UpdatedAtUtc)
+      .HasColumnName("UpdatedAtUtc")
+      .HasColumnType("timestamptz")
+      .IsRequired();
     builder
       .Property(x => x.DeletedAtUtc)
       .HasColumnName("DeletedAtUtc")

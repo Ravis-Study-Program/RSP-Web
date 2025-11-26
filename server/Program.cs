@@ -112,7 +112,7 @@ builder
   })
   .AddHttpContextAccessor()
   .AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(connectionString).AddInterceptors(new SoftDeleteInterceptor())
+    options.UseNpgsql(connectionString).AddInterceptors(new SoftDeleteInterceptor(), new AuditableEntityInterceptor())
   )
   .AddValidatorsFromAssembly(typeof(Program).Assembly, includeInternalTypes: true)
   .AddCarter()

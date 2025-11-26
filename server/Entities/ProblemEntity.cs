@@ -5,7 +5,7 @@ using RSPWebAPI.Entities.Interfaces;
 
 namespace RSPWebAPI.Entities;
 
-public class ProblemEntity : ISoftDelete
+public class ProblemEntity : IBaseEntity, ISoftDelete
 {
   [Required]
   public string ProblemId { get; set; } = string.Empty;
@@ -15,6 +15,13 @@ public class ProblemEntity : ISoftDelete
 
   [Required]
   public string? Link { get; set; }
+
+  [Required]
+  public DateTime CreatedAtUtc { get; set; }
+
+  [Required]
+  public DateTime UpdatedAtUtc { get; set; }
+
   public DateTime? DeletedAtUtc { get; set; }
 }
 
@@ -38,6 +45,16 @@ public class ProblemEntityConfiguration : IEntityTypeConfiguration<ProblemEntity
       .HasColumnType("varchar(100)")
       .IsRequired();
     builder.Property(x => x.Link).HasColumnName("Link").HasColumnType("varchar(510)");
+    builder
+      .Property(x => x.CreatedAtUtc)
+      .HasColumnName("CreatedAtUtc")
+      .HasColumnType("timestamptz")
+      .IsRequired();
+    builder
+      .Property(x => x.UpdatedAtUtc)
+      .HasColumnName("UpdatedAtUtc")
+      .HasColumnType("timestamptz")
+      .IsRequired();
     builder
       .Property(x => x.DeletedAtUtc)
       .HasColumnName("DeletedAtUtc")

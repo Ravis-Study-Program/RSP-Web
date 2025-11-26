@@ -4,33 +4,13 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
-using Npgsql;
 using Respawn;
 using RSPWebAPI.Clients.Interfaces;
 using RSPWebAPI.Common.Cache;
 using RSPWebAPI.Database;
-using RSPWebAPI.Features.Enrollments;
-using RSPWebAPI.Features.Enrollments.Interfaces;
-using RSPWebAPI.Features.LeetcodeProblemRecommendations;
-using RSPWebAPI.Features.LeetcodeProblemRecommendations.Interfaces;
-using RSPWebAPI.Features.Leetcodes;
-using RSPWebAPI.Features.Leetcodes.Interfaces;
-using RSPWebAPI.Features.Mentorships;
-using RSPWebAPI.Features.Mentorships.Interfaces;
-using RSPWebAPI.Features.MockInterviews;
-using RSPWebAPI.Features.MockInterviews.Interfaces;
-using RSPWebAPI.Features.ProblemAttempts;
-using RSPWebAPI.Features.ProblemAttempts.Interfaces;
-using RSPWebAPI.Features.Seasons;
-using RSPWebAPI.Features.Seasons.Interfaces;
-using RSPWebAPI.Features.SeasonWeeks;
-using RSPWebAPI.Features.SeasonWeeks.Interfaces;
-using RSPWebAPI.Features.Users;
-using RSPWebAPI.Features.Users.Interfaces;
+using RSPWebAPI.Database.Interceptors;
 using RSPWebAPI.Tests.Shared;
 using Testcontainers.PostgreSql;
 using Xunit;
@@ -91,7 +71,11 @@ public class IntegrationTestWebAppFactory : WebApplicationFactory<Program>, IAsy
       services.RemoveDbContext<ApplicationDbContext>();
       services.AddDbContext<ApplicationDbContext>(options =>
       {
-        options.UseNpgsql(_container.GetConnectionString());
+        options.UseNpgsql(_container.GetConnectionString())
+          .AddInterceptors(
+            new SoftDeleteInterceptor(),
+            new AuditableEntityInterceptor()
+          );
       });
 
       // Mocks

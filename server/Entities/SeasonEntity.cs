@@ -5,7 +5,7 @@ using RSPWebAPI.Entities.Interfaces;
 
 namespace RSPWebAPI.Entities;
 
-public class SeasonEntity : ISoftDelete
+public class SeasonEntity : IBaseEntity, ISoftDelete
 {
   [Required]
   public string SeasonId { get; set; } = string.Empty;
@@ -33,6 +33,12 @@ public class SeasonEntity : ISoftDelete
 
   [Required]
   public bool IsDataBackFilled { get; set; }
+
+  [Required]
+  public DateTime CreatedAtUtc { get; set; }
+
+  [Required]
+  public DateTime UpdatedAtUtc { get; set; }
 
   public DateTime? DeletedAtUtc { get; set; }
 }
@@ -84,6 +90,16 @@ public class SeasonEntityConfiguration : IEntityTypeConfiguration<SeasonEntity>
     builder
       .Property(x => x.IsDataBackFilled)
       .HasColumnName("IsDataBackFilled")
+      .IsRequired();
+    builder
+      .Property(x => x.CreatedAtUtc)
+      .HasColumnName("CreatedAtUtc")
+      .HasColumnType("timestamptz")
+      .IsRequired();
+    builder
+      .Property(x => x.UpdatedAtUtc)
+      .HasColumnName("UpdatedAtUtc")
+      .HasColumnType("timestamptz")
       .IsRequired();
     builder
       .Property(x => x.DeletedAtUtc)
