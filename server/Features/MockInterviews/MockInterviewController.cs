@@ -59,11 +59,11 @@ public class MockInterviewController : BaseController
     if (!string.IsNullOrEmpty(request.Cursor) || request.PageSize.HasValue)
     {
       var cursorResult = await _mockInterviewService.ListMockInterviewWithCursor(request, cancellationToken);
-      return OkResponse(cursorResult, Messages.MockInterview.Listed);
+      return Ok(new ApiResponse<ListMockInterviewCursorResponse> { ResponseBody = cursorResult, SuccessMessage = Messages.MockInterview.Listed });
     }
 
     var result = await _mockInterviewService.ListMockInterview(request, cancellationToken);
-    return OkResponse(result, Messages.MockInterview.Listed);
+    return Ok(new ApiResponse<ListMockInterviewResponse> { ResponseBody = result, SuccessMessage = Messages.MockInterview.Listed });
   }
 
   [HttpPut]

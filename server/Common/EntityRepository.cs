@@ -206,7 +206,7 @@ public class EntityRepository<TEntity> : IRepository<TEntity>
     // Reverse results if going backward (to maintain DESC order)
     if (!forward)
     {
-      items = items.Reverse().ToList();
+      items.Reverse();
     }
 
     // HasPrevious is true if we have a cursor (not first page)

@@ -268,7 +268,7 @@ public class MockInterviewService : BaseService, IMockInterviewService
 
     return new ListMockInterviewCursorResponse
     {
-      Items = items,
+      Items = items.ToList(),
       NextCursor = nextCursor,
       PreviousCursor = previousCursor,
       HasMore = hasMore,
