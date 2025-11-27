@@ -46,6 +46,27 @@ public interface IRepository<TEntity>
     CancellationToken cancellationToken = default
   );
 
+  /// <summary>
+  /// Gets a cursor-based paginated result for efficient sequential navigation
+  /// </summary>
+  /// <param name="pageSize">Number of items to return</param>
+  /// <param name="predicate">Optional filter predicate</param>
+  /// <param name="orderBy">Ordering function (must match cursor fields)</param>
+  /// <param name="cursorSelector">Function to extract cursor values (timestamp, id) from entity</param>
+  /// <param name="cursor">Optional cursor for pagination (timestamp, id). Null returns first page</param>
+  /// <param name="include">Optional related data to include</param>
+  /// <param name="cancellationToken">Cancellation token</param>
+  /// <returns>Tuple of (items, hasMore, hasPrevious)</returns>
+  Task<(IList<TEntity> Items, bool HasMore, bool HasPrevious)> GetPagedWithCursorAsync(
+    int pageSize,
+    Expression<Func<TEntity, bool>>? predicate,
+    Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy,
+    Func<TEntity, (DateTime timestamp, string id)> cursorSelector,
+    (DateTime timestamp, string id)? cursor = null,
+    Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null,
+    CancellationToken cancellationToken = default
+  );
+
   Task AddAsync(TEntity entity, CancellationToken cancellationToken = default);
   Task AddRangeAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default);
 

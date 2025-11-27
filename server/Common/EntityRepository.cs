@@ -120,6 +120,80 @@ public class EntityRepository<TEntity> : IRepository<TEntity>
     return (items, totalCount);
   }
 
+  public async Task<(IList<TEntity> Items, bool HasMore, bool HasPrevious)> GetPagedWithCursorAsync(
+    int pageSize,
+    Expression<Func<TEntity, bool>>? predicate,
+    Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy,
+    Func<TEntity, (DateTime timestamp, string id)> cursorSelector,
+    (DateTime timestamp, string id)? cursor = null,
+    Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null,
+    CancellationToken cancellationToken = default
+  )
+  {
+    ArgumentNullException.ThrowIfNull(orderBy);
+    ArgumentNullException.ThrowIfNull(cursorSelector);
+
+    IQueryable<TEntity> query = TableNoTracking;
+
+    // Apply includes for related data
+    if (include != null)
+    {
+      query = include(query);
+    }
+
+    // Apply filtering
+    if (predicate != null)
+    {
+      query = query.Where(predicate);
+    }
+
+    // Apply cursor filtering if provided
+    // WHERE (timestamp < cursor.timestamp) OR (timestamp = cursor.timestamp AND id < cursor.id)
+    if (cursor.HasValue)
+    {
+      var cursorTimestamp = cursor.Value.timestamp;
+      var cursorId = cursor.Value.id;
+
+      query = query.Where(entity =>
+        EF.Property<DateTime>(entity, "CreatedAtUtc") < cursorTimestamp ||
+        (EF.Property<DateTime>(entity, "CreatedAtUtc") == cursorTimestamp &&
+         string.Compare(EF.Property<string>(entity, GetIdPropertyName()), cursorId) < 0)
+      );
+    }
+
+    // Apply ordering (must match cursor fields: timestamp DESC, id DESC)
+    query = orderBy(query);
+
+    // Fetch pageSize + 1 to determine if there are more items
+    var items = await query
+      .Take(pageSize + 1)
+      .ToListAsync(cancellationToken);
+
+    // Check if there are more items
+    var hasMore = items.Count > pageSize;
+
+    // Remove the extra item if present
+    if (hasMore)
+    {
+      items.RemoveAt(items.Count - 1);
+    }
+
+    // HasPrevious is true if we have a cursor (not first page)
+    var hasPrevious = cursor.HasValue;
+
+    return (items, hasMore, hasPrevious);
+  }
+
+  private string GetIdPropertyName()
+  {
+    var keyProperty = _dbSet.EntityType.FindPrimaryKey()?.Properties.FirstOrDefault()?.Name;
+    if (keyProperty == null)
+    {
+      throw new InvalidOperationException("No primary key defined for the entity.");
+    }
+    return keyProperty;
+  }
+
   public async Task AddAsync(TEntity entity, CancellationToken cancellationToken = default)
   {
     ArgumentNullException.ThrowIfNull(entity);
