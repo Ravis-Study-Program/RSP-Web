@@ -50,11 +50,18 @@ public class MockInterviewController : BaseController
   [ServiceFilter(typeof(AuthAttribute))]
   [Route("get")]
   [ActionName("ListMockInterview")]
-  public async Task<ActionResult<ApiResponse<ListMockInterviewResponse>>> ListMockInterview(
+  public async Task<IActionResult> ListMockInterview(
     [FromQuery] ListMockInterviewRequest request,
     CancellationToken cancellationToken = default
   )
   {
+    // Use cursor pagination if Cursor or PageSize is specified
+    if (!string.IsNullOrEmpty(request.Cursor) || request.PageSize.HasValue)
+    {
+      var cursorResult = await _mockInterviewService.ListMockInterviewWithCursor(request, cancellationToken);
+      return OkResponse(cursorResult, Messages.MockInterview.Listed);
+    }
+
     var result = await _mockInterviewService.ListMockInterview(request, cancellationToken);
     return OkResponse(result, Messages.MockInterview.Listed);
   }

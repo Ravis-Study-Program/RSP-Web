@@ -27,6 +27,12 @@ public record ListMockInterviewRequest
   public string? Cursor { get; set; }
 
   /// <summary>
+  /// Pagination direction. True for forward (next), False for backward (previous).
+  /// Defaults to true (forward).
+  /// </summary>
+  public bool Forward { get; set; } = true;
+
+  /// <summary>
   /// Number of items to return per page. Defaults to 10 if not specified.
   /// Maximum value is 100.
   /// </summary>

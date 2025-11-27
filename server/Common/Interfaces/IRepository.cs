@@ -54,6 +54,7 @@ public interface IRepository<TEntity>
   /// <param name="orderBy">Ordering function (must match cursor fields)</param>
   /// <param name="cursorSelector">Function to extract cursor values (timestamp, id) from entity</param>
   /// <param name="cursor">Optional cursor for pagination (timestamp, id). Null returns first page</param>
+  /// <param name="forward">True for forward pagination, False for backward pagination</param>
   /// <param name="include">Optional related data to include</param>
   /// <param name="cancellationToken">Cancellation token</param>
   /// <returns>Tuple of (items, hasMore, hasPrevious)</returns>
@@ -63,6 +64,7 @@ public interface IRepository<TEntity>
     Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy,
     Func<TEntity, (DateTime timestamp, string id)> cursorSelector,
     (DateTime timestamp, string id)? cursor = null,
+    bool forward = true,
     Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null,
     CancellationToken cancellationToken = default
   );

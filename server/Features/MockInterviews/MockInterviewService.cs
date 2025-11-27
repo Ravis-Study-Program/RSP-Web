@@ -1,4 +1,6 @@
 using System.Linq.Expressions;
+using System.Text;
+using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using RSPWebAPI.Common;
 using RSPWEBAPI.Common.Cache;
@@ -12,6 +14,7 @@ using RSPWebAPI.Features.MockInterviews.Dtos;
 using RSPWebAPI.Features.MockInterviews.Interfaces;
 using RSPWebAPI.Features.SeasonWeeks.Interfaces;
 using RSPWebAPI.Features.Users.Interfaces;
+using server.Shared;
 
 namespace RSPWebAPI.Features.MockInterviews;
 
@@ -212,6 +215,142 @@ public class MockInterviewService : BaseService, IMockInterviewService
     }
 
     return new ListMockInterviewResponse { MockInterviews = allMockInterviews };
+  }
+
+  public async Task<ListMockInterviewCursorResponse> ListMockInterviewWithCursor(
+    ListMockInterviewRequest request,
+    CancellationToken cancellationToken = default
+  )
+  {
+    var pageSize = request.PageSize ?? 10; // Default to 10
+    var cursor = ParseCursor(request.Cursor);
+
+    // Build the query with includes
+    var includeFunc = BuildIncludeQuery(request);
+
+    // Build the predicate
+    var predicate = BuildPredicate(request);
+
+    // Call repository with cursor pagination
+    var (items, hasMore, hasPrevious) = await _mockInterviewRepository.GetPagedWithCursorAsync(
+      pageSize: pageSize,
+      predicate: predicate,
+      orderBy: q => q.OrderByDescending(m => m.CreatedAtUtc).ThenByDescending(m => m.MockInterviewId),
+      cursorSelector: entity => (entity.CreatedAtUtc, entity.MockInterviewId),
+      cursor: cursor,
+      forward: request.Forward,
+      include: includeFunc,
+      cancellationToken: cancellationToken
+    );
+
+    // Get total count (expensive, only if needed by UI)
+    int? totalCount = null;
+    if (request.PageSize.HasValue) // Only compute if pagination is being used
+    {
+      totalCount = await _mockInterviewRepository.Table
+        .Where(predicate)
+        .CountAsync(cancellationToken);
+    }
+
+    // Build next cursor from last item
+    string? nextCursor = null;
+    if (hasMore && items.Count > 0)
+    {
+      var lastItem = items.Last();
+      nextCursor = EncodeCursor(lastItem.CreatedAtUtc, lastItem.MockInterviewId);
+    }
+    string? previousCursor = null;
+    if (hasPrevious && items.Count > 0)
+    {
+      var firstItem = items.First();
+      previousCursor = EncodeCursor(firstItem.CreatedAtUtc, firstItem.MockInterviewId);
+    }
+
+    return new ListMockInterviewCursorResponse
+    {
+      Items = items,
+      NextCursor = nextCursor,
+      PreviousCursor = previousCursor,
+      HasMore = hasMore,
+      TotalCount = totalCount
+    };
+  }
+
+  private Expression<Func<MockInterviewEntity, bool>> BuildPredicate(ListMockInterviewRequest request)
+  {
+    return m =>
+      (request.UserIds.Contains(m.InterviewerUserId) || request.UserIds.Contains(m.IntervieweeUserId))
+      && (string.IsNullOrEmpty(request.SeasonId) || m.SeasonId == request.SeasonId);
+  }
+
+  private Func<IQueryable<MockInterviewEntity>, IQueryable<MockInterviewEntity>> BuildIncludeQuery(
+    ListMockInterviewRequest request
+  )
+  {
+    return query =>
+    {
+      if (request.IncludeBehavioural)
+      {
+        query = query
+          .Include(m => m.MockInterviewRounds)
+          .ThenInclude(mr => mr.BehaviouralMockInterviewRound);
+      }
+
+      if (request.IncludeLeetcode)
+      {
+        query = query
+          .Include(m => m.MockInterviewRounds)
+          .ThenInclude(mr => mr.LeetcodeMockInterviewRound)
+          .ThenInclude(l => l.LeetcodeProblem)
+          .ThenInclude(l => l.Problem);
+      }
+
+      if (request.IncludeCustom)
+      {
+        query = query
+          .Include(m => m.MockInterviewRounds)
+          .ThenInclude(mr => mr.CustomMockInterviewRound);
+      }
+
+      query = query
+        .Include(e => e.Interviewer)
+        .Include(e => e.Interviewee)
+        .Include(e => e.SeasonWeek)
+        .Include(e => e.Season);
+
+      return query;
+    };
+  }
+
+  private (DateTime timestamp, string id)? ParseCursor(string? cursorString)
+  {
+    if (string.IsNullOrEmpty(cursorString))
+      return null;
+
+    try
+    {
+      var json = Encoding.UTF8.GetString(Convert.FromBase64String(cursorString));
+      var cursor = JsonSerializer.Deserialize<Cursor>(json);
+      if (cursor == null)
+        return null;
+
+      return (cursor.CreatedAtUtc, cursor.Id);
+    }
+    catch
+    {
+      return null; // Invalid cursor, treat as first page
+    }
+  }
+
+  private string EncodeCursor(DateTime timestamp, string id)
+  {
+    var cursor = new Cursor
+    {
+      CreatedAtUtc = timestamp,
+      Id = id
+    };
+    var json = JsonSerializer.Serialize(cursor);
+    return Convert.ToBase64String(Encoding.UTF8.GetBytes(json));
   }
 
   private async Task<ListMockInterviewResponse> _listMockInterview(

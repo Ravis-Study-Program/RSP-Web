@@ -126,6 +126,7 @@ public class EntityRepository<TEntity> : IRepository<TEntity>
     Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy,
     Func<TEntity, (DateTime timestamp, string id)> cursorSelector,
     (DateTime timestamp, string id)? cursor = null,
+    bool forward = true,
     Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null,
     CancellationToken cancellationToken = default
   )
@@ -148,21 +149,45 @@ public class EntityRepository<TEntity> : IRepository<TEntity>
     }
 
     // Apply cursor filtering if provided
-    // WHERE (timestamp < cursor.timestamp) OR (timestamp = cursor.timestamp AND id < cursor.id)
     if (cursor.HasValue)
     {
       var cursorTimestamp = cursor.Value.timestamp;
       var cursorId = cursor.Value.id;
 
-      query = query.Where(entity =>
-        EF.Property<DateTime>(entity, "CreatedAtUtc") < cursorTimestamp ||
-        (EF.Property<DateTime>(entity, "CreatedAtUtc") == cursorTimestamp &&
-         string.Compare(EF.Property<string>(entity, GetIdPropertyName()), cursorId) < 0)
-      );
+      if (forward)
+      {
+        // Forward: WHERE (timestamp < cursor) OR (timestamp = cursor AND id < cursor.id)
+        // For DESC order, this gets older items
+        query = query.Where(entity =>
+          EF.Property<DateTime>(entity, "CreatedAtUtc") < cursorTimestamp ||
+          (EF.Property<DateTime>(entity, "CreatedAtUtc") == cursorTimestamp &&
+           string.Compare(EF.Property<string>(entity, GetIdPropertyName()), cursorId) < 0)
+        );
+      }
+      else
+      {
+        // Backward: WHERE (timestamp > cursor) OR (timestamp = cursor AND id > cursor.id)
+        // For DESC order, this gets newer items
+        query = query.Where(entity =>
+          EF.Property<DateTime>(entity, "CreatedAtUtc") > cursorTimestamp ||
+          (EF.Property<DateTime>(entity, "CreatedAtUtc") == cursorTimestamp &&
+           string.Compare(EF.Property<string>(entity, GetIdPropertyName()), cursorId) > 0)
+        );
+      }
     }
 
-    // Apply ordering (must match cursor fields: timestamp DESC, id DESC)
-    query = orderBy(query);
+    // Apply ordering
+    if (forward)
+    {
+      // Forward: use normal ordering (DESC)
+      query = orderBy(query);
+    }
+    else
+    {
+      // Backward: reverse ordering (ASC) to get items before cursor
+      query = query.OrderBy(e => EF.Property<DateTime>(e, "CreatedAtUtc"))
+                   .ThenBy(e => EF.Property<string>(e, GetIdPropertyName()));
+    }
 
     // Fetch pageSize + 1 to determine if there are more items
     var items = await query
@@ -176,6 +201,12 @@ public class EntityRepository<TEntity> : IRepository<TEntity>
     if (hasMore)
     {
       items.RemoveAt(items.Count - 1);
+    }
+
+    // Reverse results if going backward (to maintain DESC order)
+    if (!forward)
+    {
+      items = items.Reverse().ToList();
     }
 
     // HasPrevious is true if we have a cursor (not first page)
