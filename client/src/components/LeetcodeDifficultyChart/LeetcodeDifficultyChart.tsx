@@ -3,6 +3,7 @@ import { PieChart } from '@mantine/charts';
 import { Center, Container, Text, useComputedColorScheme } from '@mantine/core';
 import { LeetcodeProblemDifficulty, ProblemAttemptEntity } from '@/generated/api/client';
 import chartClasses from '@/shared/styles/chartContainer.module.css';
+import { createPieLabels } from '@/shared/utils/chartUtils';
 
 interface LeetcodeDifficultyChartProps {
   problemAttempts: ProblemAttemptEntity[] | undefined;
@@ -18,9 +19,6 @@ export const LeetcodeDifficultyChart = ({ problemAttempts }: LeetcodeDifficultyC
   const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
   const bgColor = computedColorScheme === 'light' ? 'white' : 'dark';
   const totalProblems = problemAttempts?.length ?? 0;
-
-  const toPercent = (count: number) =>
-    Number(((count / totalProblems) * 100).toFixed(1));
 
   const chartData: ChartData[] = useMemo(() => {
     if (!problemAttempts || problemAttempts.length === 0) {
@@ -47,21 +45,28 @@ export const LeetcodeDifficultyChart = ({ problemAttempts }: LeetcodeDifficultyC
     return [
       {
         name: 'Easy',
-        value: toPercent(difficultyCounts.Easy),
+        value: difficultyCounts.Easy,
         color: 'var(--mantine-color-green-6)',
       },
       {
         name: 'Medium',
-        value: toPercent(difficultyCounts.Medium),
+        value: difficultyCounts.Medium,
         color: 'var(--mantine-color-yellow-6)',
       },
       {
         name: 'Hard',
-        value: toPercent(difficultyCounts.Hard),
+        value: difficultyCounts.Hard,
         color: 'var(--mantine-color-red-6)',
       },
     ].filter((item) => item.value > 0);
   }, [problemAttempts]);
+
+  const valueFormatter = (count: number) => {
+    const percent = totalProblems > 0 ? ((count / totalProblems) * 100).toFixed(1) : '0.0';
+    return `${percent}% (${count})`;
+  };
+
+  const customInsideLabel = createPieLabels(valueFormatter, 0.3, 16);
 
   return (
     <Container bg={bgColor} fluid className={chartClasses.chartContainer}>
@@ -70,14 +75,16 @@ export const LeetcodeDifficultyChart = ({ problemAttempts }: LeetcodeDifficultyC
       </Text>
       <Center h="calc(100% - 100px)">
         {totalProblems > 0 && (
-          <PieChart data={chartData}
-            withLabelsLine={false}
+          <PieChart
+            data={chartData}
             labelsPosition="inside"
             withTooltip
+            tooltipDataSource="segment"
             withLabels
-            labelsType="percent"
+            valueFormatter={valueFormatter}
             strokeWidth={2}
-            size={200}
+            size={250}
+            pieProps={{ label: customInsideLabel }}
           />
         )}
       </Center>
