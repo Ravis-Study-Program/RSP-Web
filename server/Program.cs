@@ -157,6 +157,7 @@ var env = builder.Environment;
 if (!env.IsDevelopment())
 {
   builder.Services.AddHostedService<LeetcodeQuestionScraper>();
+  builder.Services.AddHostedService<AuditLogCleaner>();
 }
 builder.Services.AddScoped<DbContext, ApplicationDbContext>();
 builder.Services.AddScoped(typeof(IRepository<>), typeof(EntityRepository<>));

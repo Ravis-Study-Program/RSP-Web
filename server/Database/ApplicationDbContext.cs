@@ -1,15 +1,24 @@
 using System.Reflection;
+using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
+using RSPWebAPI.Database.Helpers;
 using RSPWebAPI.Entities;
 
 namespace RSPWebAPI.Database;
 
 public class ApplicationDbContext : DbContext
 {
+  private readonly IHttpContextAccessor? _httpContextAccessor;
+
   public ApplicationDbContext() { }
 
-  public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
-    : base(options) { }
+  public ApplicationDbContext(
+    DbContextOptions<ApplicationDbContext> options,
+    IHttpContextAccessor httpContextAccessor
+  ) : base(options)
+  {
+    _httpContextAccessor = httpContextAccessor;
+  }
 
   public virtual DbSet<BehaviouralMockInterviewRoundEntity> BehaviouralMockInterviewRounds { get; set; }
   public virtual DbSet<CustomMockInterviewRoundEntity> CustomMockInterviewRounds { get; set; }
@@ -28,6 +37,40 @@ public class ApplicationDbContext : DbContext
   public virtual DbSet<UserEntity> Users { get; set; }
   public virtual DbSet<SeasonWeekEntity> SeasonWeeks { get; set; }
   public virtual DbSet<KickStudentEventEntity> KickStudentEvents { get; set; }
+  public virtual DbSet<AuditEventEntity> AuditEvents { get; set; }
+
+  public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+  {
+    string userId =
+      _httpContextAccessor?.HttpContext?.User.FindFirst(ClaimTypes.Name)?.Value
+      ?? "SYSTEM";
+
+    return await SaveChangesWithAuditAsync(userId, cancellationToken);
+  }
+
+  public virtual async Task<int> SaveChangesWithAuditAsync(
+    string userId,
+    CancellationToken cancellationToken = default
+  )
+  {
+    var changeSet = ChangeTracker.Entries().ToList();
+
+    var result = await base.SaveChangesAsync(cancellationToken);
+
+    try
+    {
+      var auditEntries = await AuditHelper.GenerateAuditEntries(userId, changeSet);
+      await base.AddRangeAsync(auditEntries, cancellationToken);
+      await base.SaveChangesAsync(cancellationToken);
+    }
+    catch (Exception ex)
+    {
+      // Audit logging shouldn't effect result of original query
+      Console.WriteLine($"Failed to write Audit Entry. {ex.Message}");
+    }
+
+    return result;
+  }
 
   protected override void OnModelCreating(ModelBuilder modelBuilder)
   {
