@@ -8,14 +8,14 @@ import classes from './SeasonsOverview.module.css';
 export default function SeasonsOverviewPage() {
   const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
   const { seasonSlug } = useSeasonSlug();
-  const { isAdmin, role, isLoading } = useUserAndEnrollment(seasonSlug);
+  const { user, isAdmin, role, isLoading } = useUserAndEnrollment(seasonSlug);
   const { data: enrollmentsResponse } = useGetUserEnrollments();
 
   const resourcesUrl = enrollmentsResponse?.responseBody?.enrollments?.find(
     (enrollment) => enrollment.seasonSlug === seasonSlug
   )?.seasonResourcesUrl;
 
-  const tabs = getTabs(seasonSlug, isAdmin, role, resourcesUrl);
+  const tabs = getTabs(seasonSlug, isAdmin, role, user?.isGraduate, resourcesUrl);
   const tabItems = tabs.season?.[0]?.links?.filter((item) => !item.hidden) ?? [];
 
   if (isLoading) {

@@ -9,11 +9,11 @@ import {
   AdminCreateEnrollmentRequest,
   AdminCreateEnrollmentResponseApiResponse,
   AdminListEnrollmentResponseApiResponse,
+  AdminUserDto,
   EnrollmentResponseDto,
   SeasonEntity,
   SeasonRole,
   SeasonStudentRolePromotion,
-  UserEntity,
 } from '@/generated/api/client';
 import { createOptionsFilter } from '@/shared/table/globalFilters';
 
@@ -168,5 +168,5 @@ type AdminEnrollmentsCreateModalProps = {
     options?: RefetchOptions
   ) => Promise<QueryObserverResult<AdminListEnrollmentResponseApiResponse, unknown>>;
   seasons: SeasonEntity[] | null | undefined;
-  users: UserEntity[] | null | undefined;
+  users: AdminUserDto[] | null | undefined;
 };

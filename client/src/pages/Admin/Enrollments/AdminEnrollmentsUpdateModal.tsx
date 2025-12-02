@@ -9,11 +9,11 @@ import {
   AdminListEnrollmentResponseApiResponse,
   AdminUpdateEnrollmentRequest,
   AdminUpdateEnrollmentResponseApiResponse,
+  AdminUserDto,
   EnrollmentResponseDto,
   SeasonEntity,
   SeasonRole,
   SeasonStudentRolePromotion,
-  UserEntity,
 } from '@/generated/api/client';
 import {
   SeasonRoleReverseIndex,
@@ -175,5 +175,5 @@ type AdminEnrollmentsUpdateModalProps = {
     options?: RefetchOptions
   ) => Promise<QueryObserverResult<AdminListEnrollmentResponseApiResponse, unknown>>;
   seasons: SeasonEntity[] | null | undefined;
-  users: UserEntity[] | null | undefined;
+  users: AdminUserDto[] | null | undefined;
 };

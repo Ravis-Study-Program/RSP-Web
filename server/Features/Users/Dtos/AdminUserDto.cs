@@ -25,5 +25,9 @@ public record AdminUserDto
   public string Slug { get; set; } = string.Empty;
 
   public string? ProfileImage { get; set; }
+  
+  [Required]
+  public bool IsGraduate { get; set; }
+  
   public DateTime? DeletedAtUtc { get; set; }
 }
