@@ -3,6 +3,10 @@ export const NOTIFICATION_MESSAGES = {
     CREATED: 'User created successfully.',
     UPDATED: 'User updated successfully.',
     DELETED: 'User deleted successfully.',
+    SLUG_UPDATED: 'Your profile slug has been updated successfully! Refreshing page...',
+    SLUG_UPDATE_FAILED: 'Failed to update slug. Please try again.',
+    SLUG_GENERATED: 'A new random slug has been generated for you!',
+    SLUG_GENERATE_FAILED: 'Failed to generate random slug. Please try again.',
   },
   SEASON: {
     CREATED: 'Season created successfully.',

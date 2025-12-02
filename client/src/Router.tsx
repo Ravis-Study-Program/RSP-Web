@@ -27,6 +27,7 @@ const ProfilePage = lazy(() => import('./pages/Profile/Profile.page'));
 const SeasonUsersPage = lazy(() => import('./pages/SeasonUsers/SeasonUsers.page'));
 const SeasonsPage = lazy(() => import('./pages/Seasons/Seasons.page'));
 const SeasonsOverviewPage = lazy(() => import('./pages/Seasons/SeasonsOverview.page'));
+const SettingsPage = lazy(() => import('./pages/Settings/Settings.page'));
 
 const routes = (
   <Routes>
@@ -73,6 +74,7 @@ const routes = (
         </Route>
 
         {createRouteMeta({ path: 'profile', title: 'Profile | RSP', element: <ProfilePage /> })}
+        {createRouteMeta({ path: 'settings', title: 'Settings | RSP', element: <SettingsPage /> })}
         {createRouteMeta({ path: 'seasons', title: 'Seasons | RSP', element: <SeasonsPage /> })}
         {createRouteMeta({
           path: 'graduates',

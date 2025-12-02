@@ -61,4 +61,15 @@ public interface IUserService
     string? email,
     CancellationToken cancellationToken = default
   );
+
+  Task<UpdateUserSlugResponse> UpdateUserSlug(
+    UpdateUserSlugRequest request,
+    string userId,
+    CancellationToken cancellationToken = default
+  );
+
+  Task<GenerateRandomSlugResponse> GenerateRandomSlug(
+    GenerateRandomSlugRequest request,
+    CancellationToken cancellationToken = default
+  );
 }

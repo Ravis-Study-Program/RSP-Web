@@ -1,16 +1,22 @@
 using System.Text.RegularExpressions;
+using Bogus;
 
 namespace RSPWebAPI.Shared.Strings
 {
   public static class StringUtils
   {
-    public static string Slugify(string input)
+    private static readonly Faker _faker = new Faker();
+    
+
+    public static string Slugify()
     {
-      input = input.ToLowerInvariant().Trim();
-      input = Regex.Replace(input, @"[^a-z0-9\s-]", ""); // Remove non-alphanumerics
-      input = Regex.Replace(input, @"\s+", "-"); // Replace spaces with dashes
-      input = Regex.Replace(input, @"-+", "-"); // Remove multiple dashes
-      return input;
+      var color = _faker.Commerce.Color().ToLowerInvariant();
+      var material = _faker.Commerce.ProductMaterial().ToLowerInvariant();
+      
+      color = Regex.Replace(color, @"[^a-z0-9]", "");
+      material = Regex.Replace(material, @"[^a-z0-9]", "");
+      
+      return $"{color}-{material}";
     }
   }
 }

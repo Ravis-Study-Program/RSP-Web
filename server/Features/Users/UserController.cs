@@ -124,5 +124,37 @@ public class UserController : BaseController
     return OkResponse(result, Messages.User.Listed);
   }
 
+  [HttpPut]
+  [ServiceFilter(typeof(AuthAttribute))]
+  [Route("update-slug")]
+  [ActionName("UpdateUserSlug")]
+  public async Task<ActionResult<ApiResponse<UpdateUserSlugResponse>>> UpdateUserSlug(
+    UpdateUserSlugRequest request,
+    CancellationToken cancellationToken = default
+  )
+  {
+    var userId = GetCurrentUserId();
+    if (string.IsNullOrEmpty(userId))
+    {
+      return ErrorResponse<UpdateUserSlugResponse>(SlugConstants.Messages.UserIdNotFoundInToken);
+    }
+
+    var result = await _userService.UpdateUserSlug(request, userId, cancellationToken);
+    return OkResponse(result, Messages.User.Updated);
+  }
+
+  [HttpPost]
+  [ServiceFilter(typeof(AuthAttribute))]
+  [Route("generate-random-slug")]
+  [ActionName("GenerateRandomSlug")]
+  public async Task<ActionResult<ApiResponse<GenerateRandomSlugResponse>>> GenerateRandomSlug(
+    GenerateRandomSlugRequest request,
+    CancellationToken cancellationToken = default
+  )
+  {
+    var result = await _userService.GenerateRandomSlug(request, cancellationToken);
+    return OkResponse(result, SlugConstants.Messages.RandomSlugGeneratedSuccessfully);
+  }
+
   #endregion
 }

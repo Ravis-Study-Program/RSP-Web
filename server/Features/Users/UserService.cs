@@ -11,6 +11,7 @@ using RSPWebAPI.Entities;
 using RSPWebAPI.Features.Constants;
 using RSPWebAPI.Features.Users.Dtos;
 using RSPWebAPI.Features.Users.Interfaces;
+using RSPWebAPI.Shared;
 using RSPWebAPI.Shared.Strings;
 
 namespace RSPWebAPI.Features.Users;
@@ -49,7 +50,7 @@ public class UserService : BaseService, IUserService
       throw new InvalidOperationException(Messages.User.EmailExists);
     }
 
-    var slug = await createSlug(request.Name);
+    var slug = await createSlug();
     var user = new UserEntity
     {
       UserId = Database.Constants.GeneratePrimaryKeyId(),
@@ -271,6 +272,76 @@ public class UserService : BaseService, IUserService
     );
   }
 
+  public async Task<UpdateUserSlugResponse> UpdateUserSlug(
+    UpdateUserSlugRequest request,
+    string userId,
+    CancellationToken cancellationToken = default
+  )
+  {
+    var existingUser = await GetUserAsync(
+      userId: userId,
+      bypassCache: true,
+      cancellationToken: cancellationToken
+    );
+    if (existingUser == null)
+    {
+      throw new KeyNotFoundException(Messages.User.IdDoesNotExist);
+    }
+
+    // Check if the new slug is already taken by another user
+    var existingSlugUser = await GetUserBySlugAsync(
+      slug: request.Slug,
+      bypassCache: true,
+      cancellationToken: cancellationToken
+    );
+    if (existingSlugUser != null && existingSlugUser.UserId != userId)
+    {
+      throw new InvalidOperationException(SlugConstants.Messages.SlugAlreadyTaken);
+    }
+
+    // Store the old slug before updating
+    var oldSlug = existingUser.Slug;
+    existingUser.Slug = request.Slug;
+
+    return await ExecuteWithSaveAsync(
+      async () =>
+      {
+        await UpdateUserAsync(existingUser, cancellationToken);
+        
+        // Evict user cache entries since slug has been updated
+        _cache.Remove(RouteCacheKeys.GetUserByUserId, userId);
+        _cache.Remove(RouteCacheKeys.GetUserByEmail, existingUser.Email);
+        _cache.Remove(RouteCacheKeys.GetUserBySlug, request.Slug);
+        
+        // Also remove the old slug from cache if it was different
+        if (!string.IsNullOrEmpty(oldSlug) && oldSlug != request.Slug)
+        {
+          _cache.Remove(RouteCacheKeys.GetUserBySlug, oldSlug);
+        }
+        
+        return new UpdateUserSlugResponse();
+      },
+      Messages.User.UpdateError,
+      cancellationToken
+    );
+  }
+
+  public async Task<GenerateRandomSlugResponse> GenerateRandomSlug(
+    GenerateRandomSlugRequest request,
+    CancellationToken cancellationToken = default
+  )
+  {
+    return await ExecuteWithSaveAsync(
+      async () =>
+      {
+        var randomSlug = await createSlug();
+        return new GenerateRandomSlugResponse { Slug = randomSlug };
+      },
+      SlugConstants.Messages.FailedToGenerateRandomSlug,
+      cancellationToken
+    );
+  }
+
   private async Task<UserEntity?> GetUserByEmailOrNull(
     string? email,
     CancellationToken cancellationToken
@@ -310,7 +381,7 @@ public class UserService : BaseService, IUserService
     CancellationToken cancellationToken
   )
   {
-    var slug = await createSlug(request.Name);
+    var slug = await createSlug();
     var userId = Database.Constants.GeneratePrimaryKeyId();
     var user = new UserEntity
     {
@@ -326,20 +397,33 @@ public class UserService : BaseService, IUserService
     return userId;
   }
 
-  private async Task<string> createSlug(string name)
+  private async Task<string> createSlug()
   {
-    string baseSlug = StringUtils.Slugify(name);
-    string slug = baseSlug;
+    const int maxAttemptsWithSameBase = 50;
+    const int minRandomNumber = 100;
+    const int maxRandomNumber = 9999;
+    
     var random = new Random();
+    string baseSlug = StringUtils.Slugify();
+    int attemptCount = 0;
 
-    // Keep adding a suffix until it sticks
-    while (await GetUserAsync(slug: slug, bypassCache: true) is not null)
+    while (true)
     {
-      int randomNumber = random.Next(1, 10001);
-      slug = $"{baseSlug}-{randomNumber}";
-    }
+      var randomNumber = random.Next(minRandomNumber, maxRandomNumber);
+      var slug = $"{baseSlug}-{randomNumber}";
+      
+      if (await GetUserAsync(slug: slug, bypassCache: true) is null)
+      {
+        return slug;
+      }
 
-    return slug;
+      attemptCount++;
+      if (attemptCount >= maxAttemptsWithSameBase)
+      {
+        baseSlug = StringUtils.Slugify();
+        attemptCount = 0;
+      }
+    }
   }
 
   #region CRUD Operations
