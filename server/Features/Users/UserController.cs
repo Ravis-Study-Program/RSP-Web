@@ -136,7 +136,7 @@ public class UserController : BaseController
     var userId = GetCurrentUserId();
     if (string.IsNullOrEmpty(userId))
     {
-      return ErrorResponse<UpdateUserSlugResponse>(SlugConstants.Messages.UserIdNotFoundInToken);
+      return ErrorResponse<UpdateUserSlugResponse>(UserMessages.UserIdNotFoundInToken);
     }
 
     var result = await _userService.UpdateUserSlug(request, userId, cancellationToken);
@@ -153,7 +153,7 @@ public class UserController : BaseController
   )
   {
     var result = await _userService.GenerateRandomSlug(request, cancellationToken);
-    return OkResponse(result, SlugConstants.Messages.RandomSlugGeneratedSuccessfully);
+    return OkResponse(result, UserMessages.RandomSlugGeneratedSuccessfully);
   }
 
   #endregion

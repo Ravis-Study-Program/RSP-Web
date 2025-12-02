@@ -11,7 +11,6 @@ using RSPWebAPI.Entities;
 using RSPWebAPI.Features.Constants;
 using RSPWebAPI.Features.Users.Dtos;
 using RSPWebAPI.Features.Users.Interfaces;
-using RSPWebAPI.Shared;
 using RSPWebAPI.Shared.Strings;
 
 namespace RSPWebAPI.Features.Users;
@@ -296,7 +295,7 @@ public class UserService : BaseService, IUserService
     );
     if (existingSlugUser != null && existingSlugUser.UserId != userId)
     {
-      throw new InvalidOperationException(SlugConstants.Messages.SlugAlreadyTaken);
+      throw new InvalidOperationException(UserMessages.SlugAlreadyTaken);
     }
 
     // Store the old slug before updating
@@ -337,7 +336,7 @@ public class UserService : BaseService, IUserService
         var randomSlug = await createSlug();
         return new GenerateRandomSlugResponse { Slug = randomSlug };
       },
-      SlugConstants.Messages.FailedToGenerateRandomSlug,
+      UserMessages.FailedToGenerateRandomSlug,
       cancellationToken
     );
   }
