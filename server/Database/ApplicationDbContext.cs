@@ -1,5 +1,4 @@
 using System.Reflection;
-using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
 using RSPWebAPI.Database.Helpers;
 using RSPWebAPI.Entities;
@@ -42,7 +41,7 @@ public class ApplicationDbContext : DbContext
   public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
   {
     string userId =
-      _httpContextAccessor?.HttpContext?.User.FindFirst(ClaimTypes.Name)?.Value
+      _httpContextAccessor?.HttpContext?.User.FindFirst($"{Constants.Domain}userId")?.Value
       ?? "SYSTEM";
 
     return await SaveChangesWithAuditAsync(userId, cancellationToken);
@@ -54,12 +53,12 @@ public class ApplicationDbContext : DbContext
   )
   {
     var changeSet = ChangeTracker.Entries().ToList();
+    var auditEntries = await AuditHelper.GenerateAuditEntries(userId, changeSet);
 
     var result = await base.SaveChangesAsync(cancellationToken);
 
     try
     {
-      var auditEntries = await AuditHelper.GenerateAuditEntries(userId, changeSet);
       await base.AddRangeAsync(auditEntries, cancellationToken);
       await base.SaveChangesAsync(cancellationToken);
     }
