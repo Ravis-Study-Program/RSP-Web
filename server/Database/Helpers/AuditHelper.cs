@@ -48,10 +48,13 @@ public static class AuditHelper
                     break;
 
                 case EntityState.Modified:
-                    // If entity state modified we still need to check if this specific property is modified or not
-                    if (property.IsModified)
+                    var originalValue = entry.GetDatabaseValues()?.GetValue<object>(propertyName);
+                    var currentValue = property.CurrentValue;
+
+                    var hasChanged = originalValue?.Equals(currentValue) == false;
+                    if (hasChanged)
                     {
-                        auditEntry.OldValues[propertyName] = property.OriginalValue;
+                        auditEntry.OldValues[propertyName] = originalValue;
                         auditEntry.NewValues[propertyName] = property.CurrentValue;
                     }
                     break;
