@@ -270,10 +270,16 @@ public class EnrollmentService : BaseService, IEnrollmentService
       .AsQueryable();
 
     var filterBySeason = !string.IsNullOrEmpty(request.SeasonSlug);
+    var filterByGraduates = request.OnlyGraduates == true;
 
     if (filterBySeason)
     {
       query = query.Where(e => e.Season.Slug == request.SeasonSlug);
+    }
+    
+    if (filterByGraduates)
+    {
+      query = query.Where(e => e.User.IsGraduate);
     }
 
     var enrollmentUsers = await query.ToListAsync(cancellationToken);
@@ -289,9 +295,10 @@ public class EnrollmentService : BaseService, IEnrollmentService
           UserId = e.User.UserId,
           Name = e.User.Name,
           Slug = e.User.Slug,
-          ProfileImage = e.User?.ProfileImage,
+          ProfileImage = e.User.ProfileImage,
           Role = filterBySeason ? e.Role : null,
           StudentRolePromotion = filterBySeason ? e.StudentRolePromotion : null,
+          IsGraduate = e.User.IsGraduate,
         };
       })
       .OrderBy(e => e.Name)

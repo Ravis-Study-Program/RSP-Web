@@ -13,7 +13,7 @@ export default function GraduatesPage() {
     isError: isLoadingEnrollmentUsersError,
     isFetching: isFetchingEnrollmentUsers,
     isLoading: isLoadingEnrollmentUsers,
-  } = useGetEnrollmentUsers();
+  } = useGetEnrollmentUsers({ OnlyGraduates: true });
 
   const users = enrollmentUsersResponse?.responseBody?.enrollmentUsers || [];
   const {

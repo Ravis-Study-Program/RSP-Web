@@ -3,6 +3,7 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import { Layout } from './components/Layout/Layout';
 import { createRouteMeta } from './components/RouteMeta/createRouteMeta';
 import AdminRouteGuard from './shared/auth/AdminRouteGuard';
+import GraduateRouteGuard from './shared/auth/GraduateRouteGuard';
 import SeasonRoleViewRouter from './shared/auth/SeasonRoleViewRouter';
 import SeasonRouteGuard from './shared/auth/SeasonRouteGuard';
 import UnverifiedUserAuthGuard from './shared/auth/UnverifiedUserAuthGuard';
@@ -13,7 +14,7 @@ const AdminMentorshipsPage = lazy(() => import('./pages/Admin/Mentorships/AdminM
 const AdminSeasonsPage = lazy(() => import('./pages/Admin/Seasons/AdminSeasons.page'));
 const AdminSeasonWeeksPage = lazy(() => import('./pages/Admin/SeasonWeeks/AdminSeasonWeeks.page'));
 const AdminUsersPage = lazy(() => import('./pages/Admin/Users/AdminUsers.page'));
-const EmailVerificiationPage = lazy(
+const EmailVerificationPage = lazy(
   () => import('./pages/EmailVerification/EmailVerification.page')
 );
 const GraduatesPage = lazy(() => import('./pages/Graduates/Graduates.page'));
@@ -36,7 +37,7 @@ const routes = (
       {createRouteMeta({
         path: 'verify-email',
         title: 'Email Verification | RSP',
-        element: <EmailVerificiationPage />,
+        element: <EmailVerificationPage />,
       })}
     </Route>
 
@@ -76,17 +77,23 @@ const routes = (
         {createRouteMeta({ path: 'profile', title: 'Profile | RSP', element: <ProfilePage /> })}
         {createRouteMeta({ path: 'settings', title: 'Settings | RSP', element: <SettingsPage /> })}
         {createRouteMeta({ path: 'seasons', title: 'Seasons | RSP', element: <SeasonsPage /> })}
-        {createRouteMeta({
-          path: 'graduates',
-          title: 'Graduates | RSP',
-          element: <GraduatesPage />,
-        })}
-        {createRouteMeta({ path: 'leetcode', title: 'Leetcode | RSP', element: <LeetcodePage /> })}
-        {createRouteMeta({
-          path: 'mock-interviews',
-          title: 'Mock Interviews | RSP',
-          element: <MockInterviewPage />,
-        })}
+        <Route element={<GraduateRouteGuard />}>
+          {createRouteMeta({
+            path: 'graduates',
+            title: 'Graduates | RSP',
+            element: <GraduatesPage />,
+          })}
+          {createRouteMeta({
+            path: 'leetcode',
+            title: 'Leetcode | RSP',
+            element: <LeetcodePage />,
+          })}
+          {createRouteMeta({
+            path: 'mock-interviews',
+            title: 'Mock Interviews | RSP',
+            element: <MockInterviewPage />,
+          })}
+        </Route>
 
         <Route path="seasons/:seasonSlug" element={<SeasonRouteGuard />}>
           <Route index element={<Navigate to="overview" replace />} />

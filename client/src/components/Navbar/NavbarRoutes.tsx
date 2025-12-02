@@ -19,9 +19,10 @@ import { SpotlightActionData } from '@mantine/spotlight';
 import { SeasonRole } from '@/generated/api/client';
 
 export function createNonAdminSpotlightActions(
-  navigate: (path: string) => void
+  navigate: (path: string) => void,
+  isGraduate: boolean | undefined = undefined
 ): SpotlightActionData[] {
-  return [
+  const allActions = [
     {
       id: 'seasons',
       label: 'Seasons',
@@ -58,6 +59,16 @@ export function createNonAdminSpotlightActions(
       leftSection: <IconUser size={24} stroke={1.5} />,
     },
   ];
+
+  // Filter out graduate-only actions for non-graduates
+  if (isGraduate !== true) {
+    return allActions.filter(
+      (action) =>
+        action.id !== 'graduates' && action.id !== 'leetcode' && action.id !== 'mock-interviews'
+    );
+  }
+
+  return allActions;
 }
 
 export interface TabItem {
@@ -367,10 +378,34 @@ const getAdminTabs = (seasonSlug: string | null, resourcesUrl?: string): Tabs =>
     : [],
 });
 
+// Helper function to filter out graduate-only tabs for non-graduates
+const filterGraduateOnlyTabs = (tabs: Tabs, isGraduate: boolean | undefined): Tabs => {
+  if (isGraduate === true) {
+    return tabs; // Graduates can see everything
+  }
+
+  const filterTabs = (items: TabItem[]): TabItem[] => {
+    return items.filter((item) => {
+      // Hide graduates, leetcode and mock interview tabs for non-graduates
+      return (
+        !item.link?.includes('/graduates') &&
+        !item.link?.includes('/leetcode') &&
+        !item.link?.includes('/mock-interviews')
+      );
+    });
+  };
+
+  return {
+    general: filterTabs(tabs.general),
+    season: tabs.season ? filterTabs(tabs.season) : undefined,
+  };
+};
+
 export const getTabs = (
   seasonSlug: string | null,
   isAdmin: boolean,
   role: SeasonRole | null,
+  isGraduate: boolean | undefined = undefined,
   resourcesUrl?: string
 ) => {
   let tabs: Tabs = noSeasonSelectedTabs;
@@ -384,7 +419,7 @@ export const getTabs = (
   }
 
   if (role == null) {
-    return tabs;
+    return filterGraduateOnlyTabs(tabs, isGraduate);
   }
 
   switch (role) {
@@ -399,7 +434,7 @@ export const getTabs = (
       break;
   }
 
-  return tabs;
+  return filterGraduateOnlyTabs(tabs, isGraduate);
 };
 
 export const lookupTabByLink = (
@@ -407,9 +442,10 @@ export const lookupTabByLink = (
   seasonSlug: string | null,
   isAdmin: boolean,
   role: SeasonRole | null,
+  isGraduate: boolean | undefined = undefined,
   resourcesUrl?: string
 ): TabItem | undefined => {
-  const tabs = getTabs(seasonSlug, isAdmin, role, resourcesUrl);
+  const tabs = getTabs(seasonSlug, isAdmin, role, isGraduate, resourcesUrl);
   const allTabs = [...tabs.general, ...(tabs.season || [])];
 
   // Search through link and links if applicable

@@ -454,6 +454,7 @@ export interface AdminUserDto {
   slug: string;
   /** @nullable */
   profileImage?: string | null;
+  isGraduate: boolean;
   /** @nullable */
   deletedAtUtc?: string | null;
 }
@@ -473,6 +474,8 @@ export interface BehaviouralMockInterviewRoundEntity {
   /** @minLength 1 */
   behaviouralMockInterviewRoundId: string;
   behavioralScore: number;
+  createdAtUtc: string;
+  updatedAtUtc: string;
   /** @nullable */
   deletedAtUtc?: string | null;
 }
@@ -562,6 +565,8 @@ export interface CustomMockInterviewRoundEntity {
   link?: string | null;
   isReviewed: boolean;
   score: number;
+  createdAtUtc: string;
+  updatedAtUtc: string;
   /** @nullable */
   deletedAtUtc?: string | null;
 }
@@ -576,6 +581,8 @@ export interface CustomProblemEntity {
   /** @minLength 1 */
   question: string;
   problem?: ProblemEntity;
+  createdAtUtc: string;
+  updatedAtUtc: string;
   /** @nullable */
   deletedAtUtc?: string | null;
 }
@@ -627,6 +634,8 @@ export interface EnrollmentEntity {
   studentRolePromotion: SeasonStudentRolePromotion;
   season?: SeasonEntity;
   user?: UserEntity;
+  createdAtUtc: string;
+  updatedAtUtc: string;
   /** @nullable */
   deletedAtUtc?: string | null;
 }
@@ -670,6 +679,7 @@ export interface EnrollmentUserDto {
   profileImage?: string | null;
   role?: SeasonRole;
   studentRolePromotion?: SeasonStudentRolePromotion;
+  isGraduate: boolean;
 }
 
 export interface GenerateLeetcodeProblemRecommendationRequest {
@@ -853,6 +863,8 @@ export interface LeetcodeMockInterviewRoundEntity {
   testingScore: number;
   isReviewed: boolean;
   leetcodeProblem?: LeetcodeProblemEntity;
+  createdAtUtc: string;
+  updatedAtUtc: string;
   /** @nullable */
   deletedAtUtc?: string | null;
 }
@@ -862,6 +874,8 @@ export interface LeetcodeProblemCategoryEntity {
   leetcodeProblemCategoryId: string;
   /** @minLength 1 */
   name: string;
+  createdAtUtc: string;
+  updatedAtUtc: string;
   /** @nullable */
   deletedAtUtc?: string | null;
 }
@@ -898,6 +912,8 @@ export interface LeetcodeProblemEntity {
   problem?: ProblemEntity;
   /** @nullable */
   leetcodeProblemCategories?: LeetcodeProblemCategoryEntity[] | null;
+  createdAtUtc: string;
+  updatedAtUtc: string;
   /** @nullable */
   deletedAtUtc?: string | null;
 }
@@ -1003,6 +1019,8 @@ export interface MockInterviewEntity {
   /** @nullable */
   mockInterviewRounds?: MockInterviewRoundEntity[] | null;
   seasonWeek?: SeasonWeekEntity;
+  createdAtUtc: string;
+  updatedAtUtc: string;
   /** @nullable */
   deletedAtUtc?: string | null;
 }
@@ -1032,6 +1050,8 @@ export interface MockInterviewRoundEntity {
   behaviouralMockInterviewRound?: BehaviouralMockInterviewRoundEntity;
   leetcodeMockInterviewRound?: LeetcodeMockInterviewRoundEntity;
   customMockInterviewRound?: CustomMockInterviewRoundEntity;
+  createdAtUtc: string;
+  updatedAtUtc: string;
   /** @nullable */
   deletedAtUtc?: string | null;
 }
@@ -1058,6 +1078,8 @@ export interface ProblemAttemptEntity {
   customProblem?: CustomProblemEntity;
   enrollment?: EnrollmentEntity;
   seasonWeek?: SeasonWeekEntity;
+  createdAtUtc: string;
+  updatedAtUtc: string;
   /** @nullable */
   deletedAtUtc?: string | null;
 }
@@ -1069,6 +1091,8 @@ export interface ProblemEntity {
   title: string;
   /** @minLength 1 */
   link: string;
+  createdAtUtc: string;
+  updatedAtUtc: string;
   /** @nullable */
   deletedAtUtc?: string | null;
 }
@@ -1089,6 +1113,8 @@ export interface SeasonEntity {
   /** @minLength 1 */
   resourcesUrl: string;
   isDataBackFilled: boolean;
+  createdAtUtc: string;
+  updatedAtUtc: string;
   /** @nullable */
   deletedAtUtc?: string | null;
 }
@@ -1123,6 +1149,8 @@ export interface SeasonWeekEntity {
   startDate: string;
   endDate: string;
   season?: SeasonEntity;
+  createdAtUtc: string;
+  updatedAtUtc: string;
   /** @nullable */
   deletedAtUtc?: string | null;
 }
@@ -1256,6 +1284,9 @@ export interface UserEntity {
   slug: string;
   /** @nullable */
   profileImage?: string | null;
+  isGraduate: boolean;
+  createdAtUtc: string;
+  updatedAtUtc: string;
   /** @nullable */
   deletedAtUtc?: string | null;
 }
@@ -1283,6 +1314,7 @@ export type GetIsCurrentUserEnrolledParams = {
 
 export type GetEnrollmentUsersParams = {
   SeasonSlug?: string;
+  OnlyGraduates?: boolean;
 };
 
 export type AdminPopulateLeetcodeQuestionsParams = {

@@ -88,7 +88,7 @@ export function Navbar({
       ?.map((item) => <LinksGroup activeLink={pathname} {...item} key={item.label} />) ?? [];
 
   const adminSpotlightActions = createAdminSpotlightActions(navigate);
-  const nonAdminSpotlightActions = createNonAdminSpotlightActions(navigate);
+  const nonAdminSpotlightActions = createNonAdminSpotlightActions(navigate, user?.isGraduate);
 
   if (isLoading) {
     return <NavbarSkeleton />;
