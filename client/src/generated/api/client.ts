@@ -689,6 +689,22 @@ export interface GenerateLeetcodeProblemRecommendationResponseApiResponse {
   responseBody?: GenerateLeetcodeProblemRecommendationResponse;
 }
 
+export interface GenerateRandomSlugRequest {
+  [key: string]: unknown;
+}
+
+export interface GenerateRandomSlugResponse {
+  /** @minLength 1 */
+  slug: string;
+}
+
+export interface GenerateRandomSlugResponseApiResponse {
+  error?: ApiError;
+  /** @nullable */
+  successMessage?: string | null;
+  responseBody?: GenerateRandomSlugResponse;
+}
+
 export interface GetCurrentUserMenteesListResponse {
   mentorships: MentorshipResponse[];
 }
@@ -1209,6 +1225,22 @@ export interface UpdateStudentRolePromotionResponseApiResponse {
   /** @nullable */
   successMessage?: string | null;
   responseBody?: UpdateStudentRolePromotionResponse;
+}
+
+export interface UpdateUserSlugRequest {
+  /** @minLength 1 */
+  slug: string;
+}
+
+export interface UpdateUserSlugResponse {
+  [key: string]: unknown;
+}
+
+export interface UpdateUserSlugResponseApiResponse {
+  error?: ApiError;
+  /** @nullable */
+  successMessage?: string | null;
+  responseBody?: UpdateUserSlugResponse;
 }
 
 export interface UserEntity {
@@ -5534,3 +5566,152 @@ export function useGetUser<TData = Awaited<ReturnType<typeof getUser>>, TError =
 
   return query;
 }
+
+export const updateUserSlug = (
+  updateUserSlugRequest: UpdateUserSlugRequest,
+  options?: SecondParameter<typeof CustomAxiosInstance>
+) => {
+  return CustomAxiosInstance<UpdateUserSlugResponseApiResponse>(
+    {
+      url: `http://localhost:4000/api/v1/users/update-slug`,
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      data: updateUserSlugRequest,
+    },
+    options
+  );
+};
+
+export const getUpdateUserSlugMutationOptions = <TError = unknown, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updateUserSlug>>,
+    TError,
+    { data: UpdateUserSlugRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof updateUserSlug>>,
+  TError,
+  { data: UpdateUserSlugRequest },
+  TContext
+> => {
+  const mutationKey = ['updateUserSlug'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof updateUserSlug>>,
+    { data: UpdateUserSlugRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return updateUserSlug(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type UpdateUserSlugMutationResult = NonNullable<Awaited<ReturnType<typeof updateUserSlug>>>;
+export type UpdateUserSlugMutationBody = UpdateUserSlugRequest;
+export type UpdateUserSlugMutationError = unknown;
+
+export const useUpdateUserSlug = <TError = unknown, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updateUserSlug>>,
+    TError,
+    { data: UpdateUserSlugRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof updateUserSlug>>,
+  TError,
+  { data: UpdateUserSlugRequest },
+  TContext
+> => {
+  const mutationOptions = getUpdateUserSlugMutationOptions(options);
+
+  return useMutation(mutationOptions);
+};
+
+export const generateRandomSlug = (
+  generateRandomSlugRequest: GenerateRandomSlugRequest,
+  options?: SecondParameter<typeof CustomAxiosInstance>,
+  signal?: AbortSignal
+) => {
+  return CustomAxiosInstance<GenerateRandomSlugResponseApiResponse>(
+    {
+      url: `http://localhost:4000/api/v1/users/generate-random-slug`,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      data: generateRandomSlugRequest,
+      signal,
+    },
+    options
+  );
+};
+
+export const getGenerateRandomSlugMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof generateRandomSlug>>,
+    TError,
+    { data: GenerateRandomSlugRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof generateRandomSlug>>,
+  TError,
+  { data: GenerateRandomSlugRequest },
+  TContext
+> => {
+  const mutationKey = ['generateRandomSlug'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof generateRandomSlug>>,
+    { data: GenerateRandomSlugRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return generateRandomSlug(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type GenerateRandomSlugMutationResult = NonNullable<
+  Awaited<ReturnType<typeof generateRandomSlug>>
+>;
+export type GenerateRandomSlugMutationBody = GenerateRandomSlugRequest;
+export type GenerateRandomSlugMutationError = unknown;
+
+export const useGenerateRandomSlug = <TError = unknown, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof generateRandomSlug>>,
+    TError,
+    { data: GenerateRandomSlugRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof generateRandomSlug>>,
+  TError,
+  { data: GenerateRandomSlugRequest },
+  TContext
+> => {
+  const mutationOptions = getGenerateRandomSlugMutationOptions(options);
+
+  return useMutation(mutationOptions);
+};

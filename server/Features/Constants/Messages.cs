@@ -106,6 +106,13 @@ public sealed class UserMessages : EntityMessages
 
   public string NotInSeasonRole(string role) =>
     $"This user is not registered as a {role} for the specified season.";
+  
+  public const string UserIdNotFoundInToken = "User ID not found in token";
+  public const string SlugAlreadyTaken = "This slug is already taken by another user.";
+  public const string RandomSlugGeneratedSuccessfully = "Random slug generated successfully";
+  public const string FailedToGenerateRandomSlug = "Failed to generate random slug";
+  public const string SlugRequired = "Slug is required";
+  public const string SeasonSlugRequired = "Season slug is required";
 }
 
 public sealed class EnrollmentMessages : EntityMessages

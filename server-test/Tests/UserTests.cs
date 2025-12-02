@@ -272,4 +272,70 @@ public class UserTests : BaseIntegrationTest, IAsyncLifetime
     Assert.Contains(users, u => u.UserId == testUserResponse.UserId && u.IsTestUser);
     Assert.DoesNotContain(users, u => u.UserId == toDeleteUserResponse.UserId);
   }
+
+  [Fact]
+  public async Task UpdateUserSlug_Should_Update_Slug_Successfully()
+  {
+    var userId = await _seeder.SeedUserAsync();
+    var newSlug = _faker.Lorem.Slug();
+
+    var updateRequest = new UpdateUserSlugRequest { Slug = newSlug };
+    var response = await UserService.UpdateUserSlug(updateRequest, userId);
+
+    Assert.NotNull(response);
+    
+    var updatedUser = await UserService.GetUserAsync(userId: userId);
+    Assert.NotNull(updatedUser);
+    Assert.Equal(newSlug, updatedUser.Slug);
+  }
+
+  [Fact]
+  public async Task UpdateUserSlug_Should_Throw_When_User_Not_Found()
+  {
+    var nonExistentUserId = _faker.Random.AlphaNumeric(16);
+    var updateRequest = new UpdateUserSlugRequest { Slug = _faker.Lorem.Slug() };
+
+    var exception = await Assert.ThrowsAsync<KeyNotFoundException>(
+      async () => await UserService.UpdateUserSlug(updateRequest, nonExistentUserId)
+    );
+
+    Assert.Equal(Messages.User.IdDoesNotExist, exception.Message);
+  }
+
+  [Fact]
+  public async Task UpdateUserSlug_Should_Throw_When_Slug_Already_Taken()
+  {
+    var user1Id = await _seeder.SeedUserAsync();
+    var user2Id = await _seeder.SeedUserAsync();
+    
+    var existingSlug = _faker.Lorem.Slug();
+    var updateUser1Request = new UpdateUserSlugRequest { Slug = existingSlug };
+    await UserService.UpdateUserSlug(updateUser1Request, user1Id);
+
+    var updateUser2Request = new UpdateUserSlugRequest { Slug = existingSlug };
+    
+    var exception = await Assert.ThrowsAsync<InvalidOperationException>(
+      async () => await UserService.UpdateUserSlug(updateUser2Request, user2Id)
+    );
+
+    Assert.Contains("already taken", exception.Message);
+  }
+
+  [Fact]
+  public async Task UpdateUserSlug_Should_Allow_User_To_Keep_Same_Slug()
+  {
+    var userId = await _seeder.SeedUserAsync();
+    var user = await UserService.GetUserAsync(userId: userId);
+    Assert.NotNull(user);
+    
+    var currentSlug = user.Slug;
+    var updateRequest = new UpdateUserSlugRequest { Slug = currentSlug };
+    
+    var response = await UserService.UpdateUserSlug(updateRequest, userId);
+    Assert.NotNull(response);
+    
+    var updatedUser = await UserService.GetUserAsync(userId: userId);
+    Assert.NotNull(updatedUser);
+    Assert.Equal(currentSlug, updatedUser.Slug);
+  }
 }
