@@ -2,8 +2,8 @@ import { SeasonStudentRolePromotion } from '@/generated/api/client';
 
 export const SeasonStudentRolePromotionColors: Record<SeasonStudentRolePromotion, string> = {
   [SeasonStudentRolePromotion.NotApplicable]: '#a3a7b1',
-  [SeasonStudentRolePromotion.Novice]: '#a3a7b1',
-  [SeasonStudentRolePromotion.Beginner]: '#27922b',
+  [SeasonStudentRolePromotion.Novice]: '#27922b',
+  [SeasonStudentRolePromotion.Beginner]: '#a3a7b1',
   [SeasonStudentRolePromotion.Intermediate]: '#498cff',
   [SeasonStudentRolePromotion.Advanced]: '#e44ffd',
 };
