@@ -3,16 +3,16 @@ using RSPWebAPI.Database;
 
 namespace RSPWebAPI.Jobs;
 
-public class AuditLogCleaner(ServiceProvider serviceProvider) : BackgroundService
+public class AuditLogCleaner(IServiceProvider serviceProvider, TimeSpan? interval = null) : BackgroundService
 {
-    private readonly ServiceProvider _serviceProvider = serviceProvider;
-
+    private readonly IServiceProvider _serviceProvider = serviceProvider;
+    private readonly TimeSpan _interval = interval ?? TimeSpan.FromDays(1);
     protected override async Task ExecuteAsync(CancellationToken cancellationToken)
     {
         Console.WriteLine("[Audit Log Cleaner] Scheduled job started");
 
-        // Roughly once every 3 months which corresponds to a standard RSP season
-        using var timer = new PeriodicTimer(TimeSpan.FromDays(1));
+        // Will execute roughly once every 3 months which corresponds to a standard RSP season
+        using var timer = new PeriodicTimer(_interval);
 
         while (await timer.WaitForNextTickAsync(cancellationToken))
         {
