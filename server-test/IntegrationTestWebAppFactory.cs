@@ -1,6 +1,8 @@
 using System.Data.Common;
+using System.Security.Claims;
 using DotNet.Testcontainers.Builders;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
@@ -36,7 +38,8 @@ public class IntegrationTestWebAppFactory : WebApplicationFactory<Program>, IAsy
   private DbConnection _connection = null!;
 
   public Mock<IUserIdentityService> MockUserIdentityService { get; } = new();
-
+  public Mock<IHttpContextAccessor> MockHttpContextAccessor { get; } = new();
+  public string UserId { get; } = "test-user-id";
   public async Task ResetDatabase()
   {
     await _respawner.ResetAsync(_connection);
@@ -51,6 +54,18 @@ public class IntegrationTestWebAppFactory : WebApplicationFactory<Program>, IAsy
 
     _connection = Db.Database.GetDbConnection();
     await _connection.OpenAsync();
+
+    var fakeUser = new ClaimsPrincipal(
+      new ClaimsIdentity([new Claim($"{Constants.Domain}userId", UserId)],
+      "TestAuth"
+    ));
+
+    var httpContextMock = new Mock<HttpContext>();
+    httpContextMock.Setup(c => c.User).Returns(fakeUser);
+
+    MockHttpContextAccessor
+        .Setup(a => a.HttpContext)
+        .Returns(httpContextMock.Object);
 
     _respawner = await Respawner.CreateAsync(
       _connection,
@@ -85,6 +100,14 @@ public class IntegrationTestWebAppFactory : WebApplicationFactory<Program>, IAsy
         services.Remove(descriptor);
       }
       services.AddSingleton(MockUserIdentityService.Object);
+
+      var httpContextDescriptor = services.SingleOrDefault(
+          d => d.ServiceType == typeof(IHttpContextAccessor)
+      );
+      if (descriptor != null)
+        services.Remove(descriptor);
+
+      services.AddSingleton(MockHttpContextAccessor.Object);
 
       var memCacheDescriptor = services.SingleOrDefault(d =>
         d.ServiceType == typeof(IRequestCache)
