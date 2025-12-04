@@ -243,15 +243,6 @@ public class MockInterviewService : BaseService, IMockInterviewService
       cancellationToken: cancellationToken
     );
 
-    // Get total count (expensive, only if needed by UI)
-    int? totalCount = null;
-    if (request.PageSize.HasValue) // Only compute if pagination is being used
-    {
-      totalCount = await _mockInterviewRepository.Table
-        .Where(predicate)
-        .CountAsync(cancellationToken);
-    }
-
     // Build next cursor from last item
     string? nextCursor = null;
     if (hasMore && items.Count > 0)
@@ -271,8 +262,7 @@ public class MockInterviewService : BaseService, IMockInterviewService
       Items = items.ToList(),
       NextCursor = nextCursor,
       PreviousCursor = previousCursor,
-      HasMore = hasMore,
-      TotalCount = totalCount
+      HasMore = hasMore
     };
   }
 
