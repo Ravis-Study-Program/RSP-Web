@@ -85,7 +85,7 @@ public class SaveChangesBehaviourTests(IntegrationTestWebAppFactory factory) : B
 
         Assert.NotNull(changes);
 
-        var adminChange = changes.First(change => change["Column"]!.ToString() == "IsAdmin");
+        var adminChange = changes.FirstOrDefault(change => change["Column"]!.ToString() == "IsAdmin");
         Assert.NotNull(adminChange);
 
         Assert.Equal("False", adminChange["OldValue"]!.ToString());
