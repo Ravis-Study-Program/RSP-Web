@@ -32,6 +32,9 @@ public class UserEntity : IBaseEntity, ISoftDelete
   public string? ProfileImage { get; set; }
 
   [Required]
+  public bool IsGraduate { get; set; }
+
+  [Required]
   public DateTime CreatedAtUtc { get; set; }
 
   [Required]
@@ -72,6 +75,7 @@ public class UserEntityConfiguration : IEntityTypeConfiguration<UserEntity>
       .Property(x => x.ProfileImage)
       .HasColumnName("ProfileImage")
       .HasColumnType("varchar(255)");
+    builder.Property(x => x.IsGraduate).HasColumnName("IsGraduate").IsRequired();
     builder
       .Property(x => x.CreatedAtUtc)
       .HasColumnName("CreatedAtUtc")

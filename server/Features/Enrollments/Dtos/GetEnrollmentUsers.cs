@@ -6,6 +6,7 @@ namespace RSPWebAPI.Features.Enrollments.Dtos;
 public record GetEnrollmentUsersRequest
 {
   public string? SeasonSlug { get; set; }
+  public bool? OnlyGraduates { get; set; }
 }
 
 public record EnrollmentUserDto
@@ -24,6 +25,9 @@ public record EnrollmentUserDto
   public SeasonRole? Role { get; set; }
 
   public SeasonStudentRolePromotion? StudentRolePromotion { get; set; }
+  
+  [Required]
+  public bool IsGraduate { get; set; }
 }
 
 public record GetEnrollmentUsersResponse

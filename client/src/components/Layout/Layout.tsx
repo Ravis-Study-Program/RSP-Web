@@ -35,7 +35,7 @@ export function Layout() {
     (enrollment) => enrollment.seasonSlug === seasonSlug
   )?.seasonResourcesUrl;
 
-  const tabs = getTabs(seasonSlug, isAdmin, role, resourcesUrl);
+  const tabs = getTabs(seasonSlug, isAdmin, role, user?.isGraduate, resourcesUrl);
 
   const getBreadcrumbLinks = () => {
     if (isLoading || isLoadingEnrollments || isFetchingEnrollments) {
@@ -46,7 +46,14 @@ export function Layout() {
     let currentPath = '';
     for (let i = 0; i < pathSegments.length; i++) {
       currentPath += `/${pathSegments[i]}`;
-      const tab = lookupTabByLink(currentPath, seasonSlug, isAdmin, role, resourcesUrl);
+      const tab = lookupTabByLink(
+        currentPath,
+        seasonSlug,
+        isAdmin,
+        role,
+        user?.isGraduate,
+        resourcesUrl
+      );
       if (tab) {
         breadcrumbs.push(tab);
       }

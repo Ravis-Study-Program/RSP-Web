@@ -40,6 +40,7 @@ using RSPWebAPI.Features.SeasonWeeks;
 using RSPWebAPI.Features.SeasonWeeks.Interfaces;
 using RSPWebAPI.Features.Users;
 using RSPWebAPI.Features.Users.Interfaces;
+using RSPWebAPI.Features.BackgroundServices;
 using RSPWebAPI.Jobs;
 using RSPWebAPI.Shared;
 using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
@@ -158,6 +159,7 @@ if (!env.IsDevelopment())
 {
   builder.Services.AddHostedService<LeetcodeQuestionScraper>();
   builder.Services.AddHostedService<AuditLogCleaner>();
+  builder.Services.AddHostedService<UpdateGraduateStatusService>();
 }
 builder.Services.AddScoped<DbContext, ApplicationDbContext>();
 builder.Services.AddScoped(typeof(IRepository<>), typeof(EntityRepository<>));

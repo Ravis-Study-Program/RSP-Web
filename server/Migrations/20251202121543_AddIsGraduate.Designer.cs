@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using RSPWebAPI.Database;
@@ -11,9 +12,11 @@ using RSPWebAPI.Database;
 namespace RSPWebAPI.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251202121543_AddIsGraduate")]
+    partial class AddIsGraduate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -35,43 +38,6 @@ namespace RSPWebAPI.Migrations
                     b.HasIndex("LeetcodeProblemEntityLeetcodeProblemId");
 
                     b.ToTable("LeetcodeProblemCategoryMapping", (string)null);
-                });
-
-            modelBuilder.Entity("RSPWebAPI.Entities.AuditEventEntity", b =>
-                {
-                    b.Property<string>("AuditId")
-                        .HasColumnType("varchar(16)")
-                        .HasColumnName("AuditId");
-
-                    b.Property<string>("AffectedEntityKey")
-                        .IsRequired()
-                        .HasColumnType("varchar(16)")
-                        .HasColumnName("AffectedEntityKey");
-
-                    b.Property<DateTime>("AuditedAtUtc")
-                        .HasColumnType("timestamptz")
-                        .HasColumnName("AuditedAtUtc");
-
-                    b.Property<string>("ChangeState")
-                        .IsRequired()
-                        .HasColumnType("jsonb")
-                        .HasColumnName("ChangeState");
-
-                    b.Property<string>("ModifiedByUserId")
-                        .IsRequired()
-                        .HasColumnType("varchar(16)")
-                        .HasColumnName("ModifiedByUserId");
-
-                    b.Property<string>("TableName")
-                        .IsRequired()
-                        .HasColumnType("varchar(100)")
-                        .HasColumnName("TableName");
-
-                    b.HasKey("AuditId");
-
-                    b.HasIndex("TableName", "AffectedEntityKey");
-
-                    b.ToTable("AuditEvent", (string)null);
                 });
 
             modelBuilder.Entity("RSPWebAPI.Entities.BehaviouralMockInterviewRoundEntity", b =>

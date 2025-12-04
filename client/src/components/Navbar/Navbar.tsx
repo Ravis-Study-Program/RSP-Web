@@ -4,6 +4,7 @@ import {
   IconLogout,
   IconMoon,
   IconSearch,
+  IconSettings,
   IconSun,
   IconTrophy,
   IconUser,
@@ -87,7 +88,7 @@ export function Navbar({
       ?.map((item) => <LinksGroup activeLink={pathname} {...item} key={item.label} />) ?? [];
 
   const adminSpotlightActions = createAdminSpotlightActions(navigate);
-  const nonAdminSpotlightActions = createNonAdminSpotlightActions(navigate);
+  const nonAdminSpotlightActions = createNonAdminSpotlightActions(navigate, user?.isGraduate);
 
   if (isLoading) {
     return <NavbarSkeleton />;
@@ -194,6 +195,13 @@ export function Navbar({
               to="/profile"
             >
               Profile
+            </Menu.Item>
+            <Menu.Item
+              leftSection={<IconSettings style={{ width: rem(14), height: rem(14) }} />}
+              component={Link}
+              to="/settings"
+            >
+              Settings
             </Menu.Item>
             <Menu.Item
               onClick={() => setColorScheme(computedColorScheme === 'light' ? 'dark' : 'light')}
