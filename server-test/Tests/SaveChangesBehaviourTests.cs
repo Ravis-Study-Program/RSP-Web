@@ -8,6 +8,7 @@ using Xunit;
 
 namespace RSPWebAPI.Tests.Tests;
 
+[Collection(nameof(DatabaseTestCollection))]
 public class SaveChangesBehaviourTests(IntegrationTestWebAppFactory factory) : BaseIntegrationTest(factory), IAsyncLifetime
 {
     private readonly IntegrationTestWebAppFactory _factory = factory;
@@ -44,7 +45,7 @@ public class SaveChangesBehaviourTests(IntegrationTestWebAppFactory factory) : B
         var changes = JsonSerializer.Deserialize<List<Dictionary<string, object?>>>(auditEvent.ChangeState);
 
         Assert.NotNull(changes);
-        Assert.Equal(10, changes.Count);
+        Assert.Equal(11, changes.Count);
 
         Assert.Equal(user.Email, changes.First(c => c["Column"]!.ToString() == "Email")["NewValue"]!.ToString());
         Assert.Equal(user.Name, changes.First(c => c["Column"]!.ToString() == "Name")["NewValue"]!.ToString());
