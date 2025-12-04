@@ -108,7 +108,7 @@ export const getSeasonWeeks = (seasonWeeks: SeasonWeekEntity[]) => {
 export const getUsers = (users: EnrollmentUserDto[]) => {
   return users
     ?.map((user) => ({
-      value: user.name,
+      value: user.userId,
       label: user.name,
     }))
     .sort((a, b) => a.label.localeCompare(b.label));
