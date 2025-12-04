@@ -228,7 +228,7 @@ public class LeetcodeService : BaseService, ILeetcodeService
   {
     var response = await _cache.GetOrCreateAsync(
       routeKey: RouteCacheKeys.ListLeetcodeProblems,
-      primaryKey: "all",
+      primaryKey: null,
       factory: () => _listLeetcodeProblems(request, cancellationToken),
       ttl: TimeSpan.FromDays(1)
     );
@@ -246,19 +246,13 @@ public class LeetcodeService : BaseService, ILeetcodeService
     CancellationToken cancellationToken = default
   )
   {
-    Func<IQueryable<LeetcodeProblemEntity>, IQueryable<LeetcodeProblemEntity>> include = q =>
-    {
-      return q.Include(l => l.Problem).Include(l => l.LeetcodeProblemCategories);
-    };
-
     var leetcodeProblems = await GetAllLeetcodeProblemsAsync(
-      predicate: null,
+      null,
       cancellationToken,
-      include
+      q => q.Include(l => l.Problem).Include(l => l.LeetcodeProblemCategories)
     );
-
     var formattedLeetcodeProblems = leetcodeProblems
-      .OrderBy(l => l.LeetcodeNumber)
+      .OrderBy(x => x.LeetcodeNumber)
       .Select(l => new LeetcodeProblemDto
       {
         LeetcodeProblemId = l.LeetcodeProblemId,

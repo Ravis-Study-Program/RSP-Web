@@ -454,6 +454,7 @@ export interface AdminUserDto {
   slug: string;
   /** @nullable */
   profileImage?: string | null;
+  isGraduate: boolean;
   /** @nullable */
   deletedAtUtc?: string | null;
 }
@@ -473,6 +474,8 @@ export interface BehaviouralMockInterviewRoundEntity {
   /** @minLength 1 */
   behaviouralMockInterviewRoundId: string;
   behavioralScore: number;
+  createdAtUtc: string;
+  updatedAtUtc: string;
   /** @nullable */
   deletedAtUtc?: string | null;
 }
@@ -562,6 +565,8 @@ export interface CustomMockInterviewRoundEntity {
   link?: string | null;
   isReviewed: boolean;
   score: number;
+  createdAtUtc: string;
+  updatedAtUtc: string;
   /** @nullable */
   deletedAtUtc?: string | null;
 }
@@ -576,6 +581,8 @@ export interface CustomProblemEntity {
   /** @minLength 1 */
   question: string;
   problem?: ProblemEntity;
+  createdAtUtc: string;
+  updatedAtUtc: string;
   /** @nullable */
   deletedAtUtc?: string | null;
 }
@@ -627,6 +634,8 @@ export interface EnrollmentEntity {
   studentRolePromotion: SeasonStudentRolePromotion;
   season?: SeasonEntity;
   user?: UserEntity;
+  createdAtUtc: string;
+  updatedAtUtc: string;
   /** @nullable */
   deletedAtUtc?: string | null;
 }
@@ -670,6 +679,7 @@ export interface EnrollmentUserDto {
   profileImage?: string | null;
   role?: SeasonRole;
   studentRolePromotion?: SeasonStudentRolePromotion;
+  isGraduate: boolean;
 }
 
 export interface GenerateLeetcodeProblemRecommendationRequest {
@@ -687,6 +697,22 @@ export interface GenerateLeetcodeProblemRecommendationResponseApiResponse {
   /** @nullable */
   successMessage?: string | null;
   responseBody?: GenerateLeetcodeProblemRecommendationResponse;
+}
+
+export interface GenerateRandomSlugRequest {
+  [key: string]: unknown;
+}
+
+export interface GenerateRandomSlugResponse {
+  /** @minLength 1 */
+  slug: string;
+}
+
+export interface GenerateRandomSlugResponseApiResponse {
+  error?: ApiError;
+  /** @nullable */
+  successMessage?: string | null;
+  responseBody?: GenerateRandomSlugResponse;
 }
 
 export interface GetCurrentUserMenteesListResponse {
@@ -837,6 +863,8 @@ export interface LeetcodeMockInterviewRoundEntity {
   testingScore: number;
   isReviewed: boolean;
   leetcodeProblem?: LeetcodeProblemEntity;
+  createdAtUtc: string;
+  updatedAtUtc: string;
   /** @nullable */
   deletedAtUtc?: string | null;
 }
@@ -846,6 +874,8 @@ export interface LeetcodeProblemCategoryEntity {
   leetcodeProblemCategoryId: string;
   /** @minLength 1 */
   name: string;
+  createdAtUtc: string;
+  updatedAtUtc: string;
   /** @nullable */
   deletedAtUtc?: string | null;
 }
@@ -882,6 +912,8 @@ export interface LeetcodeProblemEntity {
   problem?: ProblemEntity;
   /** @nullable */
   leetcodeProblemCategories?: LeetcodeProblemCategoryEntity[] | null;
+  createdAtUtc: string;
+  updatedAtUtc: string;
   /** @nullable */
   deletedAtUtc?: string | null;
 }
@@ -913,7 +945,7 @@ export interface ListMockInterviewResponseApiResponse {
 }
 
 export interface ListProblemAttemptResponse {
-  result: ProblemAttemptEntityPagedResponse;
+  problemAttempts: ProblemAttemptEntity[];
 }
 
 export interface ListProblemAttemptResponseApiResponse {
@@ -987,6 +1019,8 @@ export interface MockInterviewEntity {
   /** @nullable */
   mockInterviewRounds?: MockInterviewRoundEntity[] | null;
   seasonWeek?: SeasonWeekEntity;
+  createdAtUtc: string;
+  updatedAtUtc: string;
   /** @nullable */
   deletedAtUtc?: string | null;
 }
@@ -1016,6 +1050,8 @@ export interface MockInterviewRoundEntity {
   behaviouralMockInterviewRound?: BehaviouralMockInterviewRoundEntity;
   leetcodeMockInterviewRound?: LeetcodeMockInterviewRoundEntity;
   customMockInterviewRound?: CustomMockInterviewRoundEntity;
+  createdAtUtc: string;
+  updatedAtUtc: string;
   /** @nullable */
   deletedAtUtc?: string | null;
 }
@@ -1042,18 +1078,10 @@ export interface ProblemAttemptEntity {
   customProblem?: CustomProblemEntity;
   enrollment?: EnrollmentEntity;
   seasonWeek?: SeasonWeekEntity;
+  createdAtUtc: string;
+  updatedAtUtc: string;
   /** @nullable */
   deletedAtUtc?: string | null;
-}
-
-export interface ProblemAttemptEntityPagedResponse {
-  items: ProblemAttemptEntity[];
-  totalCount: number;
-  page: number;
-  pageSize: number;
-  totalPages: number;
-  hasPreviousPage: boolean;
-  hasNextPage: boolean;
 }
 
 export interface ProblemEntity {
@@ -1063,6 +1091,8 @@ export interface ProblemEntity {
   title: string;
   /** @minLength 1 */
   link: string;
+  createdAtUtc: string;
+  updatedAtUtc: string;
   /** @nullable */
   deletedAtUtc?: string | null;
 }
@@ -1083,6 +1113,8 @@ export interface SeasonEntity {
   /** @minLength 1 */
   resourcesUrl: string;
   isDataBackFilled: boolean;
+  createdAtUtc: string;
+  updatedAtUtc: string;
   /** @nullable */
   deletedAtUtc?: string | null;
 }
@@ -1117,6 +1149,8 @@ export interface SeasonWeekEntity {
   startDate: string;
   endDate: string;
   season?: SeasonEntity;
+  createdAtUtc: string;
+  updatedAtUtc: string;
   /** @nullable */
   deletedAtUtc?: string | null;
 }
@@ -1221,6 +1255,22 @@ export interface UpdateStudentRolePromotionResponseApiResponse {
   responseBody?: UpdateStudentRolePromotionResponse;
 }
 
+export interface UpdateUserSlugRequest {
+  /** @minLength 1 */
+  slug: string;
+}
+
+export interface UpdateUserSlugResponse {
+  [key: string]: unknown;
+}
+
+export interface UpdateUserSlugResponseApiResponse {
+  error?: ApiError;
+  /** @nullable */
+  successMessage?: string | null;
+  responseBody?: UpdateUserSlugResponse;
+}
+
 export interface UserEntity {
   /** @minLength 1 */
   userId: string;
@@ -1234,6 +1284,9 @@ export interface UserEntity {
   slug: string;
   /** @nullable */
   profileImage?: string | null;
+  isGraduate: boolean;
+  createdAtUtc: string;
+  updatedAtUtc: string;
   /** @nullable */
   deletedAtUtc?: string | null;
 }
@@ -1261,6 +1314,7 @@ export type GetIsCurrentUserEnrolledParams = {
 
 export type GetEnrollmentUsersParams = {
   SeasonSlug?: string;
+  OnlyGraduates?: boolean;
 };
 
 export type AdminPopulateLeetcodeQuestionsParams = {
@@ -1293,8 +1347,6 @@ export type ListProblemAttemptParams = {
   IncludeLeetcode: boolean;
   IncludeCustom: boolean;
   SeasonId?: string;
-  Page?: number;
-  PageSize?: number;
 };
 
 export type AdminListSeasonParams = {
@@ -5546,3 +5598,152 @@ export function useGetUser<TData = Awaited<ReturnType<typeof getUser>>, TError =
 
   return query;
 }
+
+export const updateUserSlug = (
+  updateUserSlugRequest: UpdateUserSlugRequest,
+  options?: SecondParameter<typeof CustomAxiosInstance>
+) => {
+  return CustomAxiosInstance<UpdateUserSlugResponseApiResponse>(
+    {
+      url: `http://localhost:4000/api/v1/users/update-slug`,
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      data: updateUserSlugRequest,
+    },
+    options
+  );
+};
+
+export const getUpdateUserSlugMutationOptions = <TError = unknown, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updateUserSlug>>,
+    TError,
+    { data: UpdateUserSlugRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof updateUserSlug>>,
+  TError,
+  { data: UpdateUserSlugRequest },
+  TContext
+> => {
+  const mutationKey = ['updateUserSlug'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof updateUserSlug>>,
+    { data: UpdateUserSlugRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return updateUserSlug(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type UpdateUserSlugMutationResult = NonNullable<Awaited<ReturnType<typeof updateUserSlug>>>;
+export type UpdateUserSlugMutationBody = UpdateUserSlugRequest;
+export type UpdateUserSlugMutationError = unknown;
+
+export const useUpdateUserSlug = <TError = unknown, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updateUserSlug>>,
+    TError,
+    { data: UpdateUserSlugRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof updateUserSlug>>,
+  TError,
+  { data: UpdateUserSlugRequest },
+  TContext
+> => {
+  const mutationOptions = getUpdateUserSlugMutationOptions(options);
+
+  return useMutation(mutationOptions);
+};
+
+export const generateRandomSlug = (
+  generateRandomSlugRequest: GenerateRandomSlugRequest,
+  options?: SecondParameter<typeof CustomAxiosInstance>,
+  signal?: AbortSignal
+) => {
+  return CustomAxiosInstance<GenerateRandomSlugResponseApiResponse>(
+    {
+      url: `http://localhost:4000/api/v1/users/generate-random-slug`,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      data: generateRandomSlugRequest,
+      signal,
+    },
+    options
+  );
+};
+
+export const getGenerateRandomSlugMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof generateRandomSlug>>,
+    TError,
+    { data: GenerateRandomSlugRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof generateRandomSlug>>,
+  TError,
+  { data: GenerateRandomSlugRequest },
+  TContext
+> => {
+  const mutationKey = ['generateRandomSlug'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof generateRandomSlug>>,
+    { data: GenerateRandomSlugRequest }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return generateRandomSlug(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type GenerateRandomSlugMutationResult = NonNullable<
+  Awaited<ReturnType<typeof generateRandomSlug>>
+>;
+export type GenerateRandomSlugMutationBody = GenerateRandomSlugRequest;
+export type GenerateRandomSlugMutationError = unknown;
+
+export const useGenerateRandomSlug = <TError = unknown, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof generateRandomSlug>>,
+    TError,
+    { data: GenerateRandomSlugRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof CustomAxiosInstance>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof generateRandomSlug>>,
+  TError,
+  { data: GenerateRandomSlugRequest },
+  TContext
+> => {
+  const mutationOptions = getGenerateRandomSlugMutationOptions(options);
+
+  return useMutation(mutationOptions);
+};

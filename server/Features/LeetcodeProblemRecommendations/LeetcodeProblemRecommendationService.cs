@@ -82,7 +82,7 @@ public class LeetcodeProblemRecommendationService
     );
     var problemRecommendation = await GenerateRandom(
       problemAttemptsResponse
-        ?.Result.Items.Select(dto => new ProblemAttemptEntity
+        ?.ProblemAttempts.Select(dto => new ProblemAttemptEntity
         {
           ProblemAttemptId = dto.ProblemAttemptId,
           AttemptStartDateUtc = dto.AttemptStartDateUtc,

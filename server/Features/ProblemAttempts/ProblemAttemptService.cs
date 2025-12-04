@@ -171,26 +171,33 @@ public class ProblemAttemptService : BaseService, IProblemAttemptService
     CancellationToken cancellationToken = default
   )
   {
-    // Build cache key - differentiate between paginated and non-paginated requests
-    var userIdsKey = string.Join("-", request.UserIds.Distinct().OrderBy(x => x));
-    var isPaginated = request.Page.HasValue && request.PageSize.HasValue;
-    var paginationKey = isPaginated ? $"p{request.Page}-ps{request.PageSize}" : "all";
-    var cacheKey =
-      $"{paginationKey}-u{userIdsKey}-s{request.SeasonId ?? "all"}-lc{request.IncludeLeetcode}-c{request.IncludeCustom}";
+    var allProblemAttempts = new List<ProblemAttemptEntity>();
 
-    var response = await _cache.GetOrCreateAsync(
-      routeKey: RouteCacheKeys.ListProblemAttempts,
-      primaryKey: cacheKey,
-      factory: () => _listProblemAttempt(request, cancellationToken),
-      ttl: TimeSpan.FromDays(1)
-    );
-
-    if (response == null)
+    foreach (var userId in request.UserIds.Distinct())
     {
-      throw new InvalidOperationException("Error listing problem attempts");
+      var modifiedRequest = new ListProblemAttemptRequest
+      {
+        UserIds = new List<string> { userId },
+        SeasonId = request.SeasonId,
+        IncludeLeetcode = request.IncludeLeetcode,
+        IncludeCustom = request.IncludeCustom,
+      };
+
+      var response = await _cache.GetOrCreateAsync(
+        routeKey: RouteCacheKeys.ListProblemAttempts,
+        primaryKey: userId,
+        factory: () => _listProblemAttempt(modifiedRequest, cancellationToken),
+        ttl: TimeSpan.FromHours(1)
+      );
+      if (response == null)
+      {
+        throw new InvalidOperationException("Error listing problem attempts");
+      }
+
+      allProblemAttempts.AddRange(response.ProblemAttempts);
     }
 
-    return response;
+    return new ListProblemAttemptResponse { ProblemAttempts = allProblemAttempts };
   }
 
   private async Task<ListProblemAttemptResponse> _listProblemAttempt(
@@ -198,6 +205,8 @@ public class ProblemAttemptService : BaseService, IProblemAttemptService
     CancellationToken cancellationToken = default
   )
   {
+    var query = _problemAttemptRepository.Table;
+
     if (request.SeasonId != null)
     {
       // TODO: Parallelize to speed things up
@@ -224,77 +233,37 @@ public class ProblemAttemptService : BaseService, IProblemAttemptService
           throw new KeyNotFoundException(Messages.Season.DoesNotExist);
         }
       }
+
+      query = query.Where(p => p.Enrollment.SeasonId == request.SeasonId);
     }
 
-    // Build the query with includes
-    Func<IQueryable<ProblemAttemptEntity>, IQueryable<ProblemAttemptEntity>> includeFunc = query =>
+    if (request.IncludeLeetcode)
     {
-      if (request.SeasonId != null)
-      {
-        query = query.Where(p => p.Enrollment.SeasonId == request.SeasonId);
-      }
-
-      if (request.IncludeLeetcode)
-      {
-        query = query
-          .Include(p => p.LeetcodeProblem)
-          .ThenInclude(l => l.LeetcodeProblemCategories)
-          .Include(p => p.LeetcodeProblem)
-          .ThenInclude(l => l.Problem);
-      }
-
-      if (request.IncludeCustom)
-      {
-        query = query.Include(p => p.CustomProblem).ThenInclude(c => c.Problem);
-      }
-
       query = query
-        .Include(e => e.User)
-        .Include(e => e.Enrollment)
-        .ThenInclude(e => e.Season)
-        .Include(e => e.SeasonWeek);
-
-      return query;
-    };
-
-    // Check if pagination is requested
-    var isPaginated = request.Page.HasValue && request.PageSize.HasValue;
-
-    if (isPaginated)
-    {
-      // Use GetPagedAsync for pagination
-      var (items, totalCount) = await _problemAttemptRepository.GetPagedAsync(
-        page: request.Page!.Value,
-        pageSize: request.PageSize!.Value,
-        predicate: p => request.UserIds.Contains(p.User.UserId),
-        orderBy: q => q.OrderByDescending(p => p.AttemptStartDateUtc),
-        include: includeFunc,
-        cancellationToken: cancellationToken
-      );
-
-      var pagedResponse = RSPWebAPI.Shared.PagedResponse<ProblemAttemptEntity>.Create(
-        items.ToList(),
-        totalCount,
-        request.Page.Value,
-        request.PageSize.Value
-      );
-
-      return new ListProblemAttemptResponse { Result = pagedResponse };
+        .Include(p => p.LeetcodeProblem)
+        .ThenInclude(l => l.LeetcodeProblemCategories)
+        .Include(p => p.LeetcodeProblem)
+        .ThenInclude(l => l.Problem);
     }
-    else
+
+    if (request.IncludeCustom)
     {
-      // Return all results without pagination
-      var allAttempts = await GetAllProblemAttemptsAsync(
-        predicate: p => request.UserIds.Contains(p.User.UserId),
-        cancellationToken: cancellationToken,
-        include: includeFunc
-      );
-
-      // Sort by attempt date descending
-      var sortedAttempts = allAttempts.OrderByDescending(p => p.AttemptStartDateUtc).ToList();
-
-      return new ListProblemAttemptResponse { ProblemAttempts = sortedAttempts };
+      query = query.Include(p => p.CustomProblem).ThenInclude(c => c.Problem);
     }
+
+    query = query
+      .Include(e => e.User)
+      .Include(e => e.Enrollment)
+      .ThenInclude(e => e.Season)
+      .Include(e => e.SeasonWeek);
+
+    var problemAttempts = await _problemAttemptRepository.GetAllAsync(
+      p => request.UserIds.Contains(p.User.UserId),
+      cancellationToken,
+      _ => query
+    );
+
+    return new ListProblemAttemptResponse { ProblemAttempts = problemAttempts.ToList() };
   }
 
   public async Task<UpdateProblemAttemptResponse> UpdateProblemAttempt(

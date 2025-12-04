@@ -44,21 +44,15 @@ export const LeetcodeTable = ({
   enableEditing,
   showAuthor,
   showCategory = true,
-  totalCount = 0,
-  currentPage = 1,
-  pageSize: propPageSize = 10,
-  onPageChange,
-  onPageSizeChange,
-  isLoadingAttempts = false,
 }: LeetcodeTableProps) => {
   const [pageSize, setPageSize] = useLocalStorage({
     key: 'page-size',
-    defaultValue: propPageSize,
+    defaultValue: 10,
     getInitialValueInEffect: false,
   });
 
   const [pagination, setPagination] = useState({
-    pageIndex: currentPage - 1, // Mantine uses 0-indexed, backend uses 1-indexed
+    pageIndex: 0,
     pageSize,
   });
 
@@ -230,23 +224,11 @@ export const LeetcodeTable = ({
     columns,
     data: problemAttempts ?? [],
     ...getMantineTablePropsWithBanner(classes.table, isLoadingLeetcodeProblemsError),
-    manualPagination: true,
-    rowCount: totalCount,
     createDisplayMode: 'modal',
     onPaginationChange: (updater) => {
       const next = typeof updater === 'function' ? updater(pagination) : updater;
       setPageSize(next.pageSize);
       setPagination(next);
-
-      // Notify parent of page change (Mantine uses 0-indexed, backend uses 1-indexed)
-      if (onPageChange && next.pageIndex !== pagination.pageIndex) {
-        onPageChange(next.pageIndex + 1);
-      }
-
-      // Notify parent of page size change
-      if (onPageSizeChange && next.pageSize !== pagination.pageSize) {
-        onPageSizeChange(next.pageSize);
-      }
     },
     editDisplayMode: 'modal',
     enableEditing,
@@ -309,13 +291,13 @@ export const LeetcodeTable = ({
       ),
     state: {
       pagination,
-      isLoading: isLoadingLeetcodeProblems || isLoadingAttempts,
+      isLoading: isLoadingLeetcodeProblems,
       isSaving:
         isCreatingProblemAttemptStatus === 'pending' ||
         isUpdatingProblemAttemptStatus === 'pending' ||
         isDeletingProblemAttemptStatus === 'pending',
       showAlertBanner: isLoadingLeetcodeProblemsError,
-      showProgressBars: isFetchingLeetcodeProblems || isLoadingAttempts,
+      showProgressBars: isFetchingLeetcodeProblems,
     },
   });
 
@@ -331,10 +313,4 @@ type LeetcodeTableProps = {
   enableEditing: boolean;
   showAuthor: boolean;
   showCategory: boolean;
-  totalCount?: number;
-  currentPage?: number;
-  pageSize?: number;
-  onPageChange?: (page: number) => void;
-  onPageSizeChange?: (pageSize: number) => void;
-  isLoadingAttempts?: boolean;
 };
