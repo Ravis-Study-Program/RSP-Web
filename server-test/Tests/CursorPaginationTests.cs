@@ -10,6 +10,7 @@ using RSPWebAPI.Features.Seasons.Interfaces;
 using RSPWebAPI.Features.SeasonWeeks.Interfaces;
 using RSPWebAPI.Features.Users.Interfaces;
 using RSPWebAPI.Tests.Shared;
+using server.Shared;
 using Xunit;
 
 namespace RSPWebAPI.Tests.Tests
@@ -65,13 +66,13 @@ namespace RSPWebAPI.Tests.Tests
 
       // Act: Get first page (pageSize = 2)
       var page1Result = await MockInterviewRepository.GetPagedWithCursorAsync(
-        pageSize: 2,
-        predicate: null,
-        orderBy: query =>
-          query.OrderByDescending(m => m.CreatedAtUtc).ThenByDescending(m => m.MockInterviewId),
-        cursorSelector: entity => (entity.CreatedAtUtc, entity.MockInterviewId),
-        cursor: null,
-        forward: true
+        new CursorPaginationOptions<MockInterviewEntity>
+        {
+          PageSize = 2,
+          Predicate = null,
+          Cursor = null,
+          Forward = true
+        }
       );
 
       // Assert Page 1
@@ -85,13 +86,13 @@ namespace RSPWebAPI.Tests.Tests
 
       // Act: Get second page using cursor
       var page2Result = await MockInterviewRepository.GetPagedWithCursorAsync(
-        pageSize: 2,
-        predicate: null,
-        orderBy: query =>
-          query.OrderByDescending(m => m.CreatedAtUtc).ThenByDescending(m => m.MockInterviewId),
-        cursorSelector: entity => (entity.CreatedAtUtc, entity.MockInterviewId),
-        cursor: cursorForPage2,
-        forward: true
+        new CursorPaginationOptions<MockInterviewEntity>
+        {
+          PageSize = 2,
+          Predicate = null,
+          Cursor = cursorForPage2,
+          Forward = true
+        }
       );
 
       // Assert Page 2
@@ -110,13 +111,13 @@ namespace RSPWebAPI.Tests.Tests
 
       // Act: Get third page (should have 1 remaining item)
       var page3Result = await MockInterviewRepository.GetPagedWithCursorAsync(
-        pageSize: 2,
-        predicate: null,
-        orderBy: query =>
-          query.OrderByDescending(m => m.CreatedAtUtc).ThenByDescending(m => m.MockInterviewId),
-        cursorSelector: entity => (entity.CreatedAtUtc, entity.MockInterviewId),
-        cursor: cursorForPage3,
-        forward: true
+        new CursorPaginationOptions<MockInterviewEntity>
+        {
+          PageSize = 2,
+          Predicate = null,
+          Cursor = cursorForPage3,
+          Forward = true
+        }
       );
 
       // Assert Page 3
@@ -147,26 +148,26 @@ namespace RSPWebAPI.Tests.Tests
 
       // Navigate forward to page 2 first
       var page1Result = await MockInterviewRepository.GetPagedWithCursorAsync(
-        pageSize: 2,
-        predicate: null,
-        orderBy: query =>
-          query.OrderByDescending(m => m.CreatedAtUtc).ThenByDescending(m => m.MockInterviewId),
-        cursorSelector: entity => (entity.CreatedAtUtc, entity.MockInterviewId),
-        cursor: null,
-        forward: true
+        new CursorPaginationOptions<MockInterviewEntity>
+        {
+          PageSize = 2,
+          Predicate = null,
+          Cursor = null,
+          Forward = true
+        }
       );
 
       var lastItemPage1 = page1Result.Items.Last();
       var cursorForPage2 = (lastItemPage1.CreatedAtUtc, lastItemPage1.MockInterviewId);
 
       var page2Result = await MockInterviewRepository.GetPagedWithCursorAsync(
-        pageSize: 2,
-        predicate: null,
-        orderBy: query =>
-          query.OrderByDescending(m => m.CreatedAtUtc).ThenByDescending(m => m.MockInterviewId),
-        cursorSelector: entity => (entity.CreatedAtUtc, entity.MockInterviewId),
-        cursor: cursorForPage2,
-        forward: true
+        new CursorPaginationOptions<MockInterviewEntity>
+        {
+          PageSize = 2,
+          Predicate = null,
+          Cursor = cursorForPage2,
+          Forward = true
+        }
       );
 
       // Get the cursor from the first item of page 2 for backward navigation
@@ -175,13 +176,13 @@ namespace RSPWebAPI.Tests.Tests
 
       // Act: Navigate backward from page 2
       var backwardResult = await MockInterviewRepository.GetPagedWithCursorAsync(
-        pageSize: 2,
-        predicate: null,
-        orderBy: query =>
-          query.OrderByDescending(m => m.CreatedAtUtc).ThenByDescending(m => m.MockInterviewId),
-        cursorSelector: entity => (entity.CreatedAtUtc, entity.MockInterviewId),
-        cursor: cursorForBackward,
-        forward: false
+        new CursorPaginationOptions<MockInterviewEntity>
+        {
+          PageSize = 2,
+          Predicate = null,
+          Cursor = cursorForBackward,
+          Forward = false
+        }
       );
 
       // Assert: Backward navigation returns page 1 items in correct DESC order
