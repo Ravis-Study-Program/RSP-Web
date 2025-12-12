@@ -2,6 +2,7 @@ using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using RSPWebAPI.Common.Interfaces;
 using RSPWebAPI.Entities.Interfaces;
+using server.Shared;
 
 namespace RSPWebAPI.Common;
 
@@ -79,82 +80,78 @@ public class EntityRepository<TEntity> : IRepository<TEntity>
       : await query.Where(predicate).FirstOrDefaultAsync(cancellationToken);
   }
 
-  public async Task<(IList<TEntity> Items, bool HasMore, bool HasPrevious)> GetPagedWithCursorAsync(
-    int pageSize,
-    Expression<Func<TEntity, bool>>? predicate,
-    Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy,
-    Func<TEntity, (DateTime timestamp, string id)> cursorSelector,
-    (DateTime timestamp, string id)? cursor = null,
-    bool forward = true,
-    Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null,
+  public async Task<PaginatedResponse<TEntity>> GetPagedWithCursorAsync(
+    CursorPaginationOptions<TEntity> options,
     CancellationToken cancellationToken = default
   )
   {
-    ArgumentNullException.ThrowIfNull(orderBy);
-    ArgumentNullException.ThrowIfNull(cursorSelector);
+    ArgumentNullException.ThrowIfNull(options);
 
     IQueryable<TEntity> query = TableNoTracking;
 
     // Apply includes for related data
-    if (include != null)
+    if (options.Include != null)
     {
-      query = include(query);
+      query = options.Include(query);
     }
 
     // Apply filtering
-    if (predicate != null)
+    if (options.Predicate != null)
     {
-      query = query.Where(predicate);
+      query = query.Where(options.Predicate);
     }
 
     // Apply cursor filtering if provided
-    if (cursor.HasValue)
+    if (options.Cursor.HasValue)
     {
-      var cursorTimestamp = cursor.Value.timestamp;
-      var cursorId = cursor.Value.id;
+      var cursorTimestamp = options.Cursor.Value.timestamp;
+      var cursorId = options.Cursor.Value.id;
 
-      if (forward)
+      if (options.Forward)
       {
-        // Forward: WHERE (timestamp < cursor) OR (timestamp = cursor AND id < cursor.id)
-        // For DESC order, this gets older items
+        // Forward pagination with DESC ordering: get items older than cursor
+        // WHERE (timestamp < cursor) OR (timestamp = cursor AND id < cursor.id)
         query = query.Where(entity =>
-          EF.Property<DateTime>(entity, "CreatedAtUtc") < cursorTimestamp ||
-          (EF.Property<DateTime>(entity, "CreatedAtUtc") == cursorTimestamp &&
+          EF.Property<DateTime>(entity, CursorPaginationConstants.TimestampPropertyName) < cursorTimestamp ||
+          (EF.Property<DateTime>(entity, CursorPaginationConstants.TimestampPropertyName) == cursorTimestamp &&
            string.Compare(EF.Property<string>(entity, GetIdPropertyName()), cursorId) < 0)
         );
       }
       else
       {
-        // Backward: WHERE (timestamp > cursor) OR (timestamp = cursor AND id > cursor.id)
-        // For DESC order, this gets newer items
+        // Backward pagination with DESC ordering: get items newer than cursor
+        // WHERE (timestamp > cursor) OR (timestamp = cursor AND id > cursor.id)
         query = query.Where(entity =>
-          EF.Property<DateTime>(entity, "CreatedAtUtc") > cursorTimestamp ||
-          (EF.Property<DateTime>(entity, "CreatedAtUtc") == cursorTimestamp &&
+          EF.Property<DateTime>(entity, CursorPaginationConstants.TimestampPropertyName) > cursorTimestamp ||
+          (EF.Property<DateTime>(entity, CursorPaginationConstants.TimestampPropertyName) == cursorTimestamp &&
            string.Compare(EF.Property<string>(entity, GetIdPropertyName()), cursorId) > 0)
         );
       }
     }
 
-    // Apply ordering
-    if (forward)
+    // Apply ordering: DESC on timestamp, then DESC on primary key
+    if (options.Forward)
     {
-      // Forward: use normal ordering (DESC)
-      query = orderBy(query);
+      // Forward: normal DESC ordering
+      query = query
+        .OrderByDescending(e => EF.Property<DateTime>(e, CursorPaginationConstants.TimestampPropertyName))
+        .ThenByDescending(e => EF.Property<string>(e, GetIdPropertyName()));
     }
     else
     {
-      // Backward: reverse ordering (ASC) to get items before cursor
-      query = query.OrderBy(e => EF.Property<DateTime>(e, "CreatedAtUtc"))
-                   .ThenBy(e => EF.Property<string>(e, GetIdPropertyName()));
+      // Backward: ASC ordering (will be reversed later to maintain DESC result order)
+      query = query
+        .OrderBy(e => EF.Property<DateTime>(e, CursorPaginationConstants.TimestampPropertyName))
+        .ThenBy(e => EF.Property<string>(e, GetIdPropertyName()));
     }
 
     // Fetch pageSize + 1 to determine if there are more items
     var items = await query
-      .Take(pageSize + 1)
+      .Take(options.PageSize + 1)
       .ToListAsync(cancellationToken);
 
     // Check if there are more items
-    var hasMore = items.Count > pageSize;
+    var hasMore = items.Count > options.PageSize;
 
     // Remove the extra item if present
     if (hasMore)
@@ -163,20 +160,25 @@ public class EntityRepository<TEntity> : IRepository<TEntity>
     }
 
     // Reverse results if going backward (to maintain DESC order)
-    if (!forward)
+    if (!options.Forward)
     {
       items.Reverse();
     }
 
     // HasPrevious is true if we have a cursor (not first page)
-    var hasPrevious = cursor.HasValue;
+    var hasPrevious = options.Cursor.HasValue;
 
-    return (items, hasMore, hasPrevious);
+    return new PaginatedResponse<TEntity>
+    {
+      Items = items,
+      HasMore = hasMore,
+      HasPrevious = hasPrevious
+    };
   }
 
   private string GetIdPropertyName()
   {
-    var keyProperty = _dbSet.EntityType.FindPrimaryKey()?.Properties.FirstOrDefault()?.Name;
+    var keyProperty = _dbSet.EntityType.FindPrimaryKey()?.GetName();
     if (keyProperty == null)
     {
       throw new InvalidOperationException("No primary key defined for the entity.");

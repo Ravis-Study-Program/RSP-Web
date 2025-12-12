@@ -58,7 +58,7 @@ public class MockInterviewController : BaseController
     // Use cursor pagination if Cursor or PageSize is specified
     if (!string.IsNullOrEmpty(request.Cursor) || request.PageSize.HasValue)
     {
-      var cursorResult = await _mockInterviewService.ListMockInterviewWithCursor(request, cancellationToken);
+      var cursorResult = await _mockInterviewService.ListPaginatedMockInterview(request, cancellationToken);
       return Ok(new ApiResponse<ListMockInterviewCursorResponse> { ResponseBody = cursorResult, SuccessMessage = Messages.MockInterview.Listed });
     }
 

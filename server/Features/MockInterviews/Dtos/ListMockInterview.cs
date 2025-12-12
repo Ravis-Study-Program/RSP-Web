@@ -36,7 +36,7 @@ public record ListMockInterviewRequest
   /// Number of items to return per page. Defaults to 10 if not specified.
   /// Maximum value is 100.
   /// </summary>
-  public int? PageSize { get; set; }
+  public int PageSize { get; set; } = 10;
 }
 
 public record ListMockInterviewResponse
@@ -60,9 +60,9 @@ public class ListMockInterviewRequestValidator : AbstractValidator<ListMockInter
     RuleFor(c => c.UserIds).NotEmpty().WithMessage("At least one user Id must be provided.");
 
     RuleFor(c => c.PageSize)
-      .GreaterThan(0).When(c => c.PageSize.HasValue)
+      .GreaterThan(0)
       .WithMessage("PageSize must be greater than 0.")
-      .LessThanOrEqualTo(100).When(c => c.PageSize.HasValue)
+      .LessThanOrEqualTo(100)
       .WithMessage("PageSize cannot exceed 100.");
 
     RuleFor(c => c.Cursor)

@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using server.Shared;
 
 namespace RSPWebAPI.Common.Interfaces;
 
@@ -30,23 +31,11 @@ public interface IRepository<TEntity>
   /// <summary>
   /// Gets a cursor-based paginated result for efficient sequential navigation
   /// </summary>
-  /// <param name="pageSize">Number of items to return</param>
-  /// <param name="predicate">Optional filter predicate</param>
-  /// <param name="orderBy">Ordering function (must match cursor fields)</param>
-  /// <param name="cursorSelector">Function to extract cursor values (timestamp, id) from entity</param>
-  /// <param name="cursor">Optional cursor for pagination (timestamp, id). Null returns first page</param>
-  /// <param name="forward">True for forward pagination, False for backward pagination</param>
-  /// <param name="include">Optional related data to include</param>
+  /// <param name="options">Cursor pagination options including page size, filtering, ordering, and navigation</param>
   /// <param name="cancellationToken">Cancellation token</param>
-  /// <returns>Tuple of (items, hasMore, hasPrevious)</returns>
-  Task<(IList<TEntity> Items, bool HasMore, bool HasPrevious)> GetPagedWithCursorAsync(
-    int pageSize,
-    Expression<Func<TEntity, bool>>? predicate,
-    Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy,
-    Func<TEntity, (DateTime timestamp, string id)> cursorSelector,
-    (DateTime timestamp, string id)? cursor = null,
-    bool forward = true,
-    Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null,
+  /// <returns>Paginated response containing items and navigation metadata</returns>
+  Task<PaginatedResponse<TEntity>> GetPagedWithCursorAsync(
+    CursorPaginationOptions<TEntity> options,
     CancellationToken cancellationToken = default
   );
 

@@ -49,7 +49,7 @@ public interface IMockInterviewService
     CancellationToken cancellationToken = default
   );
 
-  Task<ListMockInterviewCursorResponse> ListMockInterviewWithCursor(
+  Task<ListMockInterviewCursorResponse> ListPaginatedMockInterview(
     ListMockInterviewRequest request,
     CancellationToken cancellationToken = default
   );

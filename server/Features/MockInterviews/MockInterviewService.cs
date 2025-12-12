@@ -1,6 +1,4 @@
 using System.Linq.Expressions;
-using System.Text;
-using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using RSPWebAPI.Common;
 using RSPWEBAPI.Common.Cache;
@@ -217,52 +215,50 @@ public class MockInterviewService : BaseService, IMockInterviewService
     return new ListMockInterviewResponse { MockInterviews = allMockInterviews };
   }
 
-  public async Task<ListMockInterviewCursorResponse> ListMockInterviewWithCursor(
+  public async Task<ListMockInterviewCursorResponse> ListPaginatedMockInterview(
     ListMockInterviewRequest request,
     CancellationToken cancellationToken = default
   )
   {
-    var pageSize = request.PageSize ?? 10; // Default to 10
-    var cursor = ParseCursor(request.Cursor);
+    var cursor = Cursor.Parse(request.Cursor);
 
-    // Build the query with includes
-    var includeFunc = BuildIncludeQuery(request);
-
-    // Build the predicate
-    var predicate = BuildPredicate(request);
+    // Create cursor pagination options
+    // Note: Ordering is handled by the repository (CreatedAtUtc DESC, then primary key DESC)
+    var options = new CursorPaginationOptions<MockInterviewEntity>
+    {
+      PageSize = request.PageSize,
+      Predicate = BuildPredicate(request),
+      Cursor = cursor,
+      Forward = request.Forward,
+      Include = BuildIncludeQuery(request)
+    };
 
     // Call repository with cursor pagination
-    var (items, hasMore, hasPrevious) = await _mockInterviewRepository.GetPagedWithCursorAsync(
-      pageSize: pageSize,
-      predicate: predicate,
-      orderBy: q => q.OrderByDescending(m => m.CreatedAtUtc).ThenByDescending(m => m.MockInterviewId),
-      cursorSelector: entity => (entity.CreatedAtUtc, entity.MockInterviewId),
-      cursor: cursor,
-      forward: request.Forward,
-      include: includeFunc,
-      cancellationToken: cancellationToken
+    var response = await _mockInterviewRepository.GetPagedWithCursorAsync(
+      options,
+      cancellationToken
     );
 
     // Build next cursor from last item
     string? nextCursor = null;
-    if (hasMore && items.Count > 0)
+    if (response.HasMore && response.Items.Count > 0)
     {
-      var lastItem = items.Last();
-      nextCursor = EncodeCursor(lastItem.CreatedAtUtc, lastItem.MockInterviewId);
+      var lastItem = response.Items.Last();
+      nextCursor = Cursor.Encode(lastItem.CreatedAtUtc, lastItem.MockInterviewId);
     }
     string? previousCursor = null;
-    if (hasPrevious && items.Count > 0)
+    if (response.HasPrevious && response.Items.Count > 0)
     {
-      var firstItem = items.First();
-      previousCursor = EncodeCursor(firstItem.CreatedAtUtc, firstItem.MockInterviewId);
+      var firstItem = response.Items.First();
+      previousCursor = Cursor.Encode(firstItem.CreatedAtUtc, firstItem.MockInterviewId);
     }
 
     return new ListMockInterviewCursorResponse
     {
-      Items = items.ToList(),
+      Items = response.Items.ToList(),
       NextCursor = nextCursor,
       PreviousCursor = previousCursor,
-      HasMore = hasMore
+      HasMore = response.HasMore
     };
   }
 
@@ -310,37 +306,6 @@ public class MockInterviewService : BaseService, IMockInterviewService
 
       return query;
     };
-  }
-
-  private (DateTime timestamp, string id)? ParseCursor(string? cursorString)
-  {
-    if (string.IsNullOrEmpty(cursorString))
-      return null;
-
-    try
-    {
-      var json = Encoding.UTF8.GetString(Convert.FromBase64String(cursorString));
-      var cursor = JsonSerializer.Deserialize<Cursor>(json);
-      if (cursor == null)
-        return null;
-
-      return (cursor.CreatedAtUtc, cursor.Id);
-    }
-    catch
-    {
-      return null; // Invalid cursor, treat as first page
-    }
-  }
-
-  private string EncodeCursor(DateTime timestamp, string id)
-  {
-    var cursor = new Cursor
-    {
-      CreatedAtUtc = timestamp,
-      Id = id
-    };
-    var json = JsonSerializer.Serialize(cursor);
-    return Convert.ToBase64String(Encoding.UTF8.GetBytes(json));
   }
 
   private async Task<ListMockInterviewResponse> _listMockInterview(
