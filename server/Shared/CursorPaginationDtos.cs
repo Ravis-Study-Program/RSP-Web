@@ -36,11 +36,11 @@ public record Cursor
     public string Id { get; init; } = string.Empty;
 
     /// <summary>
-    /// Parses a base64-encoded cursor string into a tuple of (timestamp, id).
+    /// Parses a base64-encoded cursor string into a Cursor object.
     /// </summary>
     /// <param name="cursorString">The base64-encoded cursor string</param>
-    /// <returns>A tuple of (DateTime, string) if valid, null otherwise</returns>
-    public static (DateTime timestamp, string id)? Parse(string? cursorString)
+    /// <returns>A Cursor object if valid, null otherwise</returns>
+    public static Cursor? Parse(string? cursorString)
     {
         if (string.IsNullOrEmpty(cursorString))
             return null;
@@ -48,11 +48,7 @@ public record Cursor
         try
         {
             var json = Encoding.UTF8.GetString(Convert.FromBase64String(cursorString));
-            var cursor = JsonSerializer.Deserialize<Cursor>(json);
-            if (cursor == null)
-                return null;
-
-            return (cursor.CreatedAtUtc, cursor.Id);
+            return JsonSerializer.Deserialize<Cursor>(json);
         }
         catch
         {
