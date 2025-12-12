@@ -178,7 +178,7 @@ public class EntityRepository<TEntity> : IRepository<TEntity>
 
   private string GetIdPropertyName()
   {
-    var keyProperty = _dbSet.EntityType.FindPrimaryKey()?.GetName();
+    var keyProperty = _dbSet.EntityType.FindPrimaryKey()?.Properties.FirstOrDefault()?.Name;
     if (keyProperty == null)
     {
       throw new InvalidOperationException("No primary key defined for the entity.");
