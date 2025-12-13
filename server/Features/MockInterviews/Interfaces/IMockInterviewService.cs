@@ -49,6 +49,11 @@ public interface IMockInterviewService
     CancellationToken cancellationToken = default
   );
 
+  Task<ListMockInterviewCursorResponse> ListPaginatedMockInterview(
+    ListMockInterviewRequest request,
+    CancellationToken cancellationToken = default
+  );
+
   Task<UpdateMockInterviewResponse> UpdateMockInterview(
     UpdateMockInterviewRequest request,
     CancellationToken cancellationToken = default

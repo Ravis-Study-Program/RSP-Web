@@ -3,7 +3,7 @@ using RSPWebAPI.Entities;
 
 namespace RSPWebAPI.Features.Leetcode.Dtos;
 
-public record ListLeetcodeProblemsRequest { };
+public record ListLeetcodeProblemsRequest { }
 
 public class ListLeetcodeProblemsResponse
 {

@@ -12,6 +12,7 @@ using RSPWebAPI.Features.MockInterviews.Dtos;
 using RSPWebAPI.Features.MockInterviews.Interfaces;
 using RSPWebAPI.Features.SeasonWeeks.Interfaces;
 using RSPWebAPI.Features.Users.Interfaces;
+using server.Shared;
 
 namespace RSPWebAPI.Features.MockInterviews;
 
@@ -212,6 +213,97 @@ public class MockInterviewService : BaseService, IMockInterviewService
     }
 
     return new ListMockInterviewResponse { MockInterviews = allMockInterviews };
+  }
+
+  public async Task<ListMockInterviewCursorResponse> ListPaginatedMockInterview(
+    ListMockInterviewRequest request,
+    CancellationToken cancellationToken = default
+  )
+  {
+    var cursor = Cursor.Parse(request.Cursor);
+
+    var options = new CursorPaginationOptions<MockInterviewEntity>
+    {
+      PageSize = request.PageSize,
+      Predicate = BuildPredicate(request),
+      Cursor = cursor,
+      Forward = request.Forward,
+      Include = BuildIncludeQuery(request)
+    };
+
+    // Call repository with cursor pagination
+    var response = await _mockInterviewRepository.GetPagedWithCursorAsync(
+      options,
+      cancellationToken
+    );
+
+    // Build next cursor from last item
+    string? nextCursor = null;
+    if (response.HasMore && response.Items.Count > 0)
+    {
+      var lastItem = response.Items.Last();
+      nextCursor = Cursor.Encode(lastItem.CreatedAtUtc, lastItem.MockInterviewId);
+    }
+    string? previousCursor = null;
+    if (response.HasPrevious && response.Items.Count > 0)
+    {
+      var firstItem = response.Items.First();
+      previousCursor = Cursor.Encode(firstItem.CreatedAtUtc, firstItem.MockInterviewId);
+    }
+
+    return new ListMockInterviewCursorResponse
+    {
+      Items = response.Items.ToList(),
+      NextCursor = nextCursor,
+      PreviousCursor = previousCursor,
+      HasMore = response.HasMore
+    };
+  }
+
+  private Expression<Func<MockInterviewEntity, bool>> BuildPredicate(ListMockInterviewRequest request)
+  {
+    return m =>
+      (request.UserIds.Contains(m.InterviewerUserId) || request.UserIds.Contains(m.IntervieweeUserId))
+      && (string.IsNullOrEmpty(request.SeasonId) || m.SeasonId == request.SeasonId);
+  }
+
+  private Func<IQueryable<MockInterviewEntity>, IQueryable<MockInterviewEntity>> BuildIncludeQuery(
+    ListMockInterviewRequest request
+  )
+  {
+    return query =>
+    {
+      if (request.IncludeBehavioural)
+      {
+        query = query
+          .Include(m => m.MockInterviewRounds)
+          .ThenInclude(mr => mr.BehaviouralMockInterviewRound);
+      }
+
+      if (request.IncludeLeetcode)
+      {
+        query = query
+          .Include(m => m.MockInterviewRounds)
+          .ThenInclude(mr => mr.LeetcodeMockInterviewRound)
+          .ThenInclude(l => l.LeetcodeProblem)
+          .ThenInclude(l => l.Problem);
+      }
+
+      if (request.IncludeCustom)
+      {
+        query = query
+          .Include(m => m.MockInterviewRounds)
+          .ThenInclude(mr => mr.CustomMockInterviewRound);
+      }
+
+      query = query
+        .Include(e => e.Interviewer)
+        .Include(e => e.Interviewee)
+        .Include(e => e.SeasonWeek)
+        .Include(e => e.Season);
+
+      return query;
+    };
   }
 
   private async Task<ListMockInterviewResponse> _listMockInterview(

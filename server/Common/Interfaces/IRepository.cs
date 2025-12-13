@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using server.Shared;
 
 namespace RSPWebAPI.Common.Interfaces;
 
@@ -25,6 +26,17 @@ public interface IRepository<TEntity>
     Expression<Func<TEntity, bool>> predicate,
     CancellationToken cancellationToken = default,
     Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null
+  );
+
+  /// <summary>
+  /// Gets a cursor-based paginated result for efficient sequential navigation
+  /// </summary>
+  /// <param name="options">Cursor pagination options including page size, filtering, ordering, and navigation</param>
+  /// <param name="cancellationToken">Cancellation token</param>
+  /// <returns>Paginated response containing items and navigation metadata</returns>
+  Task<PaginatedResponse<TEntity>> GetPagedWithCursorAsync(
+    CursorPaginationOptions<TEntity> options,
+    CancellationToken cancellationToken = default
   );
 
   Task AddAsync(TEntity entity, CancellationToken cancellationToken = default);

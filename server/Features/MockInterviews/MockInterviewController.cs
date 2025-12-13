@@ -50,12 +50,12 @@ public class MockInterviewController : BaseController
   [ServiceFilter(typeof(AuthAttribute))]
   [Route("get")]
   [ActionName("ListMockInterview")]
-  public async Task<ActionResult<ApiResponse<ListMockInterviewResponse>>> ListMockInterview(
+  public async Task<ActionResult<ApiResponse<ListMockInterviewCursorResponse>>> ListMockInterview(
     [FromQuery] ListMockInterviewRequest request,
     CancellationToken cancellationToken = default
   )
   {
-    var result = await _mockInterviewService.ListMockInterview(request, cancellationToken);
+    var result = await _mockInterviewService.ListPaginatedMockInterview(request, cancellationToken);
     return OkResponse(result, Messages.MockInterview.Listed);
   }
 
