@@ -96,7 +96,7 @@ public record CursorPaginationOptions<TEntity> where TEntity : class
     /// <summary>
     /// Optional cursor for pagination (timestamp, id). Null returns first page.
     /// </summary>
-    public (DateTime timestamp, string id)? Cursor { get; init; }
+    public Cursor? Cursor { get; init; }
 
     /// <summary>
     /// True for forward pagination, False for backward pagination.
