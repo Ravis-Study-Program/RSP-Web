@@ -82,7 +82,11 @@ namespace RSPWebAPI.Tests.Tests
 
       // Get the cursor from the last item of page 1
       var lastItemPage1 = page1Result.Items.Last();
-      var cursorForPage2 = (lastItemPage1.CreatedAtUtc, lastItemPage1.MockInterviewId);
+      var cursorForPage2 = new Cursor
+      {
+        CreatedAtUtc = lastItemPage1.CreatedAtUtc,
+        Id = lastItemPage1.MockInterviewId
+      };
 
       // Act: Get second page using cursor
       var page2Result = await MockInterviewRepository.GetPagedWithCursorAsync(
@@ -107,7 +111,11 @@ namespace RSPWebAPI.Tests.Tests
 
       // Get the cursor from the last item of page 2
       var lastItemPage2 = page2Result.Items.Last();
-      var cursorForPage3 = (lastItemPage2.CreatedAtUtc, lastItemPage2.MockInterviewId);
+      var cursorForPage3 = new Cursor
+      {
+        CreatedAtUtc = lastItemPage2.CreatedAtUtc,
+        Id = lastItemPage2.MockInterviewId
+      };
 
       // Act: Get third page (should have 1 remaining item)
       var page3Result = await MockInterviewRepository.GetPagedWithCursorAsync(
@@ -158,7 +166,11 @@ namespace RSPWebAPI.Tests.Tests
       );
 
       var lastItemPage1 = page1Result.Items.Last();
-      var cursorForPage2 = (lastItemPage1.CreatedAtUtc, lastItemPage1.MockInterviewId);
+      var cursorForPage2 = new Cursor
+      {
+        CreatedAtUtc = lastItemPage1.CreatedAtUtc,
+        Id = lastItemPage1.MockInterviewId
+      };
 
       var page2Result = await MockInterviewRepository.GetPagedWithCursorAsync(
         new CursorPaginationOptions<MockInterviewEntity>
@@ -172,7 +184,11 @@ namespace RSPWebAPI.Tests.Tests
 
       // Get the cursor from the first item of page 2 for backward navigation
       var firstItemPage2 = page2Result.Items.First();
-      var cursorForBackward = (firstItemPage2.CreatedAtUtc, firstItemPage2.MockInterviewId);
+      var cursorForBackward = new Cursor
+      {
+        CreatedAtUtc = firstItemPage2.CreatedAtUtc,
+        Id = firstItemPage2.MockInterviewId
+      };
 
       // Act: Navigate backward from page 2
       var backwardResult = await MockInterviewRepository.GetPagedWithCursorAsync(

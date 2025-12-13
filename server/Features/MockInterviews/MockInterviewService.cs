@@ -226,7 +226,7 @@ public class MockInterviewService : BaseService, IMockInterviewService
     {
       PageSize = request.PageSize,
       Predicate = BuildPredicate(request),
-      Cursor = cursor != null ? (cursor.CreatedAtUtc, cursor.Id) : null,
+      Cursor = cursor,
       Forward = request.Forward,
       Include = BuildIncludeQuery(request)
     };

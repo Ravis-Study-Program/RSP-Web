@@ -102,10 +102,10 @@ public class EntityRepository<TEntity> : IRepository<TEntity>
     }
 
     // Apply cursor filtering if provided
-    if (options.Cursor.HasValue)
+    if (options.Cursor != null)
     {
-      var cursorTimestamp = options.Cursor.Value.timestamp;
-      var cursorId = options.Cursor.Value.id;
+      var cursorTimestamp = options.Cursor.CreatedAtUtc;
+      var cursorId = options.Cursor.Id;
 
       if (options.Forward)
       {
@@ -166,7 +166,7 @@ public class EntityRepository<TEntity> : IRepository<TEntity>
     }
 
     // HasPrevious is true if we have a cursor (not first page)
-    var hasPrevious = options.Cursor.HasValue;
+    var hasPrevious = options.Cursor != null;
 
     return new PaginatedResponse<TEntity>
     {
