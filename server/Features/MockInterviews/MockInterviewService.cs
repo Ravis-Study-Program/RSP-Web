@@ -222,8 +222,6 @@ public class MockInterviewService : BaseService, IMockInterviewService
   {
     var cursor = Cursor.Parse(request.Cursor);
 
-    // Create cursor pagination options
-    // Note: Ordering is handled by the repository (CreatedAtUtc DESC, then primary key DESC)
     var options = new CursorPaginationOptions<MockInterviewEntity>
     {
       PageSize = request.PageSize,
