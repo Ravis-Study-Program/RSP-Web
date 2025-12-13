@@ -55,7 +55,6 @@ public class MockInterviewController : BaseController
     CancellationToken cancellationToken = default
   )
   {
-    // Always use cursor pagination
     var result = await _mockInterviewService.ListPaginatedMockInterview(request, cancellationToken);
     return OkResponse(result, Messages.MockInterview.Listed);
   }
