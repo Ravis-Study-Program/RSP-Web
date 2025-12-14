@@ -50,7 +50,21 @@ public class MockInterviewController : BaseController
   [ServiceFilter(typeof(AuthAttribute))]
   [Route("get")]
   [ActionName("ListMockInterview")]
-  public async Task<ActionResult<ApiResponse<ListMockInterviewCursorResponse>>> ListMockInterview(
+  [Obsolete("Use the get-paginated route instead.")]
+  public async Task<ActionResult<ApiResponse<ListMockInterviewResponse>>> ListMockInterview(
+    [FromQuery] ListMockInterviewRequest request,
+    CancellationToken cancellationToken = default
+  )
+  {
+    var result = await _mockInterviewService.ListMockInterview(request, cancellationToken);
+    return OkResponse(result, Messages.MockInterview.Listed);
+  }
+
+  [HttpGet]
+  [ServiceFilter(typeof(AuthAttribute))]
+  [Route("get-paginated")]
+  [ActionName("ListPaginatedMockInterview")]
+  public async Task<ActionResult<ApiResponse<ListMockInterviewCursorResponse>>> ListPaginatedMockInterview(
     [FromQuery] ListMockInterviewRequest request,
     CancellationToken cancellationToken = default
   )
