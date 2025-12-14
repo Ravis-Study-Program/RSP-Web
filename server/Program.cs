@@ -1,6 +1,8 @@
+using System.Globalization;
 using System.Security.Claims;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Threading.RateLimiting;
 using Carter;
 using DotNetEnv;
 using FluentValidation;
@@ -11,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Prometheus;
+using static RSPWebAPI.Database.Constants;
 using RSPWebAPI.Clients.Interfaces;
 using RSPWebAPI.Common;
 using RSPWebAPI.Common.Auth;
@@ -188,12 +191,55 @@ builder.Services.AddScoped<IUserIdentityService, UserIdentityService>();
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 
+// Add rate limiting
+builder.Services.AddRateLimiter(options =>
+{
+  // Global limiter - applies to all endpoints automatically
+  options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
+  {
+    // Use Auth0 custom claim from UserClaimsTransformation
+    // This matches GetCurrentUserId() in BaseController
+    var partitionKey = context.User.Identity?.IsAuthenticated == true
+      ? context.User.FindFirst($"{Domain}userId")?.Value ?? "authenticated-unknown"
+      : "anonymous";
+
+    return RateLimitPartition.GetFixedWindowLimiter(
+      partitionKey: partitionKey,
+      factory: _ => new FixedWindowRateLimiterOptions
+      {
+        PermitLimit = 100,
+        Window = TimeSpan.FromMinutes(1),
+        QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+        QueueLimit = 10,
+        AutoReplenishment = true
+      }
+    );
+  });
+
+  options.OnRejected = async (context, cancellationToken) =>
+  {
+    context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+
+    if (context.Lease.TryGetMetadata(MetadataName.RetryAfter, out var retryAfter))
+    {
+      context.HttpContext.Response.Headers.RetryAfter =
+        ((int)retryAfter.TotalSeconds).ToString(NumberFormatInfo.InvariantInfo);
+    }
+
+    await context.HttpContext.Response.WriteAsJsonAsync(
+      new ApiResponse<object> { Error = new ApiError("Too many requests. Please try again later.") },
+      cancellationToken
+    );
+  };
+});
+
 var app = builder.Build();
 
 // app.UseMiddleware<RequestLoggingMiddleware>();
 app.UseMiddleware<GlobalExceptionHandlingMiddleware>();
 
 app.UseRouting();
+app.UseRateLimiter();
 app.MapControllers();
 app.UseCors("CorsPolicy");
 
