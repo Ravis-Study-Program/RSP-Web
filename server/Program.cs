@@ -191,7 +191,6 @@ builder.Services.AddScoped<IUserIdentityService, UserIdentityService>();
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 
-// Add rate limiting
 builder.Services.AddRateLimiter(options =>
 {
   // Global limiter - applies to all endpoints automatically
