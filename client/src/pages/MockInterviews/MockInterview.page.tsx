@@ -107,13 +107,8 @@ export default function MockInterviewPage() {
             filter={createOptionsFilter()}
             miw={200}
             nothingFoundMessage="Nothing found..."
-            value={(selectedMockInterviewsPreset ?? MockInterviewsPreset.All).toString()}
-            clearable
+            value={selectedMockInterviewsPreset.toString()}
             onChange={(value) => {
-              if (value === null || value === '') {
-                setSelectedMockInterviewsPreset(MockInterviewsPreset.All);
-                return;
-              }
               setSelectedMockInterviewsPreset(value as MockInterviewsPreset);
             }}
           />
