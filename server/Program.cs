@@ -238,12 +238,14 @@ var app = builder.Build();
 app.UseMiddleware<GlobalExceptionHandlingMiddleware>();
 
 app.UseRouting();
-app.UseRateLimiter();
+
 app.MapControllers();
 app.UseCors("CorsPolicy");
 
 app.UseHttpsRedirection();
 app.UseAuthentication();
+
+app.UseRateLimiter();
 
 if (app.Environment.IsDevelopment())
 {
