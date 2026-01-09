@@ -108,7 +108,6 @@ export default function MockInterviewPage() {
             miw={200}
             nothingFoundMessage="Nothing found..."
             value={selectedMockInterviewsPreset.toString()}
-            clearable
             onChange={(value) => {
               setSelectedMockInterviewsPreset(value as MockInterviewsPreset);
             }}
