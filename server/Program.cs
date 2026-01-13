@@ -158,6 +158,7 @@ var env = builder.Environment;
 if (!env.IsDevelopment())
 {
   builder.Services.AddHostedService<LeetcodeQuestionScraper>();
+  builder.Services.AddHostedService<AuditLogCleaner>();
   builder.Services.AddHostedService<UpdateGraduateStatusService>();
 }
 builder.Services.AddScoped<DbContext, ApplicationDbContext>();
