@@ -199,7 +199,6 @@ app.UseCors("CorsPolicy");
 app.UseHttpsRedirection();
 app.UseAuthentication();
 
-app.UseRateLimiter();
 app.MapControllers();
 
 if (app.Environment.IsDevelopment())
